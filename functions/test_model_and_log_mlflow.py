@@ -47,6 +47,9 @@ def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_
     # Log the overall odds metrics in MLflow
     log_metrics_odds_mlflow(actuals_data, actuals_data['target'])
     
+    # Log the parameters of the model
+    mlflow.log_params(model['params'])
+    
     ## Now begin calculating the metrics for the various breakdowns
     
     # Initiate the results dictionary
@@ -97,6 +100,8 @@ def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_
         print(summary_df)
         
         # Save a temporary csv and log it as an artifact
+        # Name the index
+        summary_df.index.name = 'Group'
         summary_df.to_csv('results/temp/summary.csv')
         mlflow.log_artifact('results/temp/summary.csv', col + ' metrics')
         
@@ -104,7 +109,7 @@ def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_
     backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet = 0.5, min_ev_to_bet = 0.05)
     
     # Log the overall backtesting results
-    backtesting.to_csv('results/temp/summary.csv')
+    backtesting.to_csv('results/temp/summary.csv', index = True)
     mlflow.log_artifact('results/temp/summary.csv', 'Backtesting results')
     
     # Log the total metrics in MLflow

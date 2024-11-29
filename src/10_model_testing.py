@@ -59,7 +59,14 @@ data['fighter_history'] = np.where(
                     '6. Both noobs',
                     '4. Other')))))
 
-# data['fighter_history'].value_counts()
+data['favourite'] = np.where(
+    ((data['fighter1_best_closing_odds'] < data['fighter2_best_closing_odds']) & (data['outcome'] == 'W/L')) |
+    ((data['fighter1_best_closing_odds'] > data['fighter2_best_closing_odds']) & (data['outcome'] == 'L/W')),
+    "Favourite win",
+    np.where(~data['outcome'].isin(['W/L', 'L/W']),
+             "Other",
+             "Non-favourite win"
+             ))
 
 ##########################################################################################
 ### Data prep for model ###
@@ -78,7 +85,7 @@ mlflow.set_experiment('final_models_oot_testing')
 ##########################################################################################
 
 # Set which columns and metrics we're interested in
-breakdown_cols = ['weightclass', 'year', 'total_fights', 'fighter_history']
+breakdown_cols = ['weightclass', 'year', 'total_fights', 'fighter_history', 'favourite']
 breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Sample Size']
 target = 'outcome'
 

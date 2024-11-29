@@ -52,8 +52,8 @@ mlflow.set_experiment('2014+_gt3_fights_xgboost_forest_set_5')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.11, # Learning rate
-    'min_child_weight': 8,                 # The min observations that should be left in a leaf node    
+    'learning_rate': 0.15, # Learning rate
+    'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.9,
     'max_depth': 2,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
