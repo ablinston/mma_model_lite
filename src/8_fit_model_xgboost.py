@@ -71,12 +71,12 @@ var_importance = pd.read_csv('./results/shap_feature_importance.csv').sort_value
 
 
 # Remove the bottom 3/4 of importance
-feature_to_remove = var_importance.iloc[500:len(var_importance),]['Feature'].tolist()
+feature_to_remove = var_importance.iloc[200:len(var_importance),]['Feature'].tolist()
 
 X_train = X_train[[col for col in X_train.columns if col not in feature_to_remove]]
 
 # # Remove all features except for differentials
-X_train = X_train[[col for col in X_train.columns if 'diff' in col]]
+# X_train = X_train[[col for col in X_train.columns if 'diff' in col]]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")

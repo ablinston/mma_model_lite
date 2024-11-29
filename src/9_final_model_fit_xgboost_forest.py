@@ -28,7 +28,7 @@ data = standard_data_filter(data)
 ##########################################################################################
 
 # Only select the columns needed for training and the test train split
-data = data[final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'level_0', 'outcome']]
+data = data[final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome']]
 
 
 ##########################################################################################
@@ -113,7 +113,7 @@ for num_trees in [10, 50, 100, 200, 500, 1000, 3000, 5000]:
 final_xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
-    num_models = 500,
+    num_models = 1000,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode,
     subsample = subsample,
@@ -122,6 +122,4 @@ final_xgboost_rf = train_ensemble_xgboost(
     )
 
 # Save the model
-joblib.dump(final_xgboost_rf, './results/final_xgboost_forest.joblib', compress = 0)
-joblib.dump(final_xgboost_rf, './results/final_xgboost_forest.joblib', compress = 5)
 joblib.dump(final_xgboost_rf, './results/final_xgboost_forest.joblib', compress = 9)
