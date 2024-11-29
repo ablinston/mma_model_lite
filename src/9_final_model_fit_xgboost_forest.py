@@ -42,7 +42,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_all_fights_xgboost_forest_set_26')
+mlflow.set_experiment('2014+_gt3_fights_xgboost_forest_set_5')
 
 
 
@@ -52,10 +52,10 @@ mlflow.set_experiment('2014+_all_fights_xgboost_forest_set_26')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.16, # Learning rate
-    'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
-    'subsample': 0.85,
-    'max_depth': 1,
+    'learning_rate': 0.11, # Learning rate
+    'min_child_weight': 8,                 # The min observations that should be left in a leaf node    
+    'subsample': 0.9,
+    'max_depth': 2,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'auc',       # Evaluation metric
@@ -70,7 +70,7 @@ params = {
 }
 
 # Set hyperparameters for the forest
-colsample_bynode = 0.2
+colsample_bynode = 0.1
 subsample = 0.8
 
 

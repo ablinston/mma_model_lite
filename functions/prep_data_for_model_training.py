@@ -20,7 +20,7 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
         data['split_dec_or_other'] = np.where(data['method'].isin(['Decision-Split', 'Other']), 1, 0)
 
     # Remove column that has results, or that contain information we don't want included.
-    data.drop(columns = ['method', 'fighter1', 'fighter2', 'index', 'level_0', 'date'], inplace = True)
+    data.drop(columns = ['method', 'fighter1', 'fighter2', 'index', 'level_0', 'date'], inplace = True, errors = 'ignore')
     
     # Set target
     target = 'outcome'
