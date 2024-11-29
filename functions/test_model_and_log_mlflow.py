@@ -1,6 +1,6 @@
 # This function takes a model and a test dataset and computes test statistics then logs them in mlflow.
 
-def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column = 'outcome'):
+def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column = 'outcome', model = None):
 
     """
     Tests a model by taking in some actuals data, a set of prediction probabilities, and any breakdown variables to use. It logs various metrics in MLflow as well as outputing some statistics
@@ -47,8 +47,8 @@ def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_
     # Log the overall odds metrics in MLflow
     log_metrics_odds_mlflow(actuals_data, actuals_data['target'])
     
-    # Log the parameters of the model
-    mlflow.log_params(model['params'])
+    # # Log the parameters of the model
+    # mlflow.log_params(model['params'])
     
     ## Now begin calculating the metrics for the various breakdowns
     

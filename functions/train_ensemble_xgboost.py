@@ -71,10 +71,7 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         
         # Join the feature names into a single string and save them as a model attribute
         model['features'] = selected_columns
-        
-        # Add on the params to save for later
-        model['params'] = params
-        
+                
         # Add model to the list
         models.append(model)
 

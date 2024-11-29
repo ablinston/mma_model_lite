@@ -100,8 +100,9 @@ with mlflow.start_run():
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
-        mlflow_description = 'XGB Forest - Train data', 
-        target_column = target)
+        mlflow_description = 'XGB Forest GT3 only - Train data', 
+        target_column = target,
+        model = rf_xgb_model)
     
     # Log the model as an artifact so we have a record of it
     mlflow.log_artifact(model_path, 'Model object')
@@ -120,8 +121,9 @@ with mlflow.start_run():
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
-        mlflow_description = 'XGB Forest - Test data', 
-        target_column = target)
+        mlflow_description = 'XGB Forest GT3 only  - Test data', 
+        target_column = target,
+        model = rf_xgb_model)
     
     mlflow.set_tag('Sample', 'Test')
     
@@ -145,8 +147,9 @@ with mlflow.start_run():
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
-        mlflow_description = 'XGB Forest - OOT data', 
-        target_column = target)
+        mlflow_description = 'XGB Forest GT3 only  - OOT data', 
+        target_column = target,
+        model = rf_xgb_model)
     
     mlflow.set_tag('Sample', 'OOT')
     
