@@ -1,0 +1,115 @@
+# This function takes a model and a test dataset and computes test statistics then logs them in mlflow.
+
+def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column = 'outcome'):
+
+    """
+    Tests a model by taking in some actuals data, a set of prediction probabilities, and any breakdown variables to use. It logs various metrics in MLflow as well as outputing some statistics
+
+    Args:
+        actuals_data (data frame): this is the data that the predictions are for. It should not contain dummy versions of columns to be uesd in breakdown cols
+        prediction_probabilities (array): the probabilities for each class of the outcome
+        breakdown_cols (list): a list of column names to create metric breakdowns for
+        breakdown_metrics (list): the metrics to output for the breakdown. These names must align with metrics calculated in the calculate_metrics() function
+        mlflow_description: a description to give for the run in MLflow
+
+    Returns:
+        None, but prints the breakdown outputs and logs everything in MLflow
+    
+    """
+    
+    # pdb.set_trace()
+    
+    ####
+    # # Debug testing
+    # actuals_data = data[data['id'].isin(X_train['id'].tolist())].copy()
+    # X_data = X_train
+    # y_data = y_train
+    # prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
+    # breakdown_cols = ['weightclass']
+    # breakdown_metrics  = ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy']
+    # mlflow_description = 'test'
+    # target_column = 'outcome'
+    ####
+
+    # Get the class predictions from the probabilities
+    actuals_data['predictions'] = np.argmax(prediction_probabilities, axis = 1)
+    actuals_data['y_pred_prob'] = list(prediction_probabilities)
+    
+    # Categorise the outcome variable to align with prediction outputs
+    actuals_data['target'] = clean_target_column(actuals_data[target_column])
+    
+    # Create the MLflow description
+    mlflow.set_tag("mlflow.note.content", mlflow_description)
+
+    # Log the overall metrics in MLflow
+    log_metrics_mlflow(prediction_probabilities, actuals_data['target'], classes = np.array([0, 1, 2]))
+    
+    # Log the overall odds metrics in MLflow
+    log_metrics_odds_mlflow(actuals_data, actuals_data['target'])
+    
+    ## Now begin calculating the metrics for the various breakdowns
+    
+    # Initiate the results dictionary
+    metrics_by_group = {}
+    
+    # Loop through the columns to be analysed
+    for col in breakdown_cols:
+        
+        print('Calculating metrics for ' + col)
+        
+        # Initial the new dictionary for this column
+        metrics_by_group.update({col: {}})
+        
+        # Now loop through all the unique values within the column
+        for group in np.unique(actuals_data[col]).tolist():
+            
+            # print(group)
+            
+            # Get the rows we're interested in
+            row_filter = actuals_data[col] == group
+            # print(row_filter.sum())
+            
+            # Use try except in case sample sizes too small
+            try:
+                # Calculate the metrics
+                metrics = calculate_metrics(prediction_probabilities[row_filter], actuals_data['target'][row_filter])
+                
+                # Add odds metrics
+                metrics.update(calculate_metrics_odds(actuals_data[row_filter], actuals_data['target'][row_filter]))
+                
+                # Add these metrics to the results dictionary
+                metrics_by_group[col].update({group: metrics})
+            except:
+                print(f"Metrics for {col}: {group} couldn't be calculated.")
+                continue
+            
+        # Get the outputs for each column and log them
+        summary_df = metric_table_from_metrics_dictionary(metrics_by_group, col)[['group'] + breakdown_metrics]
+        
+        # Sort it
+        summary_df.sort_values('group', inplace = True)
+        
+        # Calculate any differences with odds if available
+        for sub_col in summary_df.columns:
+            if 'X Odds ' + sub_col in summary_df.columns:
+                summary_df['Diff ' + sub_col] = summary_df[sub_col] - summary_df['X Odds ' + sub_col]
+        
+        print(summary_df)
+        
+        # Save a temporary csv and log it as an artifact
+        summary_df.to_csv('results/temp/summary.csv')
+        mlflow.log_artifact('results/temp/summary.csv', col + ' metrics')
+        
+    # Finally, get the backtesting results
+    backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet = 0.5, min_ev_to_bet = 0.05)
+    
+    # Log the overall backtesting results
+    backtesting.to_csv('results/temp/summary.csv')
+    mlflow.log_artifact('results/temp/summary.csv', 'Backtesting results')
+    
+    # Log the total metrics in MLflow
+    mlflow.log_metric('Backtesting_P_and_L', backtesting.loc['Total', 'profit_loss'])
+    mlflow.log_metric('Backtesting_Win_Percent', backtesting.loc['Total', 'win_percent'])
+    mlflow.log_metric('Backtesting_Max_Drawdown', backtesting.loc['Total', 'max_drawdown'])
+    
+    return None

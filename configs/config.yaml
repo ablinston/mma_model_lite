@@ -1,0 +1,188 @@
+# Wikipedia page of past UFC events for odds data scraping
+wiki_url: "https://en.wikipedia.org/wiki/List_of_UFC_events"
+
+# urls to parse
+completed_events_all_url: http://ufcstats.com/statistics/events/completed?page=all
+
+# Firefox location. Used for web scraping
+firefox_location: C:/Program Files/Mozilla Firefox/firefox.exe
+
+# Numer of CPU threads to use for concurrent processes
+num_threads: 3
+
+# Set the seed for all random components e.g. train test split etc
+seed_all: 42 
+
+# Set the earliest data on which validation checks are to be carried out from
+start_date_validation_checks: '2010-01-01'
+
+# file names for parsed data
+event_details_file_name: ufc_event_details.parquet
+fight_details_file_name: ufc_fight_details.parquet
+fight_results_file_name: ufc_fight_results.parquet
+fight_stats_file_name: ufc_fight_stats.parquet
+fighter_details_file_name: ufc_fighter_details.parquet
+fighter_tott_file_name: ufc_fighter_tott.parquet
+fighter_odds_file_name: fight_odds_data.parquet
+
+# Define log of parsed events
+parsed_events_log: ./data/parsed_events_log.parquet
+
+# columns names for extracted details
+fight_details_column_names:
+  - EVENT
+  - BOUT
+  - URL
+
+# column names for extracted fight results
+fight_results_column_names:
+  - EVENT
+  - BOUT
+  - OUTCOME
+  - WEIGHTCLASS
+  - METHOD
+  - ROUND
+  - TIME
+  - TIME FORMAT
+  - REFEREE
+  - DETAILS
+  - URL
+
+# column names for extracted fight totals
+totals_column_names:
+  - ROUND
+  - FIGHTER
+  - KD
+  - SIG.STR.
+  - SIG.STR. %
+  - TOTAL STR.
+  - TD
+  - TD %
+  - SUB.ATT
+  - REV.
+  - CTRL
+ 
+# column names for extracted significant strikes
+significant_strikes_column_names:
+  - ROUND
+  - FIGHTER
+  - SIG.STR.
+  - SIG.STR. %
+  - HEAD
+  - BODY
+  - LEG
+  - DISTANCE
+  - CLINCH
+  - GROUND
+
+# column names for fight stats
+fight_stats_column_names:
+  - EVENT
+  - BOUT
+  - ROUND
+  - FIGHTER
+  - KD
+  - SIG.STR.
+  - SIG.STR. %
+  - TOTAL STR.
+  - TD
+  - TD %
+  - SUB.ATT
+  - REV.
+  - CTRL
+  - HEAD
+  - BODY
+  - LEG
+  - DISTANCE
+  - CLINCH
+  - GROUND
+
+# column names for fighter details
+fighter_details_column_names:
+  - FIRST
+  - LAST
+  - NICKNAME
+  - URL
+
+# column names for fighter tale of the tape
+fighter_tott_column_names:
+  - FIGHTER
+  - HEIGHT
+  - WEIGHT
+  - REACH
+  - STANCE
+  - DOB
+  - URL
+
+
+# Round filters to be included in train/test/oot data
+time_format_filter:
+  - 3 Rnd (5-5-5)
+  - 5 Rnd (5-5-5-5-5)
+
+# Set a default time for a round (minutes)
+round_time_default: 5
+
+# Set the weightclass filters to be the modern ones
+weightclass_filter:
+  - Lightweight
+  - Welterweight
+  - Middleweight
+  - Featherweight
+  - LightHeavyweight
+  - Bantamweight
+  - Heavyweight
+  - Flyweight
+  - Women'sStrawweight
+  - Women'sFlyweight
+  - Women'sBantamweight
+  - CatchWeight
+  - Women'sFeatherweight
+
+# Set the headers for the fighters results table on UFCstats.com, used to get all the non-UFC event urls
+fighter_result_headers: ["W/L", "Fighter", "Kd", "Str", "Td", "Sub", "Event", "Method", "Round", "Time"]
+
+# Set a minimum number of attempts for a percentage statistic to be calculated (to avoid extreme values)
+min_attempts: 5
+
+# Set the methods of victory to keep separate. Others will be grouped into 'other'. Do not include spaces
+methods:
+  - Decision-Unanimous
+  - KO/TKO
+  - Submission
+  - Decision-Split
+  - Decision-Majority
+
+# Set the proportion of the data that should be reserved as a test dataset
+test_proportion: 0.2
+
+# Set the cut off dates for the training data
+min_training_date: '2014-01-01'
+oot_start_date: '2024-01-01'
+
+
+# Set the starting ELO for each fighter
+start_elo: 1500
+
+# A list of events that don't have odds data, so that the function checks can know to ignore them
+no_odds_data_event_list: ['ProElite1:Arlovskivs.Lopez', 'DWCS7.10', 'DWCSBrazil1.1', 'DEEP50-Impact', 'M-1Global-Fedorvs.Monson', 'DWCSBrazil1.3', 'ONEFC3:WaroftheLions', 'ImpactFC1']
+
+# Set the parameter thresholds for defining fighter type
+fighter_type_thresholds:
+  null: # default i.e. unknown
+  striker:
+    hist_allrounds_sig.str._attempt: 20
+  wrestler:
+    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+  # submitter:
+  #   hist_wins_Submission_per_fight: 0.1 # 1 in 10 fights won by submission or more
+  wrestler-submitter:
+    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_wins_Submission_per_fight: 0.1
+  mma:
+    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_wins_Submission_per_fight: 0.1
+    hist_wins_KO/TKO_per_fight: 0.1 # has some knockout success
+
+
+google_maps_api_key: AIzaSyDT1kFhElcN_vKjHc3l_Ej999ONUcCQ0aw

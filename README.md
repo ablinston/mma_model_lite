@@ -1,0 +1,44 @@
+# mma_model
+A model to predict MMA fight results.
+
+To use this, open a conda terminal, navigate to the folder and use `conda activate mma_model`. You can then run `spyder` to use Spyder IDE.
+
+# Updating training data
+
+The full data scrape code is found in the `src` folder. Scripts 1, 2 and 3 will perform a full scrape of the data and all fighters stats.
+
+Once this has been done, script 4 can be run to add new events and fighter stats to the existing data. **To update, only script 4 needs to be run.**
+
+## Unit testing
+
+There are some unit test scripts saved within `./tests/functions/`. To run this, open an anaconda prompt, activate the `mma_model` environment and then change directory to `./tests/functions/`. Then use command `pytest`.
+
+# Training Experiments
+
+These use MLflow, so ensure the server is running using (or use the .bat file in the root repo)
+`mlflow server --host 127.0.0.1 --port 8080 --backend-store-uri /Documents/mma_model/mlruns/`
+
+I couldn't get this to work when running in venv, so has to be run outside. Just ensure that a consistent version of mlflow is used inside and outside.
+
+## Metric choice
+
+I chose AUC to assess the models and target rather than accuracy. Although we are only interested in predicting the winners, if we want to make money then the odds/probability of each outcome is the most important thing to get correct.
+
+# GPU
+
+Training of models runs much faster on GPU than CPU. There is a test script in the tests folder to verify this.
+
+The experiments run with GPU on an Nvidia GTX 1060. To use this, lightgbm needs installing in a specific way. Follow the instructions at https://lightgbm.readthedocs.io/en/latest/Installation-Guide.html#id18
+
+It needs a C++ compiler installed (minGW is how to get it on Windows https://sourceforge.net/projects/mingw/). The gcc is the fidliest to install. Needs to install the gcc part with MinGW and then manually add the path.
+```
+pip install --upgrade cmake
+
+pip install --no-binary lightgbm --config-settings=cmake.define.CMAKE_C_COMPILER=C:/MinGW/bin/gcc --config-settings=cmake.define.CMAKE_CXX_COMPILER=C:/MinGW/bin/g++ --config-settings=cmake.define.PYTHON_INCLUDE_DIR=C:/Users/Andy/AppData/Local/Programs/Python/Python311/include --config-settings=cmake.define.PYTHON_LIBRARY=C:/Users/Andy/AppData/Local/Programs/Python/Python311/libs/python311.lib --config-settings=cmake.define.USE_CUDA=ON lightgbm
+
+```
+AB note: couldn't get GPU training with LightGBM working at all on Windows. Used conda and xgboost instead (for random forests too because it allows GPU training).
+
+# Notes
+
+Decimal odds are how much is received back for every 1 bet. So for example 2 means you receive 2 (original bet + 1 profit)
