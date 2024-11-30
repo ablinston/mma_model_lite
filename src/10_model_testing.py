@@ -79,6 +79,8 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('final_models_oot_testing')
 
+# Set this model's description for MLflow
+model_description = 'XGB Forest, GT3 fights, 100 trees, 200 features'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -88,6 +90,7 @@ mlflow.set_experiment('final_models_oot_testing')
 breakdown_cols = ['weightclass', 'year', 'total_fights', 'fighter_history', 'favourite']
 breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Sample Size']
 target = 'outcome'
+
 
 # Run the metrics on the training data
 with mlflow.start_run():
@@ -100,7 +103,7 @@ with mlflow.start_run():
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
-        mlflow_description = 'XGB Forest GT3 only - Train data', 
+        mlflow_description = model_description + ' - Train data', 
         target_column = target,
         model = rf_xgb_model)
     
@@ -121,7 +124,7 @@ with mlflow.start_run():
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
-        mlflow_description = 'XGB Forest GT3 only  - Test data', 
+        mlflow_description = model_description + '  - Test data', 
         target_column = target,
         model = rf_xgb_model)
     
@@ -147,7 +150,7 @@ with mlflow.start_run():
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
-        mlflow_description = 'XGB Forest GT3 only  - OOT data', 
+        mlflow_description = model_description + '  - OOT data', 
         target_column = target,
         model = rf_xgb_model)
     

@@ -311,6 +311,9 @@ dates_knocked_out = dates_knocked_out[['event',
 # Fill NAs with 0
 dates_knocked_out[['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']] = dates_knocked_out[['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']].fillna(0) 
 
+# Fill NAs in dates with arbitrary early date
+dates_knocked_out['date_last_knocked_out'] = pd.to_datetime(dates_knocked_out['date_last_knocked_out'].fillna('1900-01-01'))
+
 # Check number of rows hasn't changed
 if len(dates_knocked_out) == row_check:
     print('Merge row check PASSED')
@@ -591,7 +594,8 @@ for fighter in ['fighter1', 'fighter2']:
     # Recode Infs as missing, because could give misleading results
     new_columns = [fighter + '_sig.str._per_td_attempt', fighter + '_sig.str.per_sub.att', fighter + '_kd_per_sig.str._landed', fighter + '_sub.att.per_td_landed', fighter + '_subs_per_attempt']
     
-    merged_data[new_columns] = merged_data[new_columns].replace([-np.inf, np.inf], np.nan)
+    merged_data[new_columns] = merged_data[new_columns].fillna(-np.inf)
+    # merged_data[new_columns] = merged_data[new_columns].replace([-np.inf, np.inf], np.nans)
 
 
 ###########################################################################################
@@ -603,7 +607,10 @@ cols = ['_date_last_fight', '_date_last_knocked_out', '_date_last_loss', '_date_
 # Do each fighters per fight calcs separately
 for fighter in ['fighter1', 'fighter2']:
     for col in cols:
-        merged_data[fighter + '_date_minus' + col] = (merged_data['date'] - merged_data[fighter + col]).dt.days
+        merged_data[fighter + '_date_minus' + col] = (merged_data['date'] - pd.to_datetime(merged_data[fighter + col]).copy().fillna('1900-01-01')).dt.days
+
+        # Fill in NAs with arbitrary early date
+        # merged_data[fighter + '_date_minus' + col] = merged_data[fighter + '_date_minus' + col].fillna(99999).astype(int)
 
 # pd.DataFrame(merged_data.columns).to_csv("te.csv")
 ###########################################################################################
@@ -673,10 +680,10 @@ fighter2_accuracy_def_cols = [col for col in merged_data.columns if ('accuracy_p
 stop_if_not(check_identical_excl_string(fighter1_accuracy_off_cols, [col.replace('_against', '') for col in fighter2_accuracy_def_cols], 'fighter1', 'fighter2'))
 stop_if_not(check_identical_excl_string(fighter2_accuracy_off_cols, [col.replace('_against', '') for col in fighter1_accuracy_def_cols], 'fighter2', 'fighter1'))
 
-# Calculate the differentials
-fighter1_off_fighter2_def = pd.DataFrame(merged_data[fighter1_accuracy_off_cols].to_numpy() - (1 - merged_data[fighter2_accuracy_def_cols].to_numpy()),
+# Calculate the differentials. Fill NAs with 0 for the purposes of this calc
+fighter1_off_fighter2_def = pd.DataFrame(merged_data[fighter1_accuracy_off_cols].copy().fillna(0).to_numpy() - (1 - merged_data[fighter2_accuracy_def_cols].copy().fillna(0).to_numpy()),
                                          columns = [col.replace('fighter1', 'fighter1_offense_minus_fighter2_defense') for col in fighter1_accuracy_off_cols])
-fighter1_def_fighter2_off = pd.DataFrame(merged_data[fighter2_accuracy_off_cols].to_numpy() - (1 -  merged_data[fighter1_accuracy_def_cols].to_numpy()),
+fighter1_def_fighter2_off = pd.DataFrame(merged_data[fighter2_accuracy_off_cols].copy().fillna(0).to_numpy() - (1 -  merged_data[fighter1_accuracy_def_cols].copy().fillna(0).to_numpy()),
                                          columns = [col.replace('fighter2', 'fighter2_offense_minus_fighter1_defense') for col in fighter2_accuracy_off_cols])
 
 # Combined with the data
@@ -698,6 +705,9 @@ merged_data.columns = merged_data.columns.str.replace(" ", "_")
 # Add a womens flag
 merged_data['womens'] = np.where(merged_data['weightclass'].apply(lambda x: np.where('omen' in x, True, False)), 1, 0)
 
+# Add the matchup
+merged_data['matchup'] = merged_data['fighter1_fighter_type'] + merged_data['fighter2_fighter_type']
+
 ###########################################################################################
 # OUTPUT DATA
 
@@ -710,13 +720,14 @@ merged_data.dropna(axis = 1, how = 'all', inplace = True)
 
 # print(merged_data.columns)
 merged_data.reset_index(inplace = True)
-merged_data.drop(columns = cols_to_remove, inplace = True)
+merged_data.drop(columns = cols_to_remove, inplace = True, errors = 'ignore')
+merged_data.drop(columns = cols_to_remove, inplace = True, errors = 'ignore')
 del(cols_to_remove)
 
 split_by_year_and_save_fastparquet(merged_data, 'date', './data/final_dataset/', compression='ZSTD')
 # fp.write('./data/final_dataset.parquet', merged_data, compression = 'GZIP')
 
 # Output a single fight for checking purposes
-merged_data[(merged_data['fighter1'] == 'IsraelAdesanya') & (merged_data['fighter2'] == 'SeanStrickland')].T.to_csv('./data/final_dataset_checking.csv', index=True)
+merged_data[(merged_data['fighter1'] == 'KhabibNurmagomedov') & (merged_data['fighter2'] == 'ConorMcGregor')].T.to_csv('./data/final_dataset_checking.csv', index=True)
 
 merged_data[(merged_data['fighter1'] == 'AntonioSilva') | (merged_data['fighter2'] == 'AntonioSilva')].T.to_csv('./data/final_dataset_fighter_checking.csv')

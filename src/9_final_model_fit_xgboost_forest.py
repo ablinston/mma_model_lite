@@ -113,7 +113,7 @@ for num_trees in [10, 50, 100, 200, 500, 1000, 3000, 5000]:
 final_xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
-    num_models = 1000,
+    num_models = 100,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode,
     subsample = subsample,
