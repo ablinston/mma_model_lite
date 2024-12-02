@@ -63,7 +63,7 @@ params = {
     'colsample_bynode': np.sqrt(len(data.columns)) / len(data.columns), # fraction of columns to select for each tree
     'num_parallel_tree': 2500, # the size of the forest. For 16k features, and choosing sqrt, this gives 99.998% chance all features selected at least once
     'learning_rate': 1, # Learning rate
-    'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
+    'min_child_weight': 10,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
     # 'max_depth': 6,
     'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
