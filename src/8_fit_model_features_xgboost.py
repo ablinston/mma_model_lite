@@ -49,10 +49,10 @@ var_importance = pd.read_csv('./results/shap_feature_importance.csv').sort_value
 
 # Ensure that the data columns are ordered in descending feature importance
 # First list any columns not in the importance
-stop_if_not([col for col in X_train_master.columns if col not in var_importance['Feature'].tolist()] == [])
+[col for col in X_train_master.columns if col not in var_importance['Feature'].tolist()]
 
 # Now select the columns
-X_train_master = X_train_master[var_importance['Feature'].tolist()]
+X_train_master = X_train_master[[col for col in X_train_master.columns if col in var_importance['Feature'].tolist() + ['split_dec_or_other']]]
 
 # Now remove any columns that aren't wanted in a training dataset
 X_train_master = standard_feature_removal(X_train_master)
@@ -75,7 +75,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 300,
-    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 201, 210, 230, 251, 270, 300, 500, 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 500, 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
@@ -97,7 +97,7 @@ params_inner = {
      'n_folds': 5,                   # Number of folds for the cross-validation
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
-     'early_stopping_rounds': 50,
+     'early_stopping_rounds': 30,
      'exclude_split_other_from_train': hp.choice('exclude_split_other_from_train', [True, False]),
      'win_loss_only': hp.choice('win_loss_only', [True, False])
 }

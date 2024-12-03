@@ -14,6 +14,6 @@ def create_dmatrix_with_split_other_filter(X_train, y_train, train_idx, test_idx
         filtered_y_train = y_train[mask & ~(X_train['split_dec_or_other'] == 1) & (y_train.isin([0, 2]))]
 
     # Create the DMatrix
-    train_dmatrix = xgb.DMatrix(filtered_X_train, label=filtered_y_train)
-    test_dmatrix = xgb.DMatrix(X_train.iloc[test_idx], label=y_train.iloc[test_idx])
+    train_dmatrix = xgb.DMatrix(filtered_X_train.drop(['split_dec_or_other'], axis = 1), label=filtered_y_train)
+    test_dmatrix = xgb.DMatrix(X_train.iloc[test_idx].drop(['split_dec_or_other'], axis = 1), label=y_train.iloc[test_idx])
     return train_dmatrix, test_dmatrix

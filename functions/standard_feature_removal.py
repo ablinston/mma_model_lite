@@ -21,7 +21,8 @@ def standard_feature_removal(df):
     # This bit is optional. Just testing.
     cols_to_remove = cols_to_remove + [col for col in data.columns if ('diff' not in col) and ('opp_type' not in col) and ('offense_minus' not in col) and ('fight_elevation' not in col) and ('weightclass' not in col) and ('matchup' not in col)]
 
-    # Remove columns not wanted
-    data = data[[col for col in data.columns if not col in cols_to_remove]]
+
+    # Remove columns not wanted but select specific ones to keep
+    data = data[[col for col in data.columns if not col in cols_to_remove or col in ['split_dec_or_other']]]
 
     return data
