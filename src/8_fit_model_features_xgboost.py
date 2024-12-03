@@ -80,7 +80,7 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 10,
+    'max_evals': 300,
     'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 500, 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
