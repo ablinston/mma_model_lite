@@ -8,7 +8,7 @@ def objective_xgboost_features_mlflow(
         params):
 
     # pdb.set_trace()
-    
+    # 
     # Check for duplicates
     if is_duplicate_run(params):
         
@@ -52,8 +52,9 @@ def objective_xgboost_features_mlflow(
             global X_train
             X_train = X_train_master.iloc[:, 0:params['num_of_features']]
             
-            # Add on any specific columns needed
-            X_train = pd.concat([X_train, X_train_master[['split_dec_or_other']]], axis = 1)
+            if params['split_dec_or_other'] == True:  
+                # Add on any specific columns needed
+                X_train = pd.concat([X_train, X_train_master[['split_dec_or_other']]], axis = 1)
             
             # Log parameters in MLflow
             mlflow.log_param('num_of_features', params['num_of_features'])
