@@ -20,31 +20,31 @@ def objective_xgboost_features_mlflow(
         
     else:
         
-        # Copy the params to edit them
-        params_inner = params.copy()
+        # # Copy the params to edit them
+        # params_inner = params.copy()
         
-        # Set the hyperopt parameters for the inner optimisation
-        params_inner.update({
-             'nthread': 3, # Only applies to CPU cores
-             'learning_rate': hp.quniform('learning_rate', 0.001, 0.301, 0.005), # Learning rate
-             'min_child_weight': hp.quniform('min_child_weight', 8, 20, 1), # 15,                 # The min observations that should be left in a leaf node    
-             'subsample': 0.85,
-             'max_depth': hp.quniform('max_depth', 1, 5, 1),
-             'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
-             'objective': 'multi:softprob', # Multi classification objective
-             'eval_metric': 'auc',       # Evaluation metric
-             'tree_method': 'hist',      # Use GPU accelerated algorithm
-             'device': 'cuda',           # Use CUDA / GPU
-             'predictor': 'gpu_predictor',   # Use GPU for prediction
-             'verbosity': 1,
-             'num_class': no_of_classes,
-             'n_folds': 5,                   # Number of folds for the cross-validation
-             'random_state': config['seed_all'] + 39,
-             'num_iterations': 5000,
-             'early_stopping_rounds': 50,
-             'exclude_split_other_from_train': split_or_other_exclude,
-             'win_loss_only': win_loss_only,  
-        })
+        # # Set the hyperopt parameters for the inner optimisation
+        # params_inner = {
+        #      'nthread': 3, # Only applies to CPU cores
+        #      'learning_rate': hp.quniform('learning_rate', 0.001, 0.301, 0.005), # Learning rate
+        #      'min_child_weight': hp.quniform('min_child_weight', 8, 20, 1), # 15,                 # The min observations that should be left in a leaf node    
+        #      'subsample': 0.85,
+        #      'max_depth': hp.quniform('max_depth', 1, 5, 1),
+        #      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
+        #      'objective': 'multi:softprob', # Multi classification objective
+        #      'eval_metric': 'auc',       # Evaluation metric
+        #      'tree_method': 'hist',      # Use GPU accelerated algorithm
+        #      'device': 'cuda',           # Use CUDA / GPU
+        #      'predictor': 'gpu_predictor',   # Use GPU for prediction
+        #      'verbosity': 1,
+        #      'num_class': no_of_classes,
+        #      'n_folds': 5,                   # Number of folds for the cross-validation
+        #      'random_state': config['seed_all'] + 39,
+        #      'num_iterations': 5000,
+        #      'early_stopping_rounds': 50,
+        #      'exclude_split_other_from_train': hp.choice('exclude_split_other_from_train', [True, False]),
+        #      'win_loss_only': hp.choice('win_loss_only', [True, False])  
+        # }
         
         with mlflow.start_run():
             

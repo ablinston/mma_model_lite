@@ -29,8 +29,7 @@ data = concat_parquets_fastparquet('./data/final_dataset/')
 data = standard_data_filter(data)
 
 # Don't include split or other decisions in training data. This flag will be used in functions later to exclude them from training data but not from test data (including test in CV data)
-split_or_other_exclude = False
-win_loss_only = False
+split_or_other_exclude = True
 
 ##########################################################################################
 ### Data prep for model ###
@@ -64,7 +63,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_feature_opt')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_feature_opt')
 
 
 ##########################################################################################
@@ -75,8 +74,32 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 200,
-    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 201, 210, 230, 251, 270, 300, 500, 1000, 2000, len(X_train_master)])
+    'max_evals': 300,
+    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 201, 210, 230, 251, 270, 300, 500, 1000, 2000, len(X_train_master)]),
+    'split_dec_or_other': split_or_other_exclude
+}
+
+# Set the hyperopt parameters for the inner optimisation
+params_inner = {
+     'nthread': 3, # Only applies to CPU cores
+     'learning_rate': hp.quniform('learning_rate', 0.001, 0.301, 0.005), # Learning rate
+     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
+     'subsample': 0.85,
+     'max_depth': hp.quniform('max_depth', 1, 3, 1),
+     'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
+     'objective': 'multi:softprob', # Multi classification objective
+     'eval_metric': 'auc',       # Evaluation metric
+     'tree_method': 'hist',      # Use GPU accelerated algorithm
+     'device': 'cuda',           # Use CUDA / GPU
+     'predictor': 'gpu_predictor',   # Use GPU for prediction
+     'verbosity': 1,
+     'num_class': no_of_classes,
+     'n_folds': 5,                   # Number of folds for the cross-validation
+     'random_state': config['seed_all'] + 39,
+     'num_iterations': 5000,
+     'early_stopping_rounds': 50,
+     'exclude_split_other_from_train': hp.choice('exclude_split_other_from_train', [True, False]),
+     'win_loss_only': hp.choice('win_loss_only', [True, False])
 }
 
 best = fmin(fn = objective_xgboost_features_mlflow,

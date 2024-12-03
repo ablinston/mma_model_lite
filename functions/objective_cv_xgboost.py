@@ -37,7 +37,7 @@ def objective_cv_xgboost(
 
     # Loop through precomputed DMatrix objects for each fold
     for train_dmatrix, test_dmatrix in dmatrix_data:
-        # pdb.set_trace()
+        pdb.set_trace()
         # Train the model with early stopping
         model = xgb.train(params, train_dmatrix,
                           num_boost_round = params['num_iterations'],

@@ -72,4 +72,7 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     results['max_drawdown'] = np.nan
     results.loc['Total', 'max_drawdown'] = longest_streak(actuals_data['profit_loss'], -1)
     
+    # # Add the row names as a column
+    # results = pd.concat([pd.DataFrame({'Group': results.index}), results], axis=1)
+    
     return results
