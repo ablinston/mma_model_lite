@@ -28,7 +28,7 @@ data = standard_data_filter(data)
 ##########################################################################################
 
 # Only select the columns needed for training and the test train split
-data = data[final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome']]
+data = data[[col for col in data.columns if col in final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds']]]
 
 
 ##########################################################################################
@@ -38,11 +38,12 @@ data = data[final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'i
 # Prep the data ready for model training
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, test_size = 0.1)
 
-
+# Remove other columns from training data as not required
+X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt3_fights_xgboost_forest_set_5')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v1')
 
 
 
@@ -52,10 +53,10 @@ mlflow.set_experiment('2014+_gt3_fights_xgboost_forest_set_5')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.15, # Learning rate
-    'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
+    'learning_rate': 0.25, # Learning rate
+    'min_child_weight': 8,                 # The min observations that should be left in a leaf node    
     'subsample': 0.9,
-    'max_depth': 2,
+    'max_depth': 1,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'auc',       # Evaluation metric
@@ -66,7 +67,7 @@ params = {
     'num_class': no_of_classes,
     'random_state': config['seed_all'] + 38,
     'num_iterations': 5000,
-    'early_stopping_rounds': 30
+    'early_stopping_rounds': 50
 }
 
 # Set hyperparameters for the forest
@@ -79,7 +80,7 @@ subsample = 0.8
 ##########################################################################################
 
 # Try different numbers of trees
-for num_trees in [10, 50, 100, 200, 500, 1000, 3000, 5000]:
+for num_trees in [35, 40, 45, 50, 55, 60, 65]:
     
     # Start a new model run in MLflow
     with mlflow.start_run():
@@ -113,11 +114,11 @@ for num_trees in [10, 50, 100, 200, 500, 1000, 3000, 5000]:
 final_xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
-    num_models = 100,
+    num_models = 55,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode,
     subsample = subsample,
-    early_stopping_rounds = 30,
+    early_stopping_rounds = 50,
     params = params
     )
 

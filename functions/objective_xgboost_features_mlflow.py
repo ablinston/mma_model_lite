@@ -26,7 +26,7 @@ def objective_xgboost_features_mlflow(
         # Set the hyperopt parameters for the inner optimisation
         params_inner.update({
              'nthread': 3, # Only applies to CPU cores
-             'learning_rate': hp.quniform('learning_rate', 0.001, 0.201, 0.005), # Learning rate
+             'learning_rate': hp.quniform('learning_rate', 0.001, 0.301, 0.005), # Learning rate
              'min_child_weight': hp.quniform('min_child_weight', 8, 20, 1), # 15,                 # The min observations that should be left in a leaf node    
              'subsample': 0.85,
              'max_depth': hp.quniform('max_depth', 1, 5, 1),
@@ -41,7 +41,7 @@ def objective_xgboost_features_mlflow(
              'n_folds': 5,                   # Number of folds for the cross-validation
              'random_state': config['seed_all'] + 39,
              'num_iterations': 5000,
-             'early_stopping_rounds': 30,
+             'early_stopping_rounds': 50,
              'exclude_split_other_from_train': split_or_other_exclude,
              'win_loss_only': win_loss_only,  
         })

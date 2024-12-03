@@ -37,7 +37,7 @@ win_loss_only = False
 ##########################################################################################
 
 # Prep the data ready for model training. Create a master for the train because we will vary the number of features
-X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, split_or_other_flag = split_or_other_exclude)
+X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, split_or_other_flag = split_or_other_exclude, test_size = 0.1)
 
 
 ##########################################################################################
@@ -76,21 +76,21 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 200,
-    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 500, 1000, 2000, len(X_train_master)])
+    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 201, 210, 230, 251, 270, 300, 500, 1000, 2000, len(X_train_master)])
 }
 
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = rand.suggest, # Randomly explore the space
-            max_evals = 20,
+            max_evals = 50,
             trials = trials)
 
 
 
-# # # Output the feature set if we want to use it for the model
-# # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
-# # Convert column names to a list
-# column_names = X_train.columns.tolist()
-# # Save to a YAML file
-# with open('./configs/final_model_features.yaml', 'w') as file:
-#     dump(column_names, file, default_flow_style=False)
+# # Output the feature set if we want to use it for the model
+# X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
+# Convert column names to a list
+column_names = X_train_master.columns.tolist()[0:210]
+# Save to a YAML file
+with open('./configs/final_model_features.yaml', 'w') as file:
+    dump(column_names, file, default_flow_style=False)
