@@ -43,7 +43,7 @@ X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v1')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v2')
 
 
 
@@ -53,8 +53,8 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v1')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.25, # Learning rate
-    'min_child_weight': 8,                 # The min observations that should be left in a leaf node    
+    'learning_rate': 0.2, # Learning rate
+    'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.9,
     'max_depth': 1,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
@@ -67,7 +67,7 @@ params = {
     'num_class': no_of_classes,
     'random_state': config['seed_all'] + 38,
     'num_iterations': 5000,
-    'early_stopping_rounds': 50
+    'early_stopping_rounds': 30
 }
 
 # Set hyperparameters for the forest
@@ -80,7 +80,7 @@ subsample = 0.8
 ##########################################################################################
 
 # Try different numbers of trees
-for num_trees in [35, 40, 45, 50, 55, 60, 65]:
+for num_trees in [1, 3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 100, 200, 500]:
     
     # Start a new model run in MLflow
     with mlflow.start_run():

@@ -119,7 +119,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:210]
+column_names = X_train_master.columns.tolist()[0:300]
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:
     dump(column_names, file, default_flow_style=False)
