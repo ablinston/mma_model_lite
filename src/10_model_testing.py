@@ -80,7 +80,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('final_models_oot_testing_v2')
 
 # Set this model's description for MLflow
-model_description = 'XGB single, GT2 fights split dec exc, 300 diff only features'
+model_description = 'XGB forest, GT2 fights split dec exc, 35 trees, 300 diff only features'
 
 ##########################################################################################
 ### Calculating metrics ###

@@ -115,10 +115,10 @@ for num_trees in [1, 3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 100, 
 final_xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
-    num_models = 1,
+    num_models = 35,
     num_boost_round = 5000,
-    colsample_bynode = 1,
-    subsample = 1,
+    colsample_bynode = colsample_bynode,
+    subsample = subsample,
     early_stopping_rounds = 50,
     params = params
     )
