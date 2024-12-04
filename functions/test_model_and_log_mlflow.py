@@ -116,5 +116,6 @@ def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_
     mlflow.log_metric('Backtesting_P_and_L', backtesting.loc['Total', 'profit_loss'])
     mlflow.log_metric('Backtesting_Win_Percent', backtesting.loc['Total', 'win_percent'])
     mlflow.log_metric('Backtesting_Max_Drawdown', backtesting.loc['Total', 'max_drawdown'])
+    mlflow.log_metric('Backtesting_ROI', backtesting.loc['Total', 'roi'])
     
     return None

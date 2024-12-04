@@ -50,6 +50,11 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         selected_columns = list(np.random.choice(X_train_df.columns, num_columns_to_select, replace = False))
         X_train_df =  X_train_df[selected_columns]
 
+        # Filter win loss only if applicable
+        if params['win_loss_only'] == True:
+            X_train_df = X_train_df[y_train_df.isin([0, 2])]
+            y_train_df = y_train_df[y_train_df.isin([0, 2])]
+
         # Create the validation set from all rows not included in the training set
         # Mask to get the validation data
         train_indices = X_train_df.index

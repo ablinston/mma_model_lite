@@ -67,7 +67,8 @@ params = {
     'num_class': no_of_classes,
     'random_state': config['seed_all'] + 38,
     'num_iterations': 5000,
-    'early_stopping_rounds': 30
+    'early_stopping_rounds': 30,
+    'win_loss_only': True
 }
 
 # Set hyperparameters for the forest
@@ -97,8 +98,8 @@ for num_trees in [1, 3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 100, 
             y_train,
             num_models = num_trees,
             num_boost_round = 5000,
-            colsample_bynode = colsample_bynode,
-            subsample = subsample,
+            colsample_bynode = 1 if num_trees == 1 else colsample_bynode, # If it's only 1 tree, train the full XGboost model
+            subsample = 1 if num_trees == 1 else subsample,
             early_stopping_rounds = 30,
             params = params
             )
@@ -114,10 +115,10 @@ for num_trees in [1, 3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 100, 
 final_xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
-    num_models = 55,
+    num_models = 1,
     num_boost_round = 5000,
-    colsample_bynode = colsample_bynode,
-    subsample = subsample,
+    colsample_bynode = 1,
+    subsample = 1,
     early_stopping_rounds = 50,
     params = params
     )

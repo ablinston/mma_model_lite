@@ -69,10 +69,14 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     results['roi'] = results['profit_loss'] / results['bets'] * 100 # the profit and loss assumes every bet equal size
     
     # For the total, calculate the longest streaks
+    results['max_losing_streak'] = np.nan
+    results.loc['Total', 'max_losing_streak'] = longest_streak(actuals_data['profit_loss'], -1)
+    
     results['max_drawdown'] = np.nan
-    results.loc['Total', 'max_drawdown'] = longest_streak(actuals_data['profit_loss'], -1)
+    results.loc['Total', 'max_drawdown'] = minimum_sum_series(actuals_data['profit_loss'])
     
     # # Add the row names as a column
     # results = pd.concat([pd.DataFrame({'Group': results.index}), results], axis=1)
+    results.rename(columns={'index': 'RowName'}, inplace=True)
     
     return results

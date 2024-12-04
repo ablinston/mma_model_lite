@@ -1,6 +1,6 @@
 # This function removes columns from training data that seem arbitrary and could lead to over-fitting
 
-def standard_feature_removal(df):
+def standard_feature_removal(df, differentials_only = False):
 
     data = df.copy()
     
@@ -19,7 +19,8 @@ def standard_feature_removal(df):
 
     # Now we want to remove any column that is not a differential or a comparison between fighters
     # This bit is optional. Just testing.
-    cols_to_remove = cols_to_remove + [col for col in data.columns if ('diff' not in col) and ('opp_type' not in col) and ('offense_minus' not in col) and ('fight_elevation' not in col) and ('weightclass' not in col) and ('matchup' not in col)]
+    if differentials_only:
+        cols_to_remove = cols_to_remove + [col for col in data.columns if ('diff' not in col) and ('opp_type' not in col) and ('offense_minus' not in col) and ('fight_elevation' not in col) and ('weightclass' not in col) and ('matchup' not in col)]
 
 
     # Remove columns not wanted but select specific ones to keep
