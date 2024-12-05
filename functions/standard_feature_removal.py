@@ -4,6 +4,8 @@ def standard_feature_removal(df, differentials_only = False):
 
     data = df.copy()
     
+    # pdb.set_trace()
+    
     # Remove cols that shouldn't really affect the fight.
     # Remove dates because they can overfit. Leave date minuses, which are days since
     cols_to_remove = [col for col in data.columns if ('date' in col) & (('diff' not in col) & ('minus' not in col) & (col != 'date'))]

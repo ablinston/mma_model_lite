@@ -1,4 +1,4 @@
-def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet, min_ev_to_bet, bet_sizing = 1):
+def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet, min_ev_to_bet, bet_sizing = 1, output_data_for_debug = False):
     """
     
     A function to backtest a model's predictions against actuals data that contain the odds'
@@ -78,5 +78,9 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     # # Add the row names as a column
     # results = pd.concat([pd.DataFrame({'Group': results.index}), results], axis=1)
     results.rename(columns={'index': 'RowName'}, inplace=True)
+    
+    # Output the underlying data if required
+    if output_data_for_debug:
+        actuals_data[['fighter1', 'fighter2', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
     
     return results

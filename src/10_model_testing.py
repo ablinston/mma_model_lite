@@ -21,7 +21,7 @@ exec(open('global.py').read())
 model_path = './results/final_xgboost_forest.joblib'
 
 # Read in the data for training
-data = concat_parquets_fastparquet('./data/final_dataset/')
+backtesting_data = concat_parquets_fastparquet('./data/final_dataset/')
 # Load files
 rf_xgb_model = joblib.load(model_path)
 
@@ -30,40 +30,40 @@ rf_xgb_model = joblib.load(model_path)
 ##########################################################################################
 
 # Apply standard filters
-data = standard_data_filter(data)
+backtesting_data = standard_data_filter(backtesting_data)
 
 # Create an ID column to easily filter the data
-data['id'] = data.index
+backtesting_data['id'] = backtesting_data.index
 
 # Calculate the year of the fight
-data['year'] = data['date'].dt.year
+backtesting_data['year'] = backtesting_data['date'].dt.year
 
 # Calculate total fights of both fighters
-data['total_fights'] = data['fighter1_hist_fights'] + data['fighter2_hist_fights']
+backtesting_data['total_fights'] = backtesting_data['fighter1_hist_fights'] + backtesting_data['fighter2_hist_fights']
 
 # Create a column showing if both fighters veterans or not
-data['fighter_history'] = np.where(
-    (data['fighter1_hist_fights'] > 3) & (data['fighter2_hist_fights'] > 3),
+backtesting_data['fighter_history'] = np.where(
+    (backtesting_data['fighter1_hist_fights'] > 3) & (backtesting_data['fighter2_hist_fights'] > 3),
     '1. Both > 3 fights',
     np.where(
-        (data['fighter1_hist_fights'] > 2) & (data['fighter2_hist_fights'] > 2),
+        (backtesting_data['fighter1_hist_fights'] > 2) & (backtesting_data['fighter2_hist_fights'] > 2),
         '2. Both > 2 fights',
         np.where(
-            (data['fighter1_hist_fights'] > 3) | (data['fighter2_hist_fights'] > 3),
+            (backtesting_data['fighter1_hist_fights'] > 3) | (backtesting_data['fighter2_hist_fights'] > 3),
             '3. Only one fighter > 3 fights',
             np.where(
-                (data['fighter1_hist_fights'] == 0) | (data['fighter2_hist_fights'] == 0),
+                (backtesting_data['fighter1_hist_fights'] == 0) | (backtesting_data['fighter2_hist_fights'] == 0),
                 '5. One noob',
                 np.where(
-                    (data['fighter1_hist_fights'] == 0) & (data['fighter2_hist_fights'] == 0),
+                    (backtesting_data['fighter1_hist_fights'] == 0) & (backtesting_data['fighter2_hist_fights'] == 0),
                     '6. Both noobs',
                     '4. Other')))))
 
-data['favourite'] = np.where(
-    ((data['fighter1_best_closing_odds'] < data['fighter2_best_closing_odds']) & (data['outcome'] == 'W/L')) |
-    ((data['fighter1_best_closing_odds'] > data['fighter2_best_closing_odds']) & (data['outcome'] == 'L/W')),
+backtesting_data['favourite'] = np.where(
+    ((backtesting_data['fighter1_best_closing_odds'] < backtesting_data['fighter2_best_closing_odds']) & (backtesting_data['outcome'] == 'W/L')) |
+    ((backtesting_data['fighter1_best_closing_odds'] > backtesting_data['fighter2_best_closing_odds']) & (backtesting_data['outcome'] == 'L/W')),
     "Favourite win",
-    np.where(~data['outcome'].isin(['W/L', 'L/W']),
+    np.where(~backtesting_data['outcome'].isin(['W/L', 'L/W']),
              "Other",
              "Non-favourite win"
              ))
@@ -73,14 +73,14 @@ data['favourite'] = np.where(
 ##########################################################################################
 
 # Prep the data ready for model training as it was done in the overall model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, test_size = 0.1)
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data, config, test_size = 0.1)
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('final_models_oot_testing_v2')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest, GT2 fights split dec exc, 35 trees, 300 diff only features'
+model_description = 'XGB forest, GT2 fights split dec exc, 500 trees, 250 features'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -99,13 +99,12 @@ with mlflow.start_run():
     prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
     
     test_model_and_log_mlflow(
-        X_train[['id']].merge(data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
+        X_train[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
         mlflow_description = model_description + ' - Train data', 
-        target_column = target,
-        model = rf_xgb_model)
+        target_column = target)
     
     # Log the model as an artifact so we have a record of it
     mlflow.log_artifact(model_path, 'Model object')
@@ -120,13 +119,12 @@ with mlflow.start_run():
     prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test)
     
     test_model_and_log_mlflow(
-        X_test[['id']].merge(data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+        X_test[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
         mlflow_description = model_description + '  - Test data', 
-        target_column = target,
-        model = rf_xgb_model)
+        target_column = target)
     
     mlflow.set_tag('Sample', 'Test')
     
@@ -146,13 +144,12 @@ with mlflow.start_run():
     prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)
     
     test_model_and_log_mlflow(
-        X_oot[['id']].merge(data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+        X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
         prediction_probabilities, 
         breakdown_cols = breakdown_cols, 
         breakdown_metrics = breakdown_metrics, 
         mlflow_description = model_description + '  - OOT data', 
-        target_column = target,
-        model = rf_xgb_model)
+        target_column = target)
     
     mlflow.set_tag('Sample', 'OOT')
     

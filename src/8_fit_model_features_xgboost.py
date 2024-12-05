@@ -61,7 +61,7 @@ if split_or_other_exclude == True:
 X_train_master = X_train_master[columns_in_order]
 
 # Now remove any columns that aren't wanted in a training dataset
-X_train_master = standard_feature_removal(X_train_master)
+X_train_master = standard_feature_removal(X_train_master, differentials_only = False)
 
 # Create the empty training data for the inner optimisations
 X_train = None
@@ -69,7 +69,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_feature_opt')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_all_feature_opt')
 
 
 ##########################################################################################
@@ -119,7 +119,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:300]
+column_names = X_train_master.columns.tolist()[0:250]
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:
     dump(column_names, file, default_flow_style=False)
