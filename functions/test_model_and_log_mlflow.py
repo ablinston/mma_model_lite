@@ -1,6 +1,6 @@
 # This function takes a model and a test dataset and computes test statistics then logs them in mlflow.
 
-def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column = 'outcome', backtesting_params = {'min_prob_to_bet': 0.5, 'min_ev_to_bet': 0.05}):
+def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column = 'outcome', backtesting_params = {'min_prob_to_bet': 0.5, 'min_ev_to_bet': 0.05, 'max_bet_size': 1}):
 
     """
     Tests a model by taking in some actuals data, a set of prediction probabilities, and any breakdown variables to use. It logs various metrics in MLflow as well as outputing some statistics
@@ -106,7 +106,7 @@ def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_
         mlflow.log_artifact('results/temp/summary.csv', col + ' metrics')
         
     # Finally, get the backtesting results
-    backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet = backtesting_params['min_prob_to_bet'], min_ev_to_bet = backtesting_params['min_ev_to_bet'])
+    backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet = backtesting_params['min_prob_to_bet'], min_ev_to_bet = backtesting_params['min_ev_to_bet'], max_bet_size = backtesting_params['max_bet_size'])
     
     # Log the overall backtesting results
     backtesting.to_csv('results/temp/summary.csv', index = True)
