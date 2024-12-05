@@ -114,7 +114,8 @@ for num_trees in [150, 200, 250]:
 
 
 # Set the final number of models
-final_forest_size = 500
+final_forest_size = 200
+final_subsample = 0.6
 
 # Save the final model, choosing the number of trees
 final_xgboost_rf = train_ensemble_xgboost(
@@ -123,7 +124,7 @@ final_xgboost_rf = train_ensemble_xgboost(
     num_models = final_forest_size,
     num_boost_round = 5000,
     colsample_bynode = 1 if final_forest_size == 1 else colsample_bynode, # If it's only 1 tree, train the full XGboost model
-    subsample = 1 if final_forest_size == 1 else subsample,
+    subsample = 1 if final_forest_size == 1 else final_subsample,
     early_stopping_rounds = 50,
     params = params
     )
