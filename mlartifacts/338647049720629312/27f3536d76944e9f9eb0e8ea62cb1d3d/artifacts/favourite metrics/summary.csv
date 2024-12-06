@@ -1,0 +1,3 @@
+Group,group,Avg WL only AUC,X Odds Avg WL only AUC,Hmean WL only Accuracy,X Odds Hmean WL only Accuracy,Sample Size,Diff Avg WL only AUC,Diff Hmean WL only Accuracy
+0,Favourite win,0.9863328495403967,1.0,0.9406814171304466,1.0,131.0,-0.013667150459603317,-0.05931858286955338
+1,Non-favourite win,0.2552447552447552,0.0,0.1552511415525114,0.0,59.0,0.2552447552447552,0.1552511415525114
