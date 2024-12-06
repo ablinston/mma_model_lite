@@ -2,4 +2,4 @@ E:
 
 cd Repos/mma_model_lite/
 
-mlflow server --host 0.0.0.0 --port 8080 --backend-store-uri /mlruns/
+mlflow server --host 0.0.0.0 --port 8080 --backend-store-uri /mlruns/ --default-artifact-root /mlartifacts/

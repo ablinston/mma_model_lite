@@ -126,7 +126,7 @@ for backtesting_params in [
             backtesting_params = backtesting_params)
         
         # Log the model as an artifact so we have a record of it
-        mlflow.log_artifact(model_path, 'Model object')
+        mlflow.log_artifact(model_path, 'Model_object')
         mlflow.set_tag('Sample', 'Train')
         
     mlflow.end_run()
@@ -175,3 +175,11 @@ for backtesting_params in [
         mlflow.set_tag('Sample', 'OOT')
         
     mlflow.end_run()
+
+
+# # If the model is good, then log it in the registery
+# if model_approved:
+#     mlflow.register_model('runs:/61115eb8a09f496f815535119dad8900/artifacts/Model_object', name = 'xgb_forest_model')
+
+
+# test = mlflow.pyfunc.load_model('models:/xgb_forest_model/5')
