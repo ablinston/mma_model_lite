@@ -1,4 +1,4 @@
-def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, constant_bets = True, output_data_for_debug = False):
+def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, constant_bets = True, start_balance = 1000, output_data_for_debug = False):
     """
     
     A function to backtest a model's predictions against actuals data that contain the odds'.
@@ -18,7 +18,7 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     min_ev_to_bet : float64
         the minimum expected return required to place the bet (EV of 0 means no profit expected), and it is displayed in terms of betting units units
     min_bet_size : float64
-        the minimum bet size in units. This should be left as 1 and only max varied
+        the minimum bet size in units. This should be left as 1 and only max varied unless wanting to model £ bets
     max_bet_size : float64
         the maximum bet size. Set this to 1 to give uniform betting regardless of the probability
 
@@ -27,6 +27,7 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     None.
 
     """
+    
     # ###
     # # Debug
     # actuals_data = X_train[['id']].merge(data, on = 'id', how = 'left')
@@ -37,6 +38,10 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     # ###
     
     # pdb.set_trace()
+    
+    # Do a check that the inputs are consistent if doing a non constant bets. If using non constant bets, the bet sizing should be as proportions, not £ amounts
+    if not constant_bets:
+        stop_if_not((min_bet_size < 1) and (max_bet_size < 1), "Bet size for non-constant bets check")
     
     # First calculate the Expected Values on a W/L result and L/W result, given in betting units
     # Odds are decimal odds, so represent the payout for a 1 unit bet e.g. odds of 2 means a (2 - 1) = 1 profit.
@@ -52,6 +57,11 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     prob_lw_trigger = prediction_probabilities[:, 0] > min_prob_to_bet
     lw_trigger = 1 * ev_lw_trigger * prob_lw_trigger
     
+    # Fix any instances where both triggers happen. Remove the bet because there must be an odds mistake
+    double_trigger = (lw_trigger + wl_trigger) > 1
+    lw_trigger[double_trigger] = 0
+    wl_trigger[double_trigger] = 0
+    
     # Set whether a bet is made
     actuals_data['bets'] = wl_trigger + lw_trigger
 
@@ -64,47 +74,80 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     # Now calculate the kelly criterion
     actuals_data['kelly_criterion'] = win_prob - (1 - win_prob) / (win_odds - 1)
     
+    # Perform a check that kelly is correct
+    stop_if_not((actuals_data['kelly_criterion'].max() <= 1) and (actuals_data['kelly_criterion'].min() >= 0),
+                'Kelly criterion check')
+    
     # And use it to calculate how much to increase from the min
     actuals_data['bet_size'] = actuals_data['bets'] * (min_bet_size + (max_bet_size - min_bet_size) * actuals_data['kelly_criterion'])
+
+    # Check no bets breach the max
+    stop_if_not(actuals_data['bet_size'].max() <= max_bet_size, 'Max bet check')
     
     # Now calculate the returns if a bet was made
-    if constant_bets:
-        actuals_data['profit_loss'] = (wl_trigger * (actuals_data['outcome'] == 'W/L') - wl_trigger * (actuals_data['outcome'] != 'W/L') + lw_trigger * (actuals_data['outcome'] == 'L/W') - lw_trigger * (actuals_data['outcome'] != 'L/W')) * actuals_data['bet_size']
-    else:
-        # Not done yet but will have to loop through each row to track pot size over time
-        pass
+    actuals_data['profit_loss'] = (wl_trigger * (actuals_data['outcome'] == 'W/L') - wl_trigger * (actuals_data['outcome'] != 'W/L') + lw_trigger * (actuals_data['outcome'] == 'L/W') - lw_trigger * (actuals_data['outcome'] != 'L/W')) * actuals_data['bet_size']
     
+    if constant_bets:
+        pass
+    else:
+        # If bets are not constant, we need to work out the cumulative returns
+        
+        # Save the profit and loss
+        actuals_data['profit_loss_proportion'] = actuals_data['profit_loss'].copy()
+        
+        # First add 1 to get the proportion of the balance still left
+        actuals_data['profit_loss_multiplier'] = 1 + actuals_data['profit_loss_proportion']
+    
+        # Then convert to a cumulative product after sorting by date
+        actuals_data.sort_values('date', inplace = True)
+        
+        # Create balances
+        actuals_data['end_balance'] = start_balance * actuals_data['profit_loss_multiplier'].cumprod()
+        actuals_data['start_balance'] = actuals_data['end_balance'].shift(1).fillna(start_balance)
+        
+        # Then calculate profit and loss
+        actuals_data['profit_loss'] = actuals_data['end_balance'] - actuals_data['start_balance']
+        
     # Calculate some further columns that will be used for stats
     actuals_data['total'] = 'Total'
     actuals_data['fights'] = 1
     actuals_data['wins'] = 1 * (actuals_data['profit_loss'] > 0)
+    actuals_data['max_bet_size'] = actuals_data['bet_size']
+    
+    # If not doing constant bets, this script isn't able to break down results by anything as it stands, so reset the breakdown cols
+    if not constant_bets:
+        breakdown_cols = []
     
     ## Summarise the results
-    results = actuals_data.groupby('total').agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum'})
+    results = actuals_data.groupby('total').agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
     for col in breakdown_cols:
         results = pd.concat([
             results,
-            actuals_data.groupby(col).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum'})
+            actuals_data.groupby(col).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
         ])
     
     # Calculate percentage info
     results['percent_bet_on'] = results['bets'] / results['fights'] * 100
     results['win_percent'] = results['wins'] / results['bets'] * 100
-    results['roi'] = results['profit_loss'] / results['bet_size'] * 100 # the profit and loss assumes every bet equal size
-    
-    # For the total, calculate the longest streaks
-    results['max_losing_streak'] = np.nan
-    results.loc['Total', 'max_losing_streak'] = longest_streak(actuals_data['profit_loss'], -1)
     
     results['max_drawdown'] = np.nan
-    results.loc['Total', 'max_drawdown'] = minimum_sum_series(actuals_data['profit_loss'])
-    
+    # For the total, calculate the longest streaks
+    results['max_losing_streak'] = np.nan
+    if constant_bets:
+        results['roi'] = results['profit_loss'] / results['bet_size'] * 100 # the profit and loss assumes every bet equal size
+        results.loc['Total', 'max_drawdown'] = minimum_sum_series(actuals_data['profit_loss'])
+        results.loc['Total', 'max_losing_streak'] = longest_streak(actuals_data['profit_loss'], -1)
+    else:
+        # Work out the ROI per fight, otherwise going to be very large
+        results['roi'] = ((results['profit_loss'] / start_balance + 1) ** (1 / results['bets']) - 1) * 100 # the profit and loss assumes every bet equal size
+        results.loc['Total', 'max_drawdown'] = minimum_sum_series(actuals_data['profit_loss_proportion'])
+        
     # # Add the row names as a column
     # results = pd.concat([pd.DataFrame({'Group': results.index}), results], axis=1)
     results.rename(columns={'index': 'RowName'}, inplace=True)
     
     # Output the underlying data if required
     if output_data_for_debug:
-        actuals_data[['fighter1', 'fighter2', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
+        actuals_data[['fighter1', 'fighter2', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'kelly_criterion', 'bet_size', 'max_bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
     
     return results

@@ -80,7 +80,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('final_models_oot_testing_v2')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest, GT2 fights split dec exc, 500 trees, 250 features'
+model_description = 'XGB forest - GT2 fights split dec exc, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -92,65 +92,86 @@ breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only 
 target = 'outcome'
 
 
-# Run the metrics on the training data
-with mlflow.start_run():
+# Backtest for both constant terms and non-constant bets
+for backtesting_params in [
+        {
+            'min_prob_to_bet': 0.5,
+            'min_ev_to_bet': 0,
+            'max_bet_size': 200,
+            'min_bet_size': 85,
+            'constant_bets': True
+        },
+        {
+            'min_prob_to_bet': 0.5,
+            'min_ev_to_bet': 0,
+            'max_bet_size': 0.2,
+            'min_bet_size': 0.085,
+            'start_balance': 1000,
+            'constant_bets': False
+        }]:
     
-    # Get the model predictions
-    prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
+    # Run the metrics on the training data
+    with mlflow.start_run():
+        
+        # Get the model predictions
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
+        
+        test_model_and_log_mlflow(
+            X_train[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
+            prediction_probabilities, 
+            breakdown_cols = breakdown_cols, 
+            breakdown_metrics = breakdown_metrics, 
+            mlflow_description = model_description + ' - Train data', 
+            target_column = target,
+            backtesting_params = backtesting_params)
+        
+        # Log the model as an artifact so we have a record of it
+        mlflow.log_artifact(model_path, 'Model object')
+        mlflow.set_tag('Sample', 'Train')
+        
+    mlflow.end_run()
     
-    test_model_and_log_mlflow(
-        X_train[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
-        prediction_probabilities, 
-        breakdown_cols = breakdown_cols, 
-        breakdown_metrics = breakdown_metrics, 
-        mlflow_description = model_description + ' - Train data', 
-        target_column = target)
+    # Run the metrics on the test data
+    with mlflow.start_run():
+        
+        # Get the model predictions
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test)
+        
+        test_model_and_log_mlflow(
+            X_test[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+            prediction_probabilities, 
+            breakdown_cols = breakdown_cols, 
+            breakdown_metrics = breakdown_metrics, 
+            mlflow_description = model_description + '  - Test data', 
+            target_column = target,
+            backtesting_params = backtesting_params)
+        
+        mlflow.set_tag('Sample', 'Test')
+        
+    mlflow.end_run()
     
-    # Log the model as an artifact so we have a record of it
-    mlflow.log_artifact(model_path, 'Model object')
-    mlflow.set_tag('Sample', 'Train')
-    
-mlflow.end_run()
-
-# Run the metrics on the test data
-with mlflow.start_run():
-    
-    # Get the model predictions
-    prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test)
-    
-    test_model_and_log_mlflow(
-        X_test[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
-        prediction_probabilities, 
-        breakdown_cols = breakdown_cols, 
-        breakdown_metrics = breakdown_metrics, 
-        mlflow_description = model_description + '  - Test data', 
-        target_column = target)
-    
-    mlflow.set_tag('Sample', 'Test')
-    
-mlflow.end_run()
-
-# Run the metrics on the OOT data
-with mlflow.start_run():
-    
-    # Get the model input data
-    X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
-        oot, 
-        config = {'oot_start_date': '2999-01-01', 'min_training_date': '1000-01-01', 'seed_all': 1}, 
-        split_or_other_flag = False, 
-        test_size = 1e-99)
-    
-    # Get the model predictions
-    prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)
-    
-    test_model_and_log_mlflow(
-        X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
-        prediction_probabilities, 
-        breakdown_cols = breakdown_cols, 
-        breakdown_metrics = breakdown_metrics, 
-        mlflow_description = model_description + '  - OOT data', 
-        target_column = target)
-    
-    mlflow.set_tag('Sample', 'OOT')
-    
-mlflow.end_run()
+    # Run the metrics on the OOT data
+    with mlflow.start_run():
+        
+        # Get the model input data
+        X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
+            oot, 
+            config = {'oot_start_date': '2999-01-01', 'min_training_date': '1000-01-01', 'seed_all': 1}, 
+            split_or_other_flag = False, 
+            test_size = 1e-99)
+        
+        # Get the model predictions
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)
+        
+        test_model_and_log_mlflow(
+            X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+            prediction_probabilities, 
+            breakdown_cols = breakdown_cols, 
+            breakdown_metrics = breakdown_metrics, 
+            mlflow_description = model_description + '  - OOT data', 
+            target_column = target,
+            backtesting_params = backtesting_params)
+        
+        mlflow.set_tag('Sample', 'OOT')
+        
+    mlflow.end_run()

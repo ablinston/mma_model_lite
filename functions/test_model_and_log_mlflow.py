@@ -106,16 +106,24 @@ def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_
         mlflow.log_artifact('results/temp/summary.csv', col + ' metrics')
         
     # Finally, get the backtesting results
-    backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet = backtesting_params['min_prob_to_bet'], min_ev_to_bet = backtesting_params['min_ev_to_bet'], max_bet_size = backtesting_params['max_bet_size'])
+    backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params
+                                 )
     
     # Log the overall backtesting results
     backtesting.to_csv('results/temp/summary.csv', index = True)
     mlflow.log_artifact('results/temp/summary.csv', 'Backtesting results')
-    
+ 
     # Log the total metrics in MLflow
+    mlflow.log_params(backtesting_params)
+    
     mlflow.log_metric('Backtesting_P_and_L', backtesting.loc['Total', 'profit_loss'])
     mlflow.log_metric('Backtesting_Win_Percent', backtesting.loc['Total', 'win_percent'])
     mlflow.log_metric('Backtesting_Max_Drawdown', backtesting.loc['Total', 'max_drawdown'])
     mlflow.log_metric('Backtesting_ROI', backtesting.loc['Total', 'roi'])
+    mlflow.log_metric('Backtesting_Bets', backtesting.loc['Total', 'bets'])
+    mlflow.log_metric('Backtesting_Percent_Bet_On', backtesting.loc['Total', 'percent_bet_on'])
+    mlflow.log_metric('Backtesting_Normalised_Total_Percent_Return', 100 * ((1 + backtesting.loc['Total', 'roi'] / 100) ** backtesting.loc['Total', 'bets'] - 1))
+    mlflow.log_metric('Backtesting_Average_Bet_Size', backtesting.loc['Total', 'bet_size'] / backtesting.loc['Total', 'bets'])
+    mlflow.log_metric('Backtesting_Actual_Max_Bet_Size', backtesting.loc['Total', 'max_bet_size'])
     
     return None
