@@ -141,6 +141,8 @@ checks_passed = check_data_coverage(
     parsed_fighter_tott_df,
     config)
 
+# AB: If the fighter_tott has missing info, just run the whole thing rather than update old one
+
 #######################
 ## Save files if all has run successfully
 #######################

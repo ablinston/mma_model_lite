@@ -5,7 +5,7 @@ import shutil
 
 # Define some sample data
 sample_data = pd.DataFrame({
-    'date': pd.date_range(start='2010-01-01', end='2012-12-31', freq='M'),
+    'date': pd.date_range(start='2010-01-01', end='2012-12-31', freq='ME'),
     'value': range(36)
 })
 
