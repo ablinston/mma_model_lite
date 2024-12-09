@@ -42,3 +42,4 @@ AB note: couldn't get GPU training with LightGBM working at all on Windows. Used
 # Notes
 
 Decimal odds are how much is received back for every 1 bet. So for example 2 means you receive 2 (original bet + 1 profit)
+To undo stupid split in Spyder, use Alt + Shift + W

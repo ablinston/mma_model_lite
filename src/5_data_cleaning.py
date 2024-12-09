@@ -183,6 +183,20 @@ fighter_odds = fighter_odds[(fighter_odds['event'].isin(fight_results['event'].t
 
 ###########################################
 
+# Log the aspects of these files
+data_summary = update_data_summary(
+    results_csv_path = './data/cleaned_data_summary.csv', 
+    data_frames = {
+        'events': events, 
+        'fighters': fighters, 
+        'fight_results': fight_results, 
+        'fighter_odds':fighter_odds, 
+        'fight_stats_agg': fight_stats_agg},
+    summary_date = datetime.today())
+
+
+###########################################
+
 # Save the outputs
 
 fp.write('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
