@@ -1,13 +1,3 @@
-'''
-
-AB: NOT FINISHED UPDATING THIS
-
-Overview
-This script takes the scraped data, cleans it and formats columns
-'''
-
-# imports
-from tqdm import tqdm
 
 exec(open('global.py').read())
 

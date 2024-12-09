@@ -62,6 +62,9 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
         
         # Initial the new dictionary for this column
         metrics_by_group.update({col: {}})
+        # pdb.set_trace()
+        # Convert the column to a string to ensure consistent outputs
+        actuals_data[col] = actuals_data[col].apply(str)
         
         # Now loop through all the unique values within the column
         for group in np.unique(actuals_data[col]).tolist():

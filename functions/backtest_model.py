@@ -1,4 +1,4 @@
-def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, constant_bets = True, start_balance = 1000, output_data_for_debug = False):
+def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, constant_bets = True, start_balance = 1000, output_data_for_debug = True):
     """
     
     A function to backtest a model's predictions against actuals data that contain the odds'.
@@ -85,7 +85,7 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     stop_if_not(actuals_data['bet_size'].max() <= max_bet_size, 'Max bet check')
     
     # Now calculate the returns if a bet was made
-    actuals_data['profit_loss'] = (wl_trigger * (actuals_data['outcome'] == 'W/L') - wl_trigger * (actuals_data['outcome'] != 'W/L') + lw_trigger * (actuals_data['outcome'] == 'L/W') - lw_trigger * (actuals_data['outcome'] != 'L/W')) * actuals_data['bet_size']
+    actuals_data['profit_loss'] = ((actuals_data['fighter1_best_closing_odds'] - 1) * wl_trigger * (actuals_data['outcome'] == 'W/L') - wl_trigger * (actuals_data['outcome'] != 'W/L') + (actuals_data['fighter2_best_closing_odds'] - 1) * lw_trigger * (actuals_data['outcome'] == 'L/W') - lw_trigger * (actuals_data['outcome'] != 'L/W')) * actuals_data['bet_size']
     
     if constant_bets:
         pass
