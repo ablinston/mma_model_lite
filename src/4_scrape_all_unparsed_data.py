@@ -149,6 +149,21 @@ checks_passed = check_data_coverage(
 
 if checks_passed:
     
+    # Log the aspects of these files
+    data_summary = update_data_summary(
+        results_csv_path = './data/raw_data_summary.csv', 
+        data_frames = {
+            'updated_event_details_df': parsed_event_details_df, 
+            'parsed_fight_details_df': parsed_fight_details_df, 
+            'parsed_fight_results_df': parsed_fight_results_df, 
+            'parsed_odds_df':parsed_odds_df, 
+            'parsed_fighter_tott_df': parsed_fighter_tott_df,
+            'parsed_fight_stats_df': parsed_fight_stats_df},
+        summary_date = datetime.today(),
+        save_output = False)
+    
+    # Manually check if you're happy with the above then save
+    
     # write new fight details to file
     fp.write('./data/' + config['event_details_file_name'], updated_event_details_df, compression = 'GZIP')
     fp.write('./data/' + config['fight_details_file_name'], parsed_fight_details_df, compression = 'GZIP')
