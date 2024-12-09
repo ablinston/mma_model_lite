@@ -32,7 +32,7 @@ def update_fighter_odds_data(existing_odds_data, new_fighter_list, new_event_dat
     ###############################
     
     # Filter rows with NaT in 'date'
-    nat_date_rows = parsed_odds_df[parsed_odds_df['date'].isna()]
+    nat_date_rows = new_odds_data[new_odds_data['date'].isna()]
 
     # Total count of rows with NaT in 'date'
     total_nat_count = nat_date_rows.shape[0]

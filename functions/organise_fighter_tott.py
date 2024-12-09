@@ -13,7 +13,7 @@ def organise_fighter_tott(tott_from_soup, fighter_tott_column_names, url):
     results:
     a df of fighter tale of the tape
     """
-    pdb.set_trace()
+    # pdb.set_trace()
     fighter_tott_clean = [re.sub('^(.+?): ?', '', text) for text in
         tott_from_soup]
     fighter_tott_clean.append(url)

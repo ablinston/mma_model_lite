@@ -26,5 +26,5 @@ def test_parallel_scrape_odds():
     # Then sort by fighter in case the parallel runs did a different order
     odds_df.sort_values(by = ['fighter', 'date'], inplace = True)
     
-    assert odds_df.equals(parallel_scrape_odds_data_correct) == True
+    assert odds_df.reset_index(drop = True).equals(parallel_scrape_odds_data_correct.reset_index(drop = True)) == True
     

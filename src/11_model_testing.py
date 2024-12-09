@@ -116,7 +116,7 @@ for backtesting_params in [
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
         
-        test_model_and_log_mlflow(
+        btest_model_and_log_mlflow(
             X_train[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
             prediction_probabilities, 
             breakdown_cols = breakdown_cols, 
@@ -137,7 +137,7 @@ for backtesting_params in [
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test)
         
-        test_model_and_log_mlflow(
+        btest_model_and_log_mlflow(
             X_test[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
             prediction_probabilities, 
             breakdown_cols = breakdown_cols, 
@@ -163,7 +163,7 @@ for backtesting_params in [
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)
         
-        test_model_and_log_mlflow(
+        btest_model_and_log_mlflow(
             X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
             prediction_probabilities, 
             breakdown_cols = breakdown_cols, 

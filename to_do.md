@@ -6,6 +6,7 @@
 
 * Add sample sizes to the metric outputs in the test scripts
 * Fix error with missing groups in script 10 functions
+* Add a manual lookup for fighters odds urls, and get it to handle people like Volkanovski that have 2 pages
 
 * Fill in missing dates with a very early one. To avoid missing in diff where it could be either fighter that hasn't been KO'd for e.g.
 

@@ -16,11 +16,15 @@ def test_remove_duplicate_fighter_pairs():
         'fighter1': ['Fighter A', 'Fighter C', 'Fighter A'],
         'fighter2': ['Fighter B', 'Fighter A', 'Fighter D']
     }
+    
+    data = pd.DataFrame(data)
+    
     expected_df = pd.DataFrame(expected_data)
+    data['date'] = pd.to_datetime(data['date'])
     expected_df['date'] = pd.to_datetime(expected_df['date'])
 
     # Run the function
-    result_df = remove_fighter_duplicates(data)
+    result_df = remove_duplicate_fighter_pairs(data)
 
     # Assert that the result matches the expected DataFrame
     pd.testing.assert_frame_equal(result_df, expected_df)

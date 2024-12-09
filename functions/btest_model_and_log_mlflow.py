@@ -1,6 +1,6 @@
 # This function takes a model and a test dataset and computes test statistics then logs them in mlflow.
 
-def test_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column = 'outcome', backtesting_params = {'min_prob_to_bet': 0.5, 'min_ev_to_bet': 0.05, 'max_bet_size': 1}):
+def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column = 'outcome', backtesting_params = {'min_prob_to_bet': 0.5, 'min_ev_to_bet': 0.05, 'max_bet_size': 1}):
 
     """
     Tests a model by taking in some actuals data, a set of prediction probabilities, and any breakdown variables to use. It logs various metrics in MLflow as well as outputing some statistics
