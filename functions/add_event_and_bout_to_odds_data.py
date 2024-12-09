@@ -19,9 +19,14 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
     
     # Merge the dates onto to stats data
     new_stats_df = stats_df.merge(event_dates[['event', 'event_date']], how = 'left', on = 'event')
+        
+    # Clean the bouts and fighter columns
+    new_stats_df[['bout', 'fighter']] = clean_text_columns(new_stats_df[['bout', 'fighter']])
+    odds_df[['fighter', 'opponent']] = clean_text_columns(odds_df[['fighter', 'opponent']])
     
-    # Drop columns not needed and duplicates
+    # Drop columns not needed and duplicates. Drop NA because they will affect the match
     new_stats_df = new_stats_df[['event', 'bout', 'fighter', 'event_date']].drop_duplicates()
+    new_stats_df = new_stats_df.dropna()
     
     # Create an opponent column
     add_opponent_column(new_stats_df)
@@ -71,6 +76,10 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
     # Check the new data is a consistent length with the old data
     if len(new_odds_df) != len(odds_df):    
         print("ERROR: MATCHING EVENTS AND BOUTS TO ODDS CREATED TOO MANY RECORDS")
+        return None
+    
+    # Finally, if no event has been found, just use the old event name
+    new_odds_df['event'] = np.where(new_odds_df['event'].isna(), new_odds_df['event_old'], new_odds_df['event'])
     
     # Do a check to see where we have not found UFC events
     ufc_bouts_missing_odds = new_stats_df[new_stats_df['event_date'] > '2010-01-01']['bout'][~new_stats_df['bout'].isin(new_odds_df['bout'].tolist())]

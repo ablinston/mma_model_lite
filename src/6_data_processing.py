@@ -728,6 +728,6 @@ split_by_year_and_save_fastparquet(merged_data, 'date', './data/final_dataset/',
 # fp.write('./data/final_dataset.parquet', merged_data, compression = 'GZIP')
 
 # Output a single fight for checking purposes
-merged_data[(merged_data['fighter1'] == 'KhabibNurmagomedov') & (merged_data['fighter2'] == 'ConorMcGregor')].T.to_csv('./data/final_dataset_checking.csv', index=True)
+merged_data[(merged_data['fighter1'] == 'khabibnurmagomedov') & (merged_data['fighter2'] == 'conormcgregor')].T.to_csv('./data/final_dataset_checking.csv', index=True)
 
-merged_data[(merged_data['fighter1'] == 'AntonioSilva') | (merged_data['fighter2'] == 'AntonioSilva')].T.to_csv('./data/final_dataset_fighter_checking.csv')
+merged_data[(merged_data['fighter1'] == 'antoniosilva') | (merged_data['fighter2'] == 'antoniosilva')].T.to_csv('./data/final_dataset_fighter_checking.csv')

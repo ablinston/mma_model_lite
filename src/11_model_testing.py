@@ -87,7 +87,7 @@ model_description = 'XGB forest - GT2 fights split dec exc, ' + str(len(rf_xgb_m
 ##########################################################################################
 
 # Set which columns and metrics we're interested in
-breakdown_cols = ['weightclass', 'year', 'total_fights', 'fighter_history', 'favourite']
+breakdown_cols = ['weightclass', 'year', 'fighter_history', 'favourite', 'matchup', 'date', 'total_fights']
 breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Sample Size']
 target = 'outcome'
 

@@ -1,5 +1,5 @@
 
-def update_data_summary(results_csv_path, data_frames, summary_date):
+def update_data_summary(results_csv_path, data_frames, summary_date, save_output = False):
     """
     Updates the results dataframe with summary statistics of the provided dataframes.
     Each date will be a column with the summary for each dataframe.
@@ -14,7 +14,9 @@ def update_data_summary(results_csv_path, data_frames, summary_date):
     """
     
     pdb.set_trace()
-
+    
+    results_df = pd.read_csv(results_csv_path, index_col = 0)
+    
     # Create an empty list to store the summary data for each dataframe
     summary_data = []
     
@@ -47,6 +49,7 @@ def update_data_summary(results_csv_path, data_frames, summary_date):
     updated_results_df = pd.concat([results_df, summary_df], ignore_index=True)
 
     # Save to file before outputting
-    updated_results_df.to_csv(results_csv_path, index = True)
+    if save_output:
+        updated_results_df.to_csv(results_csv_path, index = True)
 
     return updated_results_df

@@ -87,6 +87,9 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     event_details['date'] = event_details['date'].apply(lambda x: datetime.strptime(x, '%B %d, %Y'))
     post_2010_events = event_details['event'][event_details['date'] > config['start_date_validation_checks']]
     
+    # Only keep UFC events
+    post_2010_events = pd.Series([event for event in post_2010_events if 'ufc' in event])
+    
     missing_events_from_odds = post_2010_events[~post_2010_events.isin(fight_odds['event'].tolist())]
     
     if (len(missing_events_from_odds) > 0):
@@ -99,8 +102,16 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     missing_bouts_from_odds = set(post_2010_bouts[~post_2010_bouts.isin(fight_odds['bout'].tolist())])
     
     if (len(missing_bouts_from_odds) > 0):
-        print(f"Error: {len(missing_bouts_from_odds)} bouts out of {len(all_bouts)} are missing from the odds data. The following bouts are missing from the odds data: {missing_bouts_from_odds}")
+        print(f"Warning: {len(missing_bouts_from_odds)} UFC bouts out of {len(all_bouts)} are missing from the odds data.")
         # all_checks_passed = False # Not setting to false because some bouts have no odds data because the fighters names are wrong. See UFC 298 for e.g.
+        
+    # Find which fighters appear most in missed bouts
+    # Split each element into two lists
+    list1, list2 = zip(*(char.split('vs.') for char in missing_bouts_from_odds))
+    # Combine both lists into a single list
+    combined_list = list(list1) + list(list2)
+    # Count occurrences of each item
+    pd.Series(list(list1) + list(list2)).value_counts()
         
     ## Check that all the fighters have fighter details data
     # Add a fighter column

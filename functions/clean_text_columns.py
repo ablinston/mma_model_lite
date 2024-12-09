@@ -4,5 +4,10 @@ def clean_text_columns(df):
     # Loop through the columns. This is faster than .apply with lambda
     for col in df.columns:
         df.loc[:, col] = df[col].str.replace(' ', '')
+        # Remove capitals and special characters
+        df.loc[:, col] = df[col].str.lower()
+        df.loc[:, col] = df[col].str.replace("'", "")
+        df.loc[:, col] = df[col].str.replace('-', '')
+        # df.loc[:, col] = df[col].str.replace('.', '')
         
     return df

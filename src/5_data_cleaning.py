@@ -1,13 +1,3 @@
-'''
-
-AB: NOT FINISHED UPDATING THIS
-
-Overview
-This script takes the scraped data, cleans it and formats columns
-'''
-
-# imports
-from tqdm import tqdm
 
 exec(open('global.py').read())
 
@@ -181,19 +171,6 @@ fight_stats_agg = fight_stats_agg[(fight_stats_agg['event'].isin(fight_results['
 
 fighter_odds = fighter_odds[(fighter_odds['event'].isin(fight_results['event'].tolist())) & (fighter_odds['bout'].isin(fight_results['bout'].tolist()))]
 
-###########################################
-
-# Log the aspects of these files
-data_summary = update_data_summary(
-    results_csv_path = './data/cleaned_data_summary.csv', 
-    data_frames = {
-        'events': events, 
-        'fighters': fighters, 
-        'fight_results': fight_results, 
-        'fighter_odds':fighter_odds, 
-        'fight_stats_agg': fight_stats_agg},
-    summary_date = datetime.today())
-
 
 ###########################################
 
@@ -201,21 +178,21 @@ data_summary = update_data_summary(
 
 fp.write('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
          events,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fighter_tott_file_name'].replace('.parquet', '_clean.parquet'),
          fighters,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fight_results_file_name'].replace('.parquet', '_clean.parquet'),
          fight_results,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet'),
          fight_stats_agg,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
          fighter_odds,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 

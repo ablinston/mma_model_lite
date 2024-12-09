@@ -1,0 +1,7 @@
+,date,dataframe,rows,columns,EVENT,URL,DATE,LOCATION,date_formatted,BOUT,OUTCOME,WEIGHTCLASS,METHOD,ROUND,TIME,TIME FORMAT,REFEREE,DETAILS,open_odds,closing_odds_low,closing_odds_high,event,fighter,opponent,FIGHTER,HEIGHT,WEIGHT,REACH,STANCE,DOB,KD,SIG.STR.,SIG.STR. %,TOTAL STR.,TD,TD %,SUB.ATT,REV.,CTRL,HEAD,BODY,LEG,DISTANCE,CLINCH,GROUND
+0,2024-12-09 14:42:43.404883,updated_event_details_df,1171,5,0.0,0.0,0.0,0.0,704.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1,2024-12-09 14:42:43.404883,parsed_fight_details_df,10430,3,0.0,0.0,,,,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2,2024-12-09 14:42:43.404883,parsed_fight_results_df,10430,11,0.0,0.0,,,,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3,2024-12-09 14:42:43.404883,parsed_odds_df,27382,7,,,,,,,,,,,,,,,0.0,0.0,0.0,0.0,0.0,0.0,,,,,,,,,,,,,,,,,,,,,
+4,2024-12-09 14:42:43.404883,parsed_fighter_tott_df,4255,7,,0.0,,,,,,,,,,,,,,,,,,,0.0,0.0,0.0,0.0,0.0,0.0,,,,,,,,,,,,,,,
+5,2024-12-09 14:42:43.404883,parsed_fight_stats_df,45870,19,0.0,,,,,0.0,,,,330.0,,,,,,,,,,,330.0,,,,,,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0

@@ -10,6 +10,8 @@ def add_opponent_column(df):
     Returns:
     pd.DataFrame: The DataFrame with an added 'opponent' column.
     """
+    # pdb.set_trace()
+    
     # Split 'bout' into two columns, 'fighter_1' and 'fighter_2'
     fighter_pairs = df['bout'].str.split('vs\\.', expand=True)
     df['fighter_1'] = fighter_pairs[0]
