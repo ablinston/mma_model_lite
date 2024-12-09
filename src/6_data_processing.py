@@ -78,7 +78,7 @@ fight_stats_against.rename(columns = lambda x: x + "_against" if "sub.att" in x 
 
 # Split the bout into fighters
 # Set the opponent to the fighter for merging
-fight_stats_against[['fighter1', 'fighter2']] = fight_stats_against['bout'].str.split('vs\.', expand = True)
+fight_stats_against[['fighter1', 'fighter2']] = fight_stats_against['bout'].str.split('vs\\.', expand = True)
 fight_stats_against['fighter'] = np.where(fight_stats_against['fighter'] == fight_stats_against['fighter1'], fight_stats_against['fighter2'], fight_stats_against['fighter1'])
 # Get only the columns we want
 against_columns = [col for col in fight_stats_against.columns if "against" in col]
@@ -143,7 +143,7 @@ del fight_stats_hist_last_3_check
 ###########################################################################################
 # Get the fight stats of each fighter against only specific types of fighters
 stances = fighters['stance'].str.replace(' ', '').unique().tolist()
-fight_stats[['fighter1', 'fighter2']] = fight_stats['bout'].str.split('vs\.', expand = True)
+fight_stats[['fighter1', 'fighter2']] = fight_stats['bout'].str.split('vs\\.', expand = True)
 fight_stats['opponent'] = np.where(fight_stats['fighter1'] == fight_stats['fighter'], fight_stats['fighter2'], fight_stats['fighter1'])
 fight_stats.drop(columns = ['fighter1', 'fighter2'], inplace = True)
 

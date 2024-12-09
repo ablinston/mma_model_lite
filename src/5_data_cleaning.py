@@ -74,7 +74,7 @@ fight_results['rounds'] = fight_results['time format'].str[0:1]
 fight_stats = split_of_columns(fight_stats, ['sig.str.', 'total str.', 'td', 'head', 'body', 'leg', 'distance', 'clinch', 'ground'])
 
 # Split fight into fighters
-fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\.', expand = True)
+fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\\.', expand = True)
 
 # Aggregate the fight stats to be at fight-fighter level
 # Merge on the final round time from the fight results

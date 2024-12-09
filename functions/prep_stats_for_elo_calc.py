@@ -18,7 +18,7 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
     fight_results['outcome'] = np.where((fight_results['outcome'] == "D/D") | (fight_results['outcome'] == "NC/NC"), "OTH", fight_results['outcome'])
     
     # Add the fighter columns needed to the data
-    fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\.', expand = True)
+    fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\\.', expand = True)
 
     # Merge the two datasets together to get stats for the fight
     merged_data = merge_df_both_fighters(

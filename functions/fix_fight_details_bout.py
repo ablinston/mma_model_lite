@@ -19,7 +19,7 @@ def fix_fight_details_bout(fight_details, fight_stats_df):
 
     
     # First, get individual columns for the fighters on the details data
-    fight_details[['fighter1', 'fighter2']] = fight_details['BOUT'].str.split('vs\.', expand = True)
+    fight_details[['fighter1', 'fighter2']] = fight_details['BOUT'].str.split('vs\\.', expand = True)
     
     # Now reverse the bout
     fight_details['BOUT_ALT'] = fight_details['fighter2'] + 'vs.' + fight_details['fighter1']

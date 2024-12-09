@@ -44,7 +44,7 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
     # Create a data frame with opponents details.
     new_stats_df.rename(columns = {'event_p': 'event', 'bout_p': 'bout', 'event_date_p': 'event_date'}, inplace = True)
     opponents_df = new_stats_df.copy()
-    # opponents_df[['fighter1', 'fighter2']] = opponents_df['bout'].str.split('vs\.', expand = True)
+    # opponents_df[['fighter1', 'fighter2']] = opponents_df['bout'].str.split('vs.', expand = True)
     # opponents_df['opponent'] = np.where(opponents_df['fighter1'] == opponents_df['fighter'], opponents_df['fighter2'], opponents_df['fighter1'])
     opponents_df = opponents_df[['event', 'bout', 'event_date', 'fighter', 'opponent']]
     opponents_df.columns = [f'{col}_opp' for col in opponents_df.columns]
