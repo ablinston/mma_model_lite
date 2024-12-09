@@ -188,21 +188,21 @@ fighter_odds = fighter_odds[(fighter_odds['event'].isin(fight_results['event'].t
 
 fp.write('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
          events,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fighter_tott_file_name'].replace('.parquet', '_clean.parquet'),
          fighters,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fight_results_file_name'].replace('.parquet', '_clean.parquet'),
          fight_results,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet'),
          fight_stats_agg,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
          fighter_odds,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
