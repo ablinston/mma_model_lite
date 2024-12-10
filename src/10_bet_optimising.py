@@ -75,7 +75,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_bet_testing_v3')
+mlflow.set_experiment('final_models_bet_testing_v4_prop')
 
 # Set this model's description for MLflow
 model_description = 'XGB forest, GT2 fights split dec exc, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
@@ -90,10 +90,10 @@ breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only 
 target = 'outcome'
 
 # Loop through all the minimum probabilities and ex[ected values to bet
-for min_prob_to_bet in [0.5]: # np.arange(0.48, 0.52, 0.01):
-    for min_ev_to_bet in [0]: # np.arange(0, 0.5, 0.05):
-        for max_bet_size in [100, 200]: # np.arange(5, 50, 5):
-            for min_bet_size in np.arange(0.1, 100.1, 5):
+for min_prob_to_bet in [0.35]: # np.arange(0.05, 0.7, 0.05):
+    for min_ev_to_bet in [0.1]: # np.arange(0, 0.5, 0.05):
+        for max_bet_size in np.arange(0.1, 0.4, 0.02):
+            for min_bet_size in np.arange(0.01, 0.1, 0.01):
             
                 backtesting_params = {
                     'min_prob_to_bet': min_prob_to_bet,

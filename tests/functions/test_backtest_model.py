@@ -36,7 +36,7 @@ def test_backtest_model():
     # Common parameters for backtesting
     breakdown_cols = []
     min_prob_to_bet = 0.5
-    min_ev_to_bet = 0
+    min_ev_to_bet = -1
 
     # Test each scenario
     results_perfect = backtest_model(

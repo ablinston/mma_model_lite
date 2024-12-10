@@ -1,4 +1,4 @@
-def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, constant_bets = True, start_balance = 1000, output_data_for_debug = True):
+def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, constant_bets = True, start_balance = 1000, output_data_for_debug = True):
     """
     
     A function to backtest a model's predictions against actuals data that contain the odds'.
@@ -38,6 +38,8 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
     # ###
     
     # pdb.set_trace()
+    
+    breakdown_cols = breakdown_columns.copy()
     
     # Do a check that the inputs are consistent if doing a non constant bets. If using non constant bets, the bet sizing should be as proportions, not £ amounts
     if not constant_bets:
@@ -141,10 +143,10 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_cols, min_p
         # Work out the ROI per fight, otherwise going to be very large
         results['roi'] = ((results['profit_loss'] / start_balance + 1) ** (1 / results['bets']) - 1) * 100 # the profit and loss assumes every bet equal size
         results.loc['Total', 'max_drawdown'] = minimum_sum_series(actuals_data['profit_loss_proportion'])
-        
+
     # # Add the row names as a column
-    # results = pd.concat([pd.DataFrame({'Group': results.index}), results], axis=1)
-    results.rename(columns={'index': 'RowName'}, inplace=True)
+    results = pd.concat([pd.DataFrame({'Group': results.index}, index = results.index), results], axis=1)
+    # results.rename(columns={'index': 'RowName'}, inplace=True)
     
     # Output the underlying data if required
     if output_data_for_debug:
