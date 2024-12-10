@@ -1,5 +1,4 @@
 ,5704
-level_0,5704
 fighter1,khabibnurmagomedov
 fighter2,conormcgregor
 outcome,W/L
@@ -4231,15 +4230,15 @@ fighter1_last_10_results,WWWWWWWWWW
 fighter1_hist_win_streak,10
 fighter1_hist_loss_streak,0
 fighter1_hist_W_Decision-Split,0
-fighter1_hist_W_Submission,2
 fighter1_hist_W_Decision-Unanimous,6
 fighter1_hist_W_KO/TKO,2
 fighter1_hist_W_Other,0
+fighter1_hist_W_Submission,2
 fighter1_hist_L_Decision-Split,0
-fighter1_hist_L_Submission,0
 fighter1_hist_L_Decision-Unanimous,0
 fighter1_hist_L_KO/TKO,0
 fighter1_hist_L_Other,0
+fighter1_hist_L_Submission,0
 fighter2_date_last_win,2016-11-12 00:00:00
 fighter2_date_last_loss,2016-03-05 00:00:00
 fighter2_hist_wins,9
@@ -4353,21 +4352,21 @@ fighter2_last_10_results,WWWWWWWLWW
 fighter2_hist_win_streak,2
 fighter2_hist_loss_streak,0
 fighter2_hist_W_Decision-Split,1
-fighter2_hist_W_Submission,0
 fighter2_hist_W_Decision-Unanimous,1
 fighter2_hist_W_KO/TKO,7
 fighter2_hist_W_Other,0
+fighter2_hist_W_Submission,0
 fighter2_hist_L_Decision-Split,0
-fighter2_hist_L_Submission,1
 fighter2_hist_L_Decision-Unanimous,0
 fighter2_hist_L_KO/TKO,0
 fighter2_hist_L_Other,0
-fighter1_open_odds,1.4081632653061225
-fighter1_best_closing_odds,1.529100529100529
-fighter1_odds_change,0.12093726379440661
-fighter2_open_odds,2.75
-fighter2_best_closing_odds,2.69
-fighter2_odds_change,-0.06000000000000005
+fighter2_hist_L_Submission,1
+fighter1_open_odds,1.5120593692022264
+fighter1_best_closing_odds,1.568438858401684
+fighter1_odds_change,0.056379489199457566
+fighter2_open_odds,2.952898550724638
+fighter2_best_closing_odds,2.759204152249135
+fighter2_odds_change,-0.19369439847550307
 fighter1_weight,155.0
 fighter1_reach,70.0
 fighter1_stance,Orthodox
@@ -8062,7 +8061,7 @@ diff_last_3_fights_round4to3_total_strike_per_minute_ratio,-0.20358279651383104
 diff_last_3_fights_round5to4_total_strike_accuracy_ratio,0.2693917025224015
 diff_last_3_fights_round5to4_total_strike_per_minute_ratio,0.28144536134033493
 diff_moved_weightclass,0.0
-diff_odds_change,0.18093726379440667
+diff_odds_change,0.25007388767496064
 diff_reach,-4.0
 diff_round2to1_total_strike_accuracy_ratio,0.010601748794813126
 diff_round2to1_total_strike_per_minute_ratio,0.1398506897058176
@@ -10731,8 +10730,8 @@ diff_ratio_last_3_fights_round4to3_total_strike_per_minute_ratio,0.8626999744441
 diff_ratio_last_3_fights_round5to4_total_strike_accuracy_ratio,1.2424893847602465
 diff_ratio_last_3_fights_round5to4_total_strike_per_minute_ratio,1.5149851292610383
 diff_ratio_moved_weightclass,
-diff_ratio_odds_change,-2.0156210632401086
-diff_ratio_open_odds,0.5120593692022264
+diff_ratio_odds_change,-0.2910744432632005
+diff_ratio_open_odds,0.5120593692022263
 diff_ratio_reach,0.9459459459459459
 diff_ratio_round2to1_total_strike_accuracy_ratio,1.0086158231234403
 diff_ratio_round2to1_total_strike_per_minute_ratio,1.1505251864315038

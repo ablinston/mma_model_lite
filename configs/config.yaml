@@ -16,6 +16,9 @@ seed_all: 42
 # Set the earliest data on which validation checks are to be carried out from
 start_date_validation_checks: '2010-01-01'
 
+# Set whether the odds should be normalised as part of the data processing. This ensures we don't have discrepencies
+normalise_odds_in_processing: True
+
 # file names for parsed data
 event_details_file_name: ufc_event_details.parquet
 fight_details_file_name: ufc_fight_details.parquet

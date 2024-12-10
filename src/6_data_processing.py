@@ -398,17 +398,8 @@ stop_if_not(fight_results['fight_elevation'].isna().sum() == 0, "Event elevation
 ###########################################################################################
 # FIGHT ODDS PROCESSING
 
-# Convert opening odds to decimal
-fight_odds['open_odds'] = fight_odds['open_odds'].apply(american_odds_to_decimal)
+fight_odds = process_odds_data(fight_odds)
 
-# Record the best odds as the highest (as that is what will give the biggest return)
-fight_odds['best_closing_odds'] = fight_odds['closing_odds_high'].apply(american_odds_to_decimal)
-
-# Calculate the odds change
-fight_odds['odds_change'] = fight_odds['best_closing_odds'] - fight_odds['open_odds']
-
-# Keep only the columns we need, and remove duplicates (these duplicates are where the event and bout are empty)
-fight_odds = fight_odds[['event', 'bout', 'fighter', 'open_odds', 'best_closing_odds', 'odds_change']].drop_duplicates(subset = ['event', 'bout', 'fighter'])
 
 
 ###########################################################################################
@@ -427,7 +418,7 @@ merged_data = merge_df_both_fighters(
         # win_loss_stats,
         fight_odds
     ]
-).reset_index().drop(columns = ['index'])
+).reset_index(drop = True)
 
 # Save rows for checks later
 merged_original_rows = len(merged_data)
@@ -461,6 +452,20 @@ else:
 
 # Check for duplicate column names
 duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
+
+
+
+###########################################################################################
+# FURTHER FEATURE PROCESSING
+
+# Change odds into true odds
+merged_data = calculate_true_odds(merged_data, 'fighter1_best_closing_odds', 'fighter2_best_closing_odds')
+merged_data = calculate_true_odds(merged_data, 'fighter1_open_odds', 'fighter2_open_odds')
+
+# Recalculate change
+merged_data['fighter1_odds_change'] = merged_data['fighter1_best_closing_odds'] - merged_data['fighter1_open_odds']
+merged_data['fighter2_odds_change'] = merged_data['fighter2_best_closing_odds'] - merged_data['fighter2_open_odds']
+
 
 ###########################################################################################
 # PERCENTAGE CALCULATIONS
@@ -706,7 +711,7 @@ merged_data.columns = merged_data.columns.str.replace(" ", "_")
 merged_data['womens'] = np.where(merged_data['weightclass'].apply(lambda x: np.where('omen' in x, True, False)), 1, 0)
 
 # Add the matchup
-merged_data['matchup'] = merged_data['fighter1_fighter_type'] + merged_data['fighter2_fighter_type']
+merged_data['matchup'] = merged_data['fighter1_fighter_type'] + '-vs-' + merged_data['fighter2_fighter_type']
 
 ###########################################################################################
 # OUTPUT DATA
@@ -719,8 +724,7 @@ merged_data.drop(columns = cols_to_remove, inplace = True)
 merged_data.dropna(axis = 1, how = 'all', inplace = True)
 
 # print(merged_data.columns)
-merged_data.reset_index(inplace = True)
-merged_data.drop(columns = cols_to_remove, inplace = True, errors = 'ignore')
+merged_data.reset_index(drop = True, inplace = True)
 merged_data.drop(columns = cols_to_remove, inplace = True, errors = 'ignore')
 del(cols_to_remove)
 
