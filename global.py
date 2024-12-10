@@ -31,9 +31,23 @@ import sys
 from yaml import safe_load, dump
 
 # Load the config files
-config = safe_load(open('./configs/config.yaml'))
-elo_config = safe_load(open('./configs/elo_params.yaml'))
-final_model_features = safe_load(open('./configs/final_model_features.yaml'))
+
+# Directory containing the YAML files
+yaml_folder = './configs'
+
+# Loop through all files in the folder
+for filename in os.listdir(yaml_folder):
+    if filename.endswith('.yaml') or filename.endswith('.yml'):  # Check for YAML file extensions
+        file_path = os.path.join(yaml_folder, filename)
+        
+        # Create a valid variable name from the filename
+        variable_name = os.path.splitext(filename)[0]
+        variable_name = variable_name.replace('-', '_').replace(' ', '_')
+        
+        # Load the YAML file
+        with open(file_path, 'r') as yaml_file:
+            globals()[variable_name] = safe_load(yaml_file)
+            
 
 # Go through each function file and run it
 for file in listdir('./functions/'):

@@ -1,0 +1,6 @@
+# This sets whether the fighters be swapped so that the odds favourite is always fighter1
+switch_fighters_with_odds: True
+
+# This sets whether the fighters should be randomly switched before models are fit
+# Note that if this is true it effectively undoes the switch with odds
+switch_fighters_randomly: False
