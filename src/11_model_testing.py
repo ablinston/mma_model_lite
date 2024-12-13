@@ -95,15 +95,15 @@ target = 'outcome'
 # Backtest for both constant terms and non-constant bets
 for backtesting_params in [
         {
-            'min_prob_to_bet': 0.5,
-            'min_ev_to_bet': 0.05,
+            'min_prob_to_bet': 0.35,
+            'min_ev_to_bet': 0.15,
             'max_bet_size': 400,
             'min_bet_size': 40,
             'constant_bets': True
         },
         {
-            'min_prob_to_bet': 0.5,
-            'min_ev_to_bet': 0.05,
+            'min_prob_to_bet': 0.35,
+            'min_ev_to_bet': 0.15,
             'max_bet_size': 0.4,
             'min_bet_size': 0.04,
             'start_balance': 1000,

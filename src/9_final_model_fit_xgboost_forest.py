@@ -114,7 +114,7 @@ for num_trees in [1, 3, 5, 10, 20, 50, 75, 100, 150, 200, 250, 500]:
 
 
 # Set the final number of models
-final_forest_size = 75
+final_forest_size = 50
 final_subsample = 0.7
 
 # Save the final model, choosing the number of trees
