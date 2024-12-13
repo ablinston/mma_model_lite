@@ -28,6 +28,11 @@ data = concat_parquets_fastparquet('./data/final_dataset/')
 # Apply standard filters
 data = standard_data_filter(data)
 
+# Switch fighers if necessary
+if model_hyper_params['switch_fighters_with_odds'] == True:
+    data = switch_fighter1_fighter2(data, data['fighter1_best_closing_odds'] > data['fighter2_best_closing_odds'])
+
+
 # Don't include split or other decisions in training data. This flag will be used in functions later to exclude them from training data but not from test data (including test in CV data)
 split_or_other_exclude = True
 
@@ -69,7 +74,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_all_feature_opt')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_f1_fav_feature_opt')
 
 
 ##########################################################################################
@@ -80,8 +85,8 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 300,
-    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 500, 1000, 2000, len(X_train_master)]),
+    'max_evals': 700,
+    'num_of_features': 230, # hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 500, 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
@@ -89,10 +94,10 @@ space = {
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
      'learning_rate': hp.quniform('learning_rate', 0.001, 0.301, 0.005), # Learning rate
-     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
+     'min_child_weight': hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
-     'max_depth': hp.quniform('max_depth', 1, 3, 1),
-     'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
+     'max_depth': hp.quniform('max_depth', 1, 5, 1),
+     'max_bin': 255, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
      'eval_metric': 'auc',       # Evaluation metric
      'tree_method': 'hist',      # Use GPU accelerated algorithm
@@ -111,7 +116,7 @@ params_inner = {
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = rand.suggest, # Randomly explore the space
-            max_evals = 50,
+            max_evals = 1,
             trials = trials)
 
 
@@ -119,7 +124,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:250]
+column_names = X_train_master.columns.tolist()[0:230]
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:
     dump(column_names, file, default_flow_style=False)

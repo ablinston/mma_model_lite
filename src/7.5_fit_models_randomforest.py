@@ -34,6 +34,11 @@ data = standard_data_filter(data)
 target = 'outcome'
 
 # Switch fighers if necessary
+if model_hyper_params['switch_fighters_with_odds'] == True:
+    data = switch_fighter1_fighter2(data, data['fighter1_best_closing_odds'] > data['fighter2_best_closing_odds'])
+# if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
+#     np.random.seed(seed = config['seed_all'] + 98451)
+#     data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
 
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 

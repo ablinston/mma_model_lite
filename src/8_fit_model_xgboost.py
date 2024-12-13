@@ -80,7 +80,7 @@ X_train = X_train[[col for col in X_train.columns if col not in feature_to_remov
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt3_features_set_9')
+mlflow.set_experiment('2014+_mens_fights_gt3_features_set_10')
 
 
 ##########################################################################################

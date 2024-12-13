@@ -6,9 +6,10 @@ def switch_fighter1_fighter2(df_original, filter_boolean):
     
     
     """
+    # pdb.set_trace()
 
     # Define the data to be switched
-    df = df_original[filter_boolean]
+    df = df_original[filter_boolean].copy()
 
     # First rename fighter1 columns
     df.columns = df.columns.str.replace('fighter1', 'fighterX')
@@ -29,11 +30,11 @@ def switch_fighter1_fighter2(df_original, filter_boolean):
     ## Now change individual columns
 
     # Reverse the matchup
-    fighter1, fighter2 = df['matchup'].str.split('-vs-')
-    df['matchup'] = fighter2 + "-vs-" fighter1
+    fighter_types = df['matchup'].str.split('-vs-', expand = True)
+    df['matchup'] = fighter_types[1] + "-vs-" + fighter_types[0]
 
     # Change the outcomes
-    df['outcome'] = np.where(df['outcome'] == 'W/L', 'L/W', npwhere(df['outcome'] == 'L/W', 'W/L', df['outcome']))
+    df['outcome'] = np.where(df['outcome'] == 'W/L', 'L/W', np.where(df['outcome'] == 'L/W', 'W/L', df['outcome']))
 
     # Now combine this data with the rows not switched
     final_df = pd.concat([df, df_original[~filter_boolean]])
