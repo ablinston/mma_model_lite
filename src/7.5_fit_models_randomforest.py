@@ -36,11 +36,14 @@ target = 'outcome'
 # Switch fighers if necessary
 if model_hyper_params['switch_fighters_with_odds'] == True:
     data = switch_fighter1_fighter2(data, data['fighter1_best_closing_odds'] > data['fighter2_best_closing_odds'])
-# if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
-#     np.random.seed(seed = config['seed_all'] + 98451)
-#     data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
+    np.random.seed(seed = config['seed_all'] + 98451)
+    data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
 
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
+
+# Now remove any columns that aren't wanted in a training dataset
+X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'])
 
 # Check data types
 data.dtypes.value_counts()
@@ -68,7 +71,7 @@ params = {
     'booster': 'gbtree',
     'num_boost_round': 1, # to tell the package to train only 1 random forest
     'colsample_bynode': np.sqrt(len(data.columns)) / len(data.columns), # fraction of columns to select for each tree
-    'num_parallel_tree': 2500, # the size of the forest. For 16k features, and choosing sqrt, this gives 99.998% chance all features selected at least once
+    'num_parallel_tree': 1500, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
     'learning_rate': 1, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,

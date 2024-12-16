@@ -11,7 +11,7 @@ def standard_feature_removal(df, differentials_only = False):
     cols_to_remove = [col for col in data.columns if ('date' in col) & (('diff' not in col) & ('minus' not in col) & (col != 'date'))]
 
     # Get rid of dob and reach. Seem arbitrary
-    cols_to_remove = cols_to_remove + ['fighter1_dob', 'fighter2_dob', 'fighter1_reach', 'fighter2_reach', 'diff_reach']
+    cols_to_remove = cols_to_remove + ['fighter1_dob', 'fighter2_dob', 'fighter1_reach', 'fighter2_reach', 'diff_reach', 'fighter1_open_odds', 'fighter2_open_odds']
 
     # # Remove cols that are just totals for a fighter, like total kicks etc. Leave percentages and ratios and per minute stats
     cols_to_remove = cols_to_remove + [col for col in data.columns if ('_round' in col) and not (('percent' in col) or ('ratio' in col) or ('per_minute' in col) or ('per_fight' in col))]
@@ -22,7 +22,7 @@ def standard_feature_removal(df, differentials_only = False):
     # Now we want to remove any column that is not a differential or a comparison between fighters
     # This bit is optional. Just testing.
     if differentials_only:
-        cols_to_remove = cols_to_remove + [col for col in data.columns if ('diff' not in col) and ('opp_type' not in col) and ('offense_minus' not in col) and ('fight_elevation' not in col) and ('weightclass' not in col) and ('matchup' not in col)]
+        cols_to_remove = cols_to_remove + [col for col in data.columns if ('diff' not in col) and ('fight_elevation' not in col) and ('weightclass' not in col) and ('matchup' not in col)]
 
 
     # Remove columns not wanted but select specific ones to keep

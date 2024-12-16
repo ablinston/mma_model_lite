@@ -179,7 +179,7 @@ if checks_passed:
             'parsed_fighter_tott_df': new_parsed_fighter_tott_df,
             'parsed_fight_stats_df': new_parsed_fight_stats_df},
         summary_date = datetime.today(),
-        save_output = False)
+        save_output = True)
     
     # Manually check if you're happy with the above then save
     
