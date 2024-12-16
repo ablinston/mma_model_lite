@@ -10,7 +10,7 @@ def objective_xgboost_features_mlflow(
     # pdb.set_trace()
     # 
     # Check for duplicates
-    if is_duplicate_run(params):
+    if is_duplicate_run(params, parameter_to_check = 'num_of_features'):
         
         # If the run existing, find what the loss was and return it without logging in mlflow
         existing_metric = get_existing_metric(params, 'Avg WL only AUC')

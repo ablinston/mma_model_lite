@@ -1,5 +1,5 @@
 
-def check_identical_excl_string(list1, list2, string1, string2):
+def check_identical_excl_string(list1, list2, string1, string2, check_both = False):
     """
     This function checks whether two lists are identical once strings are removed from each
 
@@ -8,6 +8,10 @@ def check_identical_excl_string(list1, list2, string1, string2):
     """
     list1 = [element.replace(string1, '') for element in list1]
     list2 = [element.replace(string2, '') for element in list2]
+    
+    if check_both:
+        list1 = [element.replace(string2, '') for element in list1]
+        list2 = [element.replace(string1, '') for element in list2]
 
     return list1 == list2
 

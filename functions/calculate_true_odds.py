@@ -28,9 +28,9 @@ def calculate_true_odds(df, col1, col2):
     true_odds_col1 = 1 / true_prob_col1
     true_odds_col2 = 1 / true_prob_col2
 
-    # Replace the original odds
-    df[col1] = true_odds_col1
-    df[col2] = true_odds_col2
+    # # Replace the original odds
+    # df[col1] = true_odds_col1
+    # df[col2] = true_odds_col2
 
     # Create and return a new DataFrame with the results
-    return df
+    return pd.DataFrame({'col1': true_odds_col1, 'col2': true_odds_col2})
