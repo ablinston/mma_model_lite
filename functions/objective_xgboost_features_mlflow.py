@@ -12,11 +12,13 @@ def objective_xgboost_features_mlflow(
     # Check for duplicates
     if is_duplicate_run(params, parameter_to_check = 'num_of_features'):
         
+        # pdb.set_trace()
+        
         # If the run existing, find what the loss was and return it without logging in mlflow
-        existing_metric = get_existing_metric(params, 'Avg WL only AUC')
+        existing_metric = get_existing_metric({'num_of_features': params['num_of_features']}, 'Logloss')
         
         print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
-        return {'loss': 1 - existing_metric, 'params': params, 'status': STATUS_OK}
+        return {'loss': existing_metric, 'params': params, 'status': STATUS_OK}
         
     else:
         
@@ -77,4 +79,4 @@ def objective_xgboost_features_mlflow(
             mlflow.log_metrics(trials_inner.best_trial['result']['metrics'])
 
     # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-    return {'loss': 1 - trials_inner.best_trial['result']['metrics']['Avg WL only AUC'], 'params': params, 'status': STATUS_OK} 
+    return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params, 'status': STATUS_OK} 

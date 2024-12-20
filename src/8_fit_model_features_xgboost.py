@@ -80,7 +80,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_feature_opt')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_feature_opt2')
 
 
 ##########################################################################################
@@ -91,27 +91,27 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 700,
-    'num_of_features': 211, # hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 500, 1000, 2000, len(X_train_master)]),
+    'max_evals': 300,
+    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 500, 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
 # Set the hyperopt parameters for the inner optimisation
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
-     'learning_rate': hp.quniform('learning_rate', 0.001, 0.301, 0.005), # Learning rate
+     'learning_rate': hp.quniform('learning_rate', 0.0005, 0.02, 0.0005), # Learning rate
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'max_depth': hp.quniform('max_depth', 1, 3, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
-     'eval_metric': 'auc',       # Evaluation metric
+     'eval_metric': 'mlogloss',       # Evaluation metric
      'tree_method': 'hist',      # Use GPU accelerated algorithm
      'device': 'cuda',           # Use CUDA / GPU
      'predictor': 'gpu_predictor',   # Use GPU for prediction
      'verbosity': 1,
      'num_class': no_of_classes,
-     'n_folds': 8,                   # Number of folds for the cross-validation
+     'n_folds': 5,                   # Number of folds for the cross-validation
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
      'early_stopping_rounds': 30,
@@ -122,7 +122,7 @@ params_inner = {
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = rand.suggest, # Randomly explore the space
-            max_evals = 1,
+            max_evals = 50,
             trials = trials)
 
 
@@ -130,7 +130,11 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:210]
+column_names = X_train_master.columns.tolist()[0:230]
+
+# Ensure that both fighter1 and fighter2 versions of columns are in there
+column_names = column_names + pd.Series(column_names).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()
+
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:
-    dump(column_names, file, default_flow_style=False)
+    dump(list(set(column_names)), file, default_flow_style=False)

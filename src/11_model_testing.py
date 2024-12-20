@@ -77,7 +77,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_oot_testing_v3')
+mlflow.set_experiment('final_models_oot_testing_v4')
 
 # Set this model's description for MLflow
 model_description = 'XGB forest - GT2 fights split dec exc, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
@@ -87,23 +87,23 @@ model_description = 'XGB forest - GT2 fights split dec exc, ' + str(len(rf_xgb_m
 ##########################################################################################
 
 # Set which columns and metrics we're interested in
-breakdown_cols = ['weightclass', 'year', 'fighter_history', 'favourite', 'date', 'total_fights']
-breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Sample Size']
+breakdown_cols = ['weightclass', 'year', 'fighter_history', 'date']
+breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Logloss', 'X Odds Logloss', 'Sample Size']
 target = 'outcome'
 
 
 # Backtest for both constant terms and non-constant bets
 for backtesting_params in [
+        # {
+        #     'min_prob_to_bet': 0.55,
+        #     'min_ev_to_bet': 0.0,
+        #     'max_bet_size': 400,
+        #     'min_bet_size': 40,
+        #     'constant_bets': True
+        # },
         {
-            'min_prob_to_bet': 0.35,
-            'min_ev_to_bet': 0.15,
-            'max_bet_size': 400,
-            'min_bet_size': 40,
-            'constant_bets': True
-        },
-        {
-            'min_prob_to_bet': 0.35,
-            'min_ev_to_bet': 0.15,
+            'min_prob_to_bet': 0.55,
+            'min_ev_to_bet': 0.05,
             'max_bet_size': 0.4,
             'min_bet_size': 0.04,
             'start_balance': 1000,

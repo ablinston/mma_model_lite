@@ -1,15 +1,20 @@
 # This function switches who is fighter1 and fighter2 on the merged final dataset
 
-def switch_fighter1_fighter2(df_original, filter_boolean):
+def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None):
     """
     # This functions takes a dataframe and a filter of same length and switches fighter1 and fighter2 in the rows labelled 'True'
     
+    It can either take a data frame as a whole, or take data in the form of X y, i.e. predictors split into a data frame X and y is the observed outcomes
     
     """
     # pdb.set_trace()
 
     # Define the data to be switched
-    df = df_original[filter_boolean].copy()
+    if X is None:
+        df = df_original[filter_boolean].copy()
+    else:
+        df = X[filter_boolean].copy()
+        y_new = y[filter_boolean].copy()
 
     # First rename fighter1 columns
     df.columns = df.columns.str.replace('fighter1', 'fighterX')
@@ -29,17 +34,36 @@ def switch_fighter1_fighter2(df_original, filter_boolean):
 
     ## Now change individual columns
 
-    # Reverse the matchup
-    fighter_types = df['matchup'].str.split('-vs-', expand = True)
-    df['matchup'] = fighter_types[1] + "-vs-" + fighter_types[0]
+    # Reverse the matchup. Have only done this when the matchup column is as a whole, dummies wont be properly adjusted! But they never seem to be high in importance so assumed not included in final models
+    if 'matchup' in df.columns:
+        fighter_types = df['matchup'].str.split('-vs-', expand = True)
+        df['matchup'] = fighter_types[1] + "-vs-" + fighter_types[0]
 
     # Change the outcomes
-    df['outcome'] = np.where(df['outcome'] == 'W/L', 'L/W', np.where(df['outcome'] == 'L/W', 'W/L', df['outcome']))
-
+    if 'outcome' in df.columns:
+        df['outcome'] = np.where(df['outcome'] == 'W/L', 'L/W', np.where(df['outcome'] == 'L/W', 'W/L', df['outcome']))
+        
     # Now combine this data with the rows not switched
-    final_df = pd.concat([df, df_original[~filter_boolean]])
+    if X is None:
+        final_df = pd.concat([df, df_original[~filter_boolean]])
+    else:
+        final_df = pd.concat([df, X[~filter_boolean]])
+    
+    # Handle cases where we have X, y input instead of a single data frame
+    if y is not None: # Check this works with W/L and isn't 0, 1, 2
+        y_new = pd.Series(np.where(y_new == '2', '0', np.where(y_new == '0', '2', y_new)))
+        
+        # Now combine this data with the rows not switched
+        y_new = pd.concat([y_new, y[~filter_boolean]])
+    
 
-    # Check we have the correct number of rows
-    stop_if_not(len(final_df) == len(df_original), 'Dataset length check')
+    # Check we have the correct number of rows and columns
+    if X is None:
+        stop_if_not(final_df.shape == df_original.shape, 'Dataset length check')
+    else:
+        stop_if_not(final_df.shape == X.shape, 'Dataset length check')
 
-    return final_df
+    if y is None:
+        return final_df
+    else:
+        return final_df.reset_index(drop = True), y_new.reset_index(drop = True)

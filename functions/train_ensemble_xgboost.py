@@ -50,6 +50,10 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         selected_columns = list(np.random.choice(X_train_df.columns, num_columns_to_select, replace = False))
         X_train_df =  X_train_df[selected_columns]
 
+        # Switch fighters if needed
+        if params['switch_fighters_randomly'] == True:
+            X_train_df, y_train_df = switch_fighter1_fighter2(X = X_train_df, y = y_train_df, filter_boolean = np.random.choice([True, False], size = len(X_train_df)))
+        
         # Filter win loss only if applicable
         if params['win_loss_only'] == True:
             X_train_df = X_train_df[y_train_df.isin([0, 2])]

@@ -16,6 +16,7 @@ def objective_cv_xgboost_mlflow(
     wl_accuracies = []
     lw_accuracies = []
     avg_accuracies = []
+    log_losses = []
 
     # Ensure formatting of params is correct
     for param in ['max_bin', 'min_child_weight', 'max_depth', 'num_iterations']:
@@ -95,7 +96,11 @@ def objective_cv_xgboost_mlflow(
             
             # Average the two accuracies
             avg_accuracies.append(hmean([lw_accuracy, wl_accuracy]))
-
+            
+            # **Calculate LogLoss for the fold**
+            log_loss_fold = log_loss(y_test_fold, y_pred_prob)
+            log_losses.append(log_loss_fold)
+            
             # Clean up memory
             del model, train_dmatrix, test_dmatrix, y_pred_prob, wl_auc, lw_auc, wl_accuracy, lw_accuracy
             gc.collect()
@@ -110,8 +115,9 @@ def objective_cv_xgboost_mlflow(
         mlflow.log_metric('L/W Accuracy', np.mean(lw_accuracies))
         mlflow.log_metric('Avg WL only AUC', np.mean(avg_aucs))
         mlflow.log_metric('Hmean WL only Accuracy', np.mean(avg_accuracies))
+        mlflow.log_metric('LogLoss', np.mean(log_losses)) 
  
     del kf
 
-    # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-    return {'loss': 1 - np.mean(avg_aucs), 'params': params, 'status': STATUS_OK} 
+    # Return whatever metric we wish to optimise for. Do 1 - because it tries to minimise the value.
+    return {'loss': np.mean(log_losses), 'params': params, 'status': STATUS_OK} 

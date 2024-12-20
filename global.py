@@ -26,6 +26,7 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from sklearn.utils import resample
+from sklearn.metrics import log_loss
 import string
 import sys
 from yaml import safe_load, dump

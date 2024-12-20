@@ -88,7 +88,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
             except:
                 print(f"Metrics for {col}: {group} couldn't be calculated.")
                 continue
-            
+        pdb.set_trace()
         # Get the outputs for each column and log them
         summary_df = metric_table_from_metrics_dictionary(metrics_by_group, col)[['group'] + breakdown_metrics]
         
