@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/1cf40600b79e453dacfe3bdfd88b5c6f/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 1cf40600b79e453dacfe3bdfd88b5c6f
+run_name: merciful-tern-443
+run_uuid: 1cf40600b79e453dacfe3bdfd88b5c6f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1736184655261
+status: 1
+tags: []
+user_id: Andy

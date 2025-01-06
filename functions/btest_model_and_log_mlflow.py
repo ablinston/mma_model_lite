@@ -88,7 +88,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
             except:
                 print(f"Metrics for {col}: {group} couldn't be calculated.")
                 continue
-        pdb.set_trace()
+        # pdb.set_trace()
         # Get the outputs for each column and log them
         summary_df = metric_table_from_metrics_dictionary(metrics_by_group, col)[['group'] + breakdown_metrics]
         
@@ -129,4 +129,4 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
     mlflow.log_metric('Backtesting_Average_Bet_Size', backtesting.loc['Total', 'bet_size'] / backtesting.loc['Total', 'bets'])
     mlflow.log_metric('Backtesting_Actual_Max_Bet_Size', backtesting.loc['Total', 'max_bet_size'])
     
-    return None
+    return backtesting

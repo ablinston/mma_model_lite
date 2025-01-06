@@ -4,6 +4,8 @@
 
 # To do scripts
 
+* Want to rerun script 11 with current model but getting error.
+
 * Add sample sizes to the metric outputs in the test scripts
 * Fix error with missing groups in script 10 functions
 * Add a manual lookup for fighters odds urls, and get it to handle people like Volkanovski that have 2 pages

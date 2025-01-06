@@ -80,7 +80,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('final_models_oot_testing_v4')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - GT2 fights split dec exc, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
+model_description = 'XGB forest - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -96,19 +96,20 @@ target = 'outcome'
 for backtesting_params in [
         # {
         #     'min_prob_to_bet': 0.55,
-        #     'min_ev_to_bet': 0.0,
-        #     'max_bet_size': 400,
-        #     'min_bet_size': 40,
-        #     'constant_bets': True
+        #     'min_ev_to_bet': 0.05,
+        #     'max_bet_size': 0.4,
+        #     'min_bet_size': 0.04,
+        #     'start_balance': 1000,
+        #     'constant_bets': False
         # },
         {
             'min_prob_to_bet': 0.55,
-            'min_ev_to_bet': 0.05,
-            'max_bet_size': 0.4,
-            'min_bet_size': 0.04,
-            'start_balance': 1000,
-            'constant_bets': False
-        }]:
+            'min_ev_to_bet': 0.0,
+            'max_bet_size': 400,
+            'min_bet_size': 40,
+            'constant_bets': True
+        }
+        ]:
     
     # Run the metrics on the training data
     with mlflow.start_run():

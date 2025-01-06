@@ -16,8 +16,8 @@ def test_calculate_true_odds():
     result = calculate_true_odds(df.copy(), 'odds1', 'odds2')
 
     # Assert the results are correct with a tolerance for floating-point comparisons
-    assert np.round(result['odds1'], 4).tolist() == expected_true_odds1
-    assert np.round(result['odds2'], 4).tolist() == expected_true_odds2
+    assert np.round(result['col1'], 4).tolist() == expected_true_odds1
+    assert np.round(result['col2'], 4).tolist() == expected_true_odds2
 
 def test_input_dataframe_not_modified():
     # Test that the original DataFrame is not modified
