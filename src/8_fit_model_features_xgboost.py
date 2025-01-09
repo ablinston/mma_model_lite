@@ -92,7 +92,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 300,
-    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 500, 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 350, 400, 500), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
@@ -130,7 +130,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:230]
+column_names = X_train_master.columns.tolist()[0:270]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + pd.Series(column_names).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()

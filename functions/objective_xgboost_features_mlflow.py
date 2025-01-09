@@ -50,9 +50,15 @@ def objective_xgboost_features_mlflow(
         
         with mlflow.start_run():
             
+            # Find the features that we want
+            column_names = X_train_master.columns[0:params['num_of_features']].to_list()
+            
+            # Ensure that both fighter1 and fighter2 versions of columns are in there
+            column_names = column_names + pd.Series(column_names).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()
+            
             # Create the train dataset based on the number of features
             global X_train
-            X_train = X_train_master.iloc[:, 0:params['num_of_features']]
+            X_train = X_train_master[list(set(column_names))]
             
             if params['split_dec_or_other'] == True:  
                 # Add on any specific columns needed

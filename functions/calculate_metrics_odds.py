@@ -5,10 +5,10 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     # First get the predictions from the ensemble
     y_pred_prob = odds_to_probabilities(X_test['fighter1_best_closing_odds'], X_test['fighter2_best_closing_odds'])
 
-    # Fill in nas
-    y_pred_prob['L/W'] = y_pred_prob['L/W'].fillna(0.499)
-    y_pred_prob['OTH'] = y_pred_prob['OTH'].fillna(0)
-    y_pred_prob['W/L'] = y_pred_prob['W/L'].fillna(0.501)
+    # # Fill in nas
+    # y_pred_prob['L/W'] = y_pred_prob['L/W'].fillna(0.499)
+    # y_pred_prob['OTH'] = y_pred_prob['OTH'].fillna(0)
+    # y_pred_prob['W/L'] = y_pred_prob['W/L'].fillna(0.501)
 
     # Convert the probabilities to predictions
     y_pred = np.argmax(y_pred_prob, axis = 1)

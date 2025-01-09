@@ -6,4 +6,4 @@ switch_fighters_with_odds: False
 switch_fighters_randomly: True
 
 # Set whether we include differential features only in the model features
-differential_features_only: True
+differential_features_only: False

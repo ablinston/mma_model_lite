@@ -35,8 +35,9 @@ backtesting_data = standard_data_filter(backtesting_data)
 # Create an ID column to easily filter the data
 backtesting_data['id'] = backtesting_data.index
 
-# Calculate the year of the fight
+# Calculate the year and month of the fight
 backtesting_data['year'] = backtesting_data['date'].dt.year
+backtesting_data['month_year'] = backtesting_data['date'].dt.to_period('M').astype(str)
 
 # Calculate total fights of both fighters
 backtesting_data['total_fights'] = backtesting_data['fighter1_hist_fights'] + backtesting_data['fighter2_hist_fights']
@@ -87,7 +88,7 @@ model_description = 'XGB forest - GT2 fights split dec exc diff only, ' + str(le
 ##########################################################################################
 
 # Set which columns and metrics we're interested in
-breakdown_cols = ['weightclass', 'year', 'fighter_history', 'date']
+breakdown_cols = ['weightclass', 'year', 'month_year', 'fighter_history', 'date']
 breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Logloss', 'X Odds Logloss', 'Sample Size']
 target = 'outcome'
 
