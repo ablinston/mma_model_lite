@@ -133,7 +133,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 column_names = X_train_master.columns.tolist()[0:270]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
-column_names = column_names + pd.Series(column_names).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()
+column_names2 = column_names + pd.Series(column_names).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()
 
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:

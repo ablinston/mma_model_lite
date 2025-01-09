@@ -36,14 +36,14 @@ data = data[[col for col in data.columns if col in final_model_features + ['date
 ##########################################################################################
 
 # Prep the data ready for model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, test_size = 0.1)
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, test_size = 0.2)
 
 # Remove other columns from training data as not required
 X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v6')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v7')
 
 
 
@@ -53,10 +53,10 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v6')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.011, # Learning rate
+    'learning_rate': 0.012, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.9,
-    'max_depth': 2,
+    'max_depth': 3,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -82,11 +82,11 @@ colsample_bynode = 0.1
 ##########################################################################################
 
 # Try different numbers of trees
-# for num_trees in [1]:
-for num_trees in [400, 500, 1000]:
+for num_trees in [1]:
+# for num_trees in [400, 500, 1000]:
     # Try different subsamples
-    # for subsample in [1]:
-    for subsample in [0.6]:
+    for subsample in [1]:
+    # for subsample in [0.6]:
         
         # Start a new model run in MLflow
         with mlflow.start_run():

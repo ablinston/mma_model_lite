@@ -7,7 +7,7 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     It can either take a data frame as a whole, or take data in the form of X y, i.e. predictors split into a data frame X and y is the observed outcomes
     
     """
-    # pdb.set_trace()
+    pdb.set_trace()
 
     # Define the data to be switched
     if X is None:
