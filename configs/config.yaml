@@ -157,7 +157,7 @@ methods:
   - Decision-Majority
 
 # Set the proportion of the data that should be reserved as a test dataset
-test_proportion: 0.1
+test_proportion: 0.2
 
 # Set the cut off dates for the training data
 min_training_date: '2014-01-01'
