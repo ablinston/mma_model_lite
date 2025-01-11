@@ -74,14 +74,14 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Prep the data ready for model training as it was done in the overall model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data, config, test_size = 0.1)
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data, config, test_size = config['test_proportion'])
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('final_models_oot_testing_v4')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
+model_description = 'XGB forest - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features 0.1 test size'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -104,8 +104,8 @@ for backtesting_params in [
         #     'constant_bets': False
         # },
         {
-            'min_prob_to_bet': 0.55,
-            'min_ev_to_bet': 0.0,
+            'min_prob_to_bet': 0.5,
+            'min_ev_to_bet': 0.1,
             'max_bet_size': 400,
             'min_bet_size': 40,
             'constant_bets': True

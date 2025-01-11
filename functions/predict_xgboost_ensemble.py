@@ -12,12 +12,14 @@ def predict_xgboost_ensemble(models, X_test_df, y_test_df):
     - predicted_classes (np.array): Predicted class labels for each instance based on averaged probabilities.
     """
     
+    # pdb.set_trace()
+    
     # Collect predictions from each model
     model_predictions = []
     for model in models:
         
         # Create the DMatrix for predictions
-        dmatrix_test = xgb.DMatrix(X_test_df[model['features']], label = y_test_df)
+        dmatrix_test = xgb.DMatrix(X_test_df[model['model'].feature_names], label = y_test_df)
         
         preds = model['model'].predict(dmatrix_test)
         model_predictions.append(preds)

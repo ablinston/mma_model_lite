@@ -45,7 +45,7 @@ split_or_other_exclude = True
 ##########################################################################################
 
 # Prep the data ready for model training. Create a master for the train because we will vary the number of features
-X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, split_or_other_flag = split_or_other_exclude, test_size = 0.1)
+X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, split_or_other_flag = split_or_other_exclude, test_size = config['test_proportion'])
 
 
 ##########################################################################################
@@ -133,7 +133,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 column_names = X_train_master.columns.tolist()[0:270]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
-column_names2 = column_names + pd.Series(column_names).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()
+column_names = column_names + list_swap_fighter1_fighter2(column_names)
 
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:

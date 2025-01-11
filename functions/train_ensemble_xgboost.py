@@ -42,7 +42,7 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         
         # Randomly sample rows with replacement for the training set
         X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
-        pdb.set_trace()
+        
         # Calculate the number of columns to randomly select
         num_columns_to_select = int(colsample_bynode * X_train_df.shape[1])
         
@@ -50,9 +50,9 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         selected_columns = list(np.random.choice(X_train_df.columns, num_columns_to_select, replace = False))
         
         # Make sure both fighter1 and figher2 versions of columns in there or switch will fail
-        selected_columns = selected_columns + pd.Series(selected_columns).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()
+        selected_columns = list(set(selected_columns + list_swap_fighter1_fighter2(selected_columns)))
         
-        X_train_df =  X_train_df[list(set(selected_columns))]
+        X_train_df =  X_train_df[selected_columns]
 
         # Switch fighters if needed
         if params['switch_fighters_randomly'] == True:
@@ -71,7 +71,7 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
 
         # Create the DMatrix for XGBoost with the bootstrap sample for training and the full remaining data for validation
         dmatrix_train = xgb.DMatrix(X_train_df, label=y_train_df)
-        dmatrix_val = xgb.DMatrix(X_val[selected_columns], label=y_val)
+        dmatrix_val = xgb.DMatrix(X_val[X_train_df.columns], label=y_val)
         
         # Train an XGBoost model on the bootstrap sample with column sampling
         model['model'] = xgb.train(

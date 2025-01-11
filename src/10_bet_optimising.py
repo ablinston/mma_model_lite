@@ -71,14 +71,14 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Prep the data ready for model training as it was done in the overall model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data, config, test_size = 0.1)
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data, config, test_size = config['test_proportion'])
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_bet_testing_v6')
+mlflow.set_experiment('final_models_bet_testing_v7')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest, GT2 fights split exc random fighter, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
+model_description = 'XGB forest, GT2 fights split exc random fighter, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' all features'
 
 ##########################################################################################
 ### Calculating metrics ###

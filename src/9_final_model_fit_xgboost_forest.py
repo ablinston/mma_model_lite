@@ -36,7 +36,7 @@ data = data[[col for col in data.columns if col in final_model_features + ['date
 ##########################################################################################
 
 # Prep the data ready for model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, test_size = 0.2)
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, test_size = config['test_proportion'])
 
 # Remove other columns from training data as not required
 X_train = X_train[final_model_features]
@@ -82,11 +82,11 @@ colsample_bynode = 0.1
 ##########################################################################################
 
 # Try different numbers of trees
-for num_trees in [1]:
-# for num_trees in [400, 500, 1000]:
+# for num_trees in [1]:
+for num_trees in [150, 250, 300]:
     # Try different subsamples
-    for subsample in [1]:
-    # for subsample in [0.6]:
+    # for subsample in [1]:
+    for subsample in [0.6]:
         
         # Start a new model run in MLflow
         with mlflow.start_run():
@@ -117,8 +117,8 @@ for num_trees in [1]:
 
 
 # Set the final number of models
-final_forest_size = 500
-final_subsample = 0.5
+final_forest_size = 300
+final_subsample = 0.6
 
 # Save the final model, choosing the number of trees
 final_xgboost_rf = train_ensemble_xgboost(
