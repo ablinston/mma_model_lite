@@ -35,7 +35,7 @@ upcoming_events_df = upcoming_events_df.iloc[0:2]
 
 # Parse upcoming fight details
 upcoming_fight_details_df = update_fight_details_data(
-    existing_fights_data = parsed_fight_details_df.iloc[0:0],
+    existing_fights_data = pd.DataFrame(),
     new_events_url_list = upcoming_events_df['URL'].to_list(),
     config = config,
     num_threads = 3)

@@ -25,7 +25,7 @@ def update_fighter_odds_data(existing_odds_data, new_fighter_list, new_event_dat
     new_odds_data = pd.concat([new_odds_data, existing_odds_data])
     
     # Remove any duplicate records
-    new_odds_data = new_odds_data.drop_duplicates()
+    new_odds_data = new_odds_data.drop_duplicates(subset = ['event', 'date', 'fighter', 'opponent'], keep = 'first', inplace = False)
     
     ###############################
     # Deal with missing odds data
