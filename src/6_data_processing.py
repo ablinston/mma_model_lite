@@ -402,7 +402,7 @@ del(fight_stats_no_na)
 # FIGHT RESULTS PROCESSING
 
 # Filter for fight formats to be included
-fight_results = fight_results[fight_results['time format'].isin(config['time_format_filter']) & fight_results['weightclass'].isin(config['weightclass_filter'])]
+fight_results = fight_results[((fight_results['time format'].isna()) | (fight_results['time format'].isin(config['time_format_filter']))) & fight_results['weightclass'].isin(config['weightclass_filter'])]
 
 # Add elevation data to fight results
 events['fight_elevation'] = get_elevation_series(events['location'], config['google_maps_api_key'])
