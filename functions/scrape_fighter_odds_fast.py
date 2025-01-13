@@ -17,7 +17,6 @@ def scrape_fighter_odds_fast(
             'Accept-Encoding':'gzip, deflate, br, zstd',
             'Accept-Language':'en-US,en;q=0.5',
             'Connection':'keep-alive',
-            'Cookie':'nexus_cookie={"is_new_session":"false","user_id":"0b3c7bb9-c66e-4cd8-828a-6942ab7cbf53","last_session_id":"63cae38a-7d8c-4d61-af5e-958ecdae9ad5","last_session_start":"1736770512978","referrer_og":"https://www.google.com/"}; bfo_reqdesktop=true',
             'Host':'www.bestfightodds.com',
             'Priority':'u=0, i',
             'Referer':'https://www.bestfightodds.com/events/ufc-3570',
@@ -35,8 +34,6 @@ def scrape_fighter_odds_fast(
 
         # skip if no possible matches found
         if soup.find('table') == None:
-            # Quit the browser
-            driver.quit()
             print(f"Error scraping {fighter_name}: {e}")
             return pd.DataFrame()
 

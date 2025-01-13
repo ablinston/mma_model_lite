@@ -61,14 +61,14 @@ else:
 # the code below continues to run to parse all missing events
 # new data is added to existing data and is written to file
 
+# Read existing data files
+parsed_fight_details_df = fp.ParquetFile('./data/' + config['fight_details_file_name']).to_pandas()
+parsed_fight_results_df = fp.ParquetFile('./data/' + config['fight_results_file_name']).to_pandas()
+parsed_fight_stats_df = fp.ParquetFile('./data/' + config['fight_stats_file_name']).to_pandas()
+parsed_odds_df = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_pandas()
+
 if unparsed_events == True:
     
-    # Read existing data files
-    parsed_fight_details_df = fp.ParquetFile('./data/' + config['fight_details_file_name']).to_pandas()
-    parsed_fight_results_df = fp.ParquetFile('./data/' + config['fight_results_file_name']).to_pandas()
-    parsed_fight_stats_df = fp.ParquetFile('./data/' + config['fight_stats_file_name']).to_pandas()
-    parsed_odds_df = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_pandas()
-
     ##### Add new events to events data #####
     updated_event_details_df = pd.concat([parsed_event_details_df, new_event_details_df[new_event_details_df['EVENT'].isin(list_of_unparsed_events)]])
     
@@ -107,12 +107,17 @@ if unparsed_events == True:
 ###############################################################################
 
 # define list of urls of fighters we want new odds data for
-list_of_unparsed_fighter_odds = list(set(new_parsed_fight_stats_df[new_parsed_fight_stats_df['EVENT'].isin(list_of_unparsed_events)]['FIGHTER'].to_list() + fighter_list_from_bouts(upcoming_fight_details_df['BOUT'])))
-
-list_of_unparsed_event_dates = list(updated_event_details_df[updated_event_details_df['EVENT'].isin(list_of_unparsed_events)]['DATE']) + upcoming_events_df['DATE'].to_list()
+try:
+    list_of_unparsed_fighter_odds = list(set(new_parsed_fight_stats_df[new_parsed_fight_stats_df['EVENT'].isin(list_of_unparsed_events)]['FIGHTER'].to_list()))
+    list_of_unparsed_event_dates = list(updated_event_details_df[updated_event_details_df['EVENT'].isin(list_of_unparsed_events)]['DATE']) + upcoming_events_df['DATE'].to_list()
+except:
+    list_of_unparsed_fighter_odds = []
+    list_of_unparsed_event_dates = []
 
 # Add on the upcoming events too
+list_of_unparsed_fighter_odds = list(set(list_of_unparsed_fighter_odds + fighter_list_from_bouts(upcoming_fight_details_df['BOUT'])))
 
+list_of_unparsed_event_dates = list_of_unparsed_event_dates + upcoming_events_df['DATE'].to_list()
 
 # Convert the dates
 list_of_unparsed_event_dates = [datetime.strptime(x, '%B %d, %Y') for x in list_of_unparsed_event_dates]
@@ -167,50 +172,64 @@ if len(unparsed_fighter_urls) > 0:
 ##### Data consistency checks #####
 ###############################################################################
 
-## Run checks to ensure each of the datasets are consistent and cover the same events
-checks_passed = check_data_coverage(
-    updated_event_details_df, 
-    new_parsed_fight_details_df, 
-    new_parsed_fight_results_df, 
-    new_parsed_fight_stats_df, 
-    new_parsed_odds_df,
-    all_fighter_details_df,
-    new_parsed_fighter_tott_df,
-    config)
-
-# Check new rows have been added
-stop_if_not(
-    (len(updated_event_details_df) >= len(parsed_event_details_df)) & (
-        len(new_parsed_fight_details_df) >= len(parsed_fight_details_df)) & (
-            len(new_parsed_fight_results_df) >= len(parsed_fight_results_df)) & (
-                len(new_parsed_fight_stats_df) >= len(parsed_fight_stats_df)) & (
-                    len(new_parsed_odds_df) >= len(parsed_odds_df)) & (
-                        len(new_parsed_fighter_tott_df) >= len(parsed_fighter_tott_df)),
-                        'Row change checks')
-
-# AB: If the fighter_tott has missing info, just run the whole thing rather than update old one
-
-#######################
-## Save files if all has run successfully
-#######################
-
-if checks_passed:
+if unparsed_events:
     
-    # Log the aspects of these files
-    data_summary = update_data_summary(
-        results_csv_path = './data/raw_data_summary.csv', 
-        data_frames = {
-            'updated_event_details_df': updated_event_details_df, 
-            'parsed_fight_details_df': new_parsed_fight_details_df, 
-            'parsed_fight_results_df': new_parsed_fight_results_df, 
-            'parsed_odds_df':new_parsed_odds_df, 
-            'parsed_fighter_tott_df': new_parsed_fighter_tott_df,
-            'parsed_fight_stats_df': new_parsed_fight_stats_df},
-        summary_date = datetime.today(),
-        save_output = True)
+    ## Run checks to ensure each of the datasets are consistent and cover the same events
+    checks_passed = check_data_coverage(
+        updated_event_details_df, 
+        new_parsed_fight_details_df, 
+        new_parsed_fight_results_df, 
+        new_parsed_fight_stats_df, 
+        new_parsed_odds_df,
+        all_fighter_details_df,
+        new_parsed_fighter_tott_df,
+        config)
     
-    # Manually check if you're happy with the above then save
+    # Check new rows have been added
+    stop_if_not(
+        (len(updated_event_details_df) >= len(parsed_event_details_df)) & (
+            len(new_parsed_fight_details_df) >= len(parsed_fight_details_df)) & (
+                len(new_parsed_fight_results_df) >= len(parsed_fight_results_df)) & (
+                    len(new_parsed_fight_stats_df) >= len(parsed_fight_stats_df)) & (
+                        len(new_parsed_odds_df) >= len(parsed_odds_df)) & (
+                            len(new_parsed_fighter_tott_df) >= len(parsed_fighter_tott_df)),
+                            'Row change checks')
     
+    # AB: If the fighter_tott has missing info, just run the whole thing rather than update old one
+    
+    if checks_passed:
+        
+        # Log the aspects of these files
+        data_summary = update_data_summary(
+            results_csv_path = './data/raw_data_summary.csv', 
+            data_frames = {
+                'updated_event_details_df': updated_event_details_df, 
+                'parsed_fight_details_df': new_parsed_fight_details_df, 
+                'parsed_fight_results_df': new_parsed_fight_results_df, 
+                'parsed_odds_df':new_parsed_odds_df, 
+                'parsed_fighter_tott_df': new_parsed_fighter_tott_df,
+                'parsed_fight_stats_df': new_parsed_fight_stats_df},
+            summary_date = datetime.today(),
+            save_output = True)
+        
+        # Manually check if you're happy with the above then save
+        
+        # write new fight details to file
+        fp.write('./data/' + config['event_details_file_name'], updated_event_details_df, compression = 'ZSTD')
+        fp.write('./data/' + config['upcoming_event_details_file_name'], upcoming_events_df, compression = 'ZSTD')
+        fp.write('./data/' + config['fight_details_file_name'], new_parsed_fight_details_df, compression = 'ZSTD')
+        fp.write('./data/' + config['upcoming_fight_details_file_name'], upcoming_fight_details_df, compression = 'ZSTD')
+        fp.write('./data/' + config['fight_results_file_name'], new_parsed_fight_results_df, compression = 'ZSTD')
+        fp.write('./data/' + config['fight_stats_file_name'], new_parsed_fight_stats_df, compression = 'ZSTD')
+        fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
+        fp.write('./data/' + config['fighter_details_file_name'], all_fighter_details_df, compression = 'ZSTD')
+        fp.write('./data/' + config['fighter_tott_file_name'], new_parsed_fighter_tott_df, compression = 'ZSTD')
+        
+    else:
+        print("Data checks not passed. Data not saved. See previous output messages for more information.")
+
+else:
+
     # write new fight details to file
     fp.write('./data/' + config['event_details_file_name'], updated_event_details_df, compression = 'ZSTD')
     fp.write('./data/' + config['upcoming_event_details_file_name'], upcoming_events_df, compression = 'ZSTD')
@@ -222,5 +241,32 @@ if checks_passed:
     fp.write('./data/' + config['fighter_details_file_name'], all_fighter_details_df, compression = 'ZSTD')
     fp.write('./data/' + config['fighter_tott_file_name'], new_parsed_fighter_tott_df, compression = 'ZSTD')
     
-else:
-    print("Data checks not passed. Data not saved. See previous output messages for more information.")
+    else:
+        
+        ## Run checks to ensure each of the datasets are consistent and cover the same events
+        checks_passed = check_data_coverage(
+            parsed_event_details_df, 
+            parsed_fight_details_df, 
+            parsed_fight_results_df, 
+            parsed_fight_stats_df, 
+            new_parsed_odds_df,
+            all_fighter_details_df,
+            parsed_fighter_tott_df,
+            config)
+        
+    #######################
+    ## Save files if all has run successfully
+    #######################
+    
+    if checks_passed:
+        
+        # write new fight details to file
+        fp.write('./data/' + config['upcoming_event_details_file_name'], upcoming_events_df, compression = 'ZSTD')
+        fp.write('./data/' + config['upcoming_fight_details_file_name'], upcoming_fight_details_df, compression = 'ZSTD')
+
+        fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
+        
+    else:
+        print("Data checks not passed. Data not saved. See previous output messages for more information.")
+
+    
