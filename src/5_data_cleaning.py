@@ -186,8 +186,16 @@ fp.write('./data/' + config['event_details_file_name'].replace('.parquet', '_cle
          events,
          compression = 'ZSTD')
 
+fp.write('./data/' + config['upcoming_event_details_file_name'].replace('.parquet', '_clean.parquet'),
+         upcoming_events,
+         compression = 'ZSTD')
+
 fp.write('./data/' + config['fighter_tott_file_name'].replace('.parquet', '_clean.parquet'),
          fighters,
+         compression = 'ZSTD')
+
+fp.write('./data/' + config['upcoming_fight_details_file_name'].replace('.parquet', '_clean.parquet'),
+         upcoming_fight_details,
          compression = 'ZSTD')
 
 fp.write('./data/' + config['fight_results_file_name'].replace('.parquet', '_clean.parquet'),
