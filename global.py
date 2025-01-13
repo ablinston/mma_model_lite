@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
+import copy
 import csv
 from datetime import datetime, date, timedelta
 import datatable as dt

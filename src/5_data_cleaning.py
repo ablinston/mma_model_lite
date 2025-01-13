@@ -3,6 +3,8 @@ exec(open('global.py').read())
 
 # Read in the data
 events = fp.ParquetFile('./data/' + config['event_details_file_name']).to_pandas()
+upcoming_events = fp.ParquetFile('./data/' + config['upcoming_event_details_file_name']).to_pandas()
+upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_details_file_name']).to_pandas()
 fighters = fp.ParquetFile('./data/' + config['fighter_tott_file_name']).to_pandas()
 fight_results = fp.ParquetFile('./data/' + config['fight_results_file_name']).to_pandas()
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name']).to_pandas()
@@ -10,6 +12,8 @@ fighter_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_p
 
 # Convert all column names to lowercase
 events.columns = events.columns.str.lower()
+upcoming_events.columns = upcoming_events.columns.str.lower()
+upcoming_fight_details.columns = upcoming_fight_details.columns.str.lower()
 fighters.columns = fighters.columns.str.lower()
 fight_results.columns = fight_results.columns.str.lower()
 fight_stats.columns = fight_stats.columns.str.lower()
@@ -25,7 +29,7 @@ fighters = to_numeric(fighters, ['weight', 'reach'])
 fight_stats = to_numeric(fight_stats, ['kd'])
 
 # Remove spaces in events to avoid merge errors
-for df in [events, fight_results, fight_stats, fighters, fighter_odds]:
+for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds]:
     try:
         df[['event']] = clean_text_columns(df[['event']])
     except:
@@ -45,6 +49,7 @@ fight_stats['ctrl_minutes'] = time_to_minutes_decimal(fight_stats['ctrl'])
 # Format dates
 fighters['dob'] = pd.to_datetime(fighters['dob'], errors = 'coerce')
 events['date'] = pd.to_datetime(events['date'], errors = 'coerce')
+upcoming_events['date'] = pd.to_datetime(upcoming_events['date'], errors = 'coerce')
 
 # Add the event date to the fight results
 fight_results = fight_results.merge(events[['event', 'date']], on = 'event', how = 'left')
@@ -65,6 +70,7 @@ fight_stats = split_of_columns(fight_stats, ['sig.str.', 'total str.', 'td', 'he
 
 # Split fight into fighters
 fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\\.', expand = True)
+upcoming_fight_details[['fighter1', 'fighter2']] = upcoming_fight_details['bout'].str.split('vs\\.', expand = True)
 
 # Aggregate the fight stats to be at fight-fighter level
 # Merge on the final round time from the fight results

@@ -6,7 +6,7 @@ def update_fighter_odds_data(existing_odds_data, new_fighter_list, new_event_dat
     # pdb.set_trace()    
 
     # Scrape all the odds data for the fighters in the list
-    new_odds_data = parallel_scrape_odds(
+    new_odds_data = parallel_scrape_odds_fast(
         new_fighter_list, 
         num_threads = config['num_threads'], 
         firefox_location = config['firefox_location'], 

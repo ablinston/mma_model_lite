@@ -1,9 +1,17 @@
 # This function takes an html table from BetFightOdds.com and turns it into a properly formatted pandas data frame
 
 def betfightodds_table_to_df(table, fighter):
-
+    # pdb.set_trace()
+    
     # Extract headers and rows in one go using list comprehensions
-    headers = [header.text for header in table.find_all('th')]
+    # First remove all tds
+    # Find all <td> elements and remove them
+    decomposed_table = copy.deepcopy(table)
+    
+    for td in decomposed_table.find_all('td'):
+        td.decompose()  # This removes the <td> element from the tree
+
+    headers = [header.text for header in decomposed_table.find_all('th')]
     rows = [[cell.text for cell in row.find_all('td')] for row in table.find_all('tr')[1:]]
 
     # The rows contain 3 vectors, one with the event, the next with the fighter's odds, the final with the opponents odds and the date

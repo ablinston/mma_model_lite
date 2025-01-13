@@ -21,6 +21,31 @@ list_of_all_events = list(new_event_details_df['EVENT'])
 # find list event names that have not been parsed
 list_of_unparsed_events = [event for event in list_of_all_events if event not in list_of_parsed_events]
 
+
+
+###############################################################################
+##### Parse upcoming fight data #####
+###############################################################################
+
+# Get a list of upcoming events
+upcoming_events_df = parse_event_details(get_soup(config['upcoming_events_url']), upcoming = True)
+
+# Only look at the first two to save time
+upcoming_events_df = upcoming_events_df.iloc[0:2]
+
+# Parse upcoming fight details
+upcoming_fight_details_df = update_fight_details_data(
+    existing_fights_data = parsed_fight_details_df.iloc[0:0],
+    new_events_url_list = upcoming_events_df['URL'].to_list(),
+    config = config,
+    num_threads = 3)
+
+
+
+###############################################################################
+### parse all missing events ###
+###############################################################################
+
 # check if there are any unparsed events
 unparsed_events = False
 # if list_of_unparsed_events is empty then all available events have been parsed
@@ -31,11 +56,6 @@ else:
     unparsed_events = True
     # show list of unparsed events
     print(list_of_unparsed_events)
-
-
-###############################################################################
-### parse all missing events ###
-###############################################################################
 
 # if unparsed_events = True
 # the code below continues to run to parse all missing events
@@ -56,7 +76,7 @@ if unparsed_events == True:
     ##### Parse fight details #####
 
     # define list of urls of missing fights to parse
-    list_of_unparsed_events_urls = list(updated_event_details_df['URL'].loc[(updated_event_details_df['EVENT'].isin(list_of_unparsed_events))])
+    list_of_unparsed_events_urls =  list(updated_event_details_df['URL'].loc[(updated_event_details_df['EVENT'].isin(list_of_unparsed_events))])
 
     # Create new data frame including the new events
     new_parsed_fight_details_df = update_fight_details_data(
@@ -78,20 +98,28 @@ if unparsed_events == True:
         num_threads = config['num_threads']
         )
 
-
-    ##### Parse new fighter odds data #####
-    
-    # define list of urls of fighters we want new odds data for
-    list_of_unparsed_fighter_odds = list(set(new_parsed_fight_stats_df[new_parsed_fight_stats_df['EVENT'].isin(list_of_unparsed_events)]['FIGHTER']))
-    list_of_unparsed_event_dates = list(updated_event_details_df[updated_event_details_df['EVENT'].isin(list_of_unparsed_events)]['DATE'])
-    
-    # Convert the dates
-    list_of_unparsed_event_dates = [datetime.strptime(x, '%B %d, %Y') for x in list_of_unparsed_event_dates]
-
-    new_parsed_odds_df = update_fighter_odds_data(parsed_odds_df, list_of_unparsed_fighter_odds, list_of_unparsed_event_dates, config, num_threads = config['num_threads'])
-    
     # Run a fix on the bouts in the details data
     new_parsed_fight_details_df = fix_fight_details_bout(new_parsed_fight_details_df, new_parsed_fight_stats_df)
+
+
+###############################################################################
+##### Parse new fighter odds data #####
+###############################################################################
+
+# define list of urls of fighters we want new odds data for
+list_of_unparsed_fighter_odds = list(set(new_parsed_fight_stats_df[new_parsed_fight_stats_df['EVENT'].isin(list_of_unparsed_events)]['FIGHTER'].to_list() + fighter_list_from_bouts(upcoming_fight_details_df['BOUT'])))
+
+list_of_unparsed_event_dates = list(updated_event_details_df[updated_event_details_df['EVENT'].isin(list_of_unparsed_events)]['DATE']) + upcoming_events_df['DATE'].to_list()
+
+# Add on the upcoming events too
+
+
+# Convert the dates
+list_of_unparsed_event_dates = [datetime.strptime(x, '%B %d, %Y') for x in list_of_unparsed_event_dates]
+
+new_parsed_odds_df = update_fighter_odds_data(parsed_odds_df, list_of_unparsed_fighter_odds, list_of_unparsed_event_dates, config, num_threads = config['num_threads'])
+    
+    
         
 
 
@@ -185,7 +213,9 @@ if checks_passed:
     
     # write new fight details to file
     fp.write('./data/' + config['event_details_file_name'], updated_event_details_df, compression = 'ZSTD')
+    fp.write('./data/' + config['upcoming_event_details_file_name'], upcoming_events_df, compression = 'ZSTD')
     fp.write('./data/' + config['fight_details_file_name'], new_parsed_fight_details_df, compression = 'ZSTD')
+    fp.write('./data/' + config['upcoming_fight_details_file_name'], upcoming_fight_details_df, compression = 'ZSTD')
     fp.write('./data/' + config['fight_results_file_name'], new_parsed_fight_results_df, compression = 'ZSTD')
     fp.write('./data/' + config['fight_stats_file_name'], new_parsed_fight_stats_df, compression = 'ZSTD')
     fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')

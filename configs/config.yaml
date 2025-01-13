@@ -3,6 +3,7 @@ wiki_url: "https://en.wikipedia.org/wiki/List_of_UFC_events"
 
 # urls to parse
 completed_events_all_url: http://ufcstats.com/statistics/events/completed?page=all
+upcoming_events_url: http://ufcstats.com/statistics/events/upcoming?page=all
 
 # Firefox location. Used for web scraping
 firefox_location: C:/Program Files/Mozilla Firefox/firefox.exe
@@ -21,6 +22,8 @@ normalise_odds_in_processing: True
 
 # file names for parsed data
 event_details_file_name: ufc_event_details.parquet
+upcoming_event_details_file_name: ufc_upcoming_event_details.parquet
+upcoming_fight_details_file_name: ufc_upcoming_fight_details.parquet
 fight_details_file_name: ufc_fight_details.parquet
 fight_results_file_name: ufc_fight_results.parquet
 fight_stats_file_name: ufc_fight_stats.parquet
