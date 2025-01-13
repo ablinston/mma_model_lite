@@ -56,6 +56,7 @@ fight_results = fight_results.merge(events[['event', 'date']], on = 'event', how
 
 # Reformat weightclass
 fight_results['weightclass'] = fight_results['weightclass'].str.replace('UFC', '').str.replace('Bout', '').str.replace('Title', '').str.replace(' ', '').str.replace('Interim', '')
+upcoming_fight_details['weightclass'] = upcoming_fight_details['weightclass'].str.replace('UFC', '').str.replace('Bout', '').str.replace('Title', '').str.replace(' ', '').str.replace('Interim', '')
 
 # Clean the methods of victory
 fight_results['method'] = fight_results['method'].str.replace(' ', '')

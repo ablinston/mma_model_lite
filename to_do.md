@@ -4,7 +4,10 @@
 
 # To do scripts
 
-* Want to rerun script 11 with current model but getting error.
+* Change the ELO parameter choices so that it accounts for the scale of how wrong the ELO is, not just predicting binary. Turn ELO into a probability and use logloss?
+
+* Add test scripts of the backtesting and for the odds to check it's working correctly.
+* Change test split so it can exclude test fighters instead of fights specifically.
 
 * Add sample sizes to the metric outputs in the test scripts
 * Fix error with missing groups in script 10 functions

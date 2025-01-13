@@ -31,8 +31,11 @@ def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission'
     win_loss_stats['hist_wins_finishes'] = 0
     win_loss_stats['hist_losses_finishes'] = 0
     
+    # Get a unique list of methods
+    unique_method_list = win_loss_stats['method'].dropna().unique()
+    
     # Now calculate the wins and losses by method
-    for method in win_loss_stats['method'].unique():
+    for method in unique_method_list:
         # Create a binary flag to say whether a win or loss was by a method
         win_loss_stats['W_' + method] = (win_loss_stats['method'] == method).astype(int) * win_loss_stats['win']
         win_loss_stats['L_' + method] = (win_loss_stats['method'] == method).astype(int) * win_loss_stats['loss']
@@ -93,14 +96,14 @@ def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission'
 
     ############################
     # Clean up columns
-    win_loss_stats.drop(columns = ['hist_fights', 'weightclass', 'weightclass_m1', 'weightclass_m2', 'method', 'round', 'time format', 'date', 'rounds', 'result', 'win', 'loss', 'win_finish', 'loss_finish', 'date_win', 'date_loss'] + ('W_' + win_loss_stats['method'].unique()).tolist() + ('L_' + win_loss_stats['method'].unique()).tolist(), inplace = True)
+    win_loss_stats.drop(columns = ['hist_fights', 'weightclass', 'weightclass_m1', 'weightclass_m2', 'method', 'round', 'time format', 'date', 'rounds', 'result', 'win', 'loss', 'win_finish', 'loss_finish', 'date_win', 'date_loss'] + ('W_' + unique_method_list).tolist() + ('L_' + unique_method_list).tolist(), inplace = True)
 
     # Merge back onto the fighter results data
     output_data = fighter_results.merge(win_loss_stats, on = ['event', 'bout', 'fighter'], how = 'left')
     
     # Do a check
     if len(output_data) == len(fighter_results):
-        return output_data
+        return output_data.copy()
     else:
         print("Error: win loss stats couldn't be merged")
         return None

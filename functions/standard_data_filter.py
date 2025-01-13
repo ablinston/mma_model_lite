@@ -7,6 +7,6 @@ def standard_data_filter(df):
                      (df['fighter2_hist_fights'] > 2)]
     
     # Remove any data were odds are missing
-    filtered_df = filtered_df[(~filtered_df['fighter1_best_closing_odds'].isna()) & (~filtered_df['fighter2_best_closing_odds'].isna())]
+    filtered_df = filtered_df[(~filtered_df['fighter1_best_closing_odds'].isna()) & (~filtered_df['fighter2_best_closing_odds'].isna()) & (~filtered_df['outcome'].isna())]
 
     return filtered_df

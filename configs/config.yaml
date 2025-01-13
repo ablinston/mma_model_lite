@@ -39,6 +39,7 @@ fight_details_column_names:
   - EVENT
   - BOUT
   - URL
+  - weightclass
 
 # column names for extracted fight results
 fight_results_column_names:

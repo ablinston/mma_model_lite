@@ -25,6 +25,13 @@ def parse_fight_details_url(url):
     for tag in soup.find_all('a', class_='b-link b-link_style_black'):
         fighters_in_event.append(tag.text.strip())
         
+    weightclass = []
+    
+    for tag in soup.find_all('p', class_='b-fight-details__table-text'):
+        weightclass.append(tag.text.strip())
+        
+    weightclass = [item for item in weightclass if 'weight' in item]
+        
     # Remove any 'view matchup that might have been introduced
     fighters_in_event = [fighter for fighter in fighters_in_event if fighter != 'View Matchup']
     
@@ -39,5 +46,7 @@ def parse_fight_details_url(url):
     
     fight_details_df = move_columns(fight_details_df, ['EVENT'], 'BOUT',
         'before')
+    
+    fight_details_df['weightclass'] = pd.Series(weightclass)
    
     return fight_details_df

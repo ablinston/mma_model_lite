@@ -10,12 +10,34 @@ exec(open('global.py').read())
 
 # Read in the data
 events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+upcoming_events = fp.ParquetFile('./data/' + config['upcoming_event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fighters = fp.ParquetFile('./data/' + config['fighter_tott_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_results = fp.ParquetFile('./data/' + config['fight_results_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 
 
+
+###########################################################################################
+# UPCOMING
+
+# Add upcoming events
+events = pd.concat([upcoming_events, events], axis = 0)
+
+# Add the date to the upcoming fights
+upcoming_fight_details = upcoming_fight_details.merge(upcoming_events[['event', 'date']], on = 'event', how = 'left')
+
+# Add upcoming fights to the results with empty results
+fight_results = pd.concat([upcoming_fight_details.drop('url', axis = 1), fight_results])
+
+# Create empty stats rows for each fight
+upcoming_fight_details[['fighter1', 'fighter2']] = upcoming_fight_details['bout'].str.split('vs\\.', expand = True)
+upcoming_fight_stats = pd.concat([
+    upcoming_fight_details[['event', 'bout', 'fighter1']].rename(columns = {'fighter1': 'fighter'}),
+    upcoming_fight_details[['event', 'bout', 'fighter2']].rename(columns = {'fighter2': 'fighter'})
+    ])
+fight_stats = pd.concat([upcoming_fight_stats, fight_stats])
 
 ###########################################################################################
 # CALCULATE ELOs
@@ -340,7 +362,7 @@ fighter_results[fighter_results['hist_win_streak'] == 10]['fighter'].unique()
 fighter_results[fighter_results['hist_loss_streak'] == 5]['fighter'].unique()
 
 # Calculate results by method
-methods = list(set(fighter_results['method']))
+methods = list(set(fighter_results['method'].dropna()))
 row_count = len(fighter_results)
 for result in ['W', 'L']:
     for method in methods:
