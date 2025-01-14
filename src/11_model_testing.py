@@ -81,7 +81,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('final_models_oot_testing_v4')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features 0.1 test size'
+model_description = 'XGB forest - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -96,16 +96,17 @@ target = 'outcome'
 # Backtest for both constant terms and non-constant bets
 for backtesting_params in [
         # {
-        #     'min_prob_to_bet': 0.55,
-        #     'min_ev_to_bet': 0.05,
-        #     'max_bet_size': 0.4,
-        #     'min_bet_size': 0.04,
+        #     'min_prob_to_bet': 0.5,
+        #     'min_ev_to_bet': 0.0,
+        #     'max_bet_size': 0.2,
+        #     'min_bet_size': 0.05,
         #     'start_balance': 1000,
         #     'constant_bets': False
-        # },
+        # }
+        # # ,
         {
             'min_prob_to_bet': 0.5,
-            'min_ev_to_bet': 0.1,
+            'min_ev_to_bet': 0.0,
             'max_bet_size': 400,
             'min_bet_size': 40,
             'constant_bets': True

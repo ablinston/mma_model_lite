@@ -39,7 +39,7 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
     
     # pdb.set_trace()
     
-    breakdown_cols = breakdown_columns.copy()
+    breakdown_cols = ['bet_ev_band'] + breakdown_columns.copy()
     
     # Do a check that the inputs are consistent if doing a non constant bets. If using non constant bets, the bet sizing should be as proportions, not £ amounts
     if not constant_bets:
@@ -66,7 +66,17 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
     
     # Set whether a bet is made
     actuals_data['bets'] = wl_trigger + lw_trigger
-
+    
+    # Add the EV for later breakdowns
+    actuals_data['bet_ev'] = np.where(actuals_data['bets'] == 0, np.nan, wl_trigger * ev_wl + lw_trigger * ev_lw)
+    #  Convert it into buckets
+    bucket_width = 0.1
+    col_min = round(np.floor(actuals_data['bet_ev'].min() / bucket_width) * bucket_width, 2)
+    col_max = round(np.ceil(actuals_data['bet_ev'].max() / bucket_width) * bucket_width, 2)
+    actuals_data['bet_ev_band'] = pd.cut(actuals_data['bet_ev'],
+                                    bins=np.arange(col_min, col_max + bucket_width, bucket_width))
+    
+    
     ## Determine the bet size. Begin with the minimum, then add on the confidence of the bet
     
     # First get the probabilities of winning and odds, irrespective of fighter to win
@@ -150,6 +160,7 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
     
     # Output the underlying data if required
     if output_data_for_debug:
-        actuals_data[['fighter1', 'fighter2', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'kelly_criterion', 'bet_size', 'max_bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
+        actuals_data.sort_values('date', inplace = True)
+        actuals_data[['fighter1', 'fighter2', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'bet_ev' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
     
     return results
