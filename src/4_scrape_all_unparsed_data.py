@@ -230,29 +230,16 @@ if unparsed_events:
 
 else:
 
-    # write new fight details to file
-    fp.write('./data/' + config['event_details_file_name'], updated_event_details_df, compression = 'ZSTD')
-    fp.write('./data/' + config['upcoming_event_details_file_name'], upcoming_events_df, compression = 'ZSTD')
-    fp.write('./data/' + config['fight_details_file_name'], new_parsed_fight_details_df, compression = 'ZSTD')
-    fp.write('./data/' + config['upcoming_fight_details_file_name'], upcoming_fight_details_df, compression = 'ZSTD')
-    fp.write('./data/' + config['fight_results_file_name'], new_parsed_fight_results_df, compression = 'ZSTD')
-    fp.write('./data/' + config['fight_stats_file_name'], new_parsed_fight_stats_df, compression = 'ZSTD')
-    fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
-    fp.write('./data/' + config['fighter_details_file_name'], all_fighter_details_df, compression = 'ZSTD')
-    fp.write('./data/' + config['fighter_tott_file_name'], new_parsed_fighter_tott_df, compression = 'ZSTD')
-    
-    else:
-        
-        ## Run checks to ensure each of the datasets are consistent and cover the same events
-        checks_passed = check_data_coverage(
-            parsed_event_details_df, 
-            parsed_fight_details_df, 
-            parsed_fight_results_df, 
-            parsed_fight_stats_df, 
-            new_parsed_odds_df,
-            all_fighter_details_df,
-            parsed_fighter_tott_df,
-            config)
+    ## Run checks to ensure each of the datasets are consistent and cover the same events
+    checks_passed = check_data_coverage(
+        parsed_event_details_df, 
+        parsed_fight_details_df, 
+        parsed_fight_results_df, 
+        parsed_fight_stats_df, 
+        new_parsed_odds_df,
+        all_fighter_details_df,
+        parsed_fighter_tott_df,
+        config)
         
     #######################
     ## Save files if all has run successfully

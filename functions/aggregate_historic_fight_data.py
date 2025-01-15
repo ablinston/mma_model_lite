@@ -11,7 +11,7 @@ def aggregate_historic_fight_data(df, ignore_cols, group_by, prefix):
     returns:
     data frame showing the historic sums for each column excluding the current date
     """
-    # pdb.set_trace()
+    pdb.set_trace()
 
     # Get the columns of stat
     id_columns = list(set(ignore_cols + group_by))
@@ -29,8 +29,13 @@ def aggregate_historic_fight_data(df, ignore_cols, group_by, prefix):
     
     # Calculate cumulative sums for each stat column and store in the dictionary
     for column in stat_columns:
-        cumsum_series = df.groupby(group_by)[column].cumsum()
-        cumulative_data[prefix + column] = cumsum_series - df[column]
+        # Calculate expanding sum within groups
+        cumsum_series = df.groupby(group_by)[column].expanding().sum()
+        
+        # Reset the index to align with the original DataFrame
+        cumsum_series = cumsum_series.reset_index(level=0, drop=True)
+        
+        cumulative_data[prefix + column] = cumsum_series - df[column].fillna(0)
     
     # Concatenate all cumulative columns in a single operation to reduce fragmentation
     df_hist = pd.concat([df[id_columns]] + [pd.Series(data=cumulative_data[prefix + column], name=prefix + column) for column in stat_columns], axis=1)

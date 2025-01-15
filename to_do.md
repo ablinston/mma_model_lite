@@ -6,6 +6,8 @@
 
 * Change the ELO parameter choices so that it accounts for the scale of how wrong the ELO is, not just predicting binary. Turn ELO into a probability and use logloss?
 
+* Fix aggregation error in script 6
+
 * Add test scripts of the backtesting and for the odds to check it's working correctly.
 * Change test split so it can exclude test fighters instead of fights specifically.
 
