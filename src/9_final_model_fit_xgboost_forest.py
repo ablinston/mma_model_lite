@@ -43,7 +43,7 @@ X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v7')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v8')
 
 
 
@@ -53,7 +53,7 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v7')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.012, # Learning rate
+    'learning_rate': 0.01, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.9,
     'max_depth': 3,
@@ -83,7 +83,7 @@ colsample_bynode = 0.1
 
 # Try different numbers of trees
 # for num_trees in [1]:
-for num_trees in [150, 250, 300]:
+for num_trees in [10, 50, 150, 250, 300, 500]:
     # Try different subsamples
     # for subsample in [1]:
     for subsample in [0.6]:
