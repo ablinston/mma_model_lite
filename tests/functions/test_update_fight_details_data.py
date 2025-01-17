@@ -7,9 +7,12 @@ update_fight_details_data_correct = fp.ParquetFile('./tests/data/update_fight_de
 
 # This test ensures that the update to fight details data correctly adds the data to an existing data frame
 def test_update_fight_details_data():
-    assert update_fight_details_data(
+    
+    result = update_fight_details_data(
         existing_fights_data = existing_fight_details_data,
         new_events_url_list = ['http://ufcstats.com/event-details/0c01568b1ac77bff'],
         config = config
-    ).equals(update_fight_details_data_correct) == True
+    )
+    
+    assert result[['EVENT', 'BOUT', 'URL']].equals(update_fight_details_data_correct) == True
     

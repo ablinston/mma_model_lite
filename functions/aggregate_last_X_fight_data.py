@@ -1,4 +1,4 @@
-def aggregate_last_3_fight_data(df, ignore_cols, group_by, prefix):
+def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X):
     """
     Convert fight data into cumulative fight history for the last 3 entries (excluding the current entry).
 
@@ -7,6 +7,7 @@ def aggregate_last_3_fight_data(df, ignore_cols, group_by, prefix):
     ignore_cols: the columns not to be aggregated
     group_by: a list of columns to be aggregated by
     prefix: a str to be added to the start of stat columns
+    X: the number of historic fights to include
 
     returns:S
     data frame showing the sum for the last 3 entries for each column excluding the current date.
@@ -21,7 +22,7 @@ def aggregate_last_3_fight_data(df, ignore_cols, group_by, prefix):
     # Group by the group_by columns and calculate rolling sums for the last 3 entries
     rolling_data = (
         df_sorted.groupby(group_by)[stat_columns]
-        .apply(lambda x: x.shift(1).rolling(window=3, min_periods=1).sum())
+        .apply(lambda x: x.shift(1).rolling(window=X, min_periods=1).sum())
         .reset_index(level=group_by, drop=True)
     )
 

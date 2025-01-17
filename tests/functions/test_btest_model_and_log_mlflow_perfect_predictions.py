@@ -19,6 +19,7 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
     # Create synthetic data for perfect predictions
     actuals_data = pd.DataFrame({
         'outcome': ['L/W', 'L/W', 'W/L', 'L/W', 'W/L', 'W/L', 'OTH'],
+        'date': pd.to_datetime(['2024-01-01'] * 7),
         'weightclass': ['light', 'heavy', 'light', 'heavy', 'light', 'heavy', 'middle'],
         'fighter1_best_closing_odds': [9e99, 9e99, 1.0000000001, 9e99, 1.0000000001, 1.0000000001, 9e99],
         'fighter2_best_closing_odds': [1.0000000001, 1.0000000001, 9e99, 1.0000000001, 9e99, 9e99, 9e99], 
@@ -46,6 +47,8 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
     
     # Call the function with synthetic data
     # Act
+# with mlflow.start_run():
+        
     test_results = btest_model_and_log_mlflow(
         actuals_data=actuals_data,
         prediction_probabilities=prediction_probabilities,

@@ -21,7 +21,7 @@ exec(open('global.py').read())
 model_path = './results/final_xgboost_forest.joblib'
 
 # Set whether to run the whole data processing. Otherwise, only odds are updated
-whole_data_processing = True
+whole_data_processing = False
 
 # Read in the data for training
 forecasting_data = concat_parquets_fastparquet('./data/final_dataset/')
@@ -43,6 +43,7 @@ if whole_data_processing:
     forecasting_data = merged_data.copy()
 else:
     # add in only odds update
+    
 
 # Apply standard filters
 forecasting_data = standard_data_filter(forecasting_data, include_upcoming = True)

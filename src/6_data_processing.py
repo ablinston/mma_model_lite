@@ -120,11 +120,12 @@ del fight_stats_against
 
 ###########################################################################################
 # Get the columns of stats
-fight_stats_hist = aggregate_historic_fight_data(
+fight_stats_hist = aggregate_last_X_fight_data(
     fight_stats,
     ignore_cols = ['date', 'event', 'bout', 'fighter'],
     group_by = ['fighter'],
-    prefix = "hist_"
+    prefix = "hist_",
+    X = 1000
 ).drop(columns = ['date'])
 
 # Check that all first fights are 0 stats
@@ -143,11 +144,12 @@ fight_stats_hist['hist_fight_length_minutes_avg'] = np.where(fight_stats_hist['h
 
 ###########################################################################################
 # Get the stats of the last 3 fights only
-fight_stats_hist_last_3 = aggregate_last_3_fight_data(
+fight_stats_hist_last_3 = aggregate_last_X_fight_data(
     fight_stats,
     ignore_cols = ['date', 'event', 'bout', 'fighter'],
     group_by = ['fighter'],
-    prefix = "hist_last_3_fights_"
+    prefix = "hist_last_3_fights_",
+    X = 3
 ).drop(columns = ['date'])
 
 # Check that all first fights are NaN
@@ -184,11 +186,12 @@ fight_stats['opponent_stance'] = fight_stats[['opponent']].merge(
     how = 'left')['stance']
 
 # Get the historic records of each fighter for each opponent stance
-fight_stats_hist_opponent_stance = aggregate_historic_fight_data(
+fight_stats_hist_opponent_stance = aggregate_last_X_fight_data(
     fight_stats,
     ignore_cols = ['date', 'event', 'bout', 'fighter', 'opponent', 'opponent_stance'],
     group_by = ['fighter', 'opponent_stance'],
-    prefix = 'hist_opp_stance_'
+    prefix = 'hist_opp_stance_',
+    X = 1000
 ).drop(columns = ['date', 'opponent', 'opponent_stance'])
 
 # Check the row numbers are correct
@@ -278,11 +281,12 @@ fight_stats['opponent_type'] = fight_stats[['event', 'bout', 'opponent']].merge(
     how = 'left')['fighter_type']
 
 # Get the historic records of each fighter for each opponent type
-fight_stats_hist_opponent_type = aggregate_historic_fight_data(
+fight_stats_hist_opponent_type = aggregate_last_X_fight_data(
     fight_stats,
     ignore_cols = ['date', 'event', 'bout', 'fighter', 'opponent', 'opponent_stance', 'fighter_type', 'opponent_type'],
     group_by = ['fighter', 'opponent_type'],
-    prefix = 'hist_opp_type_'
+    prefix = 'hist_opp_type_',
+    X = 1000
 ).drop(columns = ['date', 'opponent', 'opponent_stance', 'fighter_type', 'opponent_type'])
 
 # Add on the per minute stats
@@ -743,7 +747,7 @@ merged_data['matchup'] = merged_data['fighter1_fighter_type'] + '-vs-' + merged_
 # OUTPUT DATA
 
 # Remove columns not needed, or that are all na
-cols_to_remove = [col for col in merged_data.columns if any(substring in col for substring in ['bout', 'event', 'level_0'])]
+cols_to_remove = [col for col in merged_data.columns if any(substring in col for substring in ['bout', 'level_0'])]
 # cols_to_remove.append('date')
 
 merged_data.drop(columns = cols_to_remove, inplace = True)
