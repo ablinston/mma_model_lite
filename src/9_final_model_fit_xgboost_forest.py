@@ -43,7 +43,7 @@ X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v9')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v10')
 
 
 
@@ -53,7 +53,7 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v9')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.11, # Learning rate
+    'learning_rate': 0.01, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.9,
     'max_depth': 2,

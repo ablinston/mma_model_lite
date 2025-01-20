@@ -164,6 +164,6 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
     # Output the underlying data if required
     if output_data_for_debug:
         actuals_data.sort_values('date', inplace = True)
-        actuals_data[['fighter1', 'fighter2', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'bet_ev' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
+        actuals_data[['date', 'fighter1', 'fighter2', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'bet_ev' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
     
     return results

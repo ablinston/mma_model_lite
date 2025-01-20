@@ -17,38 +17,47 @@ import xgboost as xgb
 # Read in global objects and packages
 exec(open('global.py').read())
 
-# Set the model location
-model_path = './results/final_xgboost_forest.joblib'
-
-# Set whether to run the whole data processing. Otherwise, only odds are updated
-whole_data_processing = False
+# Use this to skip update of data if it's already been done recently
+skip_data_update = True
 
 # Read in the data for training
 forecasting_data = concat_parquets_fastparquet('./data/final_dataset/')
 # Load files
-rf_xgb_model = joblib.load(model_path)
+rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/5')
 
 ##########################################################################################
 ### Update the upcoming event and odds data ###
 ##########################################################################################
 
-# Run these scripts to scrape then clean the raw data
-exec(open('./src/4_scrape_all_unparsed_data.py').read())
-exec(open('./src/5_data_cleaning.py').read())
-
-# Optional, can either rerun all the processing, or just update the odds
-if whole_data_processing:
-    exec(open('./src/6_data_processing.py').read())
-    # Refresh the dataset
-    forecasting_data = merged_data.copy()
-else:
-    continue
-    # add in only odds update
+if not skip_data_update:
+    
+    # Run these scripts to scrape then clean the raw data
+    exec(open('./src/4_scrape_all_unparsed_data.py').read())
+    exec(open('./src/5_data_cleaning.py').read())
+    
+    # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
+    if unparsed_events:
+        exec(open('./src/6_data_processing.py').read())
+        # Refresh the dataset
+        forecasting_data = merged_data.copy()
+    else:
+        pass
+        # add in only odds update
     
 
 # Apply standard filters
 forecasting_data = standard_data_filter(forecasting_data, include_upcoming = True)
+
+##########################################################################################
+### Choose which events to predict ###
+##########################################################################################
+
 upcoming_fights = forecasting_data[forecasting_data['outcome'].isna()]
+# upcoming_fights = forecasting_data[forecasting_data['event'] == 'ufc311:makhachevvs.moicano']
+
+##########################################################################################
+### Get the models predictions ###
+##########################################################################################
 
 # Get the data ready for the model
 X_upcoming, temp1, temp6, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
@@ -85,3 +94,6 @@ print(
 print(
       betting_data[betting_data['bets'] == 1][['event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Bet_trigger', 'Final_bet']]
 )
+
+# Output the results
+summary_data.to_csv('./results/upcoming_predictions.csv')

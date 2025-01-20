@@ -44,8 +44,8 @@ def summarise_model_preductions(actuals_data_df, prediction_probabilities, min_p
     actuals_data['bet_ev'] = np.where(actuals_data['bets'] == 0, np.nan, wl_trigger * ev_wl + lw_trigger * ev_lw)
     #  Convert it into buckets
     bucket_width = 0.1
-    col_min = round(np.floor(actuals_data['bet_ev'].min() / bucket_width) * bucket_width, 2)
-    col_max = round(np.ceil(actuals_data['bet_ev'].max() / bucket_width) * bucket_width, 2)
+    col_min = np.round(np.floor(actuals_data['bet_ev'].min() / bucket_width) * bucket_width, 2)
+    col_max = np.round(np.ceil(actuals_data['bet_ev'].max() / bucket_width) * bucket_width, 2)
     actuals_data['bet_ev_band'] = pd.cut(actuals_data['bet_ev'],
                                     bins=np.arange(col_min, col_max + bucket_width, bucket_width))
     

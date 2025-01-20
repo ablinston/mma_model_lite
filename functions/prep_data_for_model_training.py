@@ -35,7 +35,10 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
     
     # Convert object columns into series' of dummies
     obj_cols = [col for col in data.columns if data.dtypes[col] == 'object']
-    obj_cols.remove(target)
+    try:
+        obj_cols.remove(target)
+    except:
+        pass
     data = pd.get_dummies(data, columns = obj_cols)
     
     if not upcoming_fights:
