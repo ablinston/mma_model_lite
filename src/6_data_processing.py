@@ -156,7 +156,7 @@ fight_stats_hist_last_3 = aggregate_last_X_fight_data(
 stat_columns = [col for col in fight_stats.columns if col not in ['date', 'event', 'bout', 'fighter']]
 fight_stats_hist_last_3_check = fight_stats_hist_last_3[fight_stats_hist_last_3['hist_last_3_fights_fights'] == 0]
 
-if np.isnan(fight_stats_hist_last_3_check[['hist_last_3_fights_' + s for s in stat_columns]].max(skipna = True).max(skipna = True)):
+if np.isnan(fight_stats_hist_last_3_check[['hist_last_3_fights_' + s for s in stat_columns if s != 'fights']].max(skipna = True).max(skipna = True)):
     print('Cumulative aggregation check PASSED')
 else:
     print('Cumulative aggregation check FAILED')
@@ -424,8 +424,10 @@ stop_if_not(fight_results['fight_elevation'].isna().sum() == 0, "Event elevation
 ###########################################################################################
 # FIGHT ODDS PROCESSING
 
-fight_odds = process_odds_data(fight_odds)
+# Fix the events and bouts using data including upcoming events
+fight_odds = add_event_and_bout_to_odds_data(fight_odds, events, fight_stats)
 
+fight_odds = process_odds_data(fight_odds)
 
 
 ###########################################################################################

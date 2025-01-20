@@ -176,7 +176,10 @@ fight_results = remove_duplicate_fighter_pairs(fight_results)
 # Now remove those results from the other datasets
 fight_stats_agg = fight_stats_agg[(fight_stats_agg['event'].isin(fight_results['event'].tolist())) & (fight_stats_agg['bout'].isin(fight_results['bout'].tolist()))]
 
-fighter_odds = fighter_odds[(fighter_odds['event'].isin(fight_results['event'].tolist())) & (fighter_odds['bout'].isin(fight_results['bout'].tolist()))]
+# Remove odds but not for more recent events
+comparison_date = datetime.combine(date.today() - timedelta(days=5), datetime.min.time())
+
+fighter_odds = fighter_odds[((fighter_odds['event'].isin(fight_results['event'].tolist())) & (fighter_odds['bout'].isin(fight_results['bout'].tolist()))) | (fighter_odds['date'] > comparison_date)]
 
 
 ###########################################

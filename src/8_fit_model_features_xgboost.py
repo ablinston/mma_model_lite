@@ -80,7 +80,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_feature_opt2')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_feature_opt3')
 
 
 ##########################################################################################
@@ -92,7 +92,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 300,
-    'num_of_features': hp.choice('num_of_features', [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175, 190, 200, 210, 230, 250, 270, 300, 350, 400, 500), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [3, 50, 100, 150, 200, 210, 230, 250, 270, 300, 350, 400, 500]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
@@ -102,7 +102,7 @@ params_inner = {
      'learning_rate': hp.quniform('learning_rate', 0.0005, 0.02, 0.0005), # Learning rate
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
-     'max_depth': hp.quniform('max_depth', 1, 3, 1),
+     'max_depth': hp.quniform('max_depth', 1, 4, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
      'eval_metric': 'mlogloss',       # Evaluation metric
@@ -130,7 +130,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:270]
+column_names = X_train_master.columns.tolist()[0:250]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

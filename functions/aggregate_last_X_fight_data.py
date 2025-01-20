@@ -25,7 +25,11 @@ def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X):
         .apply(lambda x: x.shift(1).rolling(window=X, min_periods=1).sum())
         .reset_index(level=group_by, drop=True)
     )
-
+    
+    # If fights column is in, replace NAs with 0
+    if 'fights' in stat_columns:
+        rolling_data['fights'] = rolling_data['fights'].fillna(0)
+    
     # Rename columns with prefix and concatenate with the id_columns
     rolling_data = rolling_data.rename(columns=lambda x: prefix + x)
     df_rolling = pd.concat([df_sorted[id_columns].reset_index(drop=True), rolling_data.reset_index(drop=True)], axis=1)

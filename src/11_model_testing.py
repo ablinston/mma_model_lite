@@ -88,29 +88,29 @@ model_description = 'XGB forest - fixed agg - GT2 fights split dec exc diff only
 ##########################################################################################
 
 # Set which columns and metrics we're interested in
-breakdown_cols = ['weightclass', 'year', 'month_year', 'fighter_history', 'date']
+breakdown_cols = ['weightclass', 'year', 'month_year', 'time_format', 'fighter_history', 'date']
 breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Logloss', 'X Odds Logloss', 'Sample Size']
 target = 'outcome'
 
 
 # Backtest for both constant terms and non-constant bets
 for backtesting_params in [
+        # {
+        #     'min_prob_to_bet': 0.4,
+        #     'min_ev_to_bet': 0.0,
+        #     'max_bet_size': 0.2,
+        #     'min_bet_size': 0.05,
+        #     'start_balance': 1000,
+        #     'constant_bets': False
+        # }
+        # # ,
         {
             'min_prob_to_bet': 0.5,
             'min_ev_to_bet': 0.0,
-            'max_bet_size': 0.2,
-            'min_bet_size': 0.05,
-            'start_balance': 1000,
-            'constant_bets': False
+            'max_bet_size': 400,
+            'min_bet_size': 40,
+            'constant_bets': True
         }
-        # # ,
-        # {
-        #     'min_prob_to_bet': 0.5,
-        #     'min_ev_to_bet': 0.0,
-        #     'max_bet_size': 400,
-        #     'min_bet_size': 40,
-        #     'constant_bets': True
-        # }
         ]:
     
     # Run the metrics on the training data

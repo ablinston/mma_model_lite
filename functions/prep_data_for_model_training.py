@@ -3,7 +3,7 @@
 # It returns 7 objects that can be output into env objects like
 # X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
-def prep_data_for_model_training(df, config, split_or_other_flag = False, test_size = 0.1):
+def prep_data_for_model_training(df, config, split_or_other_flag = False, test_size = 0.1, upcoming_fights = False):
     # pdb.set_trace()
     data = df.copy()
     
@@ -25,8 +25,9 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
     # Set target
     target = 'outcome'
     
-    # Recode the target. Don't need to distinguish between D and NC
-    data[target] = np.where((data[target] == "D/D") | (data[target] == "NC/NC"), "OTH", data[target])
+    if not upcoming_fights:
+        # Recode the target. Don't need to distinguish between D and NC
+        data[target] = np.where((data[target] == "D/D") | (data[target] == "NC/NC"), "OTH", data[target])
     
     # Convert all dates to integers
     date_cols = [col for col in data.columns if data.dtypes[col] == 'datetime64[ns]']
@@ -37,27 +38,37 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
     obj_cols.remove(target)
     data = pd.get_dummies(data, columns = obj_cols)
     
-    # Convert the target into a labelled column ready for multiclass modelling
-    data[target] = clean_target_column(data[target])
+    if not upcoming_fights:
+        # Convert the target into a labelled column ready for multiclass modelling
+        data[target] = clean_target_column(data[target])
     
-    # Split into train and test
-    X_train, X_test, y_train, y_test = train_test_split(
-        data.drop(columns = [target]),
-        data[target],
-        test_size = test_size,
-        random_state = config['seed_all']
-    )
+    if test_size > 0:
+        # Split into train and test
+        X_train, X_test, y_train, y_test = train_test_split(
+            data.drop(columns = [target]),
+            data[target],
+            test_size = test_size,
+            random_state = config['seed_all']
+        )
+    else:
+        X_train = data.drop(columns = [target])
+        y_train = data[target]
+        X_test = None
+        y_test = None
     
-    # Convert the test output to a binarised data frame. Can help with AUC calculations
-    y_test_bin = label_binarize(y_test, classes = np.unique(y_test))
+    if not upcoming_fights:
+        # Convert the test output to a binarised data frame. Can help with AUC calculations
+        y_test_bin = label_binarize(y_test, classes = np.unique(y_test))
     
-    # # Exclude split decisions and other if required
-    # if exclude_split_other_from_train:
-    #     X_train = X_train[X_train['split_dec_or_other'] == 0]
-    #     X_train.drop(columns = ['split_dec_or_other'], inplace = True)
-    
-    # Check data types
-    data.dtypes.value_counts()
+        # # Exclude split decisions and other if required
+        # if exclude_split_other_from_train:
+        #     X_train = X_train[X_train['split_dec_or_other'] == 0]
+        #     X_train.drop(columns = ['split_dec_or_other'], inplace = True)
+        
+        # Check data types
+        data.dtypes.value_counts()
+    else:
+        y_test_bin = None
     
     # Set number of classes for training
     no_of_classes = len(set(y_train))

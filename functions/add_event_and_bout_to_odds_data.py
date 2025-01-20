@@ -37,7 +37,7 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
     new_odds_df['date+1'] = new_odds_df['date'] + timedelta(days = 1)
     
     # Now try to merge on the event and bout. Rename columns to avoid duplicated names
-    new_odds_df.rename(columns = {'event': 'event_old'}, inplace = True)
+    new_odds_df.rename(columns = {'event': 'event_old', 'bout': 'bout_old'}, inplace = True)
     new_odds_df = new_odds_df.merge(new_stats_df, how = 'left', left_on = ['fighter', 'date', 'opponent'], right_on = ['fighter', 'event_date', 'opponent'])
     new_stats_df.rename(columns = {'event': 'event_m', 'bout': 'bout_m', 'event_date': 'event_date_m'}, inplace = True)
     new_odds_df = new_odds_df.merge(new_stats_df, how = 'left', left_on = ['fighter', 'date-1', 'opponent'], right_on = ['fighter', 'event_date_m', 'opponent'])

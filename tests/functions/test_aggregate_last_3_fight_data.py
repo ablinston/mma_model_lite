@@ -27,7 +27,7 @@ def test_aggregate_last_3_fight_data():
     # Call the function
     result_df = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 3)
     
-    assert result_df.equals(aggregate_last_3_fight_data_correct) == True
+    assert result_df[['fighter_id', 'date', 'last_3_stat1', 'last_3_stat2']].equals(aggregate_last_3_fight_data_correct) == True
     
 
 # fp.write('./tests/data/test_aggregate_last_3_fight_data_correct.parquet', result_df, compression = 'GZIP')

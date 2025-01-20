@@ -43,7 +43,7 @@ X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v8')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v9')
 
 
 
@@ -56,7 +56,7 @@ params = {
     'learning_rate': 0.01, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.9,
-    'max_depth': 3,
+    'max_depth': 2,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -74,62 +74,48 @@ params = {
 
 # Set hyperparameters for the forest
 colsample_bynode = 0.1
-# subsample = 0.6
+subsample = 0.6
 
 
 ##########################################################################################
 ### Model training
 ##########################################################################################
 
+# Train the models
+xgboost_rf = train_ensemble_xgboost(
+    X_train,
+    y_train,
+    num_models = 1000,
+    num_boost_round = 5000,
+    colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
+    subsample = subsample,
+    early_stopping_rounds = 30,
+    params = params
+    )
+
 # Try different numbers of trees
 # for num_trees in [1]:
-for num_trees in [10, 50, 150, 250, 300, 500]:
-    # Try different subsamples
-    # for subsample in [1]:
-    for subsample in [0.6]:
+for num_trees_i in list(range(5, 50, 5)) + list(range(20, 1001, 20)):
         
-        # Start a new model run in MLflow
-        with mlflow.start_run():
-            
-            # Log the initial metrics
-            mlflow.log_params(params)
-            mlflow.log_param('num_trees', num_trees)
-            mlflow.log_param('Forest col proportion', colsample_bynode)
-            mlflow.log_param('Forest subsample', subsample)
-            
-            # Train the models
-            xgboost_rf = train_ensemble_xgboost(
-                X_train,
-                y_train,
-                num_models = num_trees,
-                num_boost_round = 5000,
-                colsample_bynode = 1 if num_trees == 1 else colsample_bynode, # If it's only 1 tree, train the full XGboost model
-                subsample = 1 if num_trees == 1 else subsample,
-                early_stopping_rounds = 30,
-                params = params
-                )
-            
-            # Log the metrics in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf, X_test, y_test)
-            
-            # Log the predictions just from the odds for info
-            log_metrics_odds_mlflow(X_test, y_test)
+    # Start a new model run in MLflow
+    with mlflow.start_run():
+        
+        # Log the initial metrics
+        mlflow.log_params(params)
+        mlflow.log_param('num_trees', num_trees_i)
+        mlflow.log_param('Forest col proportion', colsample_bynode)
+        mlflow.log_param('Forest subsample', subsample)
+                    
+        # Log the metrics of the forest with that many trees in MLflow
+        log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_test, y_test)
+        
+        # Log the predictions just from the odds for info
+        log_metrics_odds_mlflow(X_test, y_test)
 
 
 # Set the final number of models
-final_forest_size = 300
-final_subsample = 0.6
+final_forest_size = 200
 
-# Save the final model, choosing the number of trees
-final_xgboost_rf = train_ensemble_xgboost(
-    X_train,
-    y_train,
-    num_models = final_forest_size,
-    num_boost_round = 5000,
-    colsample_bynode = 1 if final_forest_size == 1 else colsample_bynode, # If it's only 1 tree, train the full XGboost model
-    subsample = 1 if final_forest_size == 1 else final_subsample,
-    early_stopping_rounds = 50,
-    params = params)
 
 # Save the model
-joblib.dump(final_xgboost_rf, './results/final_xgboost_forest.joblib', compress = 9)
+joblib.dump(xgboost_rf[0:final_forest_size], './results/final_xgboost_forest.joblib', compress = 9)

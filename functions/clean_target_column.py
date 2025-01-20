@@ -9,13 +9,14 @@ def clean_target_column(target_column):
         A series to be input as the new column
 
     """
+    # pdb.set_trace()
     
     # Recode anything that isn't Wins or losses as other
-    cleaned_target = np.where((target_column == "D/D") | (target_column == "NC/NC"), "OTH", target_column)
+    cleaned_target = np.where(target_column.isna(), np.nan, np.where((target_column == "D/D") | (target_column == "NC/NC"), "OTH", target_column))
     
     # Convert the target into a labelled column ready for multiclass modelling
     le = LabelEncoder()
-    cleaned_target =le.fit_transform(cleaned_target)
+    cleaned_target = le.fit_transform(cleaned_target)
     
     # Stop if the classes aren't as expected. These are hardcoded in other functions so need to be in this order
     stop_if_not(le.classes_.tolist() == ['L/W', 'OTH', 'W/L'], "Target class check")
