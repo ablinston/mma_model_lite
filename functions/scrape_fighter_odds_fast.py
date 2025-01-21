@@ -6,7 +6,8 @@
 
 def scrape_fighter_odds_fast(
         fighter_name, 
-        cookies_dict):
+        cookies_dict, 
+        odds_urls_overide_df):
 
     # pdb.set_trace()
 
@@ -42,6 +43,11 @@ def scrape_fighter_odds_fast(
         found = False
         exact_find = False
         
+        # See if url is in override
+        if fighter_name in odds_urls_overide_df['fighter']:
+            link_url = odds_urls_overide_df[[odds_urls_overide_df['fighter'] == fighter_name]]['url'].iloc[0]
+            exact_find = True
+        
         # Then try to find the fighter in the table
         # Search through all tables in the soup
         for table in soup.find_all('table'):
@@ -50,7 +56,7 @@ def scrape_fighter_odds_fast(
                 # Iterate over each cell in the row
                 for cell in row.find_all('td'):
                     # Check if the cell contains the exact search string
-                    if (fighter_name.lower() == cell.get_text().lower()) and not exact_find:
+                    if (fighter_name.lower().replace(' ', '') == cell.get_text().lower().replace('.', '').replace(' ', '')) and not exact_find:
                         # Find the <a> tag inside the cell
                         link_tag = cell.find('a')
                         if link_tag and not exact_find:
@@ -61,7 +67,7 @@ def scrape_fighter_odds_fast(
                             exact_find = True
                             found = True
                     # Check if the cell contains the search string
-                    elif (fighter_name.lower() in cell.get_text().lower()) and not found:
+                    elif (fighter_name.lower().replace(' ', '') in cell.get_text().lower().replace('.', '').replace(' ', '')) and not found:
                         # Find the <a> tag inside the cell
                         link_tag = cell.find('a')
                         if link_tag and not found:

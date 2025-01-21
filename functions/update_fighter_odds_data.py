@@ -4,13 +4,17 @@
 def update_fighter_odds_data(existing_odds_data, new_fighter_list, new_event_date_list, config, num_threads = 1):
 
     # pdb.set_trace()    
+    
+    # Read the fighter odds urls
+    fighter_odds_urls = pd.read_csv(config['fighter_odds_urls'])
 
     # Scrape all the odds data for the fighters in the list
     new_odds_data = parallel_scrape_odds_fast(
         new_fighter_list, 
         num_threads = config['num_threads'], 
         firefox_location = config['firefox_location'], 
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe')
+        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+        odds_urls_overide_df = fighter_odds_urls)
     
     # Get the date list and expand it to include dates on either side due to timezone differences potentially causing discrepencies
     full_date_list = new_event_date_list.copy()

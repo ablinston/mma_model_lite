@@ -37,6 +37,9 @@ parsed_events_log: ./data/parsed_events_log.parquet
 # Set the final data log
 final_data_stats_log: ./data/final_data_stats_log.csv
 
+# Set the location of the fighter odds urls manual overide
+fighter_odds_urls: ./data/fighter_odds_urls.csv
+
 # columns names for extracted details
 fight_details_column_names:
   - EVENT

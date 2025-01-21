@@ -6,7 +6,8 @@ def parallel_scrape_odds_fast(
         config = [],
         num_threads = 1, 
         firefox_location = '', 
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe'):
+        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+        odds_urls_overide_df = None):
 
     ###########
     # Setup headless Firefox for getting odds information
@@ -35,7 +36,7 @@ def parallel_scrape_odds_fast(
 
     scrape_results = []
     with ThreadPoolExecutor(max_workers = num_threads) as executor:
-        future_to_url = {executor.submit(scrape_fighter_odds_fast, fighter, cookies_dict): fighter for fighter in fighter_list}
+        future_to_url = {executor.submit(scrape_fighter_odds_fast, fighter, cookies_dict, odds_urls_overide_df): fighter for fighter in fighter_list}
 
         # Collect results as they complete
         for future in as_completed(future_to_url):
