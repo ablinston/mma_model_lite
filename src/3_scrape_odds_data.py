@@ -20,12 +20,16 @@ fighters = fp.ParquetFile('./data/ufc_fighter_details.parquet').to_pandas()
 fighter_list = fighters['FIRST'] + ' ' + fighters['LAST']
 fighter_list = list(set(fighter_list))
 
+# Read the fighter odds urls
+fighter_odds_urls = pd.read_csv(config['fighter_odds_urls'])
+
 # Run scraping tasks in parallel
-fighter_odds = parallel_scrape_odds(
+fighter_odds = parallel_scrape_odds_fast(
     fighter_list, 
     num_threads = config['num_threads'], 
     firefox_location = config['firefox_location'], 
-    gecko_driver = './data/firefox_driver_32bit/geckodriver.exe')
+    gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+    odds_urls_overide_df = fighter_odds_urls)
 
 fp.write('./data/fight_odds_data.parquet',
          fighter_odds,

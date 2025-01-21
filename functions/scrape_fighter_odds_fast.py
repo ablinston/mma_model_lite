@@ -38,6 +38,8 @@ def scrape_fighter_odds_fast(
             print(f"Error scraping {fighter_name}: {e}")
             return pd.DataFrame()
 
+        fighter_name_parts = fighter_name.lower().split()
+    
         # Create placeholder for the 
         link_url = ''
         found = False
@@ -56,7 +58,7 @@ def scrape_fighter_odds_fast(
                 # Iterate over each cell in the row
                 for cell in row.find_all('td'):
                     # Check if the cell contains the exact search string
-                    if (fighter_name.lower().replace(' ', '') == cell.get_text().lower().replace('.', '').replace(' ', '')) and not exact_find:
+                    if (clean_name_for_odds_search(fighter_name) == clean_name_for_odds_search(cell.get_text()) and not exact_find:
                         # Find the <a> tag inside the cell
                         link_tag = cell.find('a')
                         if link_tag and not exact_find:
@@ -67,7 +69,7 @@ def scrape_fighter_odds_fast(
                             exact_find = True
                             found = True
                     # Check if the cell contains the search string
-                    elif (fighter_name.lower().replace(' ', '') in cell.get_text().lower().replace('.', '').replace(' ', '')) and not found:
+                    elif all(clean_name_for_odds_search(part) in clean_name_for_odds_search(cell.get_text()) for part in fighter_name_parts) and not found:
                         # Find the <a> tag inside the cell
                         link_tag = cell.find('a')
                         if link_tag and not found:
