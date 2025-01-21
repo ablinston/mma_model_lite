@@ -18,12 +18,14 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Use this to skip update of data if it's already been done recently
-skip_data_update = True
+skip_data_update = False
 
 # Read in the data for training
 forecasting_data = concat_parquets_fastparquet('./data/final_dataset/')
+
 # Load files
-rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/5')
+mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')
 
 ##########################################################################################
 ### Update the upcoming event and odds data ###
@@ -36,7 +38,7 @@ if not skip_data_update:
     exec(open('./src/5_data_cleaning.py').read())
     
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
-    if unparsed_events:
+    if True: # unparsed_events: Hard coded this to always run because fights can change if fighters drop out and otherwise they wont have the hist stats
         exec(open('./src/6_data_processing.py').read())
         # Refresh the dataset
         forecasting_data = merged_data.copy()

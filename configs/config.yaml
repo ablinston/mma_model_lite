@@ -34,6 +34,9 @@ fighter_odds_file_name: fight_odds_data.parquet
 # Define log of parsed events
 parsed_events_log: ./data/parsed_events_log.parquet
 
+# Set the final data log
+final_data_stats_log: ./data/final_data_stats_log.csv
+
 # columns names for extracted details
 fight_details_column_names:
   - EVENT

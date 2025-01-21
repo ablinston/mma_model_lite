@@ -31,5 +31,7 @@ def replace_odds_data(final_data, cleaned_odds_path):
     
     # Merge the fighter data
     
+    # NOT FINISHED BECAUSE DECIDED FULL PROCESSING NEEDS TO BE RUN EVERY TIME
+    
     return 
 

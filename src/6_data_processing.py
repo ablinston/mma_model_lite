@@ -760,6 +760,10 @@ merged_data.reset_index(drop = True, inplace = True)
 merged_data.drop(columns = cols_to_remove, inplace = True, errors = 'ignore')
 del(cols_to_remove)
 
+# Save the log of the final data
+log_final_data_stats(merged_data, config['final_data_stats_log'], config)
+
+# Save the final data
 split_by_year_and_save_fastparquet(merged_data, 'date', './data/final_dataset/', compression='ZSTD')
 # fp.write('./data/final_dataset.parquet', merged_data, compression = 'GZIP')
 
