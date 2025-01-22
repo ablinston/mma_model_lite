@@ -20,7 +20,11 @@ conda activate mma_model
 conda env update -f environment.yml
 
 # Delete the old branch and checkout a new version
-git branch -D raspberry_pi_update
+if git show-ref --verify --quiet refs/heads/raspberry_pi_update; then
+    git branch -D raspberry_pi_update
+else
+    echo "Branch 'raspberry_pi_update' does not exist. Skipping deletion."
+fi
 git checkout -b raspberry_pi_update
 
 # Run the update code
