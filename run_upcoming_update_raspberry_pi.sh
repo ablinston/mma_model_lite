@@ -6,6 +6,7 @@ set +e
 
 # Activate miniconda
 source /home/andy/miniconda3/etc/profile.d/conda.sh
+conda --version
 
 # Navigate to the repository
 REPO_DIR="/andy/home/Git_repos/mma_model_lite"
