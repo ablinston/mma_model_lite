@@ -46,38 +46,38 @@ def scrape_fighter_odds_fast(
         exact_find = False
         
         # See if url is in override
-        if fighter_name in odds_urls_overide_df['fighter']:
-            link_url = odds_urls_overide_df[[odds_urls_overide_df['fighter'] == fighter_name]]['url'].iloc[0]
+        if clean_name_for_odds_search(fighter_name) in odds_urls_overide_df['fighter'].tolist():
+            link_url = odds_urls_overide_df[odds_urls_overide_df['fighter'] == clean_name_for_odds_search(fighter_name)]['url'].iloc[0]
             exact_find = True
-        
-        # Then try to find the fighter in the table
-        # Search through all tables in the soup
-        for table in soup.find_all('table'):
-            # Iterate over all rows in the table
-            for row in table.find_all('tr'):
-                # Iterate over each cell in the row
-                for cell in row.find_all('td'):
-                    # Check if the cell contains the exact search string
-                    if (clean_name_for_odds_search(fighter_name) == clean_name_for_odds_search(cell.get_text()) and not exact_find:
-                        # Find the <a> tag inside the cell
-                        link_tag = cell.find('a')
-                        if link_tag and not exact_find:
-                            # Extract the href attribute (the link)
-                            link_url = 'https://www.bestfightodds.com' + link_tag.get('href')
-                            print(f'Found exact string: {fighter_name}, Link: {link_url}')
-                            # Take only the first entry, so flag as found
-                            exact_find = True
-                            found = True
-                    # Check if the cell contains the search string
-                    elif all(clean_name_for_odds_search(part) in clean_name_for_odds_search(cell.get_text()) for part in fighter_name_parts) and not found:
-                        # Find the <a> tag inside the cell
-                        link_tag = cell.find('a')
-                        if link_tag and not found:
-                            # Extract the href attribute (the link)
-                            link_url = 'https://www.bestfightodds.com' + link_tag.get('href')
-                            print(f'Found string: {fighter_name}, Link: {link_url}')
-                            # Take only the first entry, so flag as found
-                            found = True
+        else:
+            # Then try to find the fighter in the table
+            # Search through all tables in the soup
+            for table in soup.find_all('table'):
+                # Iterate over all rows in the table
+                for row in table.find_all('tr'):
+                    # Iterate over each cell in the row
+                    for cell in row.find_all('td'):
+                        # Check if the cell contains the exact search string
+                        if (clean_name_for_odds_search(fighter_name) == clean_name_for_odds_search(cell.get_text())) and not exact_find:
+                            # Find the <a> tag inside the cell
+                            link_tag = cell.find('a')
+                            if link_tag and not exact_find:
+                                # Extract the href attribute (the link)
+                                link_url = 'https://www.bestfightodds.com' + link_tag.get('href')
+                                print(f'Found exact string: {fighter_name}, Link: {link_url}')
+                                # Take only the first entry, so flag as found
+                                exact_find = True
+                                found = True
+                        # Check if the cell contains the search string
+                        elif all(clean_name_for_odds_search(part) in clean_name_for_odds_search(cell.get_text()) for part in fighter_name_parts) and not found:
+                            # Find the <a> tag inside the cell
+                            link_tag = cell.find('a')
+                            if link_tag and not found:
+                                # Extract the href attribute (the link)
+                                link_url = 'https://www.bestfightodds.com' + link_tag.get('href')
+                                print(f'Found string: {fighter_name}, Link: {link_url}')
+                                # Take only the first entry, so flag as found
+                                found = True
 
         # Check if a valid output has been found or if we have gone directly to the fighters odds page
         if link_url == '' and (fighter_name not in soup.title.string):

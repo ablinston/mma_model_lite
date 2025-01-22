@@ -31,18 +31,30 @@ fighter_odds = parallel_scrape_odds_fast(
     gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
     odds_urls_overide_df = fighter_odds_urls)
 
+
+# Do it a second time to catch all those not successful, in case it was a temp issue
+missing_fighters = [fighter for fighter in fighter_list if fighter not in fighter_odds['fighter'].tolist()]
+
+fighter_odds = update_fighter_odds_data(
+    fighter_odds, 
+    missing_fighters, 
+    pd.date_range(start = '1900-01-01', end = '2100-01-01'), 
+    config, 
+    num_threads = config['num_threads'])
+
+
+# Do it a final time to catch all those not successful, in case it was a temp issue
+missing_fighters = [fighter for fighter in fighter_list if fighter not in fighter_odds['fighter'].tolist()]
+
+fighter_odds = update_fighter_odds_data(
+    fighter_odds, 
+    missing_fighters, 
+    pd.date_range(start = '1900-01-01', end = '2100-01-01'), 
+    config, 
+    num_threads = config['num_threads'])
+
+
+# Save the final file
 fp.write('./data/fight_odds_data.parquet',
          fighter_odds,
          compression = 'GZIP')
-
-# # Close the browser
-# driver.quit()
-#    Zoila Frausto Gurgel
-# # Put the urls into the data frame
-# events['fight_odds_url'] =  fightodds_url
-
-# events.sort_values('Date', inplace = True)
-# events.tail(20)
-
-# # get coverage of how many ufc events in Wikipedia have bestfightodds urls in each year
-# events['fight_odds_url'].groupby(events['Date'].apply(lambda x: x.year)).apply(lambda x: (x != '').sum())/events['fight_odds_url'].groupby(events['Date'].apply(lambda x: x.year)).size()

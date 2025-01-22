@@ -39,6 +39,6 @@ def log_final_data_stats(df, log_csv_path, config):
     results_df = pd.concat([results_df, existing_results])
     
     # Now overwrite the results
-    results_df.to_csv(log_csv_path)
+    results_df.to_csv(log_csv_path, index=False)
 
     return None

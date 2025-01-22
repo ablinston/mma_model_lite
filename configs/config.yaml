@@ -7,6 +7,7 @@ upcoming_events_url: http://ufcstats.com/statistics/events/upcoming?page=all
 
 # Firefox location. Used for web scraping
 firefox_location: C:/Program Files/Mozilla Firefox/firefox.exe
+firefox_location_pi: /usr/bin/firefox
 
 # Numer of CPU threads to use for concurrent processes
 num_threads: 3

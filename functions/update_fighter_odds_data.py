@@ -17,10 +17,12 @@ def update_fighter_odds_data(existing_odds_data, new_fighter_list, new_event_dat
         odds_urls_overide_df = fighter_odds_urls)
     
     # Get the date list and expand it to include dates on either side due to timezone differences potentially causing discrepencies
-    full_date_list = new_event_date_list.copy()
+    full_date_list = list(new_event_date_list.copy())
     for date in new_event_date_list:
         full_date_list.append(date + timedelta(days = 1))
         full_date_list.append(date - timedelta(days = 1))
+        full_date_list.append(date + timedelta(days = 2))
+        full_date_list.append(date - timedelta(days = 2))
         
     # Filter only the fights that are on the specified dates
     new_odds_data = new_odds_data[new_odds_data['date'].isin(full_date_list)]

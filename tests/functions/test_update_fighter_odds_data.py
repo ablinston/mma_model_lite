@@ -10,8 +10,8 @@ def test_update_fighter_odds_data():
     
     result = update_fighter_odds_data(
         existing_odds_data = update_fighter_odds_data_input, 
-        new_fighter_list = ['Steve Garcia', 'Gilbert Burns', 'Kyle Nelson'], 
-        new_event_date_list = [datetime.strptime('08-09-2024', '%d-%m-%Y')], 
+        new_fighter_list = ['Steve Garcia', 'Gilbert Burns', 'Kyle Nelson', 'T J Dillashaw'], 
+        new_event_date_list = [datetime.strptime('08-09-2024', '%d-%m-%Y'), datetime.strptime('30-12-2016', '%d-%m-%Y')], 
         config = config, 
         num_threads = config['num_threads']
     ).sort_values(by = 'fighter').reset_index(drop = True)
@@ -20,3 +20,4 @@ def test_update_fighter_odds_data():
     assert result.equals(update_fighter_odds_data_correct) == True
     
 
+# fp.write('./tests/data/update_fighter_odds_data_data_correct.parquet', result, compression = 'ZSTD')

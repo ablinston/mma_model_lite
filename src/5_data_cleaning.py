@@ -158,7 +158,7 @@ fighter_odds_nas[fighter_odds_nas['na_count'] > 0].to_csv('./data/checks_fighter
 fighter_odds = fighter_odds[(fighter_odds['closing_odds_low'].notna()) & ~(fighter_odds['event'] == 'Future Events(')]
 
 # Clean the name columns. Not bothering with event because that column may not match the UFC events columns
-fighter_odds[['fighter', 'opponent']] = clean_text_columns(fighter_odds[['fighter', 'opponent']])
+fighter_odds.loc[:, ['fighter', 'opponent']] = clean_text_columns(fighter_odds[['fighter', 'opponent']])
 
 # Add the correct event and bout to the odds data
 fighter_odds = add_event_and_bout_to_odds_data(fighter_odds, events, fight_stats)

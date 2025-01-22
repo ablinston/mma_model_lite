@@ -4,6 +4,8 @@
 
 # To do scripts
 
+* Merge odds based on date +- 2 as well as date +- 1
+
 * Change the ELO parameter choices so that it accounts for the scale of how wrong the ELO is, not just predicting binary. Turn ELO into a probability and use logloss?
 
 * Fix aggregation error in script 6

@@ -1,6 +1,7 @@
 # This function takes an html table from BetFightOdds.com and turns it into a properly formatted pandas data frame
 
 def betfightodds_table_to_df(table, fighter):
+    
     # pdb.set_trace()
     
     # Extract headers and rows in one go using list comprehensions
@@ -40,6 +41,6 @@ def betfightodds_table_to_df(table, fighter):
     headers = [fighter if fighter.lower() == item.lower() else item for item in headers]
 
     df['fighter'] = fighter
-    df['opponent'] = [item for item in headers if item not in ['Matchup', 'Open', 'Closing range', 'Movement', '', 'Event', fighter]]
+    df['opponent'] = [item for item in headers if clean_name_for_odds_search(item) not in ['matchup', 'open', 'closingrange', 'movement', '', 'event', clean_name_for_odds_search(fighter), clean_name_for_odds_search(max(set(headers), key=headers.count))]] # exclude the most common element as it is usually their name
 
     return df

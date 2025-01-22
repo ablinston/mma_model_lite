@@ -17,15 +17,23 @@ import xgboost as xgb
 # Read in global objects and packages
 exec(open('global.py').read())
 
+# Replace the firefox location if we're not on windows
+if not os.name == "nt":
+    config['firefox_location'] = config['firefox_location_pi']
+
 # Use this to skip update of data if it's already been done recently
 skip_data_update = False
 
 # Read in the data for training
 forecasting_data = concat_parquets_fastparquet('./data/final_dataset/')
 
+# # Load files
+# mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+# rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/3')
+# Set the model location
+model_path = './results/final_xgboost_forest.joblib'
 # Load files
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')
+rf_xgb_model = joblib.load(model_path)
 
 ##########################################################################################
 ### Update the upcoming event and odds data ###
@@ -87,14 +95,16 @@ if bet_config['constant_bets'] == False:
 else:
     betting_data['Final_bet'] = betting_data['bets'] * betting_data['bet_size']
 
-summary_data = betting_data[['event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Fighter1_win_prob', 'Fighter2_win_prob', 'Fighter1_win_EV', 'Fighter2_win_EV', 'Bet_trigger', 'Final_bet']]
+betting_data['Potential_win'] = betting_data['bets'] * betting_data['Final_bet'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_best_closing_odds'], betting_data['fighter2_best_closing_odds'])
+
+summary_data = betting_data[['event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Fighter1_win_prob', 'Fighter2_win_prob', 'Fighter1_win_EV', 'Fighter2_win_EV', 'Bet_trigger', 'Final_bet', 'Potential_win']]
 
 print(
       summary_data
 )
 
 print(
-      betting_data[betting_data['bets'] == 1][['event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Bet_trigger', 'Final_bet']]
+      betting_data[betting_data['bets'] == 1][['event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Bet_trigger', 'Final_bet', 'Potential_win']]
 )
 
 # Output the results

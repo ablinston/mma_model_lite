@@ -1,11 +1,11 @@
 # Set the minimum values to trigger a bet when predicting upcoming events. Works as strictly greater than
-min_prob_to_bet: 0.5
+min_prob_to_bet: 0.49
 min_ev_to_bet: 0.0
 
 # Set either constant bets or proportion bets
 constant_bets: False
-min_bet_size: 0.1
-max_bet_size: 0.2
+min_bet_size: 0.05
+max_bet_size: 0.1
 
 # Starting balance when sizing bets
 start_balance: 2000
