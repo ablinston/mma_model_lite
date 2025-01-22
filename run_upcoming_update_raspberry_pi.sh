@@ -2,10 +2,11 @@
 #!/bin/bash
 
 # Exit on errors
-set -e
+set +e
 
 # Activate miniconda
-source ~/home/andy/miniconda3/etc/profile.d/conda.sh
+source /home/andy/miniconda3/etc/profile.d/conda.sh
+conda --version
 
 # Navigate to the repository
 REPO_DIR="/andy/home/Git_repos/mma_model_lite"
@@ -34,3 +35,5 @@ python3 src/13_predict_future_events.py
 git commit -am "automatic raspberry pi updates"
 git push -f origin raspberry_pi_update
 
+# Keep terminal open after script finishes
+exec bash
