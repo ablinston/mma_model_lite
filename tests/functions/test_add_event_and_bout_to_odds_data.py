@@ -18,3 +18,4 @@ def test_add_event_and_bout_to_odds_data():
     assert (new_odds.equals(test_add_event_and_bout_to_odds_data_correct)) == True
     
 
+# fp.write('./tests/data/test_add_event_and_bout_to_odds_data_correct.parquet', new_odds, compression = 'ZSTD')

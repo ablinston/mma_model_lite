@@ -6,18 +6,22 @@ exec(open('global.py').read())
 parallel_scrape_odds_data_correct = fp.ParquetFile('./tests/data/parallel_scrape_odds_data_correct.parquet').to_pandas()
 
 # This test looks at a specific fighter list and scrapes their odds to ensure these common errors don't occur again. One has a missing capital letter, the other isn't the first entry on the page, and the other goes directly to their page rather than a search results page
-def test_parallel_scrape_odds():
+def test_parallel_scrape_odds_fast():
     
     # Set the list of fighters to test, where problems have occurred in the past
     fighter_list = ['Joshua Van', 'Zygimantas Ramaska', 'Vanessa Demopoulos']
     
+    # Read the fighter odds urls
+    fighter_odds_urls = pd.read_csv(config['fighter_odds_urls'])
+    
     # Scrape the odds data
-    odds_df = parallel_scrape_odds(
+    odds_df = parallel_scrape_odds_fast(
         fighter_list,
         config = config,
         num_threads = config['num_threads'], 
         firefox_location = config['firefox_location'],
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe')
+        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+        odds_urls_overide_df = fighter_odds_urls)
     
 
     # Filter out any new fights that might have occurred after the correct data was scraped

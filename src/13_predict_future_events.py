@@ -104,7 +104,7 @@ print(
 )
 
 print(
-      betting_data[betting_data['bets'] == 1][['date', 'event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Bet_trigger', 'Final_bet', 'Potential_win']]
+      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['date', 'event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Bet_trigger', 'Final_bet', 'Potential_win']]
 )
 
 # Output the results

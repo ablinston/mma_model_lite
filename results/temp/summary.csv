@@ -1,2 +1,6 @@
-total,Group,fights,bets,wins,bet_size,profit_loss,max_bet_size,percent_bet_on,win_percent,max_drawdown,max_losing_streak,roi
-Total,Total,265,84,62,9.359173692659093,4616.351106021965,0.14903869926929475,31.69811320754717,73.80952380952381,-0.48560116295019795,,1.4344731802269584
+,Group,fights,bets,wins,bet_size,profit_loss,max_bet_size,percent_bet_on,win_percent,max_drawdown,max_losing_streak,roi
+Total,Total,7,6,6,6.0,6.000000496442226e-10,1.0,85.71428571428571,100.0,0.0,0.0,1.000000082740371e-08
+"(0.0, 0.1]","(0.0, 0.1]",6,6,6,6.0,6.000000496442226e-10,1.0,100.0,100.0,,,1.000000082740371e-08
+heavy,heavy,3,3,3,3.0,3.000000248221113e-10,1.0,100.0,100.0,,,1.000000082740371e-08
+light,light,3,3,3,3.0,3.000000248221113e-10,1.0,100.0,100.0,,,1.000000082740371e-08
+middle,middle,1,0,0,0.0,0.0,0.0,0.0,,,,
