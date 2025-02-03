@@ -1,5 +1,5 @@
 
-def ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2, return_loss=False):
+def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss=False):
     """
     Custom loss function for XGBoost that optimizes based on Expected Value (EV) from betting odds.
 
@@ -15,6 +15,12 @@ def ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2, return_loss
     - hess (np.array): Second derivative (Hessian) for XGBoost
     """
     # pdb.set_trace()
+    
+    # Convert from dmatrix if needed
+    try:
+        y_true = y_true.get_label()
+    except:
+        pass
     
     # Convert logits into probabilities using softmax
     exp_preds = np.exp(y_pred - np.max(y_pred, axis=1, keepdims=True))  # Stability trick

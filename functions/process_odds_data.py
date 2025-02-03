@@ -13,5 +13,8 @@ def process_odds_data(df):
 
    # Keep only the columns we need, and remove duplicates (these duplicates are where the event and bout are empty)
    df = df[['event', 'bout', 'fighter', 'open_odds', 'best_closing_odds', 'odds_change']].drop_duplicates(subset = ['event', 'bout', 'fighter'])
-    
+
+   # Add on a flag to say whether the odds have changed by more than 0.1
+   df['odds_change_gt_0'] = np.where(df['odds_change'] < 0, -1, np.where(df['odds_change'] > 0, 1, 0))     
+
    return df

@@ -16,14 +16,14 @@ def test_ev_loss_function():
     odds_fighter_2 = np.array([1.5, 2.8, 2.2, 1.6, 2.0])  # Example odds for Fighter 2
 
     # Call the function without returning loss
-    grad, hess = ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2, return_loss=False)
+    grad, hess = ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss=False)
 
     # Check gradients and Hessians are of correct shape (same as y_pred)
     assert grad.shape == y_pred.shape
     assert hess.shape == y_pred.shape
 
     # Call the function with return_loss=True to also get the actual loss
-    loss = ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2, return_loss=True)
+    loss = ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss=True)
 
     # Check that loss is a scalar
     assert np.issubdtype(type(loss), np.floating)
@@ -38,7 +38,7 @@ def test_ev_loss_function():
     ])
     
     # Call the function with return_loss=True to also get the actual loss
-    loss_improved = ev_loss_function(y_true, y_pred_improved, odds_fighter_1, odds_fighter_2, return_loss=True)
+    loss_improved = ev_loss_function(y_pred_improved, y_true, odds_fighter_1, odds_fighter_2, return_loss=True)
     
     assert loss_improved < loss
     
