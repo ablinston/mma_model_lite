@@ -31,9 +31,9 @@ forecasting_data = concat_parquets_fastparquet('./data/final_dataset/')
 # mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/3')
 # Set the model location
-model_path = './results/final_xgboost_forest.joblib'
+# model_path = './results/final_xgboost_forest.joblib'
 # Load files
-rf_xgb_model = joblib.load(model_path)
+rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')
 
 ##########################################################################################
 ### Update the upcoming event and odds data ###
@@ -78,7 +78,7 @@ X_upcoming, temp1, temp6, temp2, temp3, temp4, temp5 = prep_data_for_model_train
     upcoming_fights = True)
 
 # Get the model predictions
-prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_upcoming, y_test_df = None)
+prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
 
 # Summarise the model predictions and betting decisions using the config
 betting_data = summarise_model_preductions(
