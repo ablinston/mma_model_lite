@@ -1,5 +1,5 @@
 
-def predict_xgboost_ensemble(models, X_test_df, y_test_df):
+def predict_xgboost_ensemble(models, X_test_df, y_test_df = None):
     """
     Generates multi-class predictions from an ensemble of XGBoost models.
 

@@ -95,26 +95,26 @@ target = 'outcome'
 
 # Backtest for both constant terms and non-constant bets
 for backtesting_params in [
-        {
-            'min_prob_to_bet': 0.5,
-            'min_ev_to_bet': 0.0,
-            'max_bet_size': 0.2,
-            'min_bet_size': 0.1,
-            'start_balance': 2000,
-            'constant_bets': False
-        }
-        # # ,
         # {
         #     'min_prob_to_bet': 0.5,
         #     'min_ev_to_bet': 0.0,
-        #     'max_bet_size': 400,
-        #     'min_bet_size': 40,
-        #     'constant_bets': True
+        #     'max_bet_size': 0.2,
+        #     'min_bet_size': 0.1,
+        #     'start_balance': 2000,
+        #     'constant_bets': False
         # }
+        # # ,
+        {
+            'min_prob_to_bet': 0.49,
+            'min_ev_to_bet': 0.0,
+            'max_bet_size': 400,
+            'min_bet_size': 40,
+            'constant_bets': True
+        }
         ]:
     
     # Run the metrics on the training data
-    with mlflow.start_run():
+    with mlflow.start_run() as run:
         
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
@@ -129,8 +129,12 @@ for backtesting_params in [
             backtesting_params = backtesting_params)
         
         # Log the model as an artifact so we have a record of it
-        mlflow.log_artifact(model_path, 'Model_object')
-        mlflow.pyfunc.log_model(artifact_path="Model", python_model = custom_xgboost_model(rf_xgb_model))
+        # mlflow.log_artifact(model_path, 'Model_object')
+        mlflow.pyfunc.log_model(artifact_path="Model", python_model = custom_xgboost_model(), artifacts={"model": model_path})
+        
+        # Save the run id for if we want to register the model
+        run_id = run.info.run_id
+        
         mlflow.set_tag('Sample', 'Train')
         
     mlflow.end_run()
@@ -183,10 +187,8 @@ for backtesting_params in [
 
 # If the model is good, then log it in the registery
 if model_approved:
-    run_id = 'a4d0586467354b1bb7ef1ad9c8dad5c8'
-    artifact_uri = mlflow.get_run(run_id).info.artifact_uri
-    mlflow.register_model(f'runs:/{run_id}/Model_object/final_xgboost_forest.joblib', name = 'xgb_forest_model')
-    mlflow.register_model(f"{artifact_uri}/Model_object", name="xgb_forest_model")
+    # run_id = '17961756088941ce880360c3c0b8405b'
+    mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
 
 
-test = mlflow.pyfunc.load_model('models:/xgb_forest_model/10')
+test = mlflow.pyfunc.load_model('models:/xgb_forest_model/13')
