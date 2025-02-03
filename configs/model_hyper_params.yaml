@@ -7,3 +7,6 @@ switch_fighters_randomly: True
 
 # Set whether we include differential features only in the model features
 differential_features_only: False
+
+# Set which loss function to use. mlogloss is the most common, but ev_loss_function is the custom one I made
+loss_function: ev_loss_function
