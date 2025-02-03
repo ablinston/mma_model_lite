@@ -191,4 +191,4 @@ if model_approved:
     mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
 
 
-test = mlflow.pyfunc.load_model('models:/xgb_forest_model/13')
+test = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')

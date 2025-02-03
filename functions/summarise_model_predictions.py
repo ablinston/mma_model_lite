@@ -75,6 +75,11 @@ def summarise_model_preductions(actuals_data_df, prediction_probabilities, min_p
     actuals_data['Fighter2_win_prob'] = np.round(prediction_probabilities[:, 0] * 100, 1)
     actuals_data['Fighter2_win_EV'] = np.round(ev_lw, 2)
     actuals_data['Bet_trigger'] = np.where(wl_trigger == 1, actuals_data['fighter1'], np.where(lw_trigger == 1, actuals_data['fighter2'], 'None'))
+    actuals_data['Predict_to_win'] = np.where((actuals_data['Fighter1_win_prob'] > actuals_data['Fighter2_win_prob']) & (actuals_data['fighter1_best_closing_odds'] > actuals_data['fighter2_best_closing_odds']), 
+                                              'Underdog to win',
+                                             np.where((actuals_data['Fighter2_win_prob'] > actuals_data['Fighter1_win_prob']) & (actuals_data['fighter2_best_closing_odds'] > actuals_data['fighter1_best_closing_odds']),
+                                             'Underdog to win',
+                                             'Favourite to win'))
     
     if return_triggers:
         return [actuals_data, wl_trigger, lw_trigger]
