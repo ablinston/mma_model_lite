@@ -12,6 +12,7 @@ import importlib
 import inspect
 import itertools
 import joblib
+import mlflow.pyfunc
 import numpy as np
 import os
 from os import listdir, makedirs
