@@ -78,7 +78,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_oot_testing_v4')
+mlflow.set_experiment('OOT_testing')
 
 # Set this model's description for MLflow
 model_description = 'XGB forest - fixed agg - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'

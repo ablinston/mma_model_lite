@@ -92,8 +92,8 @@ params = {
 train = xgb.DMatrix(X_train, label = y_train)
 
 # Add the odds in case we're using custom loss
-train.set_info(fighter1_best_closing_odds=X_train['fighter1_best_closing_odds'].values,
-               fighter2_best_closing_odds=X_train['fighter2_best_closing_odds'].values)
+# train.set_info(fighter1_best_closing_odds=X_train['fighter1_best_closing_odds'].values,
+#                fighter2_best_closing_odds=X_train['fighter2_best_closing_odds'].values)
 
 
 with mlflow.start_run():
@@ -103,7 +103,7 @@ with mlflow.start_run():
     mlflow.log_param('model', "RandomForest")
 
     # Train the model
-    if model_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
+    if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
     
         # Pass the odds to the loss function
         custom_loss = create_custom_loss(X_train['fighter1_best_closing_odds'].values, X_train['fighter2_best_closing_odds'].values)
