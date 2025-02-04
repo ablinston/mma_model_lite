@@ -1,11 +1,11 @@
 
-def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss=False):
+def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss = False, for_feval = False):
     """
     Custom loss function for XGBoost that optimizes based on Expected Value (EV) from betting odds.
 
     Parameters:
     - y_true (np.array): True fight outcome (0 = Fighter 2 win, 1 = Draw, 2 = Fighter 1 win)
-    - y_pred (np.array): Raw logits from XGBoost (before softmax transformation)
+    - y_pred (np.array): Raw logits from XGBoost (before softmax transformation) i.e. NOT PROBABILITIES
     - odds_fighter_1 (np.array): Betting odds for Fighter 1
     - odds_fighter_2 (np.array): Betting odds for Fighter 2
     - return_loss (bool): If True, returns the actual EV loss for monitoring
@@ -22,9 +22,13 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     except:
         pass
     
-    # Convert logits into probabilities using softmax
-    exp_preds = np.exp(y_pred - np.max(y_pred, axis=1, keepdims=True))  # Stability trick
-    probs = exp_preds / np.sum(exp_preds, axis=1, keepdims=True)
+    if for_feval:
+        np.savetxt("predictions.csv", y_pred, delimiter=",")
+        probs = y_pred # Using the function for evaluation in xgb.train seems to pass probabilities through rather than logits
+    else:
+        # Convert logits into probabilities using softmax
+        exp_preds = np.exp(y_pred - np.max(y_pred, axis=1, keepdims=True))  # Stability trick
+        probs = exp_preds / np.sum(exp_preds, axis=1, keepdims=True)
 
     # Extract individual probabilities
     p_fighter_1 = probs[:, 2]  # Probability of Fighter 1 win
@@ -71,7 +75,10 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     # Combine Hessians into a single matrix
     hess = np.stack([hess_fighter_2, hess_draw, hess_fighter_1], axis=1)
 
-    if return_loss:
+    if for_feval:
+        # print(ev_loss.mean())
+        return 'EV MSE', ev_loss.mean()
+    elif return_loss:
         return ev_loss.mean()
     return grad, hess
 
@@ -84,11 +91,13 @@ def create_custom_loss(odds_fighter_1, odds_fighter_2):
     """
     return lambda y_true, y_pred: ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2)
 
-def create_custom_loss_metric(odds_fighter_1, odds_fighter_2):
+def ev_loss_function_test(odds_fighter_1, odds_fighter_2):
     """
     Wrapper function to pass odds dynamically to the loss function.
     
     Returns:
     - A custom loss function that can be used in XGBoost training.
     """
-    return lambda y_true, y_pred: ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2, return_loss = True)
+    # pdb.set_trace()
+    
+    return lambda y_true, y_pred: ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2, for_feval = True)

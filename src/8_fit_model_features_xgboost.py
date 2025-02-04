@@ -80,7 +80,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_feature_opt3')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt')
 
 
 ##########################################################################################
@@ -91,7 +91,7 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 300,
+    'max_evals': 1,
     'num_of_features': hp.choice('num_of_features', [3, 50, 100, 150, 200, 210, 230, 250, 270, 300, 350, 400, 500]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
@@ -105,24 +105,25 @@ params_inner = {
      'max_depth': hp.quniform('max_depth', 1, 4, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
-     'eval_metric': 'mlogloss',       # Evaluation metric
+     # 'eval_metric': 'mlogloss',       # Evaluation metric
      'tree_method': 'hist',      # Use GPU accelerated algorithm
      'device': 'cuda',           # Use CUDA / GPU
      'predictor': 'gpu_predictor',   # Use GPU for prediction
      'verbosity': 1,
      'num_class': no_of_classes,
-     'n_folds': 5,                   # Number of folds for the cross-validation
+     'n_folds': 2,                   # Number of folds for the cross-validation
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
      'early_stopping_rounds': 30,
      'exclude_split_other_from_train': split_or_other_exclude,
-     'win_loss_only': hp.choice('win_loss_only', [True, False])
+     'win_loss_only': hp.choice('win_loss_only', [True, False]),
+     'loss_function' : model_hyper_params['loss_function']
 }
 
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = rand.suggest, # Randomly explore the space
-            max_evals = 50,
+            max_evals = 1,
             trials = trials)
 
 

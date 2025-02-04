@@ -8,7 +8,7 @@ def objective_xgboost_features_mlflow(
         params):
 
     # pdb.set_trace()
-    # 
+    
     # Check for duplicates
     if is_duplicate_run(params, parameter_to_check = 'num_of_features'):
         
@@ -58,7 +58,11 @@ def objective_xgboost_features_mlflow(
             
             # Create the train dataset based on the number of features
             global X_train
-            X_train = X_train_master[list(set(column_names))]
+            X_train = X_train_master.copy()[list(set(column_names))]
+            
+            # Add on odds columns only for the loss function
+            X_train['fighter1_odds_for_loss'] = X_train_master['fighter1_best_closing_odds']
+            X_train['fighter2_odds_for_loss'] = X_train_master['fighter2_best_closing_odds']
             
             if params['split_dec_or_other'] == True:  
                 # Add on any specific columns needed

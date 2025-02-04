@@ -1,6 +1,6 @@
 # This function creates a dmatrix ready for XGBoost, but it also applies a filter to the training data (not test) to remove any split decisions or 'other' methods of victory.
-def create_dmatrix_with_split_other_filter(X_train, y_train, train_idx, test_idx, win_loss_only = False):
-    # pdb.set_trace()
+def create_dmatrix_with_split_other_filter(X_train, y_train, train_idx, test_idx, win_loss_only = False, split_dec_or_other = False):
+    pdb.set_trace()
     # Convert train_idx to a boolean mask
     mask = pd.Series(False, index=X_train.index)
     mask.iloc[train_idx] = True  # Set True for indices in train_idx

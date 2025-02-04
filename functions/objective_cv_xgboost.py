@@ -17,6 +17,7 @@ def objective_cv_xgboost(
     lw_accuracies = []
     avg_accuracies = []
     log_losses = []
+    ev_mses = []
 
     # Ensure formatting of params is correct
     for param in ['max_bin', 'min_child_weight', 'max_depth', 'num_iterations']:
@@ -24,31 +25,49 @@ def objective_cv_xgboost(
 
     ## Precompute DMatrix objects using ThreadPoolExecutor
     # If the training data is to have split decs and other results excluded, then use the custom function to do that
-    if params['exclude_split_other_from_train'] == False:
-        with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
-            futures = {executor.submit(create_dmatrix, X_train, y_train, train_idx, test_idx, params['win_loss_only']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
-            dmatrix_data = [future.result() for future in as_completed(futures)]   
-    else:
-        with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
-            futures = {executor.submit(create_dmatrix_with_split_other_filter, X_train, y_train, train_idx, test_idx, params['win_loss_only']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
-            dmatrix_data = [future.result() for future in as_completed(futures)]   
+    # if params['exclude_split_other_from_train'] == False:
+    with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
+        futures = {executor.submit(create_dmatrix, X_train, y_train, train_idx, test_idx, params['win_loss_only'], params['exclude_split_other_from_train']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
+        dmatrix_data = [future.result() for future in as_completed(futures)]   
+    # else:
+    #     with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
+    #         futures = {executor.submit(create_dmatrix_with_split_other_filter, X_train, y_train, train_idx, test_idx, params['win_loss_only']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
+    #         dmatrix_data = [future.result() for future in as_completed(futures)]   
 
     # Print out progress
     print("Training CV models...")
 
     # Loop through precomputed DMatrix objects for each fold
-    for train_dmatrix, test_dmatrix in dmatrix_data:
-        # pdb.set_trace()
-        # Train the model with early stopping
-        model = xgb.train(params, train_dmatrix,
-                          num_boost_round = params['num_iterations'],
-                          evals = [(test_dmatrix, 'eval')],
-                          early_stopping_rounds = params['early_stopping_rounds'],
-                          verbose_eval = False)
+    for train_dmatrix, test_dmatrix, train_fighter1_odds, train_fighter2_odds, test_fighter1_odds, test_fighter2_odds in dmatrix_data:
+        pdb.set_trace()
+        
+        # Train the model
+        if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
+        
+            # Pass the odds to the loss function
+            custom_loss = create_custom_loss(train_fighter1_odds.values, train_fighter2_odds.values)
+            custom_loss_test = create_custom_loss_metric(test_fighter1_odds.values, test_fighter2_odds.values)
+            
+            model = xgb.train(params, train_dmatrix,
+                              num_boost_round = params['num_iterations'],
+                              evals = [(test_dmatrix, 'eval')],
+                              early_stopping_rounds = params['early_stopping_rounds'],
+                              verbose_eval = True,
+                              obj = custom_loss,
+                              custom_metric = custom_loss_test
+                              )
+            
+        else:
+            # Train the model with early stopping
+            model = xgb.train(params, train_dmatrix,
+                              num_boost_round = params['num_iterations'],
+                              evals = [(test_dmatrix, 'eval')],
+                              early_stopping_rounds = params['early_stopping_rounds'],
+                              verbose_eval = False)
             
         # Make predictions on the test set
         y_pred_prob = model.predict(test_dmatrix)
-        
+                
         # Get the outcomes of the test data
         y_test_fold = test_dmatrix.get_label().astype(int)
 
@@ -86,11 +105,22 @@ def objective_cv_xgboost(
         # Calculate the log loss
         log_loss_fold = log_loss(y_test_fold, y_pred_prob)
         log_losses.append(log_loss_fold)
+        
+        # Get the logit predictions for use in custom loss function
+        if model_hyper_params['loss_function'] == 'ev_loss_function':
+            ev_mse_fold = ev_loss_function(
+                model.predict(test_dmatrix, output_margin = True), # Need the raw logits
+                y_test_fold,
+                test_fighter1_odds,
+                test_fighter2_odds,
+                return_loss = True)
 
         # Clean up memory
         del model, train_dmatrix, test_dmatrix, y_pred_prob, wl_auc, lw_auc, wl_accuracy, lw_accuracy
         gc.collect()
          
+        
+        
     # Save the metrics
     metrics = {
         'Avg WL only AUC': np.mean(avg_aucs),
