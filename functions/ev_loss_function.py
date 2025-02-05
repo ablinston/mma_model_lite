@@ -66,7 +66,7 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     # Gradients for each class. Got these from chatgpt differentiation
     grad_fighter_2 = 2 * error_fighter_2 * p_fighter_2 * (1 - p_fighter_2)
     # grad_draw = 2 * error_draw * p_draw * (1 - p_draw)
-    grad_draw = np.zeroes(len(p_fighter_1))
+    grad_draw = np.zeros(len(p_fighter_1))
     grad_fighter_1 = 2 * error_fighter_1 * p_fighter_1 * (1 - p_fighter_1)
     
     # Combine gradients into a single matrix
@@ -75,7 +75,7 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     # Hessians for each class
     hess_fighter_2 = 2 * p_fighter_2 * (1 - p_fighter_2) * (1 - 2 * p_fighter_2)
     # hess_draw = 2 * p_draw * (1 - p_draw) * (1 - 2 * p_draw)
-    hess_draw = np.zeroes(len(p_fighter_1))
+    hess_draw = np.zeros(len(p_fighter_1))
     hess_fighter_1 = 2 * p_fighter_1 * (1 - p_fighter_1) * (1 - 2 * p_fighter_1)
     
     # Combine Hessians into a single matrix
