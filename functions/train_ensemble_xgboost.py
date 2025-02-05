@@ -37,16 +37,18 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
     # Set random seed for Numpy
     np.random.seed(config['seed_all'])
 
+    all_columns = X.columns.tolist()
+
     # Add an id column to the X data
-    X['id'] = X.index
+    X['id'] = X.index.copy()
     
     # Calculate new odds columns to be removed later
-    X['train_fighter1_odds'] = X['fighter1_best_closing_odds']
-    X['train_fighter2_odds'] = X['fighter2_best_closing_odds']
+    X['train_fighter1_odds'] = X['fighter1_best_closing_odds'].copy()
+    X['train_fighter2_odds'] = X['fighter2_best_closing_odds'].copy()
 
     models = []
     for i in range(num_models):
-        
+        # pdb.set_trace()
         model = {}
         
         # Randomly sample rows with replacement for the training set
@@ -56,12 +58,12 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         num_columns_to_select = int(colsample_bynode * X_train_df.shape[1])
         
         # Get a random selection of column names
-        selected_columns = list(np.random.choice(X_train_df.columns, num_columns_to_select, replace = False))
+        selected_columns = list(np.random.choice(all_columns, num_columns_to_select, replace = False))
         
         # Make sure both fighter1 and figher2 versions of columns in there or switch will fail
         selected_columns = list(set(selected_columns + list_swap_fighter1_fighter2(selected_columns)))
         
-        X_train_df =  X_train_df[selected_columns + ['id', 'train_fighter1_odds', 'train_fighter2_odds']]
+        X_train_df =  X_train_df.copy()[selected_columns + ['id', 'train_fighter1_odds', 'train_fighter2_odds']]
 
         # Switch fighters if needed
         if params['switch_fighters_randomly'] == True:

@@ -11,10 +11,10 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
 
     # Define the data to be switched
     if X is None:
-        df = df_original[filter_boolean].copy()
+        df = df_original[filter_boolean].reset_index(drop = True).copy()
     else:
-        df = X[filter_boolean].copy()
-        y_new = y[filter_boolean].copy()
+        df = X[filter_boolean].reset_index(drop = True).copy()
+        y_new = y[filter_boolean].reset_index(drop = True).copy()
 
     # First rename fighter1 columns
     df.columns = df.columns.str.replace('fighter1', 'fighterX')
@@ -45,9 +45,13 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         
     # Now combine this data with the rows not switched
     if X is None:
-        final_df = pd.concat([df, df_original[~filter_boolean]])
+        final_df = pd.concat([df, df_original.reset_index(drop = True).copy()[~filter_boolean]])
     else:
-        final_df = pd.concat([df, X[~filter_boolean]])
+        X_filtered = X.copy()[~filter_boolean]
+        final_df = pd.DataFrame(index=range(len(df) + len(X_filtered)), columns=df.columns)
+        final_df.loc[: len(df) - 1] = df.values
+        final_df.loc[len(df) :] = X_filtered.values
+        # final_df = pd.concat([df, X.reset_index(drop = True).copy()[~filter_boolean]], ignore_index=True)
     
     # Handle cases where we have X, y input instead of a single data frame
     if y is not None: # Check this works with W/L and isn't 0, 1, 2
