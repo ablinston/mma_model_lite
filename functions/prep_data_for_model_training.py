@@ -5,11 +5,8 @@
 
 def prep_data_for_model_training(df, config, split_or_other_flag = False, test_size = 0.1, upcoming_fights = False):
     # pdb.set_trace()
-    data = df.copy()
     
-    # Replace infinite values with large values
-    data.replace([np.inf], 99999, inplace = True)
-    data.replace([-np.inf], -99999, inplace = True)
+    data = clean_inf_and_large(df.copy())
     
     # Filter the OOT data and training data to be ignored
     oot = data[data['date'] >= config['oot_start_date']]

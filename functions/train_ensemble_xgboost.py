@@ -19,6 +19,8 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
     - models (list): List of trained XGBoost models.
     """
 
+    # pdb.set_trace()
+
     # Default parameters if none are provided
     if params is None:
         params = {
@@ -34,6 +36,13 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
 
     # Set random seed for Numpy
     np.random.seed(config['seed_all'])
+
+    # Add an id column to the X data
+    X['id'] = X.index
+    
+    # Calculate new odds columns to be removed later
+    X['train_fighter1_odds'] = X['fighter1_best_closing_odds']
+    X['train_fighter2_odds'] = X['fighter2_best_closing_odds']
 
     models = []
     for i in range(num_models):
@@ -52,36 +61,66 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         # Make sure both fighter1 and figher2 versions of columns in there or switch will fail
         selected_columns = list(set(selected_columns + list_swap_fighter1_fighter2(selected_columns)))
         
-        X_train_df =  X_train_df[selected_columns]
+        X_train_df =  X_train_df[selected_columns + ['id', 'train_fighter1_odds', 'train_fighter2_odds']]
 
         # Switch fighters if needed
         if params['switch_fighters_randomly'] == True:
             X_train_df, y_train_df = switch_fighter1_fighter2(X = X_train_df, y = y_train_df, filter_boolean = np.random.choice([True, False], size = len(X_train_df)))
+            # Clean values
+            X_train_df = clean_inf_and_large(X_train_df)
         
         # Filter win loss only if applicable
         if params['win_loss_only'] == True:
-            X_train_df = X_train_df[y_train_df.isin([0, 2])]
-            y_train_df = y_train_df[y_train_df.isin([0, 2])]
+            X_train_df = X_train_df.copy()[y_train_df.isin([0, 2])]
+            y_train_df = y_train_df.copy()[y_train_df.isin([0, 2])]
 
         # Create the validation set from all rows not included in the training set
         # Mask to get the validation data
-        train_indices = X_train_df.index
-        X_val = X[~X.index.isin(train_indices)]
-        y_val = y[~y.index.isin(train_indices)]
+        train_ids = X_train_df['id'].tolist()
+        X_val = X.copy()[~X['id'].isin(train_ids)]
+        y_val = y.copy()[~X['id'].isin(train_ids)]
 
+        # Get the odds for the custom loss function if needed
+        train_fighter1_odds = X_train_df['train_fighter1_odds'].copy()
+        train_fighter2_odds = X_train_df['train_fighter2_odds'].copy()
+        test_fighter1_odds = X['fighter1_best_closing_odds'][~X['id'].isin(train_ids)]
+        test_fighter2_odds = X['fighter2_best_closing_odds'][~X['id'].isin(train_ids)]
+
+        # Drop the ID column
+        X_train_df.drop(['id', 'train_fighter1_odds', 'train_fighter2_odds'], axis = 1, inplace = True)
+        X_val.drop(['id', 'train_fighter1_odds', 'train_fighter2_odds'], axis = 1, inplace = True)
+        
         # Create the DMatrix for XGBoost with the bootstrap sample for training and the full remaining data for validation
         dmatrix_train = xgb.DMatrix(X_train_df, label=y_train_df)
         dmatrix_val = xgb.DMatrix(X_val[X_train_df.columns], label=y_val)
         
-        # Train an XGBoost model on the bootstrap sample with column sampling
-        model['model'] = xgb.train(
-            params,
-            dmatrix_train,
-            num_boost_round = num_boost_round,
-            evals=[(dmatrix_val, 'eval')],
-            early_stopping_rounds=early_stopping_rounds,
-            verbose_eval = verbose_eval)
+        # Train the model
+        if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
+            # Pass the odds to the loss function
+            custom_loss = create_custom_loss(train_fighter1_odds.values, train_fighter2_odds.values)
+            custom_loss_test = ev_loss_function_test(test_fighter1_odds.values, test_fighter2_odds.values)
+            
+            # Train an XGBoost model on the bootstrap sample with column sampling
+            model['model'] = xgb.train(
+                params,
+                dmatrix_train,
+                num_boost_round = num_boost_round,
+                evals=[(dmatrix_val, 'eval')],
+                early_stopping_rounds=early_stopping_rounds,
+                obj = custom_loss,
+                custom_metric = custom_loss_test,
+                verbose_eval = verbose_eval)
         
+        else:
+            # Train an XGBoost model on the bootstrap sample with column sampling
+            model['model'] = xgb.train(
+                params,
+                dmatrix_train,
+                num_boost_round = num_boost_round,
+                evals=[(dmatrix_val, 'eval')],
+                early_stopping_rounds=early_stopping_rounds,
+                verbose_eval = verbose_eval)
+            
         # Join the feature names into a single string and save them as a model attribute
         model['features'] = selected_columns
                 

@@ -43,7 +43,7 @@ X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v10')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest')
 
 
 
@@ -55,11 +55,11 @@ params = {
     'nthread': 3, # Only applies to CPU cores
     'learning_rate': 0.02, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
-    'subsample': 0.9,
-    'max_depth': 2,
+    'subsample': 0.85,
+    'max_depth': 4,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
-    'eval_metric': 'mlogloss',       # Evaluation metric
+    # 'eval_metric': 'mlogloss',       # Evaluation metric
     'tree_method': 'hist',      # Use GPU accelerated algorithm
     'device': 'cuda',           # Use CUDA / GPU
     'predictor': 'gpu_predictor',   # Use GPU for prediction
@@ -67,9 +67,10 @@ params = {
     'num_class': no_of_classes,
     'random_state': config['seed_all'] + 38,
     'num_iterations': 5000,
-    'early_stopping_rounds': 30,
-    'win_loss_only': True,
-    'switch_fighters_randomly': model_hyper_params['switch_fighters_randomly'] # Set whether each tree should have randomised fighters
+    'early_stopping_rounds': 50,
+    'win_loss_only': False,
+    'switch_fighters_randomly': model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
+    'loss_function' : model_hyper_params['loss_function']
 }
 
 # Set hyperparameters for the forest
@@ -89,7 +90,7 @@ xgboost_rf = train_ensemble_xgboost(
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
-    early_stopping_rounds = 30,
+    early_stopping_rounds = 50,
     params = params
     )
 
