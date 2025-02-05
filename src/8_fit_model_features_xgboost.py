@@ -80,7 +80,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt2')
 
 
 ##########################################################################################
@@ -91,7 +91,7 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 1,
+    'max_evals': 200,
     'num_of_features': hp.choice('num_of_features', [3, 50, 100, 150, 200, 210, 230, 250, 270, 300, 350, 400, 500]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
@@ -99,7 +99,7 @@ space = {
 # Set the hyperopt parameters for the inner optimisation
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
-     'learning_rate': hp.quniform('learning_rate', 0.0005, 0.02, 0.0005), # Learning rate
+     'learning_rate': hp.quniform('learning_rate', 0.0005, 0.03, 0.0005), # Learning rate
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'max_depth': hp.quniform('max_depth', 1, 4, 1),
@@ -114,7 +114,7 @@ params_inner = {
      'n_folds': 2,                   # Number of folds for the cross-validation
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
-     'early_stopping_rounds': 30,
+     'early_stopping_rounds': 50,
      'exclude_split_other_from_train': split_or_other_exclude,
      'win_loss_only': hp.choice('win_loss_only', [True, False]),
      'loss_function' : model_hyper_params['loss_function']
@@ -123,7 +123,7 @@ params_inner = {
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = rand.suggest, # Randomly explore the space
-            max_evals = 1,
+            max_evals = 50,
             trials = trials)
 
 

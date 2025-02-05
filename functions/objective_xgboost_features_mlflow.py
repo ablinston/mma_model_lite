@@ -15,7 +15,10 @@ def objective_xgboost_features_mlflow(
         # pdb.set_trace()
         
         # If the run existing, find what the loss was and return it without logging in mlflow
-        existing_metric = get_existing_metric({'num_of_features': params['num_of_features']}, 'Logloss')
+        if model_hyper_params['loss_function'] == 'ev_loss_function':
+            existing_metric = get_existing_metric({'num_of_features': params['num_of_features']}, 'EV MSE')
+        else:
+            existing_metric = get_existing_metric({'num_of_features': params['num_of_features']}, 'Logloss')
         
         print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
         return {'loss': existing_metric, 'params': params, 'status': STATUS_OK}
@@ -87,6 +90,10 @@ def objective_xgboost_features_mlflow(
             
             # Log the metrics of the best fit
             mlflow.log_metrics(trials_inner.best_trial['result']['metrics'])
-
-    # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-    return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params, 'status': STATUS_OK} 
+            
+    if model_hyper_params['loss_function'] == 'ev_loss_function':
+        # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
+        return {'loss': trials_inner.best_trial['result']['metrics']['EV MSE'], 'params': params, 'status': STATUS_OK} 
+    else:
+        # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
+        return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params, 'status': STATUS_OK}

@@ -22,13 +22,16 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     except:
         pass
     
-    if for_feval:
-        np.savetxt("predictions.csv", y_pred, delimiter=",")
-        probs = y_pred # Using the function for evaluation in xgb.train seems to pass probabilities through rather than logits
-    else:
-        # Convert logits into probabilities using softmax
-        exp_preds = np.exp(y_pred - np.max(y_pred, axis=1, keepdims=True))  # Stability trick
-        probs = exp_preds / np.sum(exp_preds, axis=1, keepdims=True)
+    # if for_feval:
+    #     np.savetxt("E:/predictions.csv", y_pred, delimiter=",")
+    #     np.savetxt("E:/y_true.csv", y_true, delimiter=",")
+    #     probs = y_pred # Using the function for evaluation in xgb.train seems to pass probabilities through rather than logits
+    # else:
+    # Convert logits into probabilities using softmax
+    exp_preds = np.exp(y_pred - np.max(y_pred, axis=1, keepdims=True))  # Stability trick
+    probs = exp_preds / np.sum(exp_preds, axis=1, keepdims=True)
+
+    # np.savetxt("E:/odds_fighter_1.csv", odds_fighter_1, delimiter=",")
 
     # Extract individual probabilities
     p_fighter_1 = probs[:, 2]  # Probability of Fighter 1 win
@@ -46,9 +49,10 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     ev_draw_actual = np.where(y_true == 1, 0, -1)
 
     # Select EV based on true outcome difference to the predicted EV
+    # Removed draw from EV as will never be betting on it and have no odds for it
     ev_loss = np.stack((
         (ev_fighter2_actual - ev_fighter_2) ** 2,
-        (ev_draw_actual - ev_draw) ** 2,
+        # (ev_draw_actual - ev_draw) ** 2,
         (ev_fighter1_actual - ev_fighter_1) ** 2
         ), axis = 1)
 
@@ -56,12 +60,13 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     
     # Calculate errors (difference between actual and predicted EV)
     error_fighter_2 = ev_fighter_2 - ev_fighter2_actual
-    error_draw = ev_draw - ev_draw_actual
+    # error_draw = ev_draw - ev_draw_actual
     error_fighter_1 = ev_fighter_1 - ev_fighter1_actual
     
     # Gradients for each class. Got these from chatgpt differentiation
     grad_fighter_2 = 2 * error_fighter_2 * p_fighter_2 * (1 - p_fighter_2)
-    grad_draw = 2 * error_draw * p_draw * (1 - p_draw)
+    # grad_draw = 2 * error_draw * p_draw * (1 - p_draw)
+    grad_draw = np.zeroes(len(p_fighter_1))
     grad_fighter_1 = 2 * error_fighter_1 * p_fighter_1 * (1 - p_fighter_1)
     
     # Combine gradients into a single matrix
@@ -69,17 +74,23 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
 
     # Hessians for each class
     hess_fighter_2 = 2 * p_fighter_2 * (1 - p_fighter_2) * (1 - 2 * p_fighter_2)
-    hess_draw = 2 * p_draw * (1 - p_draw) * (1 - 2 * p_draw)
+    # hess_draw = 2 * p_draw * (1 - p_draw) * (1 - 2 * p_draw)
+    hess_draw = np.zeroes(len(p_fighter_1))
     hess_fighter_1 = 2 * p_fighter_1 * (1 - p_fighter_1) * (1 - 2 * p_fighter_1)
     
     # Combine Hessians into a single matrix
     hess = np.stack([hess_fighter_2, hess_draw, hess_fighter_1], axis=1)
 
+    # Get the overall loss
+    ev_loss = np.array(ev_loss, dtype=np.float64)
+    overall_loss = np.mean(ev_loss)
+
     if for_feval:
         # print(ev_loss.mean())
-        return 'EV MSE', ev_loss.mean()
+        # joblib.dump(overall_loss, 'E:/overall_loss.pkl')
+        return 'EV_MSE', overall_loss
     elif return_loss:
-        return ev_loss.mean()
+        return overall_loss
     return grad, hess
 
 def create_custom_loss(odds_fighter_1, odds_fighter_2):
@@ -89,7 +100,7 @@ def create_custom_loss(odds_fighter_1, odds_fighter_2):
     Returns:
     - A custom loss function that can be used in XGBoost training.
     """
-    return lambda y_true, y_pred: ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2)
+    return lambda y_pred, y_true: ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2)
 
 def ev_loss_function_test(odds_fighter_1, odds_fighter_2):
     """
@@ -100,4 +111,5 @@ def ev_loss_function_test(odds_fighter_1, odds_fighter_2):
     """
     # pdb.set_trace()
     
-    return lambda y_true, y_pred: ev_loss_function(y_true, y_pred, odds_fighter_1, odds_fighter_2, for_feval = True)
+    return lambda y_pred, y_true: ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, for_feval = True)
+

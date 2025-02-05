@@ -39,23 +39,23 @@ def objective_cv_xgboost(
 
     # Loop through precomputed DMatrix objects for each fold
     for train_dmatrix, test_dmatrix, train_fighter1_odds, train_fighter2_odds, test_fighter1_odds, test_fighter2_odds in dmatrix_data:
-        pdb.set_trace()
+        # pdb.set_trace()
         
         # Train the model
         if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
         
             # Pass the odds to the loss function
             custom_loss = create_custom_loss(train_fighter1_odds.values, train_fighter2_odds.values)
-            custom_loss_test = create_custom_loss_metric(test_fighter1_odds.values, test_fighter2_odds.values)
+            custom_loss_test = ev_loss_function_test(test_fighter1_odds.values, test_fighter2_odds.values)
             
             model = xgb.train(params, train_dmatrix,
                               num_boost_round = params['num_iterations'],
                               evals = [(test_dmatrix, 'eval')],
                               early_stopping_rounds = params['early_stopping_rounds'],
-                              verbose_eval = True,
+                              verbose_eval = False,
                               obj = custom_loss,
                               custom_metric = custom_loss_test
-                              )
+                              ) # Logloss still displays with verbose but isn't being used
             
         else:
             # Train the model with early stopping
@@ -114,9 +114,10 @@ def objective_cv_xgboost(
                 test_fighter1_odds,
                 test_fighter2_odds,
                 return_loss = True)
+            ev_mses.append(ev_mse_fold)
 
         # Clean up memory
-        del model, train_dmatrix, test_dmatrix, y_pred_prob, wl_auc, lw_auc, wl_accuracy, lw_accuracy
+        del model, train_dmatrix, test_dmatrix, y_pred_prob, wl_auc, lw_auc, wl_accuracy, lw_accuracy, ev_mse_fold
         gc.collect()
          
         
@@ -126,10 +127,14 @@ def objective_cv_xgboost(
         'Avg WL only AUC': np.mean(avg_aucs),
         'Hmean WL only Accuracy': np.mean(avg_accuracies),
         'Accuracy': np.mean(accuracies),
-        'Logloss': np.mean(log_losses)
+        'Logloss': np.mean(log_losses),
+        'EV MSE': np.mean(ev_mses)
     }
         
     del kf
 
-    # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-    return {'loss': np.mean(log_losses), 'params': params, 'status': STATUS_OK, 'metrics': metrics} 
+    if model_hyper_params['loss_function'] == 'ev_loss_function':
+        return {'loss': np.mean(ev_mses), 'params': params, 'status': STATUS_OK, 'metrics': metrics} 
+    else:
+        # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
+        return {'loss': np.mean(log_losses), 'params': params, 'status': STATUS_OK, 'metrics': metrics} 
