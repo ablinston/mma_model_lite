@@ -9,12 +9,18 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     """
     # pdb.set_trace()
 
+    # Make the filter an array from a list to avoid index issues
+    filter_boolean = np.array(list(filter_boolean))
+
     # Define the data to be switched
     if X is None:
-        df = df_original[filter_boolean].reset_index(drop = True).copy()
+        df = df_original.copy()
+        df = df[filter_boolean].reset_index(drop = True).copy()
     else:
-        df = X[filter_boolean].reset_index(drop = True).copy()
-        y_new = y[filter_boolean].reset_index(drop = True).copy()
+        df = X.copy()
+        df = df[filter_boolean].reset_index(drop = True).copy()
+        y_new = y.copy()
+        y_new = y_new[filter_boolean].reset_index(drop = True).copy()
 
     # First rename fighter1 columns
     df.columns = df.columns.str.replace('fighter1', 'fighterX')
@@ -45,12 +51,21 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         
     # Now combine this data with the rows not switched
     if X is None:
-        final_df = pd.concat([df, df_original.reset_index(drop = True).copy()[~filter_boolean]])
+        final_df = pd.concat([df, df_original.copy().reset_index(drop = True)[~filter_boolean]])
     else:
+        # Create the filtered original data for those records not adjusted
         X_filtered = X.copy()[~filter_boolean]
+        
+        # Now re-align the columns of the new data
+        df = df[X_filtered.columns].copy()
+        
         final_df = pd.DataFrame(index=range(len(df) + len(X_filtered)), columns=df.columns)
         final_df.loc[: len(df) - 1] = df.values
         final_df.loc[len(df) :] = X_filtered.values
+        
+        # Set column types to match the original df
+        final_df = final_df.astype(df.dtypes.to_dict())
+
         # final_df = pd.concat([df, X.reset_index(drop = True).copy()[~filter_boolean]], ignore_index=True)
     
     # Handle cases where we have X, y input instead of a single data frame
@@ -70,4 +85,4 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     if y is None:
         return final_df
     else:
-        return final_df.reset_index(drop = True), y_new.reset_index(drop = True)
+        return final_df.reset_index(drop = True).copy(), y_new.reset_index(drop = True).copy()

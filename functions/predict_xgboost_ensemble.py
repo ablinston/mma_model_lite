@@ -13,17 +13,21 @@ def predict_xgboost_ensemble(models, X_test_df, y_test_df = None):
     """
     
     # pdb.set_trace()
-    
+    # 
     # Collect predictions from each model
     model_predictions = []
     for model in models:
+        
+        # Clean the test features
+        X_test_df = clean_inf_and_large(X_test_df).copy()
         
         # Create the DMatrix for predictions
         dmatrix_test = xgb.DMatrix(X_test_df[model['model'].feature_names], label = y_test_df)
         
         preds = model['model'].predict(dmatrix_test)
         model_predictions.append(preds)
-    
+        
+    # pdb.set_trace()
     # Stack predictions and average them
     model_predictions = np.array(model_predictions)  # Shape: (num_models, num_samples, num_classes)
     averaged_predictions = np.mean(model_predictions, axis=0)  # Average across models

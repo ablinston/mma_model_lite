@@ -10,3 +10,6 @@ differential_features_only: False
 
 # Set which loss function to use. mlogloss is the most common, but ev_loss_function is the custom one I made
 loss_function: ev_loss_function
+
+# Set whether to add some random noise to the odds as part of the XGB forest. This will be based on a fixed distribution
+add_noise_to_odds: True

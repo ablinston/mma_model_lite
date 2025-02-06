@@ -49,10 +49,20 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
     models = []
     for i in range(num_models):
         # pdb.set_trace()
+        
+        # # Switch fighters if needed
+        # if params['switch_fighters_randomly'] == True:
+        #     X_swapped, y_swapped = switch_fighter1_fighter2(X = X, y = y, filter_boolean = np.random.choice([True, False], size = len(X)))
+        #     # Clean values
+        #     X_swapped = clean_inf_and_large(X_swapped).copy()
+        # else:
+        X_swapped = X.copy()
+        y_swapped = y.copy()
+        
         model = {}
         
         # Randomly sample rows with replacement for the training set
-        X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
+        X_train_df, y_train_df = resample(X_swapped, y_swapped, replace=True, n_samples=int(len(X) * subsample), random_state=i)
         
         # Calculate the number of columns to randomly select
         num_columns_to_select = int(colsample_bynode * X_train_df.shape[1])
@@ -65,11 +75,11 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         
         X_train_df =  X_train_df.copy()[selected_columns + ['id', 'train_fighter1_odds', 'train_fighter2_odds']]
 
-        # Switch fighters if needed
+        # # Switch fighters if needed
         if params['switch_fighters_randomly'] == True:
-            X_train_df, y_train_df = switch_fighter1_fighter2(X = X_train_df, y = y_train_df, filter_boolean = np.random.choice([True, False], size = len(X_train_df)))
+            X_train_df2, y_train_df2 = switch_fighter1_fighter2(X = X_train_df, y = y_train_df, filter_boolean = np.random.choice([True, False], size = len(X_train_df)))
             # Clean values
-            X_train_df = clean_inf_and_large(X_train_df)
+            X_train_df2 = clean_inf_and_large(X_train_df2).copy()
         
         # Filter win loss only if applicable
         if params['win_loss_only'] == True:
@@ -79,14 +89,14 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
         # Create the validation set from all rows not included in the training set
         # Mask to get the validation data
         train_ids = X_train_df['id'].tolist()
-        X_val = X.copy()[~X['id'].isin(train_ids)]
-        y_val = y.copy()[~X['id'].isin(train_ids)]
+        X_val = X_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()]
+        y_val = y_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()]
 
         # Get the odds for the custom loss function if needed
         train_fighter1_odds = X_train_df['train_fighter1_odds'].copy()
         train_fighter2_odds = X_train_df['train_fighter2_odds'].copy()
-        test_fighter1_odds = X['fighter1_best_closing_odds'][~X['id'].isin(train_ids)]
-        test_fighter2_odds = X['fighter2_best_closing_odds'][~X['id'].isin(train_ids)]
+        test_fighter1_odds = X_val['train_fighter1_odds'].copy()
+        test_fighter2_odds = X_val['train_fighter2_odds'].copy()
 
         # Drop the ID column
         X_train_df.drop(['id', 'train_fighter1_odds', 'train_fighter2_odds'], axis = 1, inplace = True)
@@ -108,10 +118,10 @@ def train_ensemble_xgboost(X, y, num_models=10, num_boost_round=500, colsample_b
                 dmatrix_train,
                 num_boost_round = num_boost_round,
                 evals=[(dmatrix_val, 'eval')],
-                early_stopping_rounds=early_stopping_rounds,
+                early_stopping_rounds = early_stopping_rounds,
                 obj = custom_loss,
                 custom_metric = custom_loss_test,
-                verbose_eval = verbose_eval)
+                verbose_eval = True)
         
         else:
             # Train an XGBoost model on the bootstrap sample with column sampling

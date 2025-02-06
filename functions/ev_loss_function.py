@@ -1,5 +1,5 @@
 
-def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss = False, for_feval = False):
+def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss = False, for_feval = False, input_probs = False):
     """
     Custom loss function for XGBoost that optimizes based on Expected Value (EV) from betting odds.
 
@@ -9,6 +9,8 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     - odds_fighter_1 (np.array): Betting odds for Fighter 1
     - odds_fighter_2 (np.array): Betting odds for Fighter 2
     - return_loss (bool): If True, returns the actual EV loss for monitoring
+    - for_feval (bool): If True, the function returns a tuple. This is for the xgb.train function
+    - input_probs (bool): Set to True if y_pred is an array of probabilities rather than logits
 
     Returns:
     - grad (np.array): First derivative of the loss function
@@ -22,14 +24,17 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     except:
         pass
     
-    # if for_feval:
-    #     np.savetxt("E:/predictions.csv", y_pred, delimiter=",")
-    #     np.savetxt("E:/y_true.csv", y_true, delimiter=",")
+    if for_feval:
+        np.savetxt("E:/predictions.csv", y_pred, delimiter=",")
+        np.savetxt("E:/y_true.csv", y_true, delimiter=",")
     #     probs = y_pred # Using the function for evaluation in xgb.train seems to pass probabilities through rather than logits
     # else:
-    # Convert logits into probabilities using softmax
-    exp_preds = np.exp(y_pred - np.max(y_pred, axis=1, keepdims=True))  # Stability trick
-    probs = exp_preds / np.sum(exp_preds, axis=1, keepdims=True)
+    if input_probs:
+        probs = y_pred.copy()
+    else:
+        # Convert logits into probabilities using softmax
+        exp_preds = np.exp(y_pred - np.max(y_pred, axis=1, keepdims=True))  # Stability trick
+        probs = exp_preds / np.sum(exp_preds, axis=1, keepdims=True)
 
     # np.savetxt("E:/odds_fighter_1.csv", odds_fighter_1, delimiter=",")
 

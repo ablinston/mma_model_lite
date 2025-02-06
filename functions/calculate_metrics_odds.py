@@ -41,6 +41,15 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     # **Calculate LogLoss**
     log_loss_result = log_loss(y_test, y_pred_prob, labels = classes)    
 
+    # Calculate the MSE of the Expected value
+    ev_mse = ev_loss_function(
+        y_pred_prob,
+        y_test,
+        X_test['fighter1_best_closing_odds'], 
+        X_test['fighter2_best_closing_odds'],
+        return_loss = True,
+        input_probs = True)
+
     # Return the metrics
     
     return {
@@ -51,5 +60,6 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
         'X Odds L/W Accuracy': lw_accuracy,
         'X Odds Avg WL only AUC': np.mean([wl_auc, lw_auc]),
         'X Odds Logloss': log_loss_result,
+        'X Odds EV MSE': ev_mse,
         'X Odds Hmean WL only Accuracy': hmean([lw_accuracy, wl_accuracy])
     }
