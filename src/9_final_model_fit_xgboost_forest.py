@@ -27,8 +27,10 @@ data = standard_data_filter(data)
 ### Feature selection using config ###
 ##########################################################################################
 
-# Only select the columns needed for training and the test train split
-data = data[[col for col in data.columns if col in final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds']]]
+# Don't need to select columns now. The train function takes the feature selection as an input
+
+# # Only select the columns needed for training and the test train split
+# data = data[[col for col in data.columns if col in final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds']]]
 
 
 ##########################################################################################
@@ -38,8 +40,8 @@ data = data[[col for col in data.columns if col in final_model_features + ['date
 # Prep the data ready for model training
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, test_size = config['test_proportion'])
 
-# Remove other columns from training data as not required
-X_train = X_train[final_model_features]
+# # Remove other columns from training data as not required
+# X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
@@ -86,6 +88,7 @@ subsample = 0.6
 xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
+    X_columns_for_training = final_model_features,
     num_models = 1000,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model

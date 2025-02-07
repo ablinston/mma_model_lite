@@ -1,6 +1,6 @@
 # This function switches who is fighter1 and fighter2 on the merged final dataset
 
-def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None):
+def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None, clean_cols = True):
     """
     # This functions takes a dataframe and a filter of same length and switches fighter1 and fighter2 in the rows labelled 'True'
     
@@ -57,7 +57,7 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         X_filtered = X.copy()[~filter_boolean]
         
         # Now re-align the columns of the new data
-        df = df[X_filtered.columns].copy()
+        df = df.reindex(columns=X_filtered.columns)
         
         final_df = pd.DataFrame(index=range(len(df) + len(X_filtered)), columns=df.columns)
         final_df.loc[: len(df) - 1] = df.values
@@ -75,6 +75,14 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         # Now combine this data with the rows not switched
         y_new = pd.concat([y_new, y[~filter_boolean]])
     
+    # Recalculate diff columns because Infs etc might have been cleaned before. Only keep the columns needed
+    final_cols = final_df.columns.tolist()
+    diff_df = add_fighter_differentials(final_df)
+    final_df = diff_df[final_cols]
+    
+    # Clean columns of infs if necessary
+    if clean_cols:
+        final_df = clean_inf_and_large(final_df)
 
     # Check we have the correct number of rows and columns
     if X is None:
