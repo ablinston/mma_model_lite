@@ -3,7 +3,7 @@ exec(open('global.py').read())
 
 
 # Read in the final data
-df = concat_parquets_fastparquet('./data/final_dataset/')
+df = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 df = merged_data.copy()
 

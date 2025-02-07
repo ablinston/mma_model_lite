@@ -1,5 +1,5 @@
 
-def safe_divide_np(numerator, denominator):
+def safe_divide_np(numerator, denominator, zero_zero_fill = 1):
     # Perform element-wise division using np.divide
     result = np.divide(numerator, denominator, where=denominator != 0)
         
@@ -7,7 +7,7 @@ def safe_divide_np(numerator, denominator):
     result[denominator == 0] = np.inf
     
     # Handle the case where both numerator and denominator are zero
-    result[(numerator == 0) & (denominator == 0)] = 0
+    result[(numerator == 0) & (denominator == 0)] = zero_zero_fill
     
     return result
 

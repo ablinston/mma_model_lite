@@ -25,7 +25,7 @@ if not os.name == "nt":
 skip_data_update = False
 
 # Read in the data for training
-forecasting_data = concat_parquets_fastparquet('./data/final_dataset/')
+forecasting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 # # Load files
 # mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")

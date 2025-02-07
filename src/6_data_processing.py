@@ -519,7 +519,7 @@ new_percent_cols = [col.replace('_attempt', '_accuracy_percent') for col in perc
 merged_data[landed_columns].index = merged_data[percent_columns].index
 
 # Shapes where strange so had to use numpy
-new_data = pd.DataFrame(merged_data[landed_columns].to_numpy() / merged_data[percent_columns].to_numpy(), columns = new_percent_cols)
+new_data = pd.DataFrame(safe_divide_np(merged_data[landed_columns].to_numpy(), merged_data[percent_columns].to_numpy(), zero_zero_fill = np.nan), columns = new_percent_cols)
 
 # Remove percentages for sample sizes below minimum thresholds, excluding takedowns
 percent_columns_no_td = [col for col in percent_columns if "_td_" not in col]
@@ -546,12 +546,18 @@ stop_if_not(check_identical_excl_string(head_columns, body_columns, 'head', 'bod
 stop_if_not(check_identical_excl_string(head_columns, leg_columns, 'head', 'leg'))
 
 # Calculate ratios of attempts on body and leg
-head_body_ratios = pd.DataFrame(merged_data[head_columns].to_numpy() / merged_data[body_columns].to_numpy(),
-                                columns = [col.replace('head_attempt', 'head_body_attempt_ratio') for col in head_columns])
+head_body_ratios = pd.DataFrame(
+    safe_divide_np(merged_data[head_columns].to_numpy(), merged_data[body_columns].to_numpy(), zero_zero_fill = np.nan),
+    columns = [col.replace('head_attempt', 'head_body_attempt_ratio') for col in head_columns])
+
 merged_data = pd.concat([merged_data, head_body_ratios], axis = 1)
-head_leg_ratios = pd.DataFrame(merged_data[head_columns].to_numpy() / merged_data[leg_columns].to_numpy(),
-                                columns = [col.replace('head_attempt', 'head_leg_attempt_ratio') for col in head_columns])
+
+head_leg_ratios = pd.DataFrame(
+    safe_divide_np(merged_data[head_columns].to_numpy(), merged_data[leg_columns].to_numpy(), zero_zero_fill = np.nan),
+    columns = [col.replace('head_attempt', 'head_leg_attempt_ratio') for col in head_columns])
+
 merged_data = pd.concat([merged_data, head_leg_ratios], axis = 1)
+
 del(head_body_ratios, head_leg_ratios, head_columns, body_columns, leg_columns)
 
 # Do a check to see if row number has stayed the same
@@ -559,8 +565,16 @@ stop_if_not(len(merged_data) == merged_original_rows)
 
 # Calculate ratio of striking to takedowns by looking at distance striking compared with td attempts, and distance compared with ground and pound
 for fighter in ['fighter1', 'fighter2']:
-    merged_data[fighter + '_hist_total_distance_strikes_over_td_attempts'] = merged_data[fighter + '_hist_allrounds_distance_attempt'] / merged_data[fighter + '_hist_allrounds_td_attempt']
-    merged_data[fighter + '_hist_total_distance_over_ground_strikes'] = merged_data[fighter + '_hist_allrounds_distance_attempt'] / merged_data[fighter + '_hist_allrounds_ground_attempt']
+    
+    merged_data[fighter + '_hist_total_distance_strikes_over_td_attempts'] = safe_divide_np(
+        merged_data[fighter + '_hist_allrounds_distance_attempt'].to_numpy(), 
+        merged_data[fighter + '_hist_allrounds_td_attempt'].to_numpy(), 
+        zero_zero_fill = np.nan)
+    
+    merged_data[fighter + '_hist_total_distance_over_ground_strikes'] = safe_divide_np(
+        merged_data[fighter + '_hist_allrounds_distance_attempt'].to_numpy(),
+        merged_data[fighter + '_hist_allrounds_ground_attempt'].to_numpy(),
+        zero_zero_fill = np.nan)
 
 
 

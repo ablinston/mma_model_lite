@@ -18,7 +18,7 @@ exec(open('global.py').read())
 model_path = './results/final_xgboost_forest.joblib'
 
 # Read in the data for training
-backtesting_data = concat_parquets_fastparquet('./data/final_dataset/')
+backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 # Load files
 rf_xgb_model = joblib.load(model_path)
 

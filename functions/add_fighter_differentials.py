@@ -6,6 +6,8 @@ def add_fighter_differentials(df):
     
     merged_data = df.copy()
 
+    merged_data.reset_index(drop = True, inplace = True)
+
     # First, remove any existing diff columns
     existing_diff_cols = [col for col in df.columns if 'diff' in col or 'offense_minus' in col]
     

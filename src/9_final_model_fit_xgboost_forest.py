@@ -18,7 +18,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Read in the data for training
-data = concat_parquets_fastparquet('./data/final_dataset/')
+data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 # Apply standard filters
 data = standard_data_filter(data)
@@ -61,7 +61,7 @@ params = {
     'max_depth': 4,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
-    # 'eval_metric': 'mlogloss',       # Evaluation metric
+    'eval_metric': 'mlogloss',       # Evaluation metric
     'tree_method': 'hist',      # Use GPU accelerated algorithm
     'device': 'cuda',           # Use CUDA / GPU
     'predictor': 'gpu_predictor',   # Use GPU for prediction

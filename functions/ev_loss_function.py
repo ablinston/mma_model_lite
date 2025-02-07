@@ -24,9 +24,9 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     except:
         pass
     
-    if for_feval:
-        np.savetxt("E:/predictions.csv", y_pred, delimiter=",")
-        np.savetxt("E:/y_true.csv", y_true, delimiter=",")
+    # if for_feval:
+        # np.savetxt("E:/odds_fighter_1.csv", odds_fighter_1, delimiter=",")
+        # np.savetxt("E:/y_true.csv", y_true, delimiter=",")
     #     probs = y_pred # Using the function for evaluation in xgb.train seems to pass probabilities through rather than logits
     # else:
     if input_probs:
@@ -105,6 +105,8 @@ def create_custom_loss(odds_fighter_1, odds_fighter_2):
     Returns:
     - A custom loss function that can be used in XGBoost training.
     """
+    # np.savetxt("E:/odds_fighter_1_train.csv", odds_fighter_1, delimiter=",")
+    
     return lambda y_pred, y_true: ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2)
 
 def ev_loss_function_test(odds_fighter_1, odds_fighter_2):

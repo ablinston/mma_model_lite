@@ -26,9 +26,7 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
         # Recode the target. Don't need to distinguish between D and NC
         data[target] = np.where((data[target] == "D/D") | (data[target] == "NC/NC"), "OTH", data[target])
     
-    # Convert all dates to integers
-    date_cols = [col for col in data.columns if data.dtypes[col] == 'datetime64[ns]']
-    data[date_cols] = data[date_cols].astype('int64')
+    data = format_cols_for_model(format_cols_for_model)
     
     # Convert object columns into series' of dummies
     obj_cols = [col for col in data.columns if data.dtypes[col] == 'object']

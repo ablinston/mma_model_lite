@@ -1,6 +1,6 @@
 # This function switches who is fighter1 and fighter2 on the merged final dataset
 
-def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None, clean_cols = True):
+def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None, for_model = True):
     """
     # This functions takes a dataframe and a filter of same length and switches fighter1 and fighter2 in the rows labelled 'True'
     
@@ -21,6 +21,9 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         df = df[filter_boolean].reset_index(drop = True).copy()
         y_new = y.copy()
         y_new = y_new[filter_boolean].reset_index(drop = True).copy()
+
+    # Undo any cleaning that's been done on the data
+    df = undo_clean_inf(df)
 
     # First rename fighter1 columns
     df.columns = df.columns.str.replace('fighter1', 'fighterX')
@@ -53,20 +56,20 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     if X is None:
         final_df = pd.concat([df, df_original.copy().reset_index(drop = True)[~filter_boolean]])
     else:
-        # Create the filtered original data for those records not adjusted
-        X_filtered = X.copy()[~filter_boolean]
+        # # Create the filtered original data for those records not adjusted
+        # X_filtered = X.copy()[~filter_boolean]
         
-        # Now re-align the columns of the new data
-        df = df.reindex(columns=X_filtered.columns)
+        # # Now re-align the columns of the new data
+        # df = df.reindex(columns=X_filtered.columns)
         
-        final_df = pd.DataFrame(index=range(len(df) + len(X_filtered)), columns=df.columns)
-        final_df.loc[: len(df) - 1] = df.values
-        final_df.loc[len(df) :] = X_filtered.values
+        # final_df = pd.DataFrame(index=range(len(df) + len(X_filtered)), columns=df.columns)
+        # final_df.loc[: len(df) - 1] = df.values
+        # final_df.loc[len(df) :] = X_filtered.values
         
-        # Set column types to match the original df
-        final_df = final_df.astype(df.dtypes.to_dict())
+        # # Set column types to match the original df
+        # final_df = final_df.astype(df.dtypes.to_dict())
 
-        # final_df = pd.concat([df, X.reset_index(drop = True).copy()[~filter_boolean]], ignore_index=True)
+        final_df = pd.concat([df.reset_index(drop = True).copy(), X.reset_index(drop = True).copy()[~filter_boolean]], ignore_index=True)
     
     # Handle cases where we have X, y input instead of a single data frame
     if y is not None: # Check this works with W/L and isn't 0, 1, 2
@@ -78,12 +81,26 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     # Recalculate diff columns because Infs etc might have been cleaned before. Only keep the columns needed
     final_cols = final_df.columns.tolist()
     diff_df = add_fighter_differentials(final_df)
-    final_df = diff_df[final_cols]
+    
+    # Keep the diff in dates from the original data and use the diffs from the rest of the data
+    diff_df = pd.concat([
+        diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]], 
+        final_df[[col for col in final_cols if ('date' in col or 'dob' in col)]]
+        ], axis = 1)
+    
+    final_df = diff_df[final_cols].copy()
     
     # Clean columns of infs if necessary
-    if clean_cols:
+    if for_model:
         final_df = clean_inf_and_large(final_df)
-
+        final_df = format_cols_for_model(final_df)
+        
+    # Make sure the data types of the columns are as before
+    if X is None:
+        final_df = final_df.astype(df_original.dtypes.to_dict())
+    else:
+        final_df = final_df.astype(X.dtypes.to_dict())
+    
     # Check we have the correct number of rows and columns
     if X is None:
         stop_if_not(final_df.shape == df_original.shape, 'Dataset length check')
