@@ -80,7 +80,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt2')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt3')
 
 
 ##########################################################################################
@@ -111,7 +111,7 @@ params_inner = {
      'predictor': 'gpu_predictor',   # Use GPU for prediction
      'verbosity': 1,
      'num_class': no_of_classes,
-     'n_folds': 2,                   # Number of folds for the cross-validation
+     'n_folds': 5,                   # Number of folds for the cross-validation
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
      'early_stopping_rounds': 50,

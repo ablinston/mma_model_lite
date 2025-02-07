@@ -14,11 +14,11 @@ def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False,
             filtered_y_train = y_train[mask]
     else:
         if split_dec_or_other_filter:
-            filtered_X_train = X_train.copy()[mask & ~(X_train['split_dec_or_other'] == 1) & (y_train.isin([0, 2]))] # These are the codes for W/L and L/W
-            filtered_y_train = y_train[mask & ~(X_train['split_dec_or_other'] == 1) & (y_train.isin([0, 2]))]
+            filtered_X_train = X_train.copy()[mask & ~(X_train['split_dec_or_other'] == 1) & (y_train.isin([0, 2, '0', '2']))] # These are the codes for W/L and L/W
+            filtered_y_train = y_train[mask & ~(X_train['split_dec_or_other'] == 1) & (y_train.isin([0, 2, '0', '2']))]
         else:
-            filtered_X_train = X_train.copy()[mask & (y_train.isin([0, 2]))] # These are the codes for W/L and L/W
-            filtered_y_train = y_train[mask & (y_train.isin([0, 2]))]
+            filtered_X_train = X_train.copy()[mask & (y_train.isin([0, 2, '0', '2']))] # These are the codes for W/L and L/W
+            filtered_y_train = y_train[mask & (y_train.isin([0, 2, '0', '2']))]
 
     # Save the odds for the loss for both test and train data
     train_fighter1_odds = filtered_X_train['fighter1_odds_for_loss']
@@ -30,6 +30,10 @@ def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False,
     # Remove odds used for loss from training and test X data
     filtered_X_train.drop(['fighter1_odds_for_loss', 'fighter2_odds_for_loss'], axis = 1, inplace = True)
     X_test = X_train.copy().iloc[test_idx].drop(['fighter1_odds_for_loss', 'fighter2_odds_for_loss'], axis = 1)
+
+    # Check if empty
+    if len(filtered_X_train) == 0:
+        pdb.set_trace()
 
     # Create the DMatrix
     if split_dec_or_other_filter:

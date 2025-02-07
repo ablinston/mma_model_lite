@@ -17,6 +17,7 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     - hess (np.array): Second derivative (Hessian) for XGBoost
     """
     # pdb.set_trace()
+    # print(len(y_pred))
     
     # Convert from dmatrix if needed
     try:

@@ -34,6 +34,11 @@ def objective_cv_xgboost(
     #         futures = {executor.submit(create_dmatrix_with_split_other_filter, X_train, y_train, train_idx, test_idx, params['win_loss_only']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
     #         dmatrix_data = [future.result() for future in as_completed(futures)]   
 
+    # dmatrix_data = []
+    # for train_idx, test_idx in kf.split(X_train):
+    #     result = create_dmatrix(X_train, y_train, train_idx, test_idx, params['win_loss_only'], params['exclude_split_other_from_train'])
+    #     dmatrix_data.append(result)
+
     # Print out progress
     print("Training CV models...")
 
@@ -45,17 +50,21 @@ def objective_cv_xgboost(
         if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
         
             # Pass the odds to the loss function
-            custom_loss = create_custom_loss(train_fighter1_odds.values, train_fighter2_odds.values)
-            custom_loss_test = ev_loss_function_test(test_fighter1_odds.values, test_fighter2_odds.values)
+            custom_loss = create_custom_loss(train_fighter1_odds.to_numpy(), train_fighter2_odds.to_numpy())
+            custom_loss_test = ev_loss_function_test(test_fighter1_odds.to_numpy(), test_fighter2_odds.to_numpy())
             
-            model = xgb.train(params, train_dmatrix,
-                              num_boost_round = params['num_iterations'],
-                              evals = [(test_dmatrix, 'eval')],
-                              early_stopping_rounds = params['early_stopping_rounds'],
-                              verbose_eval = False,
-                              obj = custom_loss,
-                              custom_metric = custom_loss_test
-                              ) # Logloss still displays with verbose but isn't being used
+            # print(test_dmatrix.get_data().shape)
+            try:
+                model = xgb.train(params, train_dmatrix,
+                                  num_boost_round = params['num_iterations'],
+                                  evals = [(test_dmatrix, 'eval')],
+                                  early_stopping_rounds = params['early_stopping_rounds'],
+                                  verbose_eval = False,
+                                  obj = custom_loss,
+                                  custom_metric = custom_loss_test
+                                  ) # Logloss still displays with verbose but isn't being used
+            except:
+                pdb.set_trace()
             
         else:
             # Train the model with early stopping
@@ -109,11 +118,12 @@ def objective_cv_xgboost(
         # Get the logit predictions for use in custom loss function
         if model_hyper_params['loss_function'] == 'ev_loss_function':
             ev_mse_fold = ev_loss_function(
-                model.predict(test_dmatrix, output_margin = True), # Need the raw logits
+                y_pred_prob,
                 y_test_fold,
                 test_fighter1_odds,
                 test_fighter2_odds,
-                return_loss = True)
+                return_loss = True,
+                input_probs = True)
             ev_mses.append(ev_mse_fold)
 
         # Clean up memory
