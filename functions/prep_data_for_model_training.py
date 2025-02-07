@@ -26,7 +26,7 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
         # Recode the target. Don't need to distinguish between D and NC
         data[target] = np.where((data[target] == "D/D") | (data[target] == "NC/NC"), "OTH", data[target])
     
-    data = format_cols_for_model(format_cols_for_model)
+    data = format_cols_for_model(data)
     
     # Convert object columns into series' of dummies
     obj_cols = [col for col in data.columns if data.dtypes[col] == 'object']
@@ -71,6 +71,20 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
     # Set number of classes for training
     no_of_classes = len(set(y_train))
    
+    ####################
+    ##AB: FOR SOME REASON, THE MODELS DON'T TRAIN OR PREDICT CORRECTLY WHEN THESE HAVEN'T GONE THROUGH THIS FUNCTION. IT PRODUCES THE SAME RESULT BUT FOR SOME REASON XGB DOESN'T GIVE MODELLING OUTPUTS CORRECTLY, SO LEAVING THIS IN AS A WORKAROUND
+    
+    X_train, y_train = switch_fighter1_fighter2(X = X_train, y = y_train, filter_boolean = np.random.choice([True], size = len(X_train)))
+    X_train, y_train = switch_fighter1_fighter2(X = X_train, y = y_train, filter_boolean = np.random.choice([True], size = len(X_train)))
+    
+    gc.collect()
+    
+    if X_test is not None:
+        X_test, y_test = switch_fighter1_fighter2(X = X_test, y = y_test, filter_boolean = np.random.choice([True], size = len(X_test)))
+        X_test, y_test = switch_fighter1_fighter2(X = X_test, y = y_test, filter_boolean = np.random.choice([True], size = len(X_test)))
   
+    ####################
+    
+    
     # Return the objects needed as a list
     return [X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot]

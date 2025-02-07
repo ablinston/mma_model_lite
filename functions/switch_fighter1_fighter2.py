@@ -108,6 +108,6 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         stop_if_not(final_df.shape == X.shape, 'Dataset length check')
 
     if y is None:
-        return final_df
+        return final_df.reset_index(drop = True).copy()
     else:
         return final_df.reset_index(drop = True).copy(), y_new.reset_index(drop = True).copy()

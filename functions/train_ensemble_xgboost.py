@@ -47,7 +47,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
 
     models = []
     for i in range(num_models):
-        pdb.set_trace()
+        # pdb.set_trace()
         
         # # Switch fighters if needed
         # if params['switch_fighters_randomly'] == True:
@@ -90,10 +90,10 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         y_val = y_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()].reset_index(drop = True)
 
         # Get the odds for the custom loss function if needed
-        train_fighter1_odds = X_train_df['train_fighter1_odds'].copy()
-        train_fighter2_odds = X_train_df['train_fighter2_odds'].copy()
-        test_fighter1_odds = X_val['train_fighter1_odds'].copy()
-        test_fighter2_odds = X_val['train_fighter2_odds'].copy()
+        train_fighter1_odds = X_train_df['train_fighter1_odds'].to_numpy()
+        train_fighter2_odds = X_train_df['train_fighter2_odds'].to_numpy()
+        test_fighter1_odds = X_val['train_fighter1_odds'].to_numpy()
+        test_fighter2_odds = X_val['train_fighter2_odds'].to_numpy()
 
         # Drop the ID column
         X_train_df.drop(['id', 'train_fighter1_odds', 'train_fighter2_odds'], axis = 1, inplace = True)
@@ -106,8 +106,8 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         # Train the model
         if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
             # Pass the odds to the loss function
-            custom_loss = create_custom_loss(train_fighter1_odds.values, train_fighter2_odds.values)
-            custom_loss_test = ev_loss_function_test(test_fighter1_odds.values, test_fighter2_odds.values)
+            custom_loss = create_custom_loss(train_fighter1_odds, train_fighter2_odds)
+            custom_loss_test = ev_loss_function_test(test_fighter1_odds, test_fighter2_odds)
             
             # Train an XGBoost model on the bootstrap sample with column sampling
             model['model'] = xgb.train(
@@ -118,7 +118,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
                 early_stopping_rounds = early_stopping_rounds,
                 obj = custom_loss,
                 custom_metric = custom_loss_test,
-                verbose_eval = True)
+                verbose_eval = verbose_eval)
         
         else:
             # Train an XGBoost model on the bootstrap sample with column sampling
@@ -137,7 +137,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         models.append(model)
         
         del X_train_df, X_swapped
-        
+        gc.collect()
         # print(f"Model {i + 1}/{num_models} trained with best iteration {model.best_iteration}.")
 
     return models
