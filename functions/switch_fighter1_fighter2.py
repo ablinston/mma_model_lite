@@ -22,6 +22,8 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         y_new = y.copy()
         y_new = y_new[filter_boolean].reset_index(drop = True).copy()
 
+    final_cols = df.columns.tolist()
+        
     # Undo any cleaning that's been done on the data
     df = undo_clean_inf(df)
 
@@ -79,16 +81,15 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         y_new = pd.concat([y_new, y[~filter_boolean]])
     
     # Recalculate diff columns because Infs etc might have been cleaned before. Only keep the columns needed
-    final_cols = final_df.columns.tolist()
     diff_df = add_fighter_differentials(final_df)
     
     # Keep the diff in dates from the original data and use the diffs from the rest of the data
     diff_df = pd.concat([
-        diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]], 
-        final_df[[col for col in final_cols if ('date' in col or 'dob' in col)]]
+        diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]].reset_index(drop = True), 
+        final_df[[col for col in final_cols if ('date' in col or 'dob' in col) or col not in diff_df.columns]].reset_index(drop = True)
         ], axis = 1)
     
-    final_df = diff_df[final_cols].copy()
+    final_df = diff_df.loc[:, final_cols].copy()
     
     # Clean columns of infs if necessary
     if for_model:

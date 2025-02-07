@@ -108,7 +108,7 @@ with mlflow.start_run():
         # Pass the odds to the loss function
         custom_loss = create_custom_loss(X_train['fighter1_best_closing_odds'].values, X_train['fighter2_best_closing_odds'].values)
         # Train the model
-        rf_model = xgb.train(params, dmatrix_train, obj = custom_loss)
+        rf_model = xgb.train(params, train, obj = custom_loss)
         
     else:
         rf_model = xgb.train(params, train)
