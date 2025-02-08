@@ -17,8 +17,12 @@ def calculate_metrics(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, clas
 
     y_pred = np.argmax(y_pred_prob, axis = 1)
 
+    # Convert the predictions to object in case not already
+    y_test_fold = pd.Series(y_test_df.copy(), dtype="int")
+    y_pred = pd.Series(y_pred.copy(), dtype="int")
+    
     # Convert actual results to binarized format
-    y_test_bin = label_binarize(y_test_df, classes = classes)
+    y_test_bin = label_binarize(y_test_fold, classes = classes)
     y_pred_bin = label_binarize(y_pred, classes = classes)
 
     # AUC fails when only one class in observations, so try except

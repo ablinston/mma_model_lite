@@ -55,7 +55,7 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.02, # Learning rate
+    'learning_rate': 0.0025, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
     'max_depth': 4,
@@ -118,8 +118,8 @@ for num_trees_i in list(range(5, 50, 5)) + list(range(20, 1001, 20)):
 
 
 # Set the final number of models
-final_forest_size = 200
+final_forest_size = 2000
 
 
 # Save the model
-joblib.dump(xgboost_rf[0:final_forest_size], './results/final_xgboost_forest.joblib', compress = 9)
+joblib.dump(xgboost_rf[0:final_forest_size], './results/final_xgboost_forest_1000.joblib', compress = 9)

@@ -8,7 +8,9 @@ def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df):
     y_pred_prob, y_pred = predict_xgboost_ensemble(models, X_test_df, y_test_df)
 
     # Get the outcomes of the test data
-    y_test_fold = y_test_df.copy()
+    # Convert the predictions to object in case not already
+    y_test_fold = pd.Series(y_test_df.copy(), dtype="int")
+    y_pred = pd.Series(y_pred.copy(), dtype="int")
 
     # Convert actual results to binarized format
     y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
