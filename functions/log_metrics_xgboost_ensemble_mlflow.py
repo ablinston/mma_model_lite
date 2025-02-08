@@ -2,7 +2,7 @@
 
 def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df):
 
-    # pdb.set_trace()
+    pdb.set_trace()
 
     # First get the predictions from the ensemble
     y_pred_prob, y_pred = predict_xgboost_ensemble(models, X_test_df, y_test_df)

@@ -2,7 +2,7 @@
 
 def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
 
-    pdb.set_trace()    
+    # pdb.set_trace()    
 
     # First get the predictions from the ensemble
     y_pred_prob = odds_to_probabilities(X_test['fighter1_best_closing_odds'], X_test['fighter2_best_closing_odds'])
@@ -44,12 +44,12 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     lw_accuracy = np.nan if lw_pred.sum() == 0 else (lw_pred[lw_pred == 1] == lw_test[lw_pred == 1]).sum() / lw_pred.sum()
 
     # **Calculate LogLoss**
-    log_loss_result = log_loss(y_test_bin, y_pred_prob, labels = classes)    
+    log_loss_result = log_loss(y_test, y_pred_prob, labels = classes)    
 
     # Calculate the MSE of the Expected value
     ev_mse = ev_loss_function(
         y_pred_prob,
-        y_test_bin,
+        y_test,
         X_test['fighter1_best_closing_odds'], 
         X_test['fighter2_best_closing_odds'],
         return_loss = True,

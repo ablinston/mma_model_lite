@@ -79,6 +79,9 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         
         # Now combine this data with the rows not switched
         y_new = pd.concat([y_new, y[~filter_boolean]])
+        
+        # Convert the test output to an integer to be consistent with old y
+        y_new = y_new.astype('int32')
     
     # Recalculate diff columns because Infs etc might have been cleaned before. Only keep the columns needed
     diff_df = add_fighter_differentials(final_df)

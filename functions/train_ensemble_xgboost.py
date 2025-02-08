@@ -47,7 +47,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
 
     models = []
     for i in range(num_models):
-        # pdb.set_trace()
+        pdb.set_trace()
         
         # # Switch fighters if needed
         # if params['switch_fighters_randomly'] == True:
@@ -118,7 +118,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
                 early_stopping_rounds = early_stopping_rounds,
                 obj = custom_loss,
                 custom_metric = custom_loss_test,
-                verbose_eval = verbose_eval)
+                verbose_eval = True)
         
         else:
             # Train an XGBoost model on the bootstrap sample with column sampling
