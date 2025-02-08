@@ -6,6 +6,8 @@
 
 def fix_fight_details_bout(fight_details, fight_stats_df):
 
+    # pdb.set_trace()
+    
     # Create a copy of stats so the original isn't modified and with stripped columns
     fight_stats = fight_stats_df[['EVENT', 'BOUT']].drop_duplicates()
     
