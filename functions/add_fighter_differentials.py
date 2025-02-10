@@ -6,7 +6,7 @@ def add_fighter_differentials(df):
     
     merged_data = df.copy()
 
-    merged_data.reset_index(drop = True, inplace = True)
+    # merged_data.reset_index(drop = True, inplace = True)
 
     # First, remove any existing diff columns
     existing_diff_cols = [col for col in df.columns if 'diff' in col or 'offense_minus' in col]
@@ -31,9 +31,11 @@ def add_fighter_differentials(df):
     
     # Calculate the differentials. Fill NAs with 0 for the purposes of this calc
     fighter1_off_fighter2_def = pd.DataFrame(merged_data[fighter1_accuracy_off_cols].copy().fillna(0).to_numpy() - (1 - merged_data[fighter2_accuracy_def_cols].copy().fillna(0).to_numpy()),
-                                             columns = [col.replace('fighter1', 'fighter1_offense_minus_fighter2_defense') for col in fighter1_accuracy_off_cols])
+                                             columns = [col.replace('fighter1', 'fighter1_offense_minus_fighter2_defense') for col in fighter1_accuracy_off_cols],
+                                             index = merged_data.index)
     fighter1_def_fighter2_off = pd.DataFrame(merged_data[fighter2_accuracy_off_cols].copy().fillna(0).to_numpy() - (1 -  merged_data[fighter1_accuracy_def_cols].copy().fillna(0).to_numpy()),
-                                             columns = [col.replace('fighter2', 'fighter2_offense_minus_fighter1_defense') for col in fighter2_accuracy_off_cols])
+                                             columns = [col.replace('fighter2', 'fighter2_offense_minus_fighter1_defense') for col in fighter2_accuracy_off_cols],
+                                             index = merged_data.index)
     
     # Combined with the data
     merged_data = pd.concat([merged_data, fighter1_off_fighter2_def, fighter1_def_fighter2_off], axis = 1)
@@ -72,15 +74,18 @@ def add_fighter_differentials(df):
 
     # Create differential columns
     diff_columns = pd.DataFrame(merged_data[fighter1_cols_no_dates].to_numpy() - merged_data[fighter2_cols_no_dates].to_numpy(),
-                                columns = [col.replace('fighter1_', 'diff_').replace('fighter2_', '') for col in fighter1_cols_no_dates])
+                                columns = [col.replace('fighter1_', 'diff_').replace('fighter2_', '') for col in fighter1_cols_no_dates],
+                                index = merged_data.index)
 
     # Create differential columns but as ratios rather than differences
     diff_ratio_columns = pd.DataFrame(safe_divide_np(merged_data[fighter1_cols_no_dates].to_numpy(), merged_data[fighter2_cols_no_dates].to_numpy()),
-                                columns = [col.replace('fighter1_', 'diff_ratio_').replace('fighter2_', '') for col in fighter1_cols_no_dates])
+                                columns = [col.replace('fighter1_', 'diff_ratio_').replace('fighter2_', '') for col in fighter1_cols_no_dates],
+                                index = merged_data.index)
 
     # Perform element-wise division and replace NaN (from division by zero) with np.inf    
     diff_date_columns = pd.DataFrame((merged_data[fighter1_cols_dates].to_numpy(dtype='datetime64') - merged_data[fighter2_cols_dates].to_numpy(dtype='datetime64')) / np.timedelta64(1, 'D'),
-                                columns = [col.replace('fighter1_', 'diff_').replace('fighter2_', '') for col in fighter1_cols_dates])
+                                columns = [col.replace('fighter1_', 'diff_').replace('fighter2_', '') for col in fighter1_cols_dates],
+                                index = merged_data.index)
 
     # Remove differential columns that might not be correct or not needed
     diff_columns = diff_columns[[col for col in diff_columns.columns if col not in ['diff_weight', 'diff_open_odds', 'diff_best_closing_odds']]]

@@ -47,7 +47,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
 
     models = []
     for i in range(num_models):
-        # pdb.set_trace()
+        pdb.set_trace()
         
         # # Switch fighters if needed
         # if params['switch_fighters_randomly'] == True:

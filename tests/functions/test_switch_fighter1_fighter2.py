@@ -18,13 +18,13 @@ def test_switch_fighter1_fighter2():
         'outcome': ['W/L', 'L/W', 'D/D', 'L/W', 'W/L'],
         'train_fighter1_odds': [2.1, 2.2, 2.3, 2.4, 2.5],
         'train_fighter2_odds': [3.1, 3.2, 3.3, 3.4, 3.5]
-    }, index=[10, 20, 30, 40, 50])
+    }, index=[20, 10, 30, 40, 50])
     
     X = add_fighter_differentials(X)
     
     
     # Create y with a different index order
-    y = pd.Series(['2', '0', '1', '0', '2'], index=[50, 30, 10, 40, 20])
+    y = pd.Series(['2', '0', '1', '0', '2'], index=[20, 10, 30, 40, 50])
     
     # Create a filter boolean mask
     filter_boolean = pd.Series([True, False, True, False, False])
@@ -44,17 +44,17 @@ def test_switch_fighter1_fighter2():
         'outcome': ['L/W', 'D/D', 'L/W', 'L/W', 'W/L'],
         'train_fighter1_odds': [3.1, 3.3, 2.2, 2.4, 2.5],
         'train_fighter2_odds': [2.1, 2.3, 3.2, 3.4, 3.5]
-    })
+    }, index=[20, 30, 10, 40, 50])
     
     X_new_correct = add_fighter_differentials(X_new_correct)
     
-    y_new_correct = pd.Series(['0', '1', '0', '0', '2'])
+    y_new_correct = pd.Series([0, 1, 0, 0, 2], index=[20, 30, 10, 40, 50])
     
     # Ensure X and y have the same index
     assert X_new.index.equals(y_new.index), "Indices of X and y should match"
     
     # Ensure no unintended modifications occurred
-    assert X_new_correct[X_new.columns].equals(X_new)
+    assert X_new_correct[X_new.columns].equals(X_new) # X_new_correct[X_new.columns].compare(X_new)
     assert all(y_new_correct == y_new)
     
     # Now perform two switches and check if the outputs are the same

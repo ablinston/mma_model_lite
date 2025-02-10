@@ -1,0 +1,10 @@
+,date,event,fighter1,fighter2,fighter1_best_closing_odds,fighter2_best_closing_odds,Fighter1_win_prob,Fighter2_win_prob,Fighter1_win_EV,Fighter2_win_EV,Bet_trigger,Final_bet,Potential_win
+9199,2025-02-08,ufc312:duplessisvsstrickland2,tomnolan,viacheslavborshchev,2.25,1.9090909090909092,57.0,41.3,0.28,-0.21,tomnolan,122.58013963699341,153.22517454624176
+9200,2025-02-08,ufc312:duplessisvsstrickland2,jakematthews,franciscoprado,1.4444444444444444,2.98,74.3,24.2,0.07,-0.28,jakematthews,116.6308730840683,51.83594359291924
+9205,2025-02-08,ufc312:duplessisvsstrickland2,jackjenkins,gabrielsantos,2.95,1.5,52.0,46.2,0.54,-0.31,jackjenkins,127.44949964376598,248.52652430534368
+9207,2025-02-08,ufc312:duplessisvsstrickland2,dricusduplessis,seanstrickland,1.4761904761904763,2.85,65.8,32.6,-0.03,-0.07,None,0.0,0.0
+9208,2025-02-15,ufcfightnight:cannoniervsrodrigues,calvinkattar,youssefzalal,4.1,1.2531645569620253,30.2,68.1,0.24,-0.15,None,0.0,0.0
+9209,2025-02-15,ufcfightnight:cannoniervsrodrigues,ismaelbonfim,nazimsadykhov,1.7142857142857144,2.24,53.7,44.6,-0.08,-0.0,None,0.0,0.0
+9210,2025-02-15,ufcfightnight:cannoniervsrodrigues,rodolfovieira,andrepetroski,1.4761904761904763,2.75,65.4,33.0,-0.03,-0.09,None,0.0,0.0
+9218,2025-02-15,ufcfightnight:cannoniervsrodrigues,jaredcannonier,gregoryrodrigues,2.6799999999999997,1.5714285714285714,37.7,60.6,0.01,-0.05,None,0.0,0.0
+9219,2025-02-15,ufcfightnight:cannoniervsrodrigues,edmenshahbazyan,dylanbudka,1.3703703703703702,3.25,69.6,28.8,-0.05,-0.06,None,0.0,0.0
