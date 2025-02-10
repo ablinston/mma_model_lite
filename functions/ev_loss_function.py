@@ -47,7 +47,7 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     # Expected value calculations
     ev_fighter_1 = p_fighter_1 * (odds_fighter_1 - 1) - p_fighter_2 - p_draw
     ev_fighter_2 = p_fighter_2 * (odds_fighter_2 - 1) - p_fighter_1 - p_draw
-    ev_draw = -np.ones_like(y_true)  # Draw results in a loss of stake
+    ev_draw = -1 * (1 - p_draw) * np.ones_like(y_true)  # Draw results in a loss of stake
 
     # Now calculate the actual outcome
     ev_fighter1_actual = np.where(y_true == 2, odds_fighter_1 - 1, -1)
@@ -58,7 +58,7 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     # Removed draw from EV as will never be betting on it and have no odds for it
     ev_loss = np.stack((
         (ev_fighter2_actual - ev_fighter_2) ** 2,
-        # (ev_draw_actual - ev_draw) ** 2,
+        (ev_draw_actual - ev_draw) ** 2,
         (ev_fighter1_actual - ev_fighter_1) ** 2
         ), axis = 1)
 
@@ -66,12 +66,12 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     
     # Calculate errors (difference between actual and predicted EV)
     error_fighter_2 = ev_fighter_2 - ev_fighter2_actual
-    # error_draw = ev_draw - ev_draw_actual
+    error_draw = ev_draw - ev_draw_actual
     error_fighter_1 = ev_fighter_1 - ev_fighter1_actual
     
     # Gradients for each class. Got these from chatgpt differentiation
     grad_fighter_2 = 2 * error_fighter_2 * p_fighter_2 * (1 - p_fighter_2)
-    # grad_draw = 2 * error_draw * p_draw * (1 - p_draw)
+    grad_draw = 2 * error_draw * p_draw * (1 - p_draw)
     grad_draw = np.zeros(len(p_fighter_1))
     grad_fighter_1 = 2 * error_fighter_1 * p_fighter_1 * (1 - p_fighter_1)
     
@@ -80,7 +80,7 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
 
     # Hessians for each class
     hess_fighter_2 = 2 * p_fighter_2 * (1 - p_fighter_2) * (1 - 2 * p_fighter_2)
-    # hess_draw = 2 * p_draw * (1 - p_draw) * (1 - 2 * p_draw)
+    hess_draw = 2 * p_draw * (1 - p_draw) * (1 - 2 * p_draw)
     hess_draw = np.zeros(len(p_fighter_1))
     hess_fighter_1 = 2 * p_fighter_1 * (1 - p_fighter_1) * (1 - 2 * p_fighter_1)
     
@@ -92,6 +92,9 @@ def ev_loss_function(y_pred, y_true, odds_fighter_1, odds_fighter_2, return_loss
     overall_loss = np.mean(ev_loss)
 
     if for_feval:
+    
+        # Compute log loss for testing
+        # return 'TEst_logloss', log_loss(y_true, probs)
         # print(ev_loss.mean())
         # joblib.dump(overall_loss, 'E:/overall_loss.pkl')
         return 'EV_MSE', overall_loss

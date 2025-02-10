@@ -7,7 +7,7 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     It can either take a data frame as a whole, or take data in the form of X y, i.e. predictors split into a data frame X and y is the observed outcomes
     
     """
-    # pdb.set_trace()
+    pdb.set_trace()
 
     # Make the filter an array from a list to avoid index issues
     filter_boolean = np.array(list(filter_boolean))
@@ -26,6 +26,9 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         
     # Undo any cleaning that's been done on the data
     df = undo_clean_inf(df)
+
+    # Swap column names
+    df.columns = df.columns.str.replace(r'fighter1|fighter2', lambda x: swap_dict.get(x.group(0), x.group(0)), regex=True)
 
     # First rename fighter1 columns
     df.columns = df.columns.str.replace('fighter1', 'fighterX')
@@ -111,7 +114,15 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     else:
         stop_if_not(final_df.shape == X.shape, 'Dataset length check')
 
+    # # Ensure the old index is preserved
+    # if X is None:
+    #     final_df.index = df_original.index
+    # else:
+    #     final_df.index = X.index
+    #     y_new.index = y.index
+    
+
     if y is None:
-        return final_df.reset_index(drop = True).copy()
+        return final_df.copy()
     else:
-        return final_df.reset_index(drop = True).copy(), y_new.reset_index(drop = True).copy()
+        return final_df.copy(), y_new.copy()

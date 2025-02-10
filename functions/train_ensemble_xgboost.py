@@ -47,7 +47,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
 
     models = []
     for i in range(num_models):
-        pdb.set_trace()
+        # pdb.set_trace()
         
         # # Switch fighters if needed
         # if params['switch_fighters_randomly'] == True:
@@ -86,8 +86,8 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         # Create the validation set from all rows not included in the training set
         # Mask to get the validation data
         train_ids = X_train_df['id'].tolist()
-        X_val = X_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()].reset_index(drop = True)
-        y_val = y_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()].reset_index(drop = True)
+        X_val = X_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()]
+        y_val = y_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()]
 
         # Get the odds for the custom loss function if needed
         train_fighter1_odds = X_train_df['train_fighter1_odds'].to_numpy()
