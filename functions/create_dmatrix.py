@@ -3,7 +3,11 @@ def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False,
     # Convert train_idx to a boolean mask
     mask = pd.Series(False, index=X_train.index)
     mask.iloc[train_idx] = True  # Set True for indices in train_idx
-
+    
+    # # Reset the index
+    # X_train = X_train.reset_index(drop = True)
+    # y_train = y_train.reset_index(drop = True)
+    
     # Apply the combined filter to X_train and y_train
     if win_loss_only == False:
         if split_dec_or_other_filter:

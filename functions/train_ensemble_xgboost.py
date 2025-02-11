@@ -47,21 +47,13 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
 
     models = []
     for i in range(num_models):
-        pdb.set_trace()
         
-        # # Switch fighters if needed
-        # if params['switch_fighters_randomly'] == True:
-        #     X_swapped, y_swapped = switch_fighter1_fighter2(X = X, y = y, filter_boolean = np.random.choice([True, False], size = len(X)))
-        #     # Clean values
-        #     X_swapped = clean_inf_and_large(X_swapped).copy()
-        # else:
-        X_swapped = X.copy()
-        y_swapped = y.copy()
-        
+        # pdb.set_trace()
+                
         model = {}
         
         # Randomly sample rows with replacement for the training set
-        X_train_df, y_train_df = resample(X_swapped, y_swapped, replace=True, n_samples=int(len(X) * subsample), random_state=i)
+        X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
         
         # # Switch fighters if needed
         if params['switch_fighters_randomly'] == True:
@@ -118,7 +110,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
                 early_stopping_rounds = early_stopping_rounds,
                 obj = custom_loss,
                 custom_metric = custom_loss_test,
-                verbose_eval = True)
+                verbose_eval = verbose_eval)
         
         else:
             # Train an XGBoost model on the bootstrap sample with column sampling

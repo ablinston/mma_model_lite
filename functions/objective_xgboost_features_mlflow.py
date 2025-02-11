@@ -72,6 +72,7 @@ def objective_xgboost_features_mlflow(
                 X_train = pd.concat([X_train, X_train_master[['split_dec_or_other']]], axis = 1)
             
             X_train.reset_index(drop = True, inplace = True)
+            y_train.reset_index(drop = True, inplace = True)
             
             # Log parameters in MLflow
             mlflow.log_param('num_of_features', params['num_of_features'])

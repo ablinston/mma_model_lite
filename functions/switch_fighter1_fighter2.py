@@ -10,8 +10,9 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     # pdb.set_trace()
     
     # First, check the type of y. It will be forced to int
-    if y.dtype != 'int32':
-        print('Warning: y vector passed into switch_fighter1_fighter2() is not an int32 type. Output will be forced to int32')
+    if y is not None:
+        if y.dtype != 'int32':
+            print('Warning: y vector passed into switch_fighter1_fighter2() is not an int32 type. Output will be forced to int32')
 
     # Make the filter an array from a list to avoid index issues
     filter_boolean = np.array(list(filter_boolean))
