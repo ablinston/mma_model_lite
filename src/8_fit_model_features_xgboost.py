@@ -80,7 +80,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt3')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt4')
 
 
 ##########################################################################################
@@ -92,7 +92,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 300,
-    'num_of_features': hp.choice('num_of_features', [180]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [3, 25, 40, 50, 60, 75, 90, 100, 150, 200, 210, 230, 250, 270, 300, 350, 400, 500]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
@@ -102,7 +102,7 @@ params_inner = {
      'learning_rate': hp.quniform('learning_rate', 0.0005, 0.03, 0.0005), # Learning rate
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
-     'max_depth': hp.quniform('max_depth', 1, 4, 1),
+     'max_depth': hp.quniform('max_depth', 3, 12, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
      # 'eval_metric': 'mlogloss',       # Evaluation metric
