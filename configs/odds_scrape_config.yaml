@@ -1,0 +1,8 @@
+# These config settings relate to the events webpage and the classes of various objects
+
+
+# Get the class of the cells containing odds data
+odds_cell_class: but-sg
+
+# Events page colnames
+events_colnames: ['DraftKings', 'BetMGM', 'Caesars', 'BetRivers', 'FanDuel', 'BetWay', 'Bet365', 'Unibet', 'PointsBet']

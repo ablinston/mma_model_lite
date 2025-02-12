@@ -4,12 +4,15 @@
 
 # This fast function requires cookies so can be more temperamental. That's why there is an alternate version sans '_fast'
 
+# event_urls_only tells the function whether to only return the urls of all events for a fighter
+
 def scrape_fighter_odds_fast(
         fighter_name, 
         cookies_dict, 
-        odds_urls_overide_df):
+        odds_urls_overide_df,
+        event_urls_only = False):
 
-    # pdb.set_trace()
+    pdb.set_trace()
 
     try:
         
@@ -92,11 +95,23 @@ def scrape_fighter_odds_fast(
         # Get the html table from the page
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Find the table in the soup object
-        table = soup.find('table')
+        # pdb.set_trace()
+        
+        # See if we want to return odds data or event urls
+        if event_urls_only:
+            # Collect the event urls
+            # Extract all event URLs and their corresponding dates efficiently
+            events = [(a['href'], a.next_sibling.strip()) for a in soup.select('a[href^="/events/"]') if a.next_sibling]
+            
+            # Convert to DataFrame
+            odds_df = pd.DataFrame(events, columns=['event_url', 'event_date'])
 
-        # Convert the table to a data frame and add the rows to the results
-        odds_df = betfightodds_table_to_df(table, fighter_name)
+        else:
+            # Find the table in the soup object
+            table = soup.find('table')
+    
+            # Convert the table to a data frame and add the rows to the results
+            odds_df = betfightodds_table_to_df(table, fighter_name)
     
     except Exception as e:
         print(f"Error scraping {fighter_name}: {e}")

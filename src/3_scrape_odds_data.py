@@ -1,6 +1,7 @@
 # This script scrapes the historic betting and odds data from the UFC events
 
 # imports
+from io import StringIO
 import requests
 # from bs4 import BeautifulSoup
 # import pandas as pd
@@ -29,8 +30,26 @@ fighter_odds = parallel_scrape_odds_fast(
     num_threads = config['num_threads'], 
     firefox_location = config['firefox_location'], 
     gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
-    odds_urls_overide_df = fighter_odds_urls)
+    odds_urls_overide_df = fighter_odds_urls,
+    event_urls_only = False)
 
+# Get all the event urls for full odds
+event_urls_odds = parallel_scrape_odds_fast(
+    fighter_list, 
+    num_threads = config['num_threads'], 
+    firefox_location = config['firefox_location'], 
+    gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+    odds_urls_overide_df = fighter_odds_urls,
+    event_urls_only = True)
+
+# Drop duplicate urls
+event_urls_odds = event_urls_odds.drop_duplicates(subset='event_url')
+
+event_odds = parallel_scrape_event_odds_fast(
+    event_urls_odds.iloc[0:50,], 
+    num_threads = config['num_threads'], 
+    firefox_location = config['firefox_location'], 
+    gecko_driver = './data/firefox_driver_32bit/geckodriver.exe')
 
 # Do it a second time to catch all those not successful, in case it was a temp issue
 missing_fighters = [fighter for fighter in fighter_list if fighter not in fighter_odds['fighter'].tolist()]
