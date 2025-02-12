@@ -47,7 +47,7 @@ if not skip_data_update:
     
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if True: # unparsed_events: Hard coded this to always run because fights can change if fighters drop out and otherwise they wont have the hist stats
-        exec(open('./src/6_data_processing.py').read())
+        exec(open('./src/7_data_processing.py').read())
         # Refresh the dataset
         forecasting_data = merged_data.copy()
     else:
