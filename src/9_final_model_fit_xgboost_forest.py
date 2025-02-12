@@ -55,10 +55,10 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.015, # Learning rate
+    'learning_rate': 0.027, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
-    'max_depth': 4,
+    'max_depth': 6,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -70,7 +70,7 @@ params = {
     'random_state': config['seed_all'] + 38,
     'num_iterations': 5000,
     'early_stopping_rounds': 50,
-    'win_loss_only': False,
+    'win_loss_only': True,
     'switch_fighters_randomly': model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function']
 }
@@ -118,8 +118,8 @@ for num_trees_i in list(range(5, 50, 5)) + list(range(20, 1001, 20)):
 
 
 # Set the final number of models
-final_forest_size = 2000
+final_forest_size = 80
 
 
 # Save the model
-joblib.dump(xgboost_rf[0:final_forest_size], './results/final_xgboost_forest_1000.joblib', compress = 9)
+joblib.dump(xgboost_rf[0:final_forest_size], './results/final_xgboost_forest.joblib', compress = 9)

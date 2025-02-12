@@ -78,8 +78,8 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         # Create the validation set from all rows not included in the training set
         # Mask to get the validation data
         train_ids = X_train_df['id'].tolist()
-        X_val = X_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()]
-        y_val = y_swapped.copy()[~X_swapped['id'].isin(train_ids).to_numpy()]
+        X_val = X.copy()[~X['id'].isin(train_ids).to_numpy()]
+        y_val = y.copy()[~X['id'].isin(train_ids).to_numpy()]
 
         # Get the odds for the custom loss function if needed
         train_fighter1_odds = X_train_df['train_fighter1_odds'].to_numpy()
@@ -128,7 +128,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         # Add model to the list
         models.append(model)
         
-        del X_train_df, X_swapped
+        del X_train_df
         gc.collect()
         # print(f"Model {i + 1}/{num_models} trained with best iteration {model.best_iteration}.")
 
