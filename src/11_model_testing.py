@@ -81,7 +81,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('OOT_testing')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - fixed agg - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = 'XGB forest - EV MSE - GT2 fights split dec exc diff only, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -105,8 +105,8 @@ for backtesting_params in [
         # }
         # # ,
         {
-            'min_prob_to_bet': 0.49,
-            'min_ev_to_bet': 0.0,
+            'min_prob_to_bet': 0.3,
+            'min_ev_to_bet': 0.1,
             'max_bet_size': 400,
             'min_bet_size': 40,
             'constant_bets': True

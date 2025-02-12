@@ -90,8 +90,8 @@ breakdown_metrics= ['Logloss', 'EV MSE', 'Avg WL only AUC', 'X Odds Avg WL only 
 target = 'outcome'
 
 # Loop through all the minimum probabilities and ex[ected values to bet
-for min_prob_to_bet in np.arange(0.05, 0.7, 0.05):
-    for min_ev_to_bet in np.arange(0, 0.5, 0.05):
+for min_prob_to_bet in np.arange(0.1, 0.7, 0.1):
+    for min_ev_to_bet in np.arange(0, 0.2, 0.05):
         for max_bet_size in [1]:#np.arange(0.1, 0.4, 0.02):
             for min_bet_size in [1]:#np.arange(0.01, 0.1, 0.01):
             
