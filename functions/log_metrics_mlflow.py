@@ -1,5 +1,5 @@
 
-def log_metrics_mlflow(y_pred_prob, y_test_df, classes):
+def log_metrics_mlflow(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, classes):
     
     """
     Take a set of predictions and actuals and log all required metrics in MLflow
@@ -16,7 +16,7 @@ def log_metrics_mlflow(y_pred_prob, y_test_df, classes):
     # pdb.set_trace()
 
     # Calculate the metrics
-    metrics = calculate_metrics(y_pred_prob, y_test_df, classes)
+    metrics = calculate_metrics(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, classes)
     
     mlflow.log_metrics(metrics)
     

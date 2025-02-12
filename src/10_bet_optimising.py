@@ -75,10 +75,10 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_bet_testing_v7')
+mlflow.set_experiment('final_models_bet_testing')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest, GT2 fights split exc random fighter, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' all features'
+model_description = 'XGB forest on EV MSE, GT2 fights split exc random fighter, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' all features'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -86,7 +86,7 @@ model_description = 'XGB forest, GT2 fights split exc random fighter, ' + str(le
 
 # Set which columns and metrics we're interested in
 breakdown_cols = ['weightclass', 'year', 'total_fights', 'fighter_history']
-breakdown_metrics= ['Logloss', 'Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Sample Size']
+breakdown_metrics= ['Logloss', 'EV MSE', 'Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Sample Size']
 target = 'outcome'
 
 # Loop through all the minimum probabilities and ex[ected values to bet
