@@ -33,11 +33,13 @@ def get_website_soup(
         # Create a WebDriver instance
         driver = webdriver.Firefox(service=service, options=options)
         ###########
-        
+    
         # Use selenium to navigate to the page
         driver.get(url)
         
         # Extract the page source and convert to xml
         soup = BeautifulSoup(driver.page_source, 'lxml')
+        
+        driver.quit()
         
     return soup

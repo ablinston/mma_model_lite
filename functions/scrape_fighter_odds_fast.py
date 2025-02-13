@@ -15,7 +15,7 @@ def scrape_fighter_odds_fast(
         firefox_binary = 'C:/Program Files/Mozilla Firefox/firefox.exe', 
         gecko_driver = './data/firefox_driver_32bit/geckodriver.exe'):
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
     try:
         
