@@ -6,7 +6,8 @@ def parallel_scrape_event_odds_fast(
         config = [],
         num_threads = 1, 
         firefox_location = '', 
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe'):
+        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+        fast = True):
 
     
     scrape_results = []
@@ -46,7 +47,7 @@ def parallel_scrape_event_odds_fast(
         driver.quit()
     
         with ThreadPoolExecutor(max_workers = num_threads) as executor:
-            future_to_url = {executor.submit(scrape_event_odds_fast, row, cookies_dict): row for row in chunk.iterrows()}
+            future_to_url = {executor.submit(scrape_event_odds_fast, row, cookies_dict, fast, firefox_location, gecko_driver): row for row in chunk.iterrows()}
     
             # Collect results as they complete
             for future in as_completed(future_to_url):

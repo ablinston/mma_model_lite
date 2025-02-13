@@ -8,7 +8,8 @@ def parallel_scrape_odds_fast(
         firefox_location = '', 
         gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
         odds_urls_overide_df = None,
-        event_urls_only = False):
+        event_urls_only = False,
+        fast = True):
 
     
     # Keep counters to track progress
@@ -46,7 +47,7 @@ def parallel_scrape_odds_fast(
         driver.quit()
         
         with ThreadPoolExecutor(max_workers = num_threads) as executor:
-            future_to_url = {executor.submit(scrape_fighter_odds_fast, fighter, cookies_dict, odds_urls_overide_df, event_urls_only): fighter for fighter in chunk}
+            future_to_url = {executor.submit(scrape_fighter_odds_fast, fighter, cookies_dict, odds_urls_overide_df, event_urls_only, fast, firefox_location, gecko_driver): fighter for fighter in chunk}
     
             # Collect results as they complete
             for future in as_completed(future_to_url):

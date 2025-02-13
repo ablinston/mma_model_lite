@@ -21,15 +21,23 @@ def scrape_event_odds_fast(
             'Connection':'keep-alive',
             'Host':'www.bestfightodds.com',
             'Priority':'u=0, i',
-            'Referer':'https://www.bestfightodds.com/events/ufc-3570',
+            'Referer': f'https://www.bestfightodds.com/events/ufc-{random.randint(3500, 3700)}',
             'Sec-Fetch-Dest':'document',
             'Sec-Fetch-Mode':'navigate',
             'Sec-Fetch-Site':'same-origin',
             'Upgrade-Insecure-Requests':'1',
             'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0'}
-                
+        
+        # Use random user agent to bypass bot detection
+        ua = UserAgent()
+        headers['User-Agent'] = ua.random
+        
         # Navigate to the website
         response = requests.get('https://www.bestfightodds.com' + event_details[1]['event_url'], headers=headers, cookies=cookies_dict)
+        
+        if response.status_code in [403, 429]:
+            print("Blocked! Try changing User-Agent, IP, or waiting.")
+
         
         # Extract the page source and convert to xml
         soup = BeautifulSoup(response.text, 'html.parser')

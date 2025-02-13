@@ -6,6 +6,7 @@ import csv
 from datetime import datetime, date, timedelta
 import datatable as dt
 from datatable import f
+from fake_useragent import UserAgent
 import fastparquet as fp
 import gc
 import importlib
@@ -21,6 +22,7 @@ import pandas as pd
 import pdb
 import pyarrow.parquet as pq
 # from pycaret.classification import *
+import random
 import re
 from re import sub
 import requests

@@ -10,7 +10,10 @@ def scrape_fighter_odds_fast(
         fighter_name, 
         cookies_dict, 
         odds_urls_overide_df,
-        event_urls_only = False):
+        event_urls_only = False,
+        fast = True,
+        firefox_binary = 'C:/Program Files/Mozilla Firefox/firefox.exe', 
+        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe'):
 
     pdb.set_trace()
 
@@ -23,18 +26,26 @@ def scrape_fighter_odds_fast(
             'Connection':'keep-alive',
             'Host':'www.bestfightodds.com',
             'Priority':'u=0, i',
-            'Referer':'https://www.bestfightodds.com/events/ufc-3570',
+            'Referer': f'https://www.bestfightodds.com/events/ufc-{random.randint(3500, 3700)}',
             'Sec-Fetch-Dest':'document',
             'Sec-Fetch-Mode':'navigate',
             'Sec-Fetch-Site':'same-origin',
             'Upgrade-Insecure-Requests':'1',
             'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0'}
         
-        # Navigate to the website
-        response = requests.get('https://www.bestfightodds.com/search?query=' + fighter_name, headers=headers, cookies=cookies_dict)
-        
+        # Use random user agent to bypass bot detection
+        ua = UserAgent()
+        headers['User-Agent'] = ua.random
+                
         # Extract the page source and convert to xml
-        soup = BeautifulSoup(response.text, 'html.parser')
+        soup = get_website_soup(
+            url = 'https://www.bestfightodds.com/search?query=' + fighter_name,
+            fast = fast,
+            headers = headers, # Only needed for fast
+            cookies = cookies_dict, # Only needed for fast
+            firefox_binary = firefox_binary, # Only needed for NOT fast
+            gecko_driver = gecko_driver
+        )
 
         # skip if no possible matches found
         if soup.find('table') == None:
@@ -90,10 +101,14 @@ def scrape_fighter_odds_fast(
         # Navigate to the website if we're not already there
         if fighter_name not in soup.title.string:
             # Navigate to the website
-            response = requests.get(link_url, headers=headers, cookies=cookies_dict)
-
-        # Get the html table from the page
-        soup = BeautifulSoup(response.text, 'html.parser')
+            soup = get_website_soup(
+                url = link_url,
+                fast = fast,
+                headers = headers, # Only needed for fast
+                cookies = cookies_dict, # Only needed for fast
+                firefox_binary = firefox_binary, # Only needed for NOT fast
+                gecko_driver = gecko_driver
+            )
 
         # pdb.set_trace()
         

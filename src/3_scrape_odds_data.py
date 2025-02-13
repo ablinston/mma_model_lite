@@ -40,7 +40,8 @@ event_urls_odds = parallel_scrape_odds_fast(
     firefox_location = config['firefox_location'], 
     gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
     odds_urls_overide_df = fighter_odds_urls,
-    event_urls_only = True)
+    event_urls_only = True,
+    fast = False)
 
 # Drop duplicate urls
 event_urls_odds = event_urls_odds.drop_duplicates(subset='event_url')
