@@ -9,7 +9,8 @@ def parallel_scrape_odds_fast(
         gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
         odds_urls_overide_df = None,
         event_urls_only = False,
-        fast = True):
+        fast = True,
+        playwright = True):
 
     
     # Keep counters to track progress
@@ -17,14 +18,9 @@ def parallel_scrape_odds_fast(
     completed_count = 0
 
     scrape_results = []
-        
-    # Split the data into chunks to stop the cookies expiring
-    batch_size = 200
-    
-    # Loop through slices of the DataFrame
-    for start in range(0, len(fighter_list), batch_size):
-        chunk = fighter_list[start:(start + batch_size)]
-        
+            
+    # If fast, we will use response.get. There is selenium code in here as well from old runs that still works
+    if fast:
         ###########
         # Setup headless Firefox for getting odds information
         options = Options()
@@ -38,7 +34,7 @@ def parallel_scrape_odds_fast(
         ###########
         
         # Get the cookies for the odds webpages using a Selenium call
-        driver.get("https://www.bestfightodds.com/events/ufc-3570")
+        driver.get("https://www.bestfightodds.com/")
     
         # Get cookies from Selenium
         selenium_cookies = driver.get_cookies()
@@ -47,7 +43,7 @@ def parallel_scrape_odds_fast(
         driver.quit()
         
         with ThreadPoolExecutor(max_workers = num_threads) as executor:
-            future_to_url = {executor.submit(scrape_fighter_odds_fast, fighter, cookies_dict, odds_urls_overide_df, event_urls_only, fast, firefox_location, gecko_driver): fighter for fighter in chunk}
+            future_to_url = {executor.submit(scrape_fighter_odds_fast, fighter, cookies_dict, odds_urls_overide_df, event_urls_only, fast, firefox_location, gecko_driver): fighter for fighter in fighter_list}
     
             # Collect results as they complete
             for future in as_completed(future_to_url):
@@ -60,9 +56,37 @@ def parallel_scrape_odds_fast(
                 # Increment the completed count
                 completed_count += 1
                 print(f"Completed {completed_count} out of {total_fighters} tasks")
-            
-    # This ensures that all threads are done
-    executor.shutdown(wait=True)
+                
+        # This ensures that all threads are done
+        executor.shutdown(wait=True)
+    
+    # Else it's not fast and we use playwright
+    else:
+        
+        # Use partial to prefill arguments in the function. the map below only passes one argument.
+        scrape_func = partial(
+            scrape_fighter_odds_fast,
+            cookies_dict = {}, # only needed for fast run
+            odds_urls_overide_df = odds_urls_overide_df,
+            event_urls_only = event_urls_only,
+            fast = False,
+            playwright = playwright
+        )
+
+        # with ThreadPoolExecutor(max_workers = num_threads) as executor:
+        #     scrape_results = list(executor.map(scrape_func, fighter_list))
+        
+        with ThreadPoolExecutor(max_workers = num_threads) as executor:
+            futures = {executor.submit(scrape_func, fighter_name): fighter_name for fighter_name in fighter_list}
+
+            scrape_results = []
+            for future in as_completed(futures):
+                try:
+                    scrape_results.append(future.result())  # Get the result as soon as it's ready
+                except Exception as e:
+                    print(f"Error scraping {futures[future]}: {e}")  # Handle failures
+
+    
 
     # Combine the results
     return pd.concat(scrape_results)

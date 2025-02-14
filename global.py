@@ -8,6 +8,7 @@ import datatable as dt
 from datatable import f
 from fake_useragent import UserAgent
 import fastparquet as fp
+from functools import partial
 import gc
 import importlib
 import inspect
@@ -20,6 +21,8 @@ from os import listdir, makedirs
 from os import path
 import pandas as pd
 import pdb
+from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 import pyarrow.parquet as pq
 # from pycaret.classification import *
 import random
@@ -34,6 +37,7 @@ from sklearn.utils import resample
 from sklearn.metrics import log_loss
 import string
 import sys
+import time
 from yaml import safe_load, dump
 
 # Load the config files

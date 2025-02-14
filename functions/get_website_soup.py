@@ -3,6 +3,7 @@
 def get_website_soup(
         url, 
         fast,
+        playwright_context = None,
         headers = {}, # Only needed for fast
         cookies = {}, # Only needed for fast
         firefox_binary = '', # Only needed for NOT fast
@@ -20,6 +21,17 @@ def get_website_soup(
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
+    # Else, if we have a playwright context, we use that
+    elif playwright_context is not None:
+                
+        # Get a new page
+        page = playwright_context.new_page()
+        page.goto(url, wait_until="domcontentloaded")
+        
+        soup = BeautifulSoup(page.content(), 'html.parser')
+        page.close()
+        
+    # Otherwise, use selenium, which is the slowest
     else:
         
         ###########
