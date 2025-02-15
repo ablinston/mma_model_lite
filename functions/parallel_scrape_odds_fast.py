@@ -10,7 +10,7 @@ def parallel_scrape_odds_fast(
         odds_urls_overide_df = None,
         event_urls_only = False,
         fast = True,
-        playwright = True):
+        playwright = False):
 
     
     # Keep counters to track progress
@@ -42,8 +42,19 @@ def parallel_scrape_odds_fast(
         # Quit the browser
         driver.quit()
         
+        scrape_func = partial(
+            scrape_fighter_odds_fast,
+            cookies_dict = cookies_dict,
+            odds_urls_overide_df = odds_urls_overide_df,
+            event_urls_only = event_urls_only,
+            playwright = playwright,
+            fast = fast,
+            firefox_binary = firefox_location,
+            gecko_driver = gecko_driver
+        )
+        
         with ThreadPoolExecutor(max_workers = num_threads) as executor:
-            future_to_url = {executor.submit(scrape_fighter_odds_fast, fighter, cookies_dict, odds_urls_overide_df, event_urls_only, fast, firefox_location, gecko_driver): fighter for fighter in fighter_list}
+            future_to_url = {executor.submit(scrape_func, fighter): fighter for fighter in fighter_list}
     
             # Collect results as they complete
             for future in as_completed(future_to_url):
@@ -51,7 +62,7 @@ def parallel_scrape_odds_fast(
                     result = future.result()
                     scrape_results.append(result)  # Collect the result (url, title)
                 except Exception as e:
-                    print(f"Error for URL {url}: {e}")
+                    print(f"Error for fighter {fighter}: {e}")
     
                 # Increment the completed count
                 completed_count += 1
@@ -85,6 +96,10 @@ def parallel_scrape_odds_fast(
                     scrape_results.append(future.result())  # Get the result as soon as it's ready
                 except Exception as e:
                     print(f"Error scraping {futures[future]}: {e}")  # Handle failures
+                    
+                # Increment the completed count
+                completed_count += 1
+                print(f"Completed {completed_count} out of {total_fighters} tasks")
 
     
 

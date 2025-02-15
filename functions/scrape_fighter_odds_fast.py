@@ -31,23 +31,22 @@ def scrape_fighter_odds_fast(
         else:
             playwright_context = None
             
-            if fast:
-                # Get headers for the website request. This is a copy and paste from a manual visit
-                headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                    'Accept-Encoding':'gzip, deflate, br, zstd',
-                    'Accept-Language':'en-US,en;q=0.5',
-                    'Connection':'keep-alive',
-                    'Host':'www.bestfightodds.com',
-                    'Priority':'u=0, i',
-                    'Referer': f'https://www.bestfightodds.com/events/ufc-{random.randint(3500, 3700)}',
-                    'Sec-Fetch-Dest':'document',
-                    'Sec-Fetch-Mode':'navigate',
-                    'Sec-Fetch-Site':'same-origin',
-                    'Upgrade-Insecure-Requests':'1',
-                    'User-Agent': UserAgent().random,  # Randomize user-agent
-                    'TE': 'Trailers'  # Added to mimic more realistic behavior
-                }
-                        
+            # Get headers for the website request. This is a copy and paste from a manual visit
+            headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Encoding':'gzip, deflate, br, zstd',
+                'Accept-Language':'en-US,en;q=0.5',
+                'Connection':'keep-alive',
+                'Host':'www.bestfightodds.com',
+                'Priority':'u=0, i',
+                'Referer': f'https://www.bestfightodds.com/events/ufc-{random.randint(3500, 3700)}',
+                'Sec-Fetch-Dest':'document',
+                'Sec-Fetch-Mode':'navigate',
+                'Sec-Fetch-Site':'same-origin',
+                'Upgrade-Insecure-Requests':'1',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0', # UserAgent().random,  # Randomize user-agent
+                'TE': 'Trailers'  # Added to mimic more realistic behavior
+            }
+   
         # Extract the page source and convert to xml
         soup = get_website_soup(
             url = 'https://www.bestfightodds.com/search?query=' + fighter_name,

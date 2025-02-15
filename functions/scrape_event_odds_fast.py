@@ -10,7 +10,7 @@ def scrape_event_odds_fast(
         event_details, # A tuple with the event url and date together
         cookies_dict):
 
-    # pdb.set_trace()
+    pdb.set_trace()
 
     try:
         
@@ -26,11 +26,8 @@ def scrape_event_odds_fast(
             'Sec-Fetch-Mode':'navigate',
             'Sec-Fetch-Site':'same-origin',
             'Upgrade-Insecure-Requests':'1',
-            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0'}
-        
-        # Use random user agent to bypass bot detection
-        ua = UserAgent()
-        headers['User-Agent'] = ua.random
+            'User-Agent': random_user_agent()} # Use random user agent to bypass bot detection
+
         
         # Navigate to the website
         response = requests.get('https://www.bestfightodds.com' + event_details[1]['event_url'], headers=headers, cookies=cookies_dict)
