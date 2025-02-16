@@ -20,12 +20,12 @@ def scrape_fighter_odds_fast(
             'Connection':'keep-alive',
             'Host':'www.bestfightodds.com',
             'Priority':'u=0, i',
-            'Referer':'https://www.bestfightodds.com/events/ufc-3570',
+            'Referer':'https://www.bestfightodds.com/events/ufc-3571',
             'Sec-Fetch-Dest':'document',
             'Sec-Fetch-Mode':'navigate',
             'Sec-Fetch-Site':'same-origin',
             'Upgrade-Insecure-Requests':'1',
-            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0'}
+            'User-Agent':'Mozilla/4.1 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/133.0'}
         
         # Navigate to the website
         response = requests.get('https://www.bestfightodds.com/search?query=' + fighter_name, headers=headers, cookies=cookies_dict)

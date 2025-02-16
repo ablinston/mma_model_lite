@@ -15,8 +15,9 @@ list_of_parsed_events = list(parsed_event_details_df['EVENT'])
 soup = get_soup(config['completed_events_all_url'])
 # parse event details
 new_event_details_df = parse_event_details(soup)
+
 # get list of all event names
-list_of_all_events = list(new_event_details_df['EVENT'])
+list_of_all_events = list(new_event_details_df[new_event_details_df['DATE'] != datetime.today().strftime("%B %d, %Y")]['EVENT']) # ignore events today
 
 # find list event names that have not been parsed
 list_of_unparsed_events = [event for event in list_of_all_events if event not in list_of_parsed_events]
