@@ -78,10 +78,11 @@ event_urls_odds_agg['event_date'] = pd.to_datetime(event_urls_odds_agg['event_da
 
 # Scrape the odds of each event after 2017 (odds only really start to show after then)
 event_odds = parallel_scrape_event_odds_fast(
-    event_urls_odds_agg[event_urls_odds_agg['event_date'] > '01-01-2018'].iloc[0:3,], 
+    event_urls_odds_agg[event_urls_odds_agg['event_date'] > '01-01-2018'], 
     num_threads = config['num_threads'], 
     firefox_location = config['firefox_location'], 
-    gecko_driver = './data/firefox_driver_32bit/geckodriver.exe')
+    gecko_driver = './data/firefox_driver_32bit/geckodriver0_35.exe',
+    fast = False)
 
 
 

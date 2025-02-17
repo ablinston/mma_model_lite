@@ -40,7 +40,7 @@ def parallel_scrape_event_odds_fast(
     driver.quit()
 
     with ThreadPoolExecutor(max_workers = num_threads) as executor:
-        future_to_url = {executor.submit(scrape_event_odds_fast, row, cookies_dict): row for row in events_df.iterrows()}
+        future_to_url = {executor.submit(scrape_event_odds_fast, row, cookies_dict, fast, firefox_location, gecko_driver): row for row in events_df.iterrows()}
 
         # Collect results as they complete
         for future in as_completed(future_to_url):

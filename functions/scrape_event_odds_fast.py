@@ -8,9 +8,12 @@
 
 def scrape_event_odds_fast(
         event_details, # A tuple with the event url and date together
-        cookies_dict):
+        cookies_dict,
+        fast = True,
+        firefox_binary = '',
+        gecko_driver = ''):
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
     try:
         
@@ -28,20 +31,20 @@ def scrape_event_odds_fast(
             'Upgrade-Insecure-Requests':'1',
             'User-Agent': random_user_agent()} # Use random user agent to bypass bot detection
 
+        soup = get_website_soup('https://www.bestfightodds.com' + event_details[1]['event_url'], fast = fast, headers=headers, cookies=cookies_dict, firefox_binary = firefox_binary, gecko_driver = gecko_driver)
+        # # Navigate to the website
+        # response = requests.get('https://www.bestfightodds.com' + event_details[1]['event_url'], headers=headers, cookies=cookies_dict)
         
-        # Navigate to the website
-        response = requests.get('https://www.bestfightodds.com' + event_details[1]['event_url'], headers=headers, cookies=cookies_dict)
-        
-        if response.status_code in [403, 429]:
-            print("Blocked! Try changing User-Agent, IP, or waiting.")
+        # if response.status_code in [403, 429]:
+        #     print("Blocked! Try changing User-Agent, IP, or waiting.")
 
         
-        # Extract the page source and convert to xml
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # # Extract the page source and convert to xml
+        # soup = BeautifulSoup(response.text, 'html.parser')
 
         # skip if no possible matches found
         if soup.find('table') == None:
-            print(f"Error scraping {event_details[1]['event_url']}: {e}")
+            print(f"Error scraping {event_details[1]['event_url']}")
             return pd.DataFrame()
 
         # divs = soup.find_all('div', {'class': 'table-div'})
@@ -89,7 +92,10 @@ def scrape_event_odds_fast(
             return pd.DataFrame()
     
     except Exception as e:
-        print(f"Error scraping {fighter_name}: {e}")
+        print(f"Error scraping {event_details[1]['event_url']}")
         return pd.DataFrame()
-
+    
+    if len(df) > 0:
+        print(f"Scrape of {event_details[1]['event_url']} successful")
+        
     return df

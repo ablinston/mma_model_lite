@@ -18,6 +18,9 @@ def get_website_soup(
         # Check if been blocked by anti bot pretection
         if response.status_code in [403, 429]:
             print("Blocked! Try changing User-Agent, IP, or waiting.")
+            print(f"Using user agent: {headers['User-Agent']}")
+            
+            return ""
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
