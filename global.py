@@ -21,8 +21,8 @@ from os import listdir, makedirs
 from os import path
 import pandas as pd
 import pdb
-from playwright.sync_api import sync_playwright
-from playwright.async_api import async_playwright
+# from playwright.sync_api import sync_playwright
+# from playwright.async_api import async_playwright
 import pyarrow.parquet as pq
 # from pycaret.classification import *
 import random

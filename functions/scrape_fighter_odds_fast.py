@@ -12,7 +12,7 @@ def scrape_fighter_odds_fast(
         odds_urls_overide_df,
         event_urls_only = False,
         fast = True,
-        playwright = True,
+        playwright = False,
         firefox_binary = 'C:/Program Files/Mozilla Firefox/firefox.exe', 
         gecko_driver = './data/firefox_driver_32bit/geckodriver.exe'):
 
@@ -43,7 +43,7 @@ def scrape_fighter_odds_fast(
                 'Sec-Fetch-Mode':'navigate',
                 'Sec-Fetch-Site':'same-origin',
                 'Upgrade-Insecure-Requests':'1',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0', # UserAgent().random,  # Randomize user-agent
+                'User-Agent': random_user_agent(), #'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0', # UserAgent().random,  # Randomize user-agent
                 'TE': 'Trailers'  # Added to mimic more realistic behavior
             }
    
@@ -60,7 +60,7 @@ def scrape_fighter_odds_fast(
 
         # skip if no possible matches found
         if soup.find('table') == None:
-            print(f"Error scraping {fighter_name}: {e}")
+            print(f"Error scraping {fighter_name} with {headers['User-Agent']}")
             return pd.DataFrame()
 
         link_url = find_fighter_odds_url_in_html(soup, fighter_name, odds_urls_overide_df)
