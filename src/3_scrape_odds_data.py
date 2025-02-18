@@ -84,14 +84,25 @@ event_odds = parallel_scrape_event_odds_fast(
     gecko_driver = './data/firefox_driver_32bit/geckodriver0_35.exe',
     fast = False)
 
+# Try to scrape again any missing events
+missing_event_odds = parallel_scrape_event_odds_fast(
+    event_urls_odds_agg[(event_urls_odds_agg['event_date'] > '01-01-2018') & ~(event_urls_odds_agg['event_date'].isin(event_odds['date'].tolist()))], 
+    num_threads = config['num_threads'], 
+    firefox_location = config['firefox_location'], 
+    gecko_driver = './data/firefox_driver_32bit/geckodriver0_35.exe',
+    fast = False)
 
 
 #########################################################################
 # Save the final files
 fp.write('./data/fight_odds_data.parquet',
          fighter_odds,
-         compression = 'GZIP')
+         compression = 'ZSTD')
 
 fp.write('./data/event_odds_urls.parquet', 
          event_urls_odds_agg,
+         compression = 'ZSTD')
+
+fp.write('./data/event_odds.parquet', 
+         event_odds,
          compression = 'ZSTD')

@@ -74,15 +74,22 @@ def scrape_event_odds_fast(
             columns = ['fighter'] + [f'Odd {i+1}' for i in range(odds_count)] + [f'Missing {i+1}' for i in range(len(data[0]) - odds_count - 1)]
 
             # Convert to DataFrame
-            df = pd.DataFrame(data, columns=columns)
+            df = pd.DataFrame(data, columns = columns)
             
             # Remove prop bet columns
-            exclude_strings = ['distance', ' is ', 'Fight', ' other ', ' round ', ' rounds', 'wins by ', 'has more ', 'by decision', ' has ', ' points ', 'FOTN']
+            exclude_strings = ['distance', ' is ', 'Fight', ' other ', ' round ', ' rounds', 'wins by ', 'has more ', 'by decision', ' has ', ' points ', 'FOTN', 'scorecard']
             df = df[~df['fighter'].str.contains('|'.join(exclude_strings), na=False, case=False)]
-    
+                        
             # Drop any columns not recognised
             df = df.iloc[:, 0:(len(odds_scrape_config['events_colnames']) + 1)]
             df.columns = ['fighter'] + odds_scrape_config['events_colnames']
+            
+            # Add opponent
+            if len(df) % 2 == 0:
+                df = assign_opponents(df)
+            else:
+                print(f"Error in length of data for {event_details[1]['event_url']}. Opponent can't be determined")
+                return pd.DataFrame()
             
             # Add on the date
             df['date'] = event_details[1]['event_date']
