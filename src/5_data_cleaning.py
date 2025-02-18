@@ -9,6 +9,7 @@ fighters = fp.ParquetFile('./data/' + config['fighter_tott_file_name']).to_panda
 fight_results = fp.ParquetFile('./data/' + config['fight_results_file_name']).to_pandas()
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name']).to_pandas()
 fighter_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_pandas()
+event_odds = fp.ParquetFile('./data/' + config['event_odds_file_name']).to_pandas()
 
 # Convert all column names to lowercase
 events.columns = events.columns.str.lower()
@@ -18,6 +19,7 @@ fighters.columns = fighters.columns.str.lower()
 fight_results.columns = fight_results.columns.str.lower()
 fight_stats.columns = fight_stats.columns.str.lower()
 fighter_odds.columns = fighter_odds.columns.str.lower()
+event_odds.columns = event_odds.columns.str.lower()
 
 # Convert fighter data to numeric
 # Replace spaces and inches, then split and convert to cm
@@ -29,7 +31,7 @@ fighters = to_numeric(fighters, ['weight', 'reach'])
 fight_stats = to_numeric(fight_stats, ['kd'])
 
 # Remove spaces in events to avoid merge errors
-for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds]:
+for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds, event_odds]:
     try:
         df[['event']] = clean_text_columns(df[['event']])
     except:
@@ -40,6 +42,10 @@ for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight
         pass
     try:
         df[['fighter']] = clean_text_columns(df[['fighter']])
+    except:
+        pass
+    try:
+        df[['opponent']] = clean_text_columns(df[['opponent']])
     except:
         pass
 
@@ -165,6 +171,22 @@ fighter_odds = add_event_and_bout_to_odds_data(fighter_odds, events, fight_stats
 
 
 ###########################################
+## Event odds cleaning
+
+event_odds_cols = odds_scrape_config['events_colnames']
+
+# Convert odds to numeric
+event_odds[event_odds_cols] = event_odds[event_odds_cols].apply(pd.to_numeric, errors = 'coerce')
+
+# Add event and bout to the data
+event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
+
+# Remove empty rows
+event_odds = event_odds.dropna(subset = event_odds_cols, how = 'all')
+event_odds = event_odds.dropna(subset = 'event')
+
+
+###########################################
 # Remove multiple fights on same date - some events had fighters fight multiple times. This messes up the matching and some functions so we'll get rid of them
 
 # Take the fight results data as the primary one
@@ -181,6 +203,7 @@ comparison_date = datetime.combine(date.today() - timedelta(days=5), datetime.mi
 
 fighter_odds = fighter_odds[((fighter_odds['event'].isin(fight_results['event'].tolist())) & (fighter_odds['bout'].isin(fight_results['bout'].tolist()))) | (fighter_odds['date'] > comparison_date)]
 
+event_odds = event_odds[((event_odds['event'].isin(fight_results['event'].tolist())) & (event_odds['bout'].isin(fight_results['bout'].tolist()))) | (event_odds['date'] > comparison_date)]
 
 ###########################################
 
@@ -214,3 +237,6 @@ fp.write('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clea
          fighter_odds,
          compression = 'ZSTD')
 
+fp.write('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
+         event_odds,
+         compression = 'ZSTD')

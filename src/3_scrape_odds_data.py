@@ -103,6 +103,6 @@ fp.write('./data/event_odds_urls.parquet',
          event_urls_odds_agg,
          compression = 'ZSTD')
 
-fp.write('./data/event_odds.parquet', 
+fp.write('./data/' + config['event_odds_file_name'], 
          event_odds,
          compression = 'ZSTD')
