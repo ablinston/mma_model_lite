@@ -57,8 +57,8 @@ backtesting_data['fighter_history'] = np.where(
                     '4. Other')))))
 
 backtesting_data['favourite'] = np.where(
-    ((backtesting_data['fighter1_best_closing_odds'] < backtesting_data['fighter2_best_closing_odds']) & (backtesting_data['outcome'] == 'W/L')) |
-    ((backtesting_data['fighter1_best_closing_odds'] > backtesting_data['fighter2_best_closing_odds']) & (backtesting_data['outcome'] == 'L/W')),
+    ((backtesting_data['fighter1_backtesting_odds'] < backtesting_data['fighter2_backtesting_odds']) & (backtesting_data['outcome'] == 'W/L')) |
+    ((backtesting_data['fighter1_backtesting_odds'] > backtesting_data['fighter2_backtesting_odds']) & (backtesting_data['outcome'] == 'L/W')),
     "Favourite win",
     np.where(~backtesting_data['outcome'].isin(['W/L', 'L/W']),
              "Other",

@@ -88,7 +88,7 @@ def add_fighter_differentials(df):
                                 index = merged_data.index)
 
     # Remove differential columns that might not be correct or not needed
-    diff_columns = diff_columns[[col for col in diff_columns.columns if col not in ['diff_weight', 'diff_open_odds', 'diff_best_closing_odds']]]
+    diff_columns = diff_columns[[col for col in diff_columns.columns if col not in ['diff_weight', 'diff_open_odds', 'diff_best_closing_odds', 'diff_mean_closing_odds']]]
     try:
         diff_ratio_columns.drop(columns = ['diff_ratio_weight'], inplace = True)
     except:

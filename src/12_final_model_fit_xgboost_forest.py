@@ -30,7 +30,7 @@ data = standard_data_filter(data)
 # Don't need to select columns now. The train function takes the feature selection as an input
 
 # # Only select the columns needed for training and the test train split
-# data = data[[col for col in data.columns if col in final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds']]]
+# data = data[[col for col in data.columns if col in final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds']]]
 
 
 ##########################################################################################

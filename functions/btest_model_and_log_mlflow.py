@@ -42,7 +42,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
     mlflow.set_tag("mlflow.note.content", mlflow_description)
 
     # Log the overall metrics in MLflow
-    log_metrics_mlflow(prediction_probabilities, actuals_data['target'], actuals_data['fighter1_best_closing_odds'], actuals_data['fighter2_best_closing_odds'], classes = np.array([0, 1, 2]))
+    log_metrics_mlflow(prediction_probabilities, actuals_data['target'], actuals_data['fighter1_backtesting_odds'], actuals_data['fighter2_backtesting_odds'], classes = np.array([0, 1, 2]))
     
     # Log the overall odds metrics in MLflow
     log_metrics_odds_mlflow(actuals_data, actuals_data['target'])
@@ -78,7 +78,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
             # Use try except in case sample sizes too small
             try:
                 # Calculate the metrics
-                metrics = calculate_metrics(prediction_probabilities[row_filter], actuals_data['target'][row_filter], actuals_data['fighter1_best_closing_odds'][row_filter], actuals_data['fighter1_best_closing_odds'][row_filter])
+                metrics = calculate_metrics(prediction_probabilities[row_filter], actuals_data['target'][row_filter], actuals_data['fighter1_backtesting_odds'][row_filter], actuals_data['fighter1_backtesting_odds'][row_filter])
                 
                 # Add odds metrics
                 metrics.update(calculate_metrics_odds(actuals_data[row_filter], actuals_data['target'][row_filter]))

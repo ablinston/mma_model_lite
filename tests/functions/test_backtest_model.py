@@ -8,8 +8,8 @@ def test_backtest_model():
         'fighter1': ['A', 'B', 'C'],
         'fighter2': ['D', 'E', 'F'],
         'outcome': ['W/L', 'L/W', 'W/L'],
-        'fighter1_best_closing_odds': [2.0, 3.0, 5],
-        'fighter2_best_closing_odds': [1.5, 1.3, 1.1],
+        'fighter1_backtesting_odds': [2.0, 3.0, 5],
+        'fighter2_backtesting_odds': [1.5, 1.3, 1.1],
     })
 
     # Scenario 1: Perfect predictions

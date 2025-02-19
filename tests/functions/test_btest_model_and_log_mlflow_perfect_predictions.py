@@ -21,8 +21,8 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
         'outcome': ['L/W', 'L/W', 'W/L', 'L/W', 'W/L', 'W/L', 'OTH'],
         'date': pd.to_datetime(['2024-01-01'] * 7),
         'weightclass': ['light', 'heavy', 'light', 'heavy', 'light', 'heavy', 'middle'],
-        'fighter1_best_closing_odds': [9e99, 9e99, 1.0000000001, 9e99, 1.0000000001, 1.0000000001, 9e99],
-        'fighter2_best_closing_odds': [1.0000000001, 1.0000000001, 9e99, 1.0000000001, 9e99, 9e99, 9e99], 
+        'fighter1_backtesting_odds': [9e99, 9e99, 1.0000000001, 9e99, 1.0000000001, 1.0000000001, 9e99],
+        'fighter2_backtesting_odds': [1.0000000001, 1.0000000001, 9e99, 1.0000000001, 9e99, 9e99, 9e99], 
         'fighter1': ['A'] * 7,
         'fighter2': ['B'] * 7,
     })

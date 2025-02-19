@@ -5,7 +5,7 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     # pdb.set_trace()    
 
     # First get the predictions from the ensemble
-    y_pred_prob = odds_to_probabilities(X_test['fighter1_best_closing_odds'], X_test['fighter2_best_closing_odds'])
+    y_pred_prob = odds_to_probabilities(X_test['fighter1_backtesting_odds'], X_test['fighter2_backtesting_odds'])
 
     # # Fill in nas
     # y_pred_prob['L/W'] = y_pred_prob['L/W'].fillna(0.499)
@@ -50,8 +50,8 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     ev_mse = ev_loss_function(
         y_pred_prob,
         y_test,
-        X_test['fighter1_best_closing_odds'], 
-        X_test['fighter2_best_closing_odds'],
+        X_test['fighter1_backtesting_odds'], 
+        X_test['fighter2_backtesting_odds'],
         return_loss = True,
         input_probs = True)
 

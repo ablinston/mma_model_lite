@@ -684,6 +684,11 @@ merged_data['womens'] = np.where(merged_data['weightclass'].apply(lambda x: np.w
 # Add the matchup
 merged_data['matchup'] = merged_data['fighter1_fighter_type'] + '-vs-' + merged_data['fighter2_fighter_type']
 
+# Add what odds are to be used in model training and backtesting
+merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()
+merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper_params['odds_to_use']].copy()
+
+
 ###########################################################################################
 # OUTPUT DATA
 

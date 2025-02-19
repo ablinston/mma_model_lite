@@ -1,6 +1,6 @@
 # This function takes a dataset of actuals and prediction probabilities (which must correspond in rows to each other)
 # It returns a data frame with added columns for the EVs of each bet and bet sizing
-def summarise_model_preductions(actuals_data_df, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, return_triggers = False):
+def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, return_triggers = False):
 
     
     # ###
@@ -20,8 +20,8 @@ def summarise_model_preductions(actuals_data_df, prediction_probabilities, min_p
 
     # First calculate the Expected Values on a W/L result and L/W result, given in betting units
     # Odds are decimal odds, so represent the payout for a 1 unit bet e.g. odds of 2 means a (2 - 1) = 1 profit.
-    ev_wl = (actuals_data['fighter1_best_closing_odds'] - 1) * prediction_probabilities[:, 2] - (1 - prediction_probabilities[:, 2])
-    ev_lw = (actuals_data['fighter2_best_closing_odds'] - 1) * prediction_probabilities[:, 0] - (1 - prediction_probabilities[:, 0])
+    ev_wl = (actuals_data['fighter1_backtesting_odds'] - 1) * prediction_probabilities[:, 2] - (1 - prediction_probabilities[:, 2])
+    ev_lw = (actuals_data['fighter2_backtesting_odds'] - 1) * prediction_probabilities[:, 0] - (1 - prediction_probabilities[:, 0])
     
     # Now calculate bet triggers as 0 or 1 indicators
     ev_wl_trigger = ev_wl > min_ev_to_bet
@@ -54,7 +54,7 @@ def summarise_model_preductions(actuals_data_df, prediction_probabilities, min_p
     
     # First get the probabilities of winning and odds, irrespective of fighter to win
     win_prob = wl_trigger * prediction_probabilities[:, 2] + lw_trigger * prediction_probabilities[:, 0]
-    win_odds = wl_trigger * actuals_data['fighter1_best_closing_odds'] + lw_trigger * actuals_data['fighter2_best_closing_odds']
+    win_odds = wl_trigger * actuals_data['fighter1_backtesting_odds'] + lw_trigger * actuals_data['fighter2_backtesting_odds']
     
     # Now calculate the kelly criterion
     actuals_data['kelly_criterion'] = win_prob - (1 - win_prob) / (win_odds - 1)
@@ -75,9 +75,9 @@ def summarise_model_preductions(actuals_data_df, prediction_probabilities, min_p
     actuals_data['Fighter2_win_prob'] = np.round(prediction_probabilities[:, 0] * 100, 1)
     actuals_data['Fighter2_win_EV'] = np.round(ev_lw, 2)
     actuals_data['Bet_trigger'] = np.where(wl_trigger == 1, actuals_data['fighter1'], np.where(lw_trigger == 1, actuals_data['fighter2'], 'None'))
-    actuals_data['Predict_to_win'] = np.where((actuals_data['Fighter1_win_prob'] > actuals_data['Fighter2_win_prob']) & (actuals_data['fighter1_best_closing_odds'] > actuals_data['fighter2_best_closing_odds']), 
+    actuals_data['Predict_to_win'] = np.where((actuals_data['Fighter1_win_prob'] > actuals_data['Fighter2_win_prob']) & (actuals_data['fighter1_backtesting_odds'] > actuals_data['fighter2_backtesting_odds']), 
                                               'Underdog to win',
-                                             np.where((actuals_data['Fighter2_win_prob'] > actuals_data['Fighter1_win_prob']) & (actuals_data['fighter2_best_closing_odds'] > actuals_data['fighter1_best_closing_odds']),
+                                             np.where((actuals_data['Fighter2_win_prob'] > actuals_data['Fighter1_win_prob']) & (actuals_data['fighter2_backtesting_odds'] > actuals_data['fighter1_backtesting_odds']),
                                              'Underdog to win',
                                              'Favourite to win'))
     

@@ -35,15 +35,15 @@ target = 'outcome'
 
 # Switch fighers if necessary
 if model_hyper_params['switch_fighters_with_odds'] == True:
-    data = switch_fighter1_fighter2(data, data['fighter1_best_closing_odds'] > data['fighter2_best_closing_odds'])
+    data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
 if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
     np.random.seed(seed = config['seed_all'] + 98451)
     data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
 
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
-# Now remove any columns that aren't wanted in a training dataset
-X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'])
+# Now remove any columns that aren't wanted in a training dataset. At this point we don't remove non-true odds in order to see the rank in feature importance
+X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False)
 
 # Check data types
 data.dtypes.value_counts()
@@ -92,8 +92,8 @@ params = {
 train = xgb.DMatrix(X_train, label = y_train)
 
 # Add the odds in case we're using custom loss
-# train.set_info(fighter1_best_closing_odds=X_train['fighter1_best_closing_odds'].values,
-#                fighter2_best_closing_odds=X_train['fighter2_best_closing_odds'].values)
+# train.set_info(fighter1_backtesting_odds=X_train['fighter1_backtesting_odds'].values,
+#                fighter2_backtesting_odds=X_train['fighter2_backtesting_odds'].values)
 
 
 with mlflow.start_run():
@@ -106,7 +106,7 @@ with mlflow.start_run():
     if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
     
         # Pass the odds to the loss function
-        custom_loss = create_custom_loss(X_train['fighter1_best_closing_odds'].values, X_train['fighter2_best_closing_odds'].values)
+        custom_loss = create_custom_loss(X_train['fighter1_backtesting_odds'].values, X_train['fighter2_backtesting_odds'].values)
         # Train the model
         rf_model = xgb.train(params, train, obj = custom_loss)
         

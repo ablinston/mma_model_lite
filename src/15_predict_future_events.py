@@ -81,7 +81,7 @@ X_upcoming, temp1, temp6, temp2, temp3, temp4, temp5 = prep_data_for_model_train
 prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
 
 # Summarise the model predictions and betting decisions using the config
-betting_data = summarise_model_preductions(
+betting_data = summarise_model_predictions(
     actuals_data_df = upcoming_fights, 
     prediction_probabilities = prediction_probabilities, 
     min_prob_to_bet = bet_config['min_prob_to_bet'], 
@@ -95,16 +95,16 @@ if bet_config['constant_bets'] == False:
 else:
     betting_data['Final_bet'] = betting_data['bets'] * betting_data['bet_size']
 
-betting_data['Potential_win'] = betting_data['bets'] * betting_data['Final_bet'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_best_closing_odds'] - 1, betting_data['fighter2_best_closing_odds'] - 1)
+betting_data['Potential_win'] = betting_data['bets'] * betting_data['Final_bet'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'] - 1, betting_data['fighter2_backtesting_odds'] - 1)
 
-summary_data = betting_data[['date', 'event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Fighter1_win_prob', 'Fighter2_win_prob', 'Fighter1_win_EV', 'Fighter2_win_EV', 'Bet_trigger', 'Final_bet', 'Potential_win']]
+summary_data = betting_data[['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Fighter1_win_prob', 'Fighter2_win_prob', 'Fighter1_win_EV', 'Fighter2_win_EV', 'Bet_trigger', 'Final_bet', 'Potential_win']]
 
 print(
       summary_data
 )
 
 print(
-      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['date', 'event', 'fighter1', 'fighter2', 'fighter1_best_closing_odds', 'fighter2_best_closing_odds', 'Bet_trigger', 'Final_bet', 'Potential_win']]
+      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Bet_trigger', 'Final_bet', 'Potential_win']]
 )
 
 # Output the results

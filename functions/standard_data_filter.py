@@ -9,7 +9,7 @@ def standard_data_filter(df, include_upcoming = False):
                      (df['fighter2_hist_fights'] > 2)]
     
     # Remove any data were odds are missing
-    filtered_df = filtered_df[(~filtered_df['fighter1_best_closing_odds'].isna()) & (~filtered_df['fighter2_best_closing_odds'].isna())]
+    filtered_df = filtered_df[(~filtered_df['fighter1_mean_closing_odds'].isna()) & (~filtered_df['fighter2_mean_closing_odds'].isna())]
     
     if not include_upcoming:
         filtered_df = filtered_df[(~filtered_df['outcome'].isna())]

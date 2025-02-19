@@ -30,7 +30,7 @@ data = standard_data_filter(data)
 
 # Switch fighers if necessary
 if model_hyper_params['switch_fighters_with_odds'] == True:
-    data = switch_fighter1_fighter2(data, data['fighter1_best_closing_odds'] > data['fighter2_best_closing_odds'])
+    data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
 if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
     np.random.seed(seed = config['seed_all'] + 98451)
     data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
@@ -67,12 +67,18 @@ columns_in_order = [col for col in columns_in_order if not ('_last_' in col and 
 
 # Add on the split indicator if needed
 if split_or_other_exclude == True:
-    columns_in_order = columns_in_order + ['split_dec_or_other']
-    
+    columns_in_order = columns_in_order + ['split_dec_or_other', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds']
+
+# Add on the odds needed for custom loss and backtesting
+columns_in_order += ['fighter1_backtesting_odds', 'fighter2_backtesting_odds']
+
+# Remove any duplicates
+columns_in_order = list(set(columns_in_order))
+
 X_train_master = X_train_master[columns_in_order]
 
 # Now remove any columns that aren't wanted in a training dataset
-X_train_master = standard_feature_removal(X_train_master, differentials_only = model_hyper_params['differential_features_only'])
+X_train_master = standard_feature_removal(X_train_master, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = model_hyper_params['true_odds_only'])
 
 # Create the empty training data for the inner optimisations
 X_train = None

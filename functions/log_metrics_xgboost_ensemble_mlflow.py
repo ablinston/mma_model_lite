@@ -35,8 +35,8 @@ def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df):
     ev_mse = ev_loss_function(
         y_pred_prob,
         y_test_fold,
-        X_test_df['fighter1_best_closing_odds'],
-        X_test_df['fighter2_best_closing_odds'],
+        X_test_df['fighter1_backtesting_odds'],
+        X_test_df['fighter2_backtesting_odds'],
         return_loss = True,
         input_probs = True)
 

@@ -42,8 +42,8 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
     X['id'] = X.index.copy()
     
     # Calculate new odds columns to be removed later
-    X['train_fighter1_odds'] = X['fighter1_best_closing_odds'].to_numpy() # avoids pandas thinking they're the same column
-    X['train_fighter2_odds'] = X['fighter2_best_closing_odds'].to_numpy()
+    X['train_fighter1_odds'] = X['fighter1_backtesting_odds'].to_numpy() # avoids pandas thinking they're the same column
+    X['train_fighter2_odds'] = X['fighter2_backtesting_odds'].to_numpy()
 
     models = []
     for i in range(num_models):
@@ -88,8 +88,9 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         test_fighter2_odds = X_val['train_fighter2_odds'].to_numpy()
 
         # Drop the ID column
-        X_train_df.drop(['id', 'train_fighter1_odds', 'train_fighter2_odds'], axis = 1, inplace = True)
-        X_val.drop(['id', 'train_fighter1_odds', 'train_fighter2_odds'], axis = 1, inplace = True)
+        cols_to_drop = [col for col in X_train_df.columns if 'train_fighter' in col or 'backtesting' in col or col == 'id']
+        X_train_df.drop(cols_to_drop, axis = 1, inplace = True)
+        X_val.drop(cols_to_drop, axis = 1, inplace = True)
         
         # Create the DMatrix for XGBoost with the bootstrap sample for training and the full remaining data for validation
         dmatrix_train = xgb.DMatrix(X_train_df, label=y_train_df)

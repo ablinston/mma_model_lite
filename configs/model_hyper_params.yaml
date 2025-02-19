@@ -16,3 +16,6 @@ add_noise_to_odds: True
 
 # Set whether to use only the true odds in modelling or if we should use underlying odds too
 true_odds_only: True
+
+# Set whether to use the mean_closing_odds or best_closing_odds
+odds_to_use: mean_closing_odds

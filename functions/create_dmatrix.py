@@ -32,8 +32,9 @@ def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False,
     test_fighter2_odds = X_train.iloc[test_idx]['fighter2_odds_for_loss']
 
     # Remove odds used for loss from training and test X data
-    filtered_X_train.drop(['fighter1_odds_for_loss', 'fighter2_odds_for_loss'], axis = 1, inplace = True)
-    X_test = X_train.copy().iloc[test_idx].drop(['fighter1_odds_for_loss', 'fighter2_odds_for_loss'], axis = 1)
+    cols_to_remove = [col for col in X_train.columns if 'for_loss' in col or 'backtesting' in col]
+    filtered_X_train.drop(cols_to_remove, axis = 1, inplace = True)
+    X_test = X_train.copy().iloc[test_idx].drop(cols_to_remove, axis = 1)
 
     # Check if empty
     if len(filtered_X_train) == 0:
