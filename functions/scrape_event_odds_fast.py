@@ -77,7 +77,7 @@ def scrape_event_odds_fast(
             df = pd.DataFrame(data, columns = columns)
             
             # Remove prop bet columns
-            exclude_strings = ['distance', ' is ', 'Fight', ' other ', ' round ', ' rounds', 'wins by ', 'has more ', 'by decision', ' has ', ' points ', 'FOTN', 'scorecard']
+            exclude_strings = ['distance', ' is ', 'Fight', ' other ', ' round ', ' rounds', 'wins by ', 'has more ', 'by decision', ' has ', ' points ', 'FOTN', 'scorecard', 'awarded', 'wins', 'bleed', 'does not']
             df = df[~df['fighter'].str.contains('|'.join(exclude_strings), na=False, case=False)]
                         
             # Drop any columns not recognised

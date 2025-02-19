@@ -19,7 +19,8 @@ def scrape_fighter_odds_fast(
     # pdb.set_trace()
     
     if fast:
-        time.sleep(random.uniform(1, 3))  # Sleep for a random amount of time between requests to avoid being detected
+        # time.sleep(random.uniform(1, 3))  # Sleep for a random amount of time between requests to avoid being detected
+        pass
     
     try:
                 

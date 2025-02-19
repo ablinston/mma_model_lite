@@ -86,7 +86,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_custom_loss_feature_opt4')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v1')
 
 
 ##########################################################################################
@@ -111,7 +111,7 @@ params_inner = {
      'max_depth': hp.quniform('max_depth', 3, 12, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
-     # 'eval_metric': 'mlogloss',       # Evaluation metric
+     'eval_metric': 'mlogloss',       # Evaluation metric
      'tree_method': 'hist',      # Use GPU accelerated algorithm
      'device': 'cuda',           # Use CUDA / GPU
      'predictor': 'gpu_predictor',   # Use GPU for prediction
