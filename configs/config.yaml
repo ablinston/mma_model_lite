@@ -176,7 +176,7 @@ test_proportion: 0.2
 
 # Set the cut off dates for the training data
 min_training_date: '2014-01-01'
-oot_start_date: '2024-01-01'
+oot_start_date: '2024-02-19'
 
 
 # Set the starting ELO for each fighter
