@@ -1,21 +1,22 @@
 # This function takes existing odds data and a list of fighters and adds the new fights to the data. 
 # It requires a list of dates for the events as well as the list of fighters that fought.
 
-def update_fighter_odds_data(existing_odds_data, new_fighter_list, new_event_date_list, config, num_threads = 1):
+def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odds, new_fighter_list, new_event_date_list, config, num_threads = 1):
 
-    # pdb.set_trace()    
+    # pdb.set_trace()
     
     # Read the fighter odds urls
     fighter_odds_urls = pd.read_csv(config['fighter_odds_urls'])
 
     # Scrape all the odds data for the fighters in the list
-    new_odds_data = parallel_scrape_odds_fast(
+    new_odds_data, new_events_urls = parallel_scrape_odds_fast(
         new_fighter_list, 
         num_threads = config['num_threads'], 
         firefox_location = config['firefox_location'], 
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
-        odds_urls_overide_df = fighter_odds_urls)
-    
+        gecko_driver = config['gecko_driver_location'],
+        odds_urls_overide_df = fighter_odds_urls,
+        event_urls = True)
+        
     # Get the date list and expand it to include dates on either side due to timezone differences potentially causing discrepencies
     full_date_list = list(new_event_date_list.copy())
     for date in new_event_date_list:
@@ -53,5 +54,27 @@ def update_fighter_odds_data(existing_odds_data, new_fighter_list, new_event_dat
 
     print(f"Rows with NaT in 'date' and 'event' containing 'UFC': {ufc_nat_count} ({ufc_nat_percent:.2f}%)")
     print(f"Rows with NaT in 'date' and 'event' not containing 'UFC': {non_ufc_nat_count} ({non_ufc_nat_percent:.2f}%)")
+    
+    ###############################
+    ### Update events data
+    ###############################
+    
+    # Get a list of events that haven't already been parsed
+    new_events_to_scrape = new_events_urls[(~new_events_urls['event_url'].isin(existing_event_urls['event_url'].tolist())) | (new_events_urls['event_date'] >= date.today())]
         
-    return new_odds_data
+    # Scrape the new event odds
+    new_events_odds = parallel_scrape_event_odds_fast(
+        new_events_to_scrape, 
+        num_threads = config['num_threads'], 
+        firefox_location = config['firefox_location'], 
+        gecko_driver = config['gecko_driver_location'],
+        fast = True)
+    
+    # Concat and replace duplicates
+    final_event_urls = pd.concat([new_events_to_scrape, existing_event_urls]).drop_duplicates()
+    final_event_odds = pd.concat([new_events_odds, existing_event_odds]).drop_duplicates(['date', 'fighter', 'opponent'], keep = 'first')
+    # Ensure format of final cols correct
+    final_event_odds.loc[:, odds_scrape_config['events_colnames']] = final_event_odds[odds_scrape_config['events_colnames']].apply(pd.to_numeric, errors = 'coerce')
+
+        
+    return new_odds_data, final_event_urls, final_event_odds

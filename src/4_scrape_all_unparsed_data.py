@@ -66,6 +66,8 @@ parsed_fight_details_df = fp.ParquetFile('./data/' + config['fight_details_file_
 parsed_fight_results_df = fp.ParquetFile('./data/' + config['fight_results_file_name']).to_pandas()
 parsed_fight_stats_df = fp.ParquetFile('./data/' + config['fight_stats_file_name']).to_pandas()
 parsed_odds_df = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_pandas()
+parsed_event_odds_urls = fp.ParquetFile('./data/event_odds_urls.parquet').to_pandas()
+parsed_event_odds_df = fp.ParquetFile('./data/' + config['event_odds_file_name']).to_pandas()
 
 if unparsed_events == True:
     
@@ -122,10 +124,16 @@ list_of_unparsed_event_dates = list_of_unparsed_event_dates + upcoming_events_df
 # Convert the dates
 list_of_unparsed_event_dates = [datetime.strptime(x, '%B %d, %Y') for x in list_of_unparsed_event_dates]
 
-new_parsed_odds_df = update_fighter_odds_data(parsed_odds_df, list_of_unparsed_fighter_odds, list_of_unparsed_event_dates, config, num_threads = config['num_threads'])
+new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = update_odds_data(
+    parsed_odds_df, 
+    parsed_event_odds_urls, 
+    parsed_event_odds_df,
+    list_of_unparsed_fighter_odds, 
+    list_of_unparsed_event_dates, 
+    config, 
+    num_threads = config['num_threads'])
     
-    
-        
+
 
 
 ###############################################################################
@@ -183,6 +191,7 @@ if unparsed_events:
         new_parsed_odds_df,
         all_fighter_details_df,
         new_parsed_fighter_tott_df,
+        new_parsed_event_odds_df,
         config)
     
     # Check new rows have been added
@@ -192,7 +201,8 @@ if unparsed_events:
                 len(new_parsed_fight_results_df) >= len(parsed_fight_results_df)) & (
                     len(new_parsed_fight_stats_df) >= len(parsed_fight_stats_df)) & (
                         len(new_parsed_odds_df) >= len(parsed_odds_df)) & (
-                            len(new_parsed_fighter_tott_df) >= len(parsed_fighter_tott_df)),
+                            len(new_parsed_fighter_tott_df) >= len(parsed_fighter_tott_df)) & (
+                                len(new_parsed_event_odds_df) >= len(parsed_event_odds_df)),
                             'Row change checks')
     
     # AB: If the fighter_tott has missing info, just run the whole thing rather than update old one
@@ -206,7 +216,8 @@ if unparsed_events:
                 'updated_event_details_df': updated_event_details_df, 
                 'parsed_fight_details_df': new_parsed_fight_details_df, 
                 'parsed_fight_results_df': new_parsed_fight_results_df, 
-                'parsed_odds_df':new_parsed_odds_df, 
+                'parsed_odds_df': new_parsed_odds_df, 
+                'parsed_event_odds_df' : new_parsed_event_odds_df,
                 'parsed_fighter_tott_df': new_parsed_fighter_tott_df,
                 'parsed_fight_stats_df': new_parsed_fight_stats_df},
             summary_date = datetime.today(),
@@ -222,6 +233,8 @@ if unparsed_events:
         fp.write('./data/' + config['fight_results_file_name'], new_parsed_fight_results_df, compression = 'ZSTD')
         fp.write('./data/' + config['fight_stats_file_name'], new_parsed_fight_stats_df, compression = 'ZSTD')
         fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
+        fp.write('./data/event_odds_urls.parquet', new_parsed_event_odds_urls, compression = 'ZSTD')
+        fp.write('./data/' + config['event_odds_file_name'], new_parsed_event_odds_df, compression = 'ZSTD')
         fp.write('./data/' + config['fighter_details_file_name'], all_fighter_details_df, compression = 'ZSTD')
         fp.write('./data/' + config['fighter_tott_file_name'], new_parsed_fighter_tott_df, compression = 'ZSTD')
         
@@ -239,6 +252,7 @@ else:
         new_parsed_odds_df,
         all_fighter_details_df,
         parsed_fighter_tott_df,
+        new_parsed_event_odds_df,
         config)
         
     #######################
@@ -252,6 +266,8 @@ else:
         fp.write('./data/' + config['upcoming_fight_details_file_name'], upcoming_fight_details_df, compression = 'ZSTD')
 
         fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
+        fp.write('./data/event_odds_urls.parquet', new_parsed_event_odds_urls, compression = 'ZSTD')
+        fp.write('./data/' + config['event_odds_file_name'], new_parsed_event_odds_df, compression = 'ZSTD')
         
     else:
         print("Data checks not passed. Data not saved. See previous output messages for more information.")

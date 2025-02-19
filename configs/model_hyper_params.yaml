@@ -13,3 +13,6 @@ loss_function: ev_loss_function
 
 # Set whether to add some random noise to the odds as part of the XGB forest. This will be based on a fixed distribution
 add_noise_to_odds: True
+
+# Set whether to use only the true odds in modelling or if we should use underlying odds too
+true_odds_only: True

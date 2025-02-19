@@ -16,8 +16,10 @@ fight_results = fp.ParquetFile('./data/' + config['fight_results_file_name'].rep
 upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+event_odds = fp.ParquetFile('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 
-
+# Read in the average odds model
+average_odds_model = joblib.load('./results/average_odds_model.joblib')
 
 ###########################################################################################
 # UPCOMING
@@ -427,10 +429,11 @@ stop_if_not(fight_results['fight_elevation'].isna().sum() == 0, "Event elevation
 ###########################################################################################
 # FIGHT ODDS PROCESSING
 
-# Fix the events and bouts using data including upcoming events
+# Fix the events and bouts using data including upcoming events. Doing this again after done in cleaning because events and stats been edited
 fight_odds = add_event_and_bout_to_odds_data(fight_odds, events, fight_stats)
+event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
 
-fight_odds = process_odds_data(fight_odds)
+fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, average_odds_model)
 
 
 ###########################################################################################
@@ -490,7 +493,7 @@ duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 # FURTHER FEATURE PROCESSING
 
 # Change odds into true odds
-merged_data[['fighter1_true_closing_odds', 'fighter2_true_closing_odds']] = calculate_true_odds(merged_data, 'fighter1_best_closing_odds', 'fighter2_best_closing_odds')
+merged_data[['fighter1_true_closing_odds', 'fighter2_true_closing_odds']] = calculate_true_odds(merged_data, 'fighter1_mean_closing_odds', 'fighter2_mean_closing_odds')
 merged_data[['fighter1_true_open_odds', 'fighter2_true_open_odds']] = calculate_true_odds(merged_data, 'fighter1_open_odds', 'fighter2_open_odds')
 
 # Recalculate change

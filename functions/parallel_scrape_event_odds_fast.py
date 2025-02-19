@@ -6,7 +6,7 @@ def parallel_scrape_event_odds_fast(
         config = [],
         num_threads = 1, 
         firefox_location = '', 
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+        gecko_driver = '',
         fast = True):
 
     

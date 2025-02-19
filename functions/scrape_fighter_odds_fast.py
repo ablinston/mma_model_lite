@@ -10,11 +10,11 @@ def scrape_fighter_odds_fast(
         fighter_name, 
         cookies_dict, 
         odds_urls_overide_df,
-        event_urls_only = False,
+        event_urls = False,
         fast = True,
         playwright = False,
-        firefox_binary = 'C:/Program Files/Mozilla Firefox/firefox.exe', 
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe'):
+        firefox_binary = '', 
+        gecko_driver = ''):
 
     # pdb.set_trace()
     
@@ -88,25 +88,30 @@ def scrape_fighter_odds_fast(
             browser.close()
             
         # pdb.set_trace()
+                    
+        # Find the table in the soup object
+        table = soup.find('table')
+
+        # Convert the table to a data frame and add the rows to the results
+        odds_df = betfightodds_table_to_df(table, fighter_name)
         
         # See if we want to return odds data or event urls
-        if event_urls_only:
+        if event_urls:
             # Collect the event urls
             # Extract all event URLs and their corresponding dates efficiently
             events = [(a['href'], a.next_sibling.strip()) for a in soup.select('a[href^="/events/"]') if a.next_sibling]
             
             # Convert to DataFrame
-            odds_df = pd.DataFrame(events, columns=['event_url', 'event_date'])
-
+            events_df = pd.DataFrame(events, columns=['event_url', 'event_date'])
+            
+            # Convert date
+            events_df['event_date'] = betfightodds_dates_to_datetime(events_df['event_date'])
+            
         else:
-            # Find the table in the soup object
-            table = soup.find('table')
-    
-            # Convert the table to a data frame and add the rows to the results
-            odds_df = betfightodds_table_to_df(table, fighter_name)
+            events_df = pd.DataFrame()
     
     except Exception as e:
         print(f"Error scraping {fighter_name}: {e}")
         return pd.DataFrame()
 
-    return odds_df
+    return odds_df, events_df

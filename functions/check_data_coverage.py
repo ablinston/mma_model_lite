@@ -3,7 +3,7 @@
 
 # It returns a data frame detailing the checks done and whether they passed (True) or not (False)
 
-def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fight_stats_df, fight_odds_df, fighter_details_df, fighter_tott_df, config):
+def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fight_stats_df, fight_odds_df, fighter_details_df, fighter_tott_df, event_odds_df, config):
     
     # # Debug
     # event_details = parsed_event_details_df.copy()
@@ -27,19 +27,24 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     fighter_tott = fighter_tott_df.copy()
 
     # Change the column names to lower
-    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott]:
+    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds_df]:
         df.columns = df.columns.str.lower()
                 
     # Add event and bout data onto odds
     fight_odds = add_event_and_bout_to_odds_data(fight_odds, event_details, fight_stats)
+    event_odds = add_event_and_bout_to_odds_data(event_odds_df, event_details, fight_stats, date_check = '2018-01-01')
         
     # Clean all the columns that we wish to use
-    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott]:
+    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds]:
         for col in ['event', 'bout', 'fighter']:
             try:
                 df[[col]] = clean_text_columns(df[[col]])
             except:
                 continue
+            
+    # Process the odds data to combine events
+    fight_odds.loc[:, ['open_odds', 'closing_odds_low', 'closing_odds_high']] = fight_odds[['open_odds', 'closing_odds_low', 'closing_odds_high']].apply(pd.to_numeric, errors = 'coerce')
+    fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, impute_missing_averages = False)
     
     ## The events data is the first updated, so is assumed to be complete
     # Check that all the events have some fight details in the data
@@ -104,6 +109,14 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     if (len(missing_bouts_from_odds) > 0):
         print(f"Warning: {len(missing_bouts_from_odds)} UFC bouts out of {len(all_bouts)} are missing from the odds data.")
         # all_checks_passed = False # Not setting to false because some bouts have no odds data because the fighters names are wrong. See UFC 298 for e.g.
+        
+    # Find which recent events have missing average odds data
+    recent_events = event_details['event'][event_details['date'] > '2024-01-01']
+    
+    # Find which events are missing mean closing odds
+    missing_events_average_odds = recent_events[~recent_events.isin(fight_odds[~fight_odds['mean_closing_odds'].isna()]['event'])].tolist()
+    if (len(missing_events_average_odds) > 0):
+        print(f"Warning: The following events are missing from the event odds data: {missing_events_average_odds}")
         
     # Find which fighters appear most in missed bouts
     # Split each element into two lists

@@ -175,8 +175,8 @@ fighter_odds = add_event_and_bout_to_odds_data(fighter_odds, events, fight_stats
 
 event_odds_cols = odds_scrape_config['events_colnames']
 
-# Convert odds to numeric
-event_odds[event_odds_cols] = event_odds[event_odds_cols].apply(pd.to_numeric, errors = 'coerce')
+# # Convert odds to numeric
+# event_odds[event_odds_cols] = event_odds[event_odds_cols].apply(pd.to_numeric, errors = 'coerce')
 
 # Add event and bout to the data
 event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')

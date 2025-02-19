@@ -6,9 +6,9 @@ def parallel_scrape_odds_fast(
         config = [],
         num_threads = 1, 
         firefox_location = '', 
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+        gecko_driver = '',
         odds_urls_overide_df = None,
-        event_urls_only = False,
+        event_urls = False,
         fast = True,
         playwright = False):
 
@@ -17,7 +17,8 @@ def parallel_scrape_odds_fast(
     total_fighters = len(fighter_list)
     completed_count = 0
 
-    scrape_results = []
+    odds_scrape_results = []
+    event_scrape_results = []
             
     # If fast, we will use response.get. There is selenium code in here as well from old runs that still works
     if fast:
@@ -46,7 +47,7 @@ def parallel_scrape_odds_fast(
             scrape_fighter_odds_fast,
             cookies_dict = cookies_dict,
             odds_urls_overide_df = odds_urls_overide_df,
-            event_urls_only = event_urls_only,
+            event_urls = event_urls,
             playwright = playwright,
             fast = fast,
             firefox_binary = firefox_location,
@@ -59,10 +60,12 @@ def parallel_scrape_odds_fast(
             # Collect results as they complete
             for future in as_completed(future_to_url):
                 try:
-                    result = future.result()
-                    scrape_results.append(result)  # Collect the result (url, title)
+                    odds_result, events_result = future.result()
+                    odds_scrape_results.append(odds_result)  # Collect the result (url, title)
+                    event_scrape_results.append(events_result)  # Collect the result (url, title)
+                    
                 except Exception as e:
-                    print(f"Error for fighter {fighter}: {e}")
+                    print(f"Error for fighter {future}: {e}")
     
                 # Increment the completed count
                 completed_count += 1
@@ -79,7 +82,7 @@ def parallel_scrape_odds_fast(
             scrape_fighter_odds_fast,
             cookies_dict = {}, # only needed for fast run
             odds_urls_overide_df = odds_urls_overide_df,
-            event_urls_only = event_urls_only,
+            event_urls = event_urls,
             fast = False,
             playwright = playwright
         )
@@ -93,7 +96,9 @@ def parallel_scrape_odds_fast(
             scrape_results = []
             for future in as_completed(futures):
                 try:
-                    scrape_results.append(future.result())  # Get the result as soon as it's ready
+                    odds_result, events_result = future.result()
+                    odds_scrape_results.append(odds_result)  # Collect the result (url, title)
+                    events_scrape_results.append(events_result)  # Collect the result (url, title)
                 except Exception as e:
                     print(f"Error scraping {futures[future]}: {e}")  # Handle failures
                     
@@ -101,7 +106,14 @@ def parallel_scrape_odds_fast(
                 completed_count += 1
                 print(f"Completed {completed_count} out of {total_fighters} tasks")
 
+    # pdb.set_trace()    
     
-
     # Combine the results
-    return pd.concat(scrape_results)
+    if event_urls:
+        
+        # Get rid of duplicate events and keep the most common date for the event
+        event_urls_odds_agg = pd.concat(event_scrape_results).groupby('event_url', as_index=False)['event_date'].apply(lambda x: x.mode().iloc[0])
+        
+        return pd.concat(odds_scrape_results), event_urls_odds_agg
+    else:
+        return pd.concat(odds_scrape_results)

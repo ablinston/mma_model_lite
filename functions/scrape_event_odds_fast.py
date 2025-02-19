@@ -94,6 +94,10 @@ def scrape_event_odds_fast(
             # Add on the date
             df['date'] = event_details[1]['event_date']
             
+            # Sort column formats
+            # df['date'] = betfightodds_dates_to_datetime(df['date']) #  Now set to date in events urls
+            df.loc[:, odds_scrape_config['events_colnames']] = df[odds_scrape_config['events_colnames']].apply(pd.to_numeric, errors = 'coerce')
+            
         else:
             print("Table not found")
             return pd.DataFrame()
