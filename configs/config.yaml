@@ -45,6 +45,11 @@ final_data_stats_log: ./data/final_data_stats_log.csv
 # Set the location of the fighter odds urls manual overide
 fighter_odds_urls: ./data/fighter_odds_urls.csv
 
+# Bayesian group by. This is what we group the Bayesian smooting of stats by
+bayesian_groupby: ['weightclass']
+bayesian_fightspan: 200
+
+
 # columns names for extracted details
 fight_details_column_names:
   - EVENT
@@ -191,14 +196,14 @@ fighter_type_thresholds:
   striker:
     hist_allrounds_sig.str._attempt: 20
   wrestler:
-    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_allrounds_ctrl_minutes_per_minute: 0.15 # 10 secs in 60 average ctrl time
   # submitter:
   #   hist_wins_Submission_per_fight: 0.1 # 1 in 10 fights won by submission or more
   wrestler-submitter:
-    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_allrounds_ctrl_minutes_per_minute: 0.15 # 10 secs in 60 average ctrl time
     hist_wins_Submission_per_fight: 0.1
   mma:
-    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_allrounds_ctrl_minutes_per_minute: 0.15 # 10 secs in 60 average ctrl time
     hist_wins_Submission_per_fight: 0.1
     hist_wins_KO/TKO_per_fight: 0.1 # has some knockout success
 

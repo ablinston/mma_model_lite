@@ -122,12 +122,24 @@ del fight_stats_against
 
 ###########################################################################################
 # Get the columns of stats
+
+# FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
+fight_stats_bayes_priors = bayesian_priors(
+    fight_stats.merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
+    id_cols = ['event', 'bout', 'fighter'], 
+    group_by = config['bayesian_groupby'], 
+    fight_span = config['bayesian_fightspan']
+)
+
+# Now aggrgate
 fight_stats_hist = aggregate_last_X_fight_data(
     fight_stats,
     ignore_cols = ['date', 'event', 'bout', 'fighter'],
     group_by = ['fighter'],
     prefix = "hist_",
-    X = 1000
+    X = 1000,
+    per_minute_calc = True, 
+    bayes_priors_df = fight_stats_bayes_priors
 ).drop(columns = ['date'])
 
 # Check that all first fights are 0 stats
@@ -141,8 +153,31 @@ else:
 del fight_stats_hist_check
 
 ###########################################################################################
+# ADJUSTED STATISTICS
+
+fight_stats_bayes = calculate_per_minute_bayesian_stats(fight_stats, fight_stats_bayes_priors, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute'])
+
+# Adding on adjusted stats to the fight stats
+fight_stats_plus_adj = add_adjusted_bayes_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'])
+
+# Replace the fight stats with one with the adj but remove all the extra bayes info (will be added by aggregation later)
+fight_stats = fight_stats_plus_adj[[col for col in fight_stats_plus_adj if 'bayes' not in col or ('bayes' in col and 'adj' in col)]]
+
+# Reaggregate the data
+fight_stats_hist_adj = aggregate_last_X_fight_data(
+    fight_stats,
+    ignore_cols = ['date', 'event', 'bout', 'fighter'],
+    group_by = ['fighter'],
+    prefix = "hist_",
+    X = 100,
+    per_minute_calc = True, 
+    bayes_priors_df = fight_stats_bayes_priors
+).drop(columns = ['date'])
+
+
+###########################################################################################
 # Calculate average fight length, win length and loss length
-fight_stats_hist['hist_fight_length_minutes_avg'] = np.where(fight_stats_hist['hist_fights'] == 0, np.nan, fight_stats_hist['hist_allrounds_fight_minutes'] / fight_stats_hist['hist_fights'])
+fight_stats_hist_adj['hist_fight_length_minutes_avg'] = np.where(fight_stats_hist_adj['hist_fights'] == 0, np.nan, fight_stats_hist_adj['hist_allrounds_fight_minutes'] / fight_stats_hist['hist_fights'])
 
 ###########################################################################################
 # Get the stats of the last 3 fights only
@@ -151,7 +186,9 @@ fight_stats_hist_last_3 = aggregate_last_X_fight_data(
     ignore_cols = ['date', 'event', 'bout', 'fighter'],
     group_by = ['fighter'],
     prefix = "hist_last_3_fights_",
-    X = 3
+    X = 3,
+    per_minute_calc = True, 
+    bayes_priors_df = fight_stats_bayes_priors
 ).drop(columns = ['date'])
 
 # Check that all first fights are NaN
@@ -193,23 +230,25 @@ fight_stats_hist_opponent_stance = aggregate_last_X_fight_data(
     ignore_cols = ['date', 'event', 'bout', 'fighter', 'opponent', 'opponent_stance'],
     group_by = ['fighter', 'opponent_stance'],
     prefix = 'hist_opp_stance_',
-    X = 1000
+    X = 1000,
+    per_minute_calc = True, 
+    bayes_priors_df = fight_stats_bayes_priors
 ).drop(columns = ['date', 'opponent', 'opponent_stance'])
 
 # Check the row numbers are correct
 stop_if_not(len(fight_stats) == len(fight_stats_hist_opponent_stance), "Opponent data length check")
 
 
+
+
+
+
 ###########################################################################################
 # Calculate per minute stats for the many hist datasets
 
-fight_stats_hist = calculate_per_minute_stats(fight_stats_hist)
-fight_stats_hist_opponent_stance = calculate_per_minute_stats(fight_stats_hist_opponent_stance)
-fight_stats_hist_last_3 = calculate_per_minute_stats(fight_stats_hist_last_3)
-
 # Check all the row numbers are correct
 stop_if_not(
-    len(fight_stats) == len(fight_stats_hist) == len(fight_stats_hist_opponent_stance) == len(fight_stats_hist_last_3),
+    len(fight_stats) == len(fight_stats_hist_adj) == len(fight_stats_hist_opponent_stance) == len(fight_stats_hist_last_3),
     "All hist stats data length check")
 
 
@@ -266,18 +305,18 @@ for n in list(range(1, 11)):
 # Get the fight stats of each fighter against only specific types of fighters
 
 # First define each fighter type
-fight_stats_hist['fighter_type'] = define_fighter_type(fight_stats_hist, fighter_results, config)
+fight_stats_hist_adj['fighter_type'] = define_fighter_type(fight_stats_hist_adj, fighter_results, config)
 
 # Add this fighter type to the stats data
-fight_stats['fighter_type'] = fight_stats.merge(fight_stats_hist[['event', 'bout', 'fighter', 'fighter_type']], on = ['event', 'bout', 'fighter'], how = 'left')['fighter_type']
+fight_stats['fighter_type'] = fight_stats.merge(fight_stats_hist_adj[['event', 'bout', 'fighter', 'fighter_type']], on = ['event', 'bout', 'fighter'], how = 'left')['fighter_type']
 
 # Now create a dataset with only opponents of that type
-types = fight_stats_hist['fighter_type'].str.replace(' ', '').unique().tolist()
+types = fight_stats_hist_adj['fighter_type'].str.replace(' ', '').unique().tolist()
 types = [type for type in types if type is not None]
 
 # Merge on opponent type
 fight_stats['opponent_type'] = fight_stats[['event', 'bout', 'opponent']].merge(
-    fight_stats_hist[['event', 'bout', 'fighter', 'fighter_type']], 
+    fight_stats_hist_adj[['event', 'bout', 'fighter', 'fighter_type']], 
     left_on = ['event', 'bout', 'opponent'], 
     right_on = ['event', 'bout', 'fighter'],
     how = 'left')['fighter_type']
@@ -288,14 +327,14 @@ fight_stats_hist_opponent_type = aggregate_last_X_fight_data(
     ignore_cols = ['date', 'event', 'bout', 'fighter', 'opponent', 'opponent_stance', 'fighter_type', 'opponent_type'],
     group_by = ['fighter', 'opponent_type'],
     prefix = 'hist_opp_type_',
-    X = 1000
+    X = 1000,
+    per_minute_calc = True, 
+    bayes_priors_df = fight_stats_bayes_priors
 ).drop(columns = ['date', 'opponent', 'opponent_stance', 'fighter_type', 'opponent_type'])
 
-# Add on the per minute stats
-fight_stats_hist_opponent_type = calculate_per_minute_stats(fight_stats_hist_opponent_type)
 
 # Check that we have the correct number of rows
-stop_if_not(len(fight_stats_hist_opponent_type) == len(fight_stats_hist), 'Opponent type row count check')
+stop_if_not(len(fight_stats_hist_opponent_type) == len(fight_stats_hist_adj), 'Opponent type row count check')
 
 # test = fight_stats_hist_opponent_type[fight_stats_hist_opponent_type['fighter']=='ConorMcGregor'][['bout', 'fighter', 'opponent', 'opponent_type', 'hist_opp_type_allrounds_fight_minutes']]
 
@@ -444,7 +483,7 @@ merged_data = merge_df_both_fighters(
     df_list = [
         fight_stats[['event', 'bout', 'fighter', 'date_last_fight']],
         dates_knocked_out,
-        fight_stats_hist,
+        fight_stats_hist_adj,
         fight_stats_hist_last_3,
         fight_stats_hist_opponent_stance,
         fight_stats_hist_opponent_type,
@@ -504,36 +543,7 @@ merged_data['fighter2_true_odds_change'] = merged_data['fighter2_true_closing_od
 ###########################################################################################
 # PERCENTAGE CALCULATIONS
 
-# Calculate percentages for those columns with attempts and lands
-percent_columns = [col for col in merged_data.columns if '_attempt' in col and 'per_minute' not in col]
-landed_columns = [col for col in merged_data.columns if '_landed' in col and 'per_minute' not in col]
-percent_columns.sort()
-landed_columns.sort()
-
-# Check we have all the corresponding columns
-if ([string.replace('_attempt', '') for string in percent_columns] == [string.replace('_landed', '') for string in landed_columns]):
-    print("Percent column correspodence check PASSED")
-else:
-    print("Percent column correspodence check FAILED")
-    raise SystemExit
-
-# Now calculate the percentages
-new_percent_cols = [col.replace('_attempt', '_accuracy_percent') for col in percent_columns]
-merged_data[landed_columns].index = merged_data[percent_columns].index
-
-# Shapes where strange so had to use numpy
-new_data = pd.DataFrame(safe_divide_np(merged_data[landed_columns].to_numpy(), merged_data[percent_columns].to_numpy(), zero_zero_fill = np.nan), columns = new_percent_cols)
-
-# Remove percentages for sample sizes below minimum thresholds, excluding takedowns
-percent_columns_no_td = [col for col in percent_columns if "_td_" not in col]
-new_percent_cols_no_td = [col for col in new_percent_cols if "_td_" not in col]
-new_data.reset_index(inplace = True)
-new_data[new_percent_cols_no_td] = np.where(merged_data[percent_columns_no_td] < config['min_attempts'], np.nan, new_data[new_percent_cols_no_td])
-
-# Combine with data
-merged_data = pd.concat([merged_data, new_data], axis = 1)
-
-del([new_data, percent_columns, landed_columns, new_percent_cols])
+merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors)
 
 
 ###########################################################################################

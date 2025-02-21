@@ -2,9 +2,11 @@
 
 # Can set some excluded strings to not include columns containing those phrases
 
-def calculate_per_minute_stats(fight_stats_hist, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio']):
+def calculate_per_minute_stats(fight_stats_hist, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'baye']):
 
     stats_df = fight_stats_hist.copy()
+    
+    # pdb.set_trace()
     
     # Go through each round's stats individually
     rounds = ['round1', 'round2', 'round3', 'round4', 'round5', 'allrounds']
@@ -12,6 +14,9 @@ def calculate_per_minute_stats(fight_stats_hist, excluded_strings = ['percent', 
     for round in rounds:
         # Get all round columns
         round_columns = [col for col in stats_df.columns if (round in col)]
+        
+        if len(round_columns) == 0:
+            continue
         
         # Get the prefix of the columns
         prefix = str(round_columns[0]).split(str(round))[0]
