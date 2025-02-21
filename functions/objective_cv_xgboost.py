@@ -116,15 +116,15 @@ def objective_cv_xgboost(
         log_losses.append(log_loss_fold)
         
         # Get the logit predictions for use in custom loss function
-        if model_hyper_params['loss_function'] == 'ev_loss_function':
-            ev_mse_fold = ev_loss_function(
-                y_pred_prob,
-                y_test_fold,
-                test_fighter1_odds,
-                test_fighter2_odds,
-                return_loss = True,
-                input_probs = True)
-            ev_mses.append(ev_mse_fold)
+        # if model_hyper_params['loss_function'] == 'ev_loss_function':
+        ev_mse_fold = ev_loss_function(
+            y_pred_prob,
+            y_test_fold,
+            test_fighter1_odds,
+            test_fighter2_odds,
+            return_loss = True,
+            input_probs = True)
+        ev_mses.append(ev_mse_fold)
 
         # Clean up memory
         del model, train_dmatrix, test_dmatrix, y_pred_prob, wl_auc, lw_auc, wl_accuracy, lw_accuracy, ev_mse_fold

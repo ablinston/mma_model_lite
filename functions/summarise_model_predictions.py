@@ -80,7 +80,8 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
                                              np.where((actuals_data['Fighter2_win_prob'] > actuals_data['Fighter1_win_prob']) & (actuals_data['fighter2_backtesting_odds'] > actuals_data['fighter1_backtesting_odds']),
                                              'Underdog to win',
                                              'Favourite to win'))
-    
+    actuals_data['Bet_breakeven_odds'] = np.where(wl_trigger == 1, 100 / actuals_data['Fighter1_win_prob'],
+                                                  np.where(lw_trigger == 1, 100 / actuals_data['Fighter2_win_prob'], np.nan))    # checked the maths and this is how it works out
     if return_triggers:
         return [actuals_data, wl_trigger, lw_trigger]
     else:

@@ -28,7 +28,7 @@ skip_data_update = False
 forecasting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 # # Load files
-# mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/3')
 # Set the model location
 # model_path = './results/final_xgboost_forest.joblib'
@@ -97,14 +97,14 @@ else:
 
 betting_data['Potential_win'] = betting_data['bets'] * betting_data['Final_bet'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'] - 1, betting_data['fighter2_backtesting_odds'] - 1)
 
-summary_data = betting_data[['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Fighter1_win_prob', 'Fighter2_win_prob', 'Fighter1_win_EV', 'Fighter2_win_EV', 'Bet_trigger', 'Final_bet', 'Potential_win']]
+summary_data = betting_data[['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Fighter1_win_prob', 'Fighter2_win_prob', 'Fighter1_win_EV', 'Fighter2_win_EV', 'Bet_trigger', 'Final_bet', 'Potential_win', 'Bet_breakeven_odds']]
 
 print(
       summary_data
 )
 
 print(
-      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Bet_trigger', 'Final_bet', 'Potential_win']]
+      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Bet_trigger', 'Final_bet', 'Potential_win', 'Bet_breakeven_odds']]
 )
 
 # Output the results

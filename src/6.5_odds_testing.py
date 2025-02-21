@@ -23,7 +23,7 @@ all_odds[event_odds_cols].isna().sum(axis = 1).value_counts()
 all_odds[event_odds_cols].isna().sum(axis = 1).value_counts(normalize = True)
 
 # Get all the fighters where we have at least 4 non-NA odds
-all_complete_odds_info = all_odds[all_odds[event_odds_cols].isna().sum(axis=1) <= 5]
+all_complete_odds_info = all_odds[all_odds[event_odds_cols].isna().sum(axis=1) <= 3]
 
 # COnvert all odds to decimal
 all_complete_odds_info.loc[:, ['closing_odds_low', 'closing_odds_high'] + event_odds_cols] = all_complete_odds_info.loc[:, ['closing_odds_low', 'closing_odds_high'] + event_odds_cols].applymap(american_odds_to_decimal)
