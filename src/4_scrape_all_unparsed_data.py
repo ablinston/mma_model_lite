@@ -167,6 +167,8 @@ if len(unparsed_fighter_urls) > 0:
             fighter_tott_column_names = config['fighter_tott_column_names']),
         parsed_fighter_tott_df
     ])
+else:
+    new_parsed_fighter_tott_df = parsed_fighter_tott_df
 
 
 ###############################################################################
