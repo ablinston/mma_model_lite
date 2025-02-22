@@ -32,14 +32,18 @@ def add_adjusted_bayes_stats(
     
     # Find the columns to adjust
     columns_to_adjust = []
+    adjustment_cols = []
     for item in columns_with:
         columns_to_adjust += [col for col in new_stats_df.columns if item in col and 'against' not in col]
+        # Now find corresponding historic columns for the columns to adjust
+        adjustment_cols += ['hist_' + col.replace('_per', '_against_per') for col in columns_to_adjust]
+        # Now add on the opposing stats for defense
+        adjustment_cols += ['hist_' + col for col in columns_to_adjust]
+        # Now add on the against stats
+        columns_to_adjust += [col for col in new_stats_df.columns if item in col and 'against' in col]
         
     # Now merge on each opponents historic stats
     new_stats_df = new_stats_df.merge(hist_df, left_on = ['event', 'bout', 'opponent'], right_on = ['event', 'bout', 'fighter'], how = 'left')
-
-    # Now find corresponding historic columns for the columns to adjust
-    adjustment_cols = ['hist_' + col.replace('_per', '_against_per') for col in columns_to_adjust]
     
     # Check all the columns are in the data
     missing_cols =  [col for col in adjustment_cols if col not in new_stats_df.columns]

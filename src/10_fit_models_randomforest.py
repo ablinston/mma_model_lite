@@ -38,7 +38,11 @@ if model_hyper_params['switch_fighters_with_odds'] == True:
     data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
 if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
     np.random.seed(seed = config['seed_all'] + 9845)
+    # Switch twice then concat to try to get some variance
     data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+    # data3 = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+    
+    # data = pd.concat([data, data2, data3], ignore_index = True)
 
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
@@ -76,7 +80,7 @@ params = {
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
     # 'max_depth': 6,
-    'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
+    'max_bin': 175, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
     'tree_method': 'hist',      # Use GPU accelerated algorithm

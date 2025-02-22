@@ -125,10 +125,10 @@ del fight_stats_against
 
 # FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
 fight_stats_bayes_priors = bayesian_priors(
-    fight_stats.merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
+    fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
     id_cols = ['event', 'bout', 'fighter'], 
     group_by = config['bayesian_groupby'], 
-    fight_span = config['bayesian_fightspan']
+    fight_span = 50
 )
 
 # Now aggrgate
