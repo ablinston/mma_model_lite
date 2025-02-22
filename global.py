@@ -18,6 +18,7 @@ from os import listdir, makedirs
 from os import path
 import pandas as pd
 import pdb
+import pyarrow.parquet as pq
 # from pycaret.classification import *
 import re
 from re import sub
