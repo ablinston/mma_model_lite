@@ -23,13 +23,30 @@ def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute
     
     # Sort DataFrame by group_by columns and date for ordered cumulative calculation
     df_sorted = df.sort_values(by=group_by + ['date']).reset_index(drop=True)
-
+    
+    # pdb.set_trace()
+    
     # Group by the group_by columns and calculate rolling sums for the last 3 entries
     rolling_data = (
         df_sorted.groupby(group_by)
         .apply(lambda x: x[stat_columns].shift(1).rolling(window=X, min_periods=1).sum(), include_groups = False)
         .reset_index(level=group_by, drop=True)
     )
+    
+    # Rename the adj columns to make it clear what they are
+    rolling_data.rename(columns={col: col[:-4] + "_adjsum" if col.endswith("_adj") else col for col in df.columns}, inplace=True)
+    
+    rolling_mean_data = (
+        df_sorted.groupby(group_by)
+        .apply(lambda x: x[[stat for stat in stat_columns if '_adj' in stat]].shift(1).rolling(window=X, min_periods=1).mean(), include_groups = False)
+        .reset_index(level=group_by, drop=True)
+    )
+    
+    # Rename the adj columns to make it clear what they are
+    rolling_mean_data.rename(columns={col: col[:-4] + "_adjmean" if col.endswith("_adj") else col for col in df.columns}, inplace=True)
+    
+    # Combine the dataset
+    rolling_data = pd.concat([rolling_data, rolling_mean_data], axis = 1)
     
     # # Convert your pandas DataFrame to a Dask DataFrame
     # ddf = dd.from_pandas(df_sorted, npartitions=4)  # Adjust the number of partitions as needed
@@ -62,8 +79,5 @@ def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute
         df_rolling = calculate_per_minute_stats(df_rolling)
         if bayes_priors_df is not None:
             df_rolling = calculate_per_minute_bayesian_stats(df_rolling, bayes_priors_df)
-    
-    # Replace any column names with adj at the end to make it clear its the sum
-    df_rolling.rename(columns={col: col[:-4] + "_adjsum" if col.endswith("_adj") else col for col in df.columns}, inplace=True)
     
     return df_rolling

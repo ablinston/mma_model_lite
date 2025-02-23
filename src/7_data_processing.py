@@ -192,10 +192,10 @@ fight_stats_hist_last_3 = aggregate_last_X_fight_data(
 ).drop(columns = ['date'])
 
 # Check that all first fights are NaN
-stat_columns = [col for col in fight_stats.columns if col not in ['date', 'event', 'bout', 'fighter']]
+stat_columns = [col for col in fight_stats_hist_last_3.columns if col not in ['date', 'event', 'bout', 'fighter']]
 fight_stats_hist_last_3_check = fight_stats_hist_last_3[fight_stats_hist_last_3['hist_last_3_fights_fights'] == 0]
 
-if np.isnan(fight_stats_hist_last_3_check[['hist_last_3_fights_' + s for s in stat_columns if s != 'fights']].max(skipna = True).max(skipna = True)):
+if np.isnan(fight_stats_hist_last_3_check[[s for s in stat_columns if s != 'hist_last_3_fights_fights']].max(skipna = True).max(skipna = True)):
     print('Cumulative aggregation check PASSED')
 else:
     print('Cumulative aggregation check FAILED')
@@ -206,7 +206,7 @@ del fight_stats_hist_last_3_check
 ###########################################################################################
 # Get the fight stats of each fighter against only specific types of fighters
 stances = fighters['stance'].str.replace(' ', '').unique().tolist()
-fight_stats[['fighter1', 'fighter2']] = fight_stats['bout'].str.split('vs\\.', expand = True)
+fight_stats.loc[:, ['fighter1', 'fighter2']] = fight_stats['bout'].str.split('vs\\.', expand = True)
 fight_stats['opponent'] = np.where(fight_stats['fighter1'] == fight_stats['fighter'], fight_stats['fighter2'], fight_stats['fighter1'])
 fight_stats.drop(columns = ['fighter1', 'fighter2'], inplace = True)
 

@@ -40,14 +40,20 @@ if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out 
     np.random.seed(seed = config['seed_all'] + 9845)
     # Switch twice then concat to try to get some variance
     data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
-    # data3 = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+    # data2 = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
     
     # data = pd.concat([data, data2, data3], ignore_index = True)
 
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
+
+# Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
+var_importance = pd.read_csv('./results/shap_feature_importance_baseline.csv').sort_values('Mean SHAP Value', ascending = False)
+
+X_train = X_train[[col for col in X_train.columns if col not in var_importance['Feature'][5000:len(var_importance)].tolist()]]
+
 # Now remove any columns that aren't wanted in a training dataset. At this point we don't remove non-true odds in order to see the rank in feature importance
-X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False)
+X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = model_hyper_params['true_odds_only'])
 
 # Check data types
 data.dtypes.value_counts()
