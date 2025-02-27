@@ -131,6 +131,6 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         
         del X_train_df
         gc.collect()
-        # print(f"Model {i + 1}/{num_models} trained with best iteration {model.best_iteration}.")
+        print(f"Model {i + 1}/{num_models} trained.")
 
     return models

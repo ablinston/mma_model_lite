@@ -97,15 +97,15 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 25,
-    'num_of_features': hp.choice('num_of_features', [1650, 1550]), # , 1000, 2000, len(X_train_master)]),
+    'max_evals': 500,
+    'num_of_features': hp.choice('num_of_features', [1601]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
 # Set the hyperopt parameters for the inner optimisation
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
-     'learning_rate': hp.quniform('learning_rate', 0.001, 0.01, 0.001), # Learning rate
+     'learning_rate': hp.loguniform('learning_rate', np.log(0.001), np.log(0.2)), # Learning rate
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'max_depth': hp.quniform('max_depth', 1, 5, 1),
@@ -122,14 +122,14 @@ params_inner = {
      'num_iterations': 5000,
      'early_stopping_rounds': 50,
      'exclude_split_other_from_train': split_or_other_exclude,
-     'win_loss_only': True, # hp.choice('win_loss_only', [True, False]),
+     'win_loss_only': hp.choice('win_loss_only', [True, False]),
      'loss_function' : model_hyper_params['loss_function']
 }
 
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = rand.suggest, # Randomly explore the space
-            max_evals = 50,
+            max_evals = 1,
             trials = trials)
 
 
