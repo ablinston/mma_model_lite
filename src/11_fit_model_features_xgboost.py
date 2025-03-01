@@ -32,17 +32,11 @@ data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 data = standard_data_filter(data)
 
 # Switch fighers if necessary
-if model_hyper_params['switch_all_fighters_and_stack'] == True:
-    data = pd.concat([
-        data,
-        switch_fighter1_fighter2(data, [True] * len(data))
-    ])
-else:
-    if model_hyper_params['switch_fighters_with_odds'] == True:
-        data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
-    if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
-        np.random.seed(seed = config['seed_all'] + 8451)
-        data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+if model_hyper_params['switch_fighters_with_odds'] == True and not model_hyper_params['switch_all_fighters_and_stack']:
+    data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
+if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
+    np.random.seed(seed = config['seed_all'] + 8451)
+    data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
 
 # Don't include split or other decisions in training data. This flag will be used in functions later to exclude them from training data but not from test data (including test in CV data)
 split_or_other_exclude = True
@@ -131,6 +125,7 @@ params_inner = {
      'num_iterations': 5000,
      'early_stopping_rounds': 50,
      'exclude_split_other_from_train': split_or_other_exclude,
+     'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': hp.choice('win_loss_only', [True, False]),
      'loss_function' : model_hyper_params['loss_function']
 }
