@@ -53,17 +53,27 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         model = {}
         
         # Randomly sample rows with replacement for the training set
-        X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
+        if subsample < 1:
+            X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
+        else:
+            X_train_df = X.copy()
+            y_train_df = y.copy()
         
         # # Switch fighters if needed
         if params['switch_fighters_randomly'] == True:
             X_train_df, y_train_df = switch_fighter1_fighter2(X = X_train_df, y = y_train_df, filter_boolean = np.random.choice([True, False], size = len(X_train_df)))
         
         # Calculate the number of columns to randomly select
-        num_columns_to_select = int(colsample_bynode * len(X_columns_for_training))
-        
-        # Get a random selection of column names
-        selected_columns = list(np.random.choice(X_columns_for_training, num_columns_to_select, replace = False))
+        if colsample_bynode < 1:
+            num_columns_to_select = int(colsample_bynode * len(X_columns_for_training))
+            
+            # First, duplicate all the diff rows, otherwise 'fighter' rows have 2x the chance of being chosen
+            diff_cols = [col for col in X_columns_for_training if 'fighter1' not in col and 'fighter2' not in col]
+            
+            # Get a random selection of column names
+            selected_columns = list(set(np.random.choice(X_columns_for_training + diff_cols, num_columns_to_select, replace = False)))
+        else:
+            selected_columns = X_columns_for_training
         
         # # Make sure both fighter1 and figher2 versions of columns in there or switch will fail
         # selected_columns = list(set(selected_columns + list_swap_fighter1_fighter2(selected_columns)))

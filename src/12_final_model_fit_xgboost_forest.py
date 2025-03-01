@@ -32,6 +32,12 @@ data = standard_data_filter(data)
 # # Only select the columns needed for training and the test train split
 # data = data[[col for col in data.columns if col in final_model_features + ['date', 'method', 'fighter1', 'fighter2', 'index', 'outcome', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds']]]
 
+if model_hyper_params['switch_all_fighters_and_stack'] == True:
+    data = pd.concat([
+        data,
+        switch_fighter1_fighter2(data, [True] * len(data))
+    ])
+
 
 ##########################################################################################
 ### Data prep for model ###
@@ -45,7 +51,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v3')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v4')
 
 
 
@@ -55,10 +61,10 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v3')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.007, # Learning rate
+    'learning_rate': 0.002, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
-    'subsample': 0.85,
-    'max_depth': 3,
+    'subsample': 1,
+    'max_depth': 5,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -70,14 +76,14 @@ params = {
     'random_state': config['seed_all'] + 38,
     'num_iterations': 5000,
     'early_stopping_rounds': 30,
-    'win_loss_only': True,
-    'switch_fighters_randomly': model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
+    'win_loss_only': False,
+    'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function']
 }
 
 # Set hyperparameters for the forest
-colsample_bynode = 0.025
-subsample = 0.6
+colsample_bynode = 1
+subsample = 0.85
 
 
 ##########################################################################################
@@ -89,7 +95,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training = final_model_features,
-    num_models = 500,
+    num_models = 1,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
@@ -99,7 +105,7 @@ xgboost_rf = train_ensemble_xgboost(
 
 # Try different numbers of trees
 # for num_trees in [1]:
-for num_trees_i in list(range(5, 50, 5)) + list(range(20, 501, 20)):
+for num_trees_i in list(range(5, 50, 5)) + list(range(20, 301, 20)):
         
     # Start a new model run in MLflow
     with mlflow.start_run():
@@ -118,7 +124,7 @@ for num_trees_i in list(range(5, 50, 5)) + list(range(20, 501, 20)):
 
 
 # Set the final number of models
-final_forest_size = 40
+final_forest_size = 1
 
 
 # Save the model

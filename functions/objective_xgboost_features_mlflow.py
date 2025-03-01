@@ -84,7 +84,7 @@ def objective_xgboost_features_mlflow(
             # Train models to find the best hyperparameters
             best = fmin(fn = objective_cv_xgboost,
                         space = params_inner,
-                        algo = atpe.suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
+                        algo = atpe_suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
                         max_evals = params['max_evals'],
                         trials = trials_inner)
             

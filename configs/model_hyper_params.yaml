@@ -1,3 +1,7 @@
+
+# Set whether to switch all fights and add to date, essentially doubling it. If True, the other switch fighters options are ignored
+switch_all_fighters_and_stack: True
+
 # This sets whether the fighters be swapped so that the odds favourite is always fighter1
 switch_fighters_with_odds: False
 

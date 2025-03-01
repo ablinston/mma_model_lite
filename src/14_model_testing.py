@@ -81,7 +81,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('OOT_testing_v2')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - logloss - bayes and adj - GT2 fights split dec exc, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = 'Single XGB on stacked data - logloss - bayes and adj - GT2 fights split dec exc, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###

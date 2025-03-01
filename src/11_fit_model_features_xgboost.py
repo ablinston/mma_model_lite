@@ -13,9 +13,12 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
+import warnings
 
 # Read in global objects and packages
 exec(open('global.py').read())
+
+np.warnings = warnings # to avoid ATPE error with hyperopt
 
 # Read in the data for training
 data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -29,11 +32,17 @@ data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 data = standard_data_filter(data)
 
 # Switch fighers if necessary
-if model_hyper_params['switch_fighters_with_odds'] == True:
-    data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
-if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
-    np.random.seed(seed = config['seed_all'] + 8451)
-    data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+if model_hyper_params['switch_all_fighters_and_stack'] == True:
+    data = pd.concat([
+        data,
+        switch_fighter1_fighter2(data, [True] * len(data))
+    ])
+else:
+    if model_hyper_params['switch_fighters_with_odds'] == True:
+        data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
+    if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
+        np.random.seed(seed = config['seed_all'] + 8451)
+        data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
 
 # Don't include split or other decisions in training data. This flag will be used in functions later to exclude them from training data but not from test data (including test in CV data)
 split_or_other_exclude = True
@@ -86,7 +95,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v2')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v3')
 
 
 ##########################################################################################
@@ -97,8 +106,8 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [1601]), # , 1000, 2000, len(X_train_master)]),
+    'max_evals': 100,
+    'num_of_features': hp.choice('num_of_features', [1600]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude
 }
 
