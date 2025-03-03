@@ -68,7 +68,7 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
         X_test = None
         y_test = None
     
-    if not upcoming_fights:
+    if not upcoming_fights and test_size > 1e-98:
         # Convert the test output to a binarised data frame. Can help with AUC calculations
         y_test_bin = label_binarize(y_test, classes = np.unique(y_test))
     
