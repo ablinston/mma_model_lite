@@ -61,10 +61,10 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v4')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.002, # Learning rate
+    'learning_rate': 0.007, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 1,
-    'max_depth': 5,
+    'max_depth': 3,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -76,7 +76,7 @@ params = {
     'random_state': config['seed_all'] + 38,
     'num_iterations': 5000,
     'early_stopping_rounds': 30,
-    'win_loss_only': False,
+    'win_loss_only': True,
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function']
 }

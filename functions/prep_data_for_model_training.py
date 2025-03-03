@@ -4,20 +4,29 @@
 # X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
 def prep_data_for_model_training(df, config, split_or_other_flag = False, test_size = 0.1, upcoming_fights = False):
-    # pdb.set_trace()
+    
+    # pdb.set_trace()o  
     
     data = clean_inf_and_large(df.copy())
     
     # Filter the OOT data and training data to be ignored
     oot = data[data['date'] >= config['oot_start_date']]
-    data = data[(data['date'] >= config['min_training_date']) & (data['date'] < config['oot_start_date'])]
-    
+    data = data[(data['date'] >= config['min_training_date']) & (data['date'] < config['oot_start_date'])]    
+        
+    # First get a list of all fighters to select the test data
+    random.seed(config['seed_all'])
+    test_fighters = random.sample(
+        list(set(data['fighter1'].tolist() + data['fighter2'].tolist())),
+        int(test_size * len(data) * 0.1) # multiply by this to get roughly the correct number of rows as test_size wishes
+    )
+        
     # Create a flag for exclusion of split decision and other in training data if required
     if (split_or_other_flag):
         data['split_dec_or_other'] = np.where(data['method'].isin(['Decision-Split', 'Other']), 1, 0)
 
     # Remove column that has results, or that contain information we don't want included.
-    data.drop(columns = ['method', 'fighter1', 'fighter2', 'index', 'level_0', 'date'], inplace = True, errors = 'ignore')
+    data.drop(columns = ['method', 'index', 'level_0', 'date'], inplace = True, errors = 'ignore')
+    data.rename(columns = {'fighter1': 'notformodel_fighter1', 'fighter2': 'notformodel_fighter2'}, inplace = True)
     
     # Set target
     target = 'outcome'
@@ -29,7 +38,7 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
     data = format_cols_for_model(data)
     
     # Convert object columns into series' of dummies
-    obj_cols = [col for col in data.columns if data.dtypes[col] == 'object']
+    obj_cols = [col for col in data.columns if data.dtypes[col] == 'object' and 'notformodel' not in col]
     try:
         obj_cols.remove(target)
     except:
@@ -39,15 +48,20 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
     if not upcoming_fights:
         # Convert the target into a labelled column ready for multiclass modelling
         data[target] = clean_target_column(data[target])
-    
+            
     if test_size > 0:
         # Split into train and test
-        X_train, X_test, y_train, y_test = train_test_split(
-            data.drop(columns = [target]),
-            data[target],
-            test_size = test_size,
-            random_state = config['seed_all']
-        )
+        train = data[(~data['notformodel_fighter1'].isin(test_fighters)) & (~data['notformodel_fighter2'].isin(test_fighters))]
+        test = data[(data['notformodel_fighter1'].isin(test_fighters)) | (data['notformodel_fighter2'].isin(test_fighters))]
+        
+        X_train = train.drop(columns = target)
+        y_train = train[target]
+        
+        X_test = test.drop(columns = target)
+        y_test = test[target]    
+        
+        del([train, test])
+        
     else:
         X_train = data.drop(columns = [target])
         y_train = data[target]

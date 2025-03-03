@@ -54,7 +54,8 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         
         # Randomly sample rows with replacement for the training set
         if subsample < 1:
-            X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
+            X_train_df, y_train_df = sample_fighters(X = X, y = y, n_rows = int(len(X) * subsample))
+            # X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
         else:
             X_train_df = X.copy()
             y_train_df = y.copy()
@@ -98,7 +99,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         test_fighter2_odds = X_val['train_fighter2_odds'].to_numpy()
 
         # Drop the ID column
-        cols_to_drop = [col for col in X_train_df.columns if 'train_fighter' in col or 'backtesting' in col or col == 'id']
+        cols_to_drop = [col for col in X_train_df.columns if 'train_fighter' in col or 'backtesting' in col or col == 'id' or 'notformodel' in col]
         X_train_df.drop(cols_to_drop, axis = 1, inplace = True)
         X_val.drop(cols_to_drop, axis = 1, inplace = True)
         
