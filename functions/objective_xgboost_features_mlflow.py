@@ -86,7 +86,8 @@ def objective_xgboost_features_mlflow(
                         space = params_inner,
                         algo = atpe_suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
                         max_evals = params['max_evals'],
-                        trials = trials_inner)
+                        trials = trials_inner,
+                        early_stop_fn = no_progress_loss(params['hyperopt_early_stopping']))
             
             # Log the parameters of the best model
             mlflow.log_params(best)

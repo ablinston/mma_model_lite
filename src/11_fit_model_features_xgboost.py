@@ -74,6 +74,10 @@ columns_in_order = var_importance['Feature'].tolist()
 # Get rid of the last X results
 columns_in_order = [col for col in columns_in_order if not ('_last_' in col and '_results' in col)]
 
+# Trim additional columns if necessary
+if model_hyper_params['trim_model_features']:
+    columns_in_order = trim_column_list(columns_in_order)
+
 # Add on the split indicator if needed
 if split_or_other_exclude == True:
     columns_in_order = columns_in_order + ['split_dec_or_other']
@@ -82,9 +86,10 @@ if split_or_other_exclude == True:
 columns_in_order += ['fighter1_backtesting_odds', 'fighter2_backtesting_odds']
 
 # Remove any duplicates
-columns_in_order = list(set(columns_in_order))
+columns_in_order = pd.Series(columns_in_order).drop_duplicates().tolist()
 
-X_train_master = X_train_master[columns_in_order]
+# Select only the needed columns without duplicates
+X_train_master = X_train_master.loc[:, ~X_train_master.columns.duplicated()].copy()[columns_in_order]
 
 # Now remove any columns that aren't wanted in a training dataset
 X_train_master = standard_feature_removal(X_train_master, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = model_hyper_params['true_odds_only'])
@@ -95,7 +100,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v3')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v5')
 
 
 ##########################################################################################
@@ -106,9 +111,10 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 100,
-    'num_of_features': hp.choice('num_of_features', [1601]), # , 1000, 2000, len(X_train_master)]),
-    'split_dec_or_other': split_or_other_exclude
+    'max_evals': 200,
+    'num_of_features': hp.choice('num_of_features', [50, 100, 150, 200, 250, 300, 400, 500, 750]), # , 1000, 2000, len(X_train_master)]),
+    'split_dec_or_other': split_or_other_exclude,
+    'hyperopt_early_stopping': 20
 }
 
 # Set the hyperopt parameters for the inner optimisation
@@ -138,8 +144,8 @@ params_inner = {
 
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
-            algo = rand.suggest, # Randomly explore the space
-            max_evals = 1,
+            algo = tpe.suggest,
+            max_evals = 50,
             trials = trials)
 
 
@@ -147,7 +153,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:1600]
+column_names = X_train_master.columns.tolist()[0:1000]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

@@ -1,6 +1,6 @@
 
 # Set whether to switch all fights and add to date, essentially doubling it. If True, the other switch fighters options are ignored
-switch_all_fighters_and_stack: True
+switch_all_fighters_and_stack: False
 
 # This sets whether the fighters be swapped so that the odds favourite is always fighter1
 switch_fighters_with_odds: False
@@ -23,3 +23,6 @@ true_odds_only: True
 
 # Set whether to use the mean_closing_odds or best_closing_odds
 odds_to_use: mean_closing_odds
+
+# Set whether to trim model features to try to remove duplicated similar but slightly different features. Just keep the highest importance version
+trim_model_features: True
