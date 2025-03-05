@@ -20,7 +20,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
     - models (list): List of trained XGBoost models.
     """
 
-    # pdb.set_trace()
+    pdb.set_trace()
 
     # Default parameters if none are provided
     if params is None:
@@ -37,7 +37,10 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
 
     # Set random seed for Numpy
     np.random.seed(config['seed_all'])
-
+    
+    # Get a full list of columns needed for switching fighters then cut down the data
+    X = X[all_columns_for_differentials(X_columns_for_training) + [col for col in X.columns if 'notformodel' in col]].copy()
+    
     # Add an id column to the X data
     X['id'] = X.index.copy()
     

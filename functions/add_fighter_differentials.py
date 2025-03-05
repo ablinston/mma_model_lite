@@ -18,12 +18,14 @@ def add_fighter_differentials(df):
     duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
     stop_if_not(len(duplicate_columns) == 0)
 
+    # Get a sorted list of columns
+    sorted_columns = merged_data.columns.sort_values()  
     
     # Add direct differentials between fighter offence and defence
-    fighter1_accuracy_off_cols = [col for col in merged_data.columns if ('accuracy_percent' in col or 'ctrl_minutes_per_minute' in col) and 'diff' not in col and 'fighter1' in col and 'against' not in col]
-    fighter2_accuracy_off_cols = [col for col in merged_data.columns if ('accuracy_percent' in col or 'ctrl_minutes_per_minute' in col) and 'diff' not in col and 'fighter2' in col and 'against' not in col]
-    fighter1_accuracy_def_cols = [col for col in merged_data.columns if ('accuracy_percent' in col or 'ctrl_minutes_against_per_minute' in col) and 'diff' not in col and 'fighter1' in col and 'against' in col]
-    fighter2_accuracy_def_cols = [col for col in merged_data.columns if ('accuracy_percent' in col or 'ctrl_minutes_against_per_minute' in col) and 'diff' not in col and 'fighter2' in col and 'against' in col]
+    fighter1_accuracy_off_cols = [col for col in sorted_columns if ('accuracy_percent' in col or 'ctrl_minutes_per_minute' in col) and 'diff' not in col and 'fighter1' in col and 'against' not in col]
+    fighter2_accuracy_off_cols = [col for col in sorted_columns if ('accuracy_percent' in col or 'ctrl_minutes_per_minute' in col) and 'diff' not in col and 'fighter2' in col and 'against' not in col]
+    fighter1_accuracy_def_cols = [col for col in sorted_columns if ('accuracy_percent' in col or 'ctrl_minutes_against_per_minute' in col) and 'diff' not in col and 'fighter1' in col and 'against' in col]
+    fighter2_accuracy_def_cols = [col for col in sorted_columns if ('accuracy_percent' in col or 'ctrl_minutes_against_per_minute' in col) and 'diff' not in col and 'fighter2' in col and 'against' in col]
     
     # Check the columns line up
     stop_if_not(check_identical_excl_string(fighter1_accuracy_off_cols, [col.replace('_against', '') for col in fighter2_accuracy_def_cols], 'fighter1', 'fighter2'))

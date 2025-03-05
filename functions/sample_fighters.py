@@ -21,7 +21,7 @@ def sample_fighters(df_complete = None, X = None, y = None, n_rows = 100):
     fighters_counts['cumsums'] = fighters_counts['count'].cumsum()
     
     # Create a flag for which fighters will be in the selected data. Multiply by 1.1 because there will be overlap in these fighters fighting each other
-    fighters_counts['select_flag'] = np.where(fighters_counts['cumsums'] < (n_rows * 1.4), 1, 0)
+    fighters_counts['select_flag'] = np.where(fighters_counts['cumsums'] < (n_rows * 1.2), 1, 0)
 
     # Get the selected fighters
     selected_fighters = fighters_counts[fighters_counts['select_flag'] == 1]['index'].tolist()
@@ -30,7 +30,7 @@ def sample_fighters(df_complete = None, X = None, y = None, n_rows = 100):
 
     # Do a check to see if n rows is reasonable
     if abs(len(final_df) - n_rows) > (n_rows * 0.05):
-        print("WARNING: sample_fighters() function returned a row number > 5% different from target")
+        print(f"WARNING: sample_fighters() function returned a row number > 5% different from target. Sample is {(len(final_df) / n_rows) - 1} of data.")
 
     # Now return the selected data
     if df_complete is None:
