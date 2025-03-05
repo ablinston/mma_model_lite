@@ -112,7 +112,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 200,
-    'num_of_features': hp.choice('num_of_features', [50, 100, 150, 200, 250, 300, 400, 500, 750]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [160, 140]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude,
     'hyperopt_early_stopping': 20
 }
@@ -120,10 +120,10 @@ space = {
 # Set the hyperopt parameters for the inner optimisation
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
-     'learning_rate': hp.loguniform('learning_rate', np.log(0.001), np.log(0.2)), # Learning rate
+     'learning_rate': hp.loguniform('learning_rate', np.log(0.0001), np.log(0.2)), # Learning rate
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
-     'max_depth': hp.quniform('max_depth', 1, 5, 1),
+     'max_depth': hp.quniform('max_depth', 1, 10, 1),
      'max_bin': 180, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
      'eval_metric': 'mlogloss',       # Evaluation metric
@@ -153,7 +153,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:1000]
+column_names = X_train_master.columns.tolist()[0:150]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)
