@@ -20,7 +20,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
     - models (list): List of trained XGBoost models.
     """
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
     # Default parameters if none are provided
     if params is None:
@@ -39,7 +39,8 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
     np.random.seed(config['seed_all'])
     
     # Get a full list of columns needed for switching fighters then cut down the data
-    X = X[all_columns_for_differentials(X_columns_for_training) + [col for col in X.columns if 'notformodel' in col]].copy()
+    all_columns_for_diffs = all_columns_for_differentials(X_columns_for_training)
+    X = X[all_columns_for_diffs + [col for col in X.columns if 'notformodel' in col or ('odds' in col and col not in all_columns_for_diffs)]].copy()
     
     # Add an id column to the X data
     X['id'] = X.index.copy()
@@ -66,6 +67,10 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         # # Switch fighters if needed
         if params['switch_fighters_randomly'] == True:
             X_train_df, y_train_df = switch_fighter1_fighter2(X = X_train_df, y = y_train_df, filter_boolean = np.random.choice([True, False], size = len(X_train_df)))
+            
+        # Add noise to odds if required
+        if params['add_noise_to_odds']:
+            X_train_df = add_noise_to_odds(X_train_df, norm_sd = params['odds_noise_standard_dev'])
         
         # Calculate the number of columns to randomly select
         if colsample_bynode < 1:

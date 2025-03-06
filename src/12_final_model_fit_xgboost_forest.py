@@ -78,11 +78,13 @@ params = {
     'early_stopping_rounds': 30,
     'win_loss_only': False,
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
-    'loss_function' : model_hyper_params['loss_function']
+    'loss_function' : model_hyper_params['loss_function'],
+    'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
+    'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev']
 }
 
 # Set hyperparameters for the forest
-colsample_bynode = 0.05
+colsample_bynode = 1
 subsample = 0.6
 
 
@@ -95,7 +97,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training = final_model_features,
-    num_models = 150,
+    num_models = 100,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
@@ -105,7 +107,7 @@ xgboost_rf = train_ensemble_xgboost(
 
 # Try different numbers of trees
 # for num_trees in [1]:
-for num_trees_i in list(range(5, 50, 5)) + list(range(20, 301, 20)):
+for num_trees_i in list(range(5, 51, 5)) + list(range(50, len(xgboost_rf), 10)):
         
     # Start a new model run in MLflow
     with mlflow.start_run():
@@ -115,6 +117,23 @@ for num_trees_i in list(range(5, 50, 5)) + list(range(20, 301, 20)):
         mlflow.log_param('num_trees', num_trees_i)
         mlflow.log_param('Forest col proportion', colsample_bynode)
         mlflow.log_param('Forest subsample', subsample)
+        mlflow.set_tag('Sample', 'Train')
+                    
+        # Log the metrics of the forest with that many trees in MLflow
+        log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_train, y_train)
+        
+        # Log the predictions just from the odds for info
+        log_metrics_odds_mlflow(X_train, y_train)
+        
+    # Start a new model run in MLflow
+    with mlflow.start_run():
+        
+        # Log the initial metrics
+        mlflow.log_params(params)
+        mlflow.log_param('num_trees', num_trees_i)
+        mlflow.log_param('Forest col proportion', colsample_bynode)
+        mlflow.log_param('Forest subsample', subsample)
+        mlflow.set_tag('Sample', 'Test')
                     
         # Log the metrics of the forest with that many trees in MLflow
         log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_test, y_test)
@@ -124,7 +143,7 @@ for num_trees_i in list(range(5, 50, 5)) + list(range(20, 301, 20)):
 
 
 # Set the final number of models
-final_forest_size = 1
+final_forest_size = 26
 
 
 # Save the model
