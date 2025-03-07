@@ -82,12 +82,26 @@ def objective_xgboost_features_mlflow(
             trials_inner = Trials()
             
             # Train models to find the best hyperparameters
-            best = fmin(fn = objective_cv_xgboost,
-                        space = params_inner,
-                        algo = atpe_suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
-                        max_evals = params['max_evals'],
-                        trials = trials_inner,
-                        early_stop_fn = no_progress_loss(params['hyperopt_early_stopping']))
+            # Allow 5 errors with trials
+            error_count = 0
+            
+            while error_count < 5:
+                try:
+                    best = fmin(fn = objective_cv_xgboost,
+                                space = params_inner,
+                                algo = atpe_suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
+                                max_evals = params['max_evals'],
+                                trials = trials_inner,
+                                early_stop_fn = no_progress_loss(params['hyperopt_early_stopping']))
+                    break # exit loop if successful
+                except:
+                    print('Error encountered')
+                    error_count += 1
+                    # pdb.set_trace()
+                    
+            # Get the best params if errors occurred
+            if error_count >= 5:
+                best = trials_inner.best_trial['result']['params']
             
             # Log the parameters of the best model
             mlflow.log_params(best)
@@ -97,7 +111,7 @@ def objective_xgboost_features_mlflow(
             
     if model_hyper_params['loss_function'] == 'ev_loss_function':
         # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-        return {'loss': trials_inner.best_trial['result']['metrics']['EV MSE'], 'params': params, 'status': STATUS_OK} 
+        return {'loss': trials_inner.best_trial['result']['metrics']['EV MSE'], 'params': params.update(best), 'status': STATUS_OK}  #  Add on the inner params
     else:
         # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-        return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params, 'status': STATUS_OK}
+        return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params.update(best), 'status': STATUS_OK}
