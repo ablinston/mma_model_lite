@@ -23,6 +23,7 @@ if not os.name == "nt":
 
 # Use this to skip update of data if it's already been done recently
 skip_data_update = False
+skip_save_data = True
 
 # Read in the data for training
 forecasting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()

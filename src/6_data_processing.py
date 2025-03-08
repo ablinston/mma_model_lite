@@ -760,14 +760,17 @@ merged_data.reset_index(drop = True, inplace = True)
 merged_data.drop(columns = cols_to_remove, inplace = True, errors = 'ignore')
 del(cols_to_remove)
 
-# Save the log of the final data
-log_final_data_stats(merged_data, config['final_data_stats_log'], config)
+if 'skip_save_data' in globals():
+    if not skip_save_data:
 
-# Save the final data
-split_by_year_and_save_fastparquet(merged_data, 'date', './data/final_dataset/', compression='ZSTD')
-# fp.write('./data/final_dataset.parquet', merged_data, compression = 'GZIP')
-
-# Output a single fight for checking purposes
-merged_data[(merged_data['fighter1'] == 'khabibnurmagomedov') & (merged_data['fighter2'] == 'conormcgregor')].T.to_csv('./data/final_dataset_checking.csv', index=True)
-
-merged_data[(merged_data['fighter1'] == 'antoniosilva') | (merged_data['fighter2'] == 'antoniosilva')].T.to_csv('./data/final_dataset_fighter_checking.csv')
+        # Save the log of the final data
+        log_final_data_stats(merged_data, config['final_data_stats_log'], config)
+        
+        # Save the final data
+        split_by_year_and_save_fastparquet(merged_data, 'date', './data/final_dataset/', compression='ZSTD')
+        # fp.write('./data/final_dataset.parquet', merged_data, compression = 'GZIP')
+        
+        # Output a single fight for checking purposes
+        merged_data[(merged_data['fighter1'] == 'khabibnurmagomedov') & (merged_data['fighter2'] == 'conormcgregor')].T.to_csv('./data/final_dataset_checking.csv', index=True)
+        
+        merged_data[(merged_data['fighter1'] == 'antoniosilva') | (merged_data['fighter2'] == 'antoniosilva')].T.to_csv('./data/final_dataset_fighter_checking.csv')
