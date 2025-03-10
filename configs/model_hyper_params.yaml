@@ -24,7 +24,7 @@ odds_noise_standard_dev: 0.1
 true_odds_only: True
 
 # Set whether to use the mean_closing_odds or best_closing_odds in the backtesting
-odds_to_use: mean_closing_odds
+odds_to_use: best_closing_odds
 
 # Set whether to trim model features to try to remove duplicated similar but slightly different features. Just keep the highest importance version
 trim_model_features: True

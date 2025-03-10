@@ -14,8 +14,9 @@ def process_odds_data(fight_df, event_df, odds_scrape_config, average_odds_model
     new_event_df = new_event_df[new_event_df[odds_scrape_config['events_colnames']].isna().sum(axis = 1) <= 5]
     new_event_df['mean_closing_odds'] = np.nanmean(new_event_df[odds_scrape_config['events_colnames']], axis = 1)
     
-    # # Remove any duplicates
-    # new_event_df = new_event_df.drop_duplicates(subset = ['event', 'bout', 'fighter'])
+    # # Remove any duplicates. New odds data will be on top so keep that
+    # new_event_df[new_event_df.duplicated(subset = ['event', 'bout', 'fighter'], keep = False)].sort_values(['event', 'bout', 'fighter'])
+    new_event_df = new_event_df.drop_duplicates(subset = ['event', 'bout', 'fighter'])
     
     # Merge these means onto the fight df
     new_fight_df = fight_df.merge(new_event_df[['event', 'bout', 'fighter', 'mean_closing_odds']], on = ['event', 'bout', 'fighter'], how = 'left')

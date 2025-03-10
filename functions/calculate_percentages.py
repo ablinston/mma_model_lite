@@ -38,34 +38,37 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors):
     ##########################################
     # Now calculate the bayes percentages
     
-    # Add on the bayes variables
-    merged_data_bayes = merged_data.merge(fight_stats_bayes_priors, on = ['event', 'bout'], how = 'left')
     
-    # Find what numerators and denominators are needed
-    bayes_numerators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_3_fights', '') for col in landed_columns]
-    
-    bayes_denominators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_3_fights', '') for col in percent_columns]
-    
-    # Check these are in the bayes data
-    stop_if_not(all(item in merged_data_bayes.columns for item in bayes_numerators + bayes_denominators), "Bayes priors check in data")
-    
-    # Calculate the bayes percentage accuracies
-    new_bayes_percent_cols = [col.replace('_attempt', '_bayes_accuracy_percent') for col in percent_columns]
-    
-    new_data = pd.DataFrame(safe_divide_np(
-        merged_data_bayes[landed_columns].to_numpy() + merged_data_bayes[bayes_numerators].to_numpy(), 
-        merged_data_bayes[percent_columns].to_numpy() + merged_data_bayes[bayes_denominators].to_numpy(), 
-        zero_zero_fill = np.nan
-        ), 
-        columns = new_bayes_percent_cols
-    )
-    
-    # Check there are non > 0
-    stop_if_not(new_data[new_data>1].sum().sum() == 0, "Bayes percentages less than 1")
-    stop_if_not(new_data[new_data<0].sum().sum() == 0, "Bayes percentages greater than 0")
-    
-    # Merge the data
-    merged_data = pd.concat([merged_data, new_data], axis = 1)
+    if fight_stats_bayes_priors is not None:
+        
+        # Add on the bayes variables
+        merged_data_bayes = merged_data.merge(fight_stats_bayes_priors, on = ['event', 'bout'], how = 'left')
+        
+        # Find what numerators and denominators are needed
+        bayes_numerators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_3_fights', '') for col in landed_columns]
+        
+        bayes_denominators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_3_fights', '') for col in percent_columns]
+        
+        # Check these are in the bayes data
+        stop_if_not(all(item in merged_data_bayes.columns for item in bayes_numerators + bayes_denominators), "Bayes priors check in data")
+        
+        # Calculate the bayes percentage accuracies
+        new_bayes_percent_cols = [col.replace('_attempt', '_bayes_accuracy_percent') for col in percent_columns]
+        
+        new_data = pd.DataFrame(safe_divide_np(
+            merged_data_bayes[landed_columns].to_numpy() + merged_data_bayes[bayes_numerators].to_numpy(), 
+            merged_data_bayes[percent_columns].to_numpy() + merged_data_bayes[bayes_denominators].to_numpy(), 
+            zero_zero_fill = np.nan
+            ), 
+            columns = new_bayes_percent_cols
+        )
+        
+        # Check there are non > 0
+        stop_if_not(new_data[new_data>1].sum().sum() == 0, "Bayes percentages less than 1")
+        stop_if_not(new_data[new_data<0].sum().sum() == 0, "Bayes percentages greater than 0")
+        
+        # Merge the data
+        merged_data = pd.concat([merged_data, new_data], axis = 1)
     
     # Check we have the correct number of rows
     stop_if_not(len(merged_data_df) == len(merged_data), "Dataset length")

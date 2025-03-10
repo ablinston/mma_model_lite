@@ -1,0 +1,8 @@
+# Set the suffix of what odds to use when calculating true odds
+odds_suffix_for_true_odds: best_closing_odds
+
+# Set whether to add the bayes versions of columns
+add_bayes_stats_columns: False
+
+# Set whether to add adjusted stats as well as raw (requires bayes stats)
+add_adj_bayes_columns: False
