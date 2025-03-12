@@ -695,7 +695,7 @@ merged_data = add_fighter_differentials(merged_data)
 ###########################################################################################
 # FLAG TRAIN/TEST/OOT
 
-merged_data2 = flag_train_test_oot(merged_data, config)
+merged_data = flag_train_test_oot(merged_data, config)
 
 
 ###########################################################################################

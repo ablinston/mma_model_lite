@@ -1,24 +1,21 @@
 # This function takes a dataset and prepares the data for model training by splitting it into train and test
 
 # It returns 7 objects that can be output into env objects like
-# X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
+# X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data)
 
-def prep_data_for_model_training(df, config, split_or_other_flag = False, test_size = 0.1, upcoming_fights = False):
+def prep_data_for_model_training(df, split_or_other_flag = False, upcoming_fights = False):
     
-    pdb.set_trace()
-    
+    # pdb.set_trace()
+        
     data = clean_inf_and_large(df.copy())
+    
+    # If we're prepping upcoming fights, take whole sample
+    if upcoming_fights:
+        data['train_test_oot_flag'] = 'train'
     
     # Filter the OOT data and training data to be ignored
     oot = data[data['train_test_oot_flag'] == 'oot']
     data = data[data['train_test_oot_flag'] != 'oot']
-        
-    # First get a list of all fighters to select the test data
-    random.seed(config['seed_all'])
-    test_fighters = random.sample(
-        list(set(data['fighter1'].tolist() + data['fighter2'].tolist())),
-        int(test_size * len(data) * 0.1) # multiply by this to get roughly the correct number of rows as test_size wishes
-    )
         
     # Create a flag for exclusion of split decision and other in training data if required
     if (split_or_other_flag):
@@ -26,7 +23,7 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
 
     # Remove column that has results, or that contain information we don't want included.
     data.drop(columns = ['method', 'index', 'level_0', 'date'], inplace = True, errors = 'ignore')
-    data.rename(columns = {'fighter1': 'notformodel_fighter1', 'fighter2': 'notformodel_fighter2'}, inplace = True)
+    data.rename(columns = {'fighter1': 'notformodel_fighter1', 'fighter2': 'notformodel_fighter2', 'train_test_oot_flag': 'notformodel_train_test_oot_flag'}, inplace = True)
     
     # Set target
     target = 'outcome'
@@ -49,26 +46,12 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
         # Convert the target into a labelled column ready for multiclass modelling
         data[target] = clean_target_column(data[target])
             
-    if test_size > 0:
-        # Split into train and test
-        train = data[(~data['notformodel_fighter1'].isin(test_fighters)) & (~data['notformodel_fighter2'].isin(test_fighters))]
-        test = data[(data['notformodel_fighter1'].isin(test_fighters)) | (data['notformodel_fighter2'].isin(test_fighters))]
-        
-        X_train = train.drop(columns = target)
-        y_train = train[target]
-        
-        X_test = test.drop(columns = target)
-        y_test = test[target]    
-        
-        del([train, test])
-        
-    else:
-        X_train = data.drop(columns = [target])
-        y_train = data[target]
-        X_test = None
-        y_test = None
+    X_train = data[data['notformodel_train_test_oot_flag'] == 'train'].drop(columns = [target])
+    y_train = data[data['notformodel_train_test_oot_flag'] == 'train'][target]
+    X_test = data[data['notformodel_train_test_oot_flag'] == 'test'].drop(columns = [target])
+    y_test = data[data['notformodel_train_test_oot_flag'] == 'test'][target]
     
-    if not upcoming_fights and test_size > 1e-98:
+    if not upcoming_fights and len(X_test) > 0:
         # Convert the test output to a binarised data frame. Can help with AUC calculations
         y_test_bin = label_binarize(y_test, classes = np.unique(y_test))
     
@@ -84,20 +67,6 @@ def prep_data_for_model_training(df, config, split_or_other_flag = False, test_s
     
     # Set number of classes for training
     no_of_classes = len(set(y_train))
-   
-    # ####################
-    # ##AB: FOR SOME REASON, THE MODELS DON'T TRAIN OR PREDICT CORRECTLY WHEN THESE HAVEN'T GONE THROUGH THIS FUNCTION. IT PRODUCES THE SAME RESULT BUT FOR SOME REASON XGB DOESN'T GIVE MODELLING OUTPUTS CORRECTLY, SO LEAVING THIS IN AS A WORKAROUND
-    
-    # X_train, y_train = switch_fighter1_fighter2(X = X_train, y = y_train, filter_boolean = np.random.choice([True], size = len(X_train)))
-    # X_train, y_train = switch_fighter1_fighter2(X = X_train, y = y_train, filter_boolean = np.random.choice([True], size = len(X_train)))
-    
-    # gc.collect()
-    
-    # if X_test is not None:
-    #     X_test, y_test = switch_fighter1_fighter2(X = X_test, y = y_test, filter_boolean = np.random.choice([True], size = len(X_test)))
-    #     X_test, y_test = switch_fighter1_fighter2(X = X_test, y = y_test, filter_boolean = np.random.choice([True], size = len(X_test)))
-  
-    # ####################
     
     
     # Return the objects needed as a list

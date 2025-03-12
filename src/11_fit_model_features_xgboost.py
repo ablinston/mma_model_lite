@@ -54,7 +54,7 @@ split_or_other_exclude = True
 ##########################################################################################
 
 # Prep the data ready for model training. Create a master for the train because we will vary the number of features
-X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config, split_or_other_flag = split_or_other_exclude, test_size = config['test_proportion'])
+X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = split_or_other_exclude)
 
 
 ##########################################################################################
