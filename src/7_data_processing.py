@@ -692,6 +692,11 @@ for fighter in ['fighter1', 'fighter2']:
 merged_data = add_fighter_differentials(merged_data)
 
 
+###########################################################################################
+# FLAG TRAIN/TEST/OOT
+
+merged_data2 = flag_train_test_oot(merged_data, config)
+
 
 ###########################################################################################
 # Formatting tweaks

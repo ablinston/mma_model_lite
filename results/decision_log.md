@@ -6,5 +6,7 @@ Experiment: http://localhost:8080/#/experiments/490730489596532803/runs/78d44d90
 
 # Modelling parameters
 
-* Column proportion in xgboost forest: found that using all the columns in every model significantly decreased logloss. Needed much fewer trees. But logloss difference between test and train  rose to around 0.3, but test had a better logloss! Also seen that on OOT data.
-* True odds only: I found that using this swapped the logloss with the train suddenly being better but test worse. Similar thing with EV MSE
+* Column proportion in xgboost forest: 
+    * **Use 1**: found that using all the columns in every model significantly decreased logloss. Needed much fewer trees. But logloss difference between test and train  rose to around 0.3, but test had a better logloss! Also seen that on OOT data.
+* True odds only: 
+    * **Don't use**: I found that using this swapped the logloss with the train suddenly being better but test worse. Similar thing with EV mses.

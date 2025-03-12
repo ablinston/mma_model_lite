@@ -113,7 +113,7 @@ xgboost_rf = train_ensemble_xgboost(
 # for num_trees in [1]:
 for num_trees_i in list(range(1, 51, 1)) + list(range(50, len(xgboost_rf) + 1, 20)):
         
-    if len(num_models) >= num_trees_i:
+    if len(xgboost_rf) >= num_trees_i:
         
         # Start a new model run in MLflow
         with mlflow.start_run():
