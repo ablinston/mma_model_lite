@@ -27,4 +27,4 @@ true_odds_only: True
 odds_to_use: best_closing_odds
 
 # Set whether to trim model features to try to remove duplicated similar but slightly different features. Just keep the highest importance version
-trim_model_features: True
+trim_model_features: False

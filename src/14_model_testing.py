@@ -81,7 +81,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('OOT_testing_v2')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - regularised - logloss - bayes and adj - GT2 fights split dec exc, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = 'XGB forest - recreating v1 method with updated data, all cols, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -191,4 +191,4 @@ if model_approved:
     mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
 
 
-test = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')
+# test = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')

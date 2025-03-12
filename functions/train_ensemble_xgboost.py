@@ -40,7 +40,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
     
     # Get a full list of columns needed for switching fighters then cut down the data
     all_columns_for_diffs = all_columns_for_differentials(X_columns_for_training)
-    X = X[all_columns_for_diffs + [col for col in X.columns if 'notformodel' in col or ('odds' in col and col not in all_columns_for_diffs)]].copy()
+    X = X[[col for col in all_columns_for_diffs if col in X.columns] + [col for col in X.columns if 'notformodel' in col or ('odds' in col and col not in all_columns_for_diffs)]].copy()
     
     # Add an id column to the X data
     X['id'] = X.index.copy()

@@ -81,6 +81,17 @@ if model_hyper_params['trim_model_features']:
 # Add on the split indicator if needed
 if split_or_other_exclude == True:
     columns_in_order = columns_in_order + ['split_dec_or_other']
+    
+if model_hyper_params['odds_to_use'] == 'best_closing_odds':
+    columns_in_order = [col for col in columns_in_order if 'mean_closing_odds' not in col]
+else:
+    columns_in_order = [col for col in columns_in_order if 'best_closing_odds' not in col]
+    
+# Remove true odds if not only using them to avoid too much emphasis on odds
+if model_hyper_params['true_odds_only'] == True:
+    columns_in_order = [col for col in columns_in_order if not ('true' not in col and 'odds' in col)]
+else:
+    columns_in_order = [col for col in columns_in_order if not ('true' in col and 'odds' in col)]
 
 # Add on the odds needed for custom loss and backtesting
 columns_in_order += ['fighter1_backtesting_odds', 'fighter2_backtesting_odds']
@@ -100,7 +111,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v6')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v9')
 
 
 ##########################################################################################
@@ -112,18 +123,18 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [300, 400]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [100, 150, 200, 250, 300]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': split_or_other_exclude,
-    'hyperopt_early_stopping': 75
+    'hyperopt_early_stopping': 25
 }
 
 # Set the hyperopt parameters for the inner optimisation
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
-     'learning_rate': hp.uniform('learning_rate', 0.01, 0.2), # Learning rate #  These are considered low-moderate learning rates
+     'learning_rate': hp.uniform('learning_rate', 0.001, 0.2), # Learning rate #  0.01-0.2 is considered low-moderate learning rates
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
-     # 'colsample_bytree': hp.quniform('colsample_bytree', 0.3, 1, 0.05),
+     # 'colsample_bytree': hp.quniform('colsample_bytree', 0.1, 1, 0.05),
      'max_depth': hp.quniform('max_depth', 1, 8, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
@@ -137,9 +148,9 @@ params_inner = {
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
      'early_stopping_rounds': 50,
-     'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
-     'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
-     'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
+     # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
+     # 'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
+     # 'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
      'exclude_split_other_from_train': split_or_other_exclude,
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': hp.choice('win_loss_only', [True, False]),
@@ -149,7 +160,7 @@ params_inner = {
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = tpe.suggest,
-            max_evals = 10,
+            max_evals = 20,
             trials = trials)
 
 
