@@ -9,6 +9,9 @@ switch_fighters_with_odds: False
 # Note that if this is true it effectively undoes the switch with odds
 switch_fighters_randomly: True
 
+# Set whether to exclude split decisions and other from training data (this won't be applied to test data)
+split_or_other_exclude: True
+
 # Set whether we include differential features only in the model features
 differential_features_only: False
 

@@ -19,7 +19,7 @@ def prep_data_for_model_training(df, split_or_other_flag = False, upcoming_fight
         
     # Create a flag for exclusion of split decision and other in training data if required
     if (split_or_other_flag):
-        data['split_dec_or_other'] = np.where(data['method'].isin(['Decision-Split', 'Other']), 1, 0)
+        data['notformodel_split_dec_or_other'] = np.where(data['method'].isin(['Decision-Split', 'Other']), 1, 0)
 
     # Remove column that has results, or that contain information we don't want included.
     data.drop(columns = ['method', 'index', 'level_0', 'date'], inplace = True, errors = 'ignore')

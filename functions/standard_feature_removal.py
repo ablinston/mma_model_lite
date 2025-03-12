@@ -32,6 +32,6 @@ def standard_feature_removal(df, differentials_only = False, true_odds_only = Fa
         cols_to_remove += [col for col in data.columns if 'odds' in col and 'true' not in col and 'backtesting' not in col] 
     
     # Remove columns not wanted but select specific ones to keep
-    data = data[[col for col in data.columns if not col in cols_to_remove or col in ['split_dec_or_other']]]
+    data = data[[col for col in data.columns if not col in cols_to_remove or col in ['notformodel_split_dec_or_other']]]
 
     return data

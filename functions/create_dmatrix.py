@@ -11,15 +11,15 @@ def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False,
     # Apply the combined filter to X_train and y_train
     if win_loss_only == False:
         if split_dec_or_other_filter:
-            filtered_X_train = X_train.copy()[mask & ~(X_train['split_dec_or_other'] == 1)]
-            filtered_y_train = y_train[mask & ~(X_train['split_dec_or_other'] == 1)]
+            filtered_X_train = X_train.copy()[mask & ~(X_train['notformodel_split_dec_or_other'] == 1)]
+            filtered_y_train = y_train[mask & ~(X_train['notformodel_split_dec_or_other'] == 1)]
         else:
             filtered_X_train = X_train.copy()[mask]
             filtered_y_train = y_train[mask]
     else:
         if split_dec_or_other_filter:
-            filtered_X_train = X_train.copy()[mask & ~(X_train['split_dec_or_other'] == 1) & (y_train.isin([0, 2, '0', '2']))] # These are the codes for W/L and L/W
-            filtered_y_train = y_train[mask & ~(X_train['split_dec_or_other'] == 1) & (y_train.isin([0, 2, '0', '2']))]
+            filtered_X_train = X_train.copy()[mask & ~(X_train['notformodel_split_dec_or_other'] == 1) & (y_train.isin([0, 2, '0', '2']))] # These are the codes for W/L and L/W
+            filtered_y_train = y_train[mask & ~(X_train['notformodel_split_dec_or_other'] == 1) & (y_train.isin([0, 2, '0', '2']))]
         else:
             filtered_X_train = X_train.copy()[mask & (y_train.isin([0, 2, '0', '2']))] # These are the codes for W/L and L/W
             filtered_y_train = y_train[mask & (y_train.isin([0, 2, '0', '2']))]
@@ -42,8 +42,8 @@ def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False,
 
     # Create the DMatrix
     if split_dec_or_other_filter:
-        train_dmatrix = xgb.DMatrix(filtered_X_train.drop(['split_dec_or_other'], axis = 1), label=filtered_y_train)
-        test_dmatrix = xgb.DMatrix(X_test.drop(['split_dec_or_other'], axis = 1), label=y_train.iloc[test_idx])
+        train_dmatrix = xgb.DMatrix(filtered_X_train, label=filtered_y_train)
+        test_dmatrix = xgb.DMatrix(X_test, label=y_train.iloc[test_idx])
     else:
         train_dmatrix = xgb.DMatrix(filtered_X_train, label=filtered_y_train)
         test_dmatrix = xgb.DMatrix(X_test, label=y_train.iloc[test_idx])

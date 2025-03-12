@@ -69,7 +69,7 @@ def objective_xgboost_features_mlflow(
             
             if params['split_dec_or_other'] == True:  
                 # Add on any specific columns needed
-                X_train = pd.concat([X_train, X_train_master[['split_dec_or_other']]], axis = 1)
+                X_train = pd.concat([X_train, X_train_master[['notformodel_split_dec_or_other']]], axis = 1)
             
             X_train.reset_index(drop = True, inplace = True)
             y_train.reset_index(drop = True, inplace = True)

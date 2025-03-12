@@ -72,6 +72,11 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         if params['add_noise_to_odds']:
             X_train_df = add_noise_to_odds(X_train_df, norm_sd = params['odds_noise_standard_dev'])
         
+        # Remove split decisions if required
+        if params['split_dec_or_other']:
+            y_train_df = y_train_df[X_train_df['notformodel_split_dec_or_other'] == 0]
+            X_train_df = X_train_df[X_train_df['notformodel_split_dec_or_other'] == 0]
+        
         # Calculate the number of columns to randomly select
         if colsample_bynode < 1:
             num_columns_to_select = int(colsample_bynode * len(X_columns_for_training))

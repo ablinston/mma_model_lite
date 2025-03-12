@@ -44,9 +44,6 @@ else:
         np.random.seed(seed = config['seed_all'] + 8451)
         data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
 
-# Don't include split or other decisions in training data. This flag will be used in functions later to exclude them from training data but not from test data (including test in CV data)
-split_or_other_exclude = True
-
 
 
 ##########################################################################################
@@ -54,7 +51,7 @@ split_or_other_exclude = True
 ##########################################################################################
 
 # Prep the data ready for model training. Create a master for the train because we will vary the number of features
-X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = split_or_other_exclude)
+X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = model_hyper_params['split_or_other_exclude'])
 
 
 ##########################################################################################
@@ -80,7 +77,7 @@ if model_hyper_params['trim_model_features']:
 
 # Add on the split indicator if needed
 if split_or_other_exclude == True:
-    columns_in_order = columns_in_order + ['split_dec_or_other']
+    columns_in_order = columns_in_order + ['notformodel_split_dec_or_other']
     
 if model_hyper_params['odds_to_use'] == 'best_closing_odds':
     columns_in_order = [col for col in columns_in_order if 'mean_closing_odds' not in col]
@@ -124,7 +121,7 @@ space = {
     # Set the feature objective params
     'max_evals': 500,
     'num_of_features': hp.choice('num_of_features', [100, 150, 200, 250, 300]), # , 1000, 2000, len(X_train_master)]),
-    'split_dec_or_other': split_or_other_exclude,
+    'split_dec_or_other': model_hyper_params['split_or_other_exclude'],
     'hyperopt_early_stopping': 25
 }
 
