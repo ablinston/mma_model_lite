@@ -2,7 +2,7 @@
 odds_suffix_for_true_odds: best_closing_odds
 
 # Set whether to add the bayes versions of columns
-add_bayes_stats_columns: False
+add_bayes_stats_columns: True
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats)
 add_adj_bayes_columns: False

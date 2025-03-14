@@ -10,7 +10,7 @@ switch_fighters_with_odds: False
 switch_fighters_randomly: True
 
 # Set whether to exclude split decisions and other from training data (this won't be applied to test data)
-split_or_other_exclude: True
+split_or_other_exclude: False
 
 # Set whether we include differential features only in the model features
 differential_features_only: False
@@ -24,10 +24,13 @@ add_noise_to_odds: False
 odds_noise_standard_dev: 0.1
 
 # Set whether to use only the true odds in modelling or if we should use underlying odds too
-true_odds_only: False
+true_odds_only: True
 
 # Set whether to use the mean_closing_odds or best_closing_odds in the backtesting
 odds_to_use: best_closing_odds
 
 # Set whether to trim model features to try to remove duplicated similar but slightly different features. Just keep the highest importance version
 trim_model_features: True
+
+# Set whether to use bootstrapping and bagging on the training data, or just use the training dataset.
+xbg_forest_bagging: True

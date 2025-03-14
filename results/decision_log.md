@@ -6,7 +6,11 @@ Experiment: http://localhost:8080/#/experiments/490730489596532803/runs/78d44d90
 
 # Modelling parameters
 
+* Split decisions and other results:
+    * **Don't remove**: Reduced the fit of the models when excluded, 2014+_gt2_fights_xgboost_forest_v10. Still a 0.04 difference in logloss (train better than test)
 * Column proportion in xgboost forest: 
     * **Use 1**: found that using all the columns in every model significantly decreased logloss. Needed much fewer trees. But logloss difference between test and train  rose to around 0.3, but test had a better logloss! Also seen that on OOT data.
 * True odds only: 
-    * **Don't use**: I found that using this swapped the logloss with the train suddenly being better but test worse. Similar thing with EV mses.
+    * **Use?**: I found that using this led to slightly better fit on test data but worse on training data. This brought the two loglosses closer together though.
+* Bayes features:
+    * **Don't use**: found the logloss was worse after adding these. The EV MSE was worse for both test and train but they were both closer together.

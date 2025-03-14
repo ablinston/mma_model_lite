@@ -76,7 +76,7 @@ if model_hyper_params['trim_model_features']:
     columns_in_order = trim_column_list(columns_in_order)
 
 # Add on the split indicator if needed
-if split_or_other_exclude == True:
+if model_hyper_params['split_or_other_exclude'] == True:
     columns_in_order = columns_in_order + ['notformodel_split_dec_or_other']
     
 if model_hyper_params['odds_to_use'] == 'best_closing_odds':
@@ -108,7 +108,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v9')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v13')
 
 
 ##########################################################################################
@@ -120,7 +120,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [100, 150, 200, 250, 300]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [100, 150, 200, 250, 300, 500]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': model_hyper_params['split_or_other_exclude'],
     'hyperopt_early_stopping': 25
 }
@@ -148,7 +148,7 @@ params_inner = {
      # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
      # 'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
      # 'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
-     'exclude_split_other_from_train': split_or_other_exclude,
+     'exclude_split_other_from_train': model_hyper_params['split_or_other_exclude'],
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': hp.choice('win_loss_only', [True, False]),
      'loss_function' : model_hyper_params['loss_function']
