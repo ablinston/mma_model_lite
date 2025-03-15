@@ -5,6 +5,7 @@ import h2o
 from h2o.automl import H2OAutoML
 from hyperopt import hp, STATUS_OK, tpe, fmin, rand, Trials # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
+import hyperopt
 import itertools
 import lightgbm as lgb
 import mlflow
@@ -51,7 +52,7 @@ else:
 ##########################################################################################
 
 # Prep the data ready for model training. Create a master for the train because we will vary the number of features
-X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = model_hyper_params['split_or_other_exclude'])
+X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = True)
 
 
 ##########################################################################################
@@ -76,8 +77,7 @@ if model_hyper_params['trim_model_features']:
     columns_in_order = trim_column_list(columns_in_order)
 
 # Add on the split indicator if needed
-if model_hyper_params['split_or_other_exclude'] == True:
-    columns_in_order = columns_in_order + ['notformodel_split_dec_or_other']
+columns_in_order = columns_in_order + ['notformodel_split_dec_or_other']
     
 if model_hyper_params['odds_to_use'] == 'best_closing_odds':
     columns_in_order = [col for col in columns_in_order if 'mean_closing_odds' not in col]
@@ -108,7 +108,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v14')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v15')
 
 
 ##########################################################################################
@@ -120,8 +120,8 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [20, 30, 149]), # , 1000, 2000, len(X_train_master)]),
-    'split_dec_or_other': model_hyper_params['split_or_other_exclude'],
+    'num_of_features': hp.choice('num_of_features', [75, 150, 125]), # , 1000, 2000, len(X_train_master)]),
+    'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
     'hyperopt_early_stopping': 25
 }
 
@@ -131,7 +131,7 @@ params_inner = {
      'learning_rate': hp.uniform('learning_rate', 0.001, 0.2), # Learning rate #  0.01-0.2 is considered low-moderate learning rates
      'min_child_weight': 15, # hp.quniform('min_child_weight', 15, 21, 3), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
-     # 'colsample_bytree': hp.quniform('colsample_bytree', 0.1, 1, 0.05),
+     'colsample_bytree': hp.quniform('colsample_bytree', 0.1, 1, 0.05),
      'max_depth': hp.quniform('max_depth', 1, 8, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
@@ -148,7 +148,7 @@ params_inner = {
      # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
      # 'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
      # 'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
-     'exclude_split_other_from_train': model_hyper_params['split_or_other_exclude'],
+     'exclude_split_other_from_train': hp.choice('exclude_split_other_from_train', [True, False]),
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': hp.choice('win_loss_only', [True, False]),
      'loss_function' : model_hyper_params['loss_function']
@@ -160,12 +160,12 @@ best = fmin(fn = objective_xgboost_features_mlflow,
             max_evals = 20,
             trials = trials)
 
-
+ 
 
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:150]
+column_names = X_train_master.columns.tolist()[0:25]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

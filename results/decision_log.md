@@ -16,3 +16,5 @@ Experiment: http://localhost:8080/#/experiments/490730489596532803/runs/78d44d90
     * **Don't use**: found the logloss was worse after adding these. The EV MSE was worse for both test and train but they were both closer together. Even with feature trimming, it didn't improve more than features without bayes.
 * Feature trimming:
     * Testing when looking at the bayes variables and it improved the model fit.
+* SHAP importance from xgboost:
+    * Keep ussing random forest. Models didn't fit as well

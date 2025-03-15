@@ -51,7 +51,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v13')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v14')
 
 
 
@@ -61,12 +61,12 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v13')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.0289, # Learning rate
+    'learning_rate': 0.002, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
     'split_dec_or_other': model_hyper_params['split_or_other_exclude'],
     'subsample': 0.85,
     'colsample_bytree': 1,
-    'max_depth': 2,
+    'max_depth': 1,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric

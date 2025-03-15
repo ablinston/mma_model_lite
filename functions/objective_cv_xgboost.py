@@ -23,7 +23,7 @@ def objective_cv_xgboost(
         # Ensure formatting of params is correct
         for param in ['max_bin', 'min_child_weight', 'max_depth', 'num_iterations']:
             params[param] = int(params[param])
-    
+        
         ## Precompute DMatrix objects using ThreadPoolExecutor
         # If the training data is to have split decs and other results excluded, then use the custom function to do that
         # if params['exclude_split_other_from_train'] == False:

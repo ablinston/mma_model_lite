@@ -67,9 +67,7 @@ def objective_xgboost_features_mlflow(
             X_train['fighter1_odds_for_loss'] = X_train_master['fighter1_backtesting_odds']
             X_train['fighter2_odds_for_loss'] = X_train_master['fighter2_backtesting_odds']
             
-            if params['split_dec_or_other'] == True:  
-                # Add on any specific columns needed
-                X_train = pd.concat([X_train, X_train_master[['notformodel_split_dec_or_other']]], axis = 1)
+            X_train = pd.concat([X_train, X_train_master[['notformodel_split_dec_or_other']]], axis = 1)
             
             X_train.reset_index(drop = True, inplace = True)
             y_train.reset_index(drop = True, inplace = True)
@@ -87,10 +85,25 @@ def objective_xgboost_features_mlflow(
             
             while error_count < 5:
                 try:
+                    # First do some random ones to get a baseline
+                    best = fmin(fn = objective_cv_xgboost,
+                                space = params_inner,
+                                algo = rand.suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
+                                max_evals = 50,
+                                trials = trials_inner,
+                                early_stop_fn = no_progress_loss(51))
+                    break # exit loop if successful
+                except:
+                    print('Error encountered')
+                    error_count += 1
+                    # pdb.set_trace()
+                    
+            while error_count < 5:
+                try:
                     best = fmin(fn = objective_cv_xgboost,
                                 space = params_inner,
                                 algo = atpe_suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
-                                max_evals = params['max_evals'],
+                                max_evals = (params['max_evals'] - 50),
                                 trials = trials_inner,
                                 early_stop_fn = no_progress_loss(params['hyperopt_early_stopping']))
                     break # exit loop if successful
