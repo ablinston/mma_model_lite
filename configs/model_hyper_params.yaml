@@ -33,4 +33,4 @@ odds_to_use: best_closing_odds
 trim_model_features: False
 
 # Set whether to use bootstrapping and bagging on the training data, or just use the training dataset. If enabled, the model will take the subsample and increase the sample size back to the original dataset through bootstrapping
-xgb_forest_bagging: False
+xgb_forest_bagging: True

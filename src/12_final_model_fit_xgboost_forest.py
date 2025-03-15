@@ -44,14 +44,14 @@ if model_hyper_params['switch_all_fighters_and_stack'] == True:
 ##########################################################################################
 
 # Prep the data ready for model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = model_hyper_params['split_or_other_exclude'])
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = True)
 
 # # Remove other columns from training data as not required
 # X_train = X_train[final_model_features]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v14')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v15')
 
 
 
@@ -61,12 +61,12 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v14')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.002, # Learning rate
+    'learning_rate': 0.0219, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
-    'split_dec_or_other': model_hyper_params['split_or_other_exclude'],
+    'split_dec_or_other': True,
     'subsample': 0.85,
-    'colsample_bytree': 1,
-    'max_depth': 1,
+    'colsample_bytree': 0.35,
+    'max_depth': 2,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -103,7 +103,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training = final_model_features,
-    num_models = 20,
+    num_models = 25,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
@@ -151,7 +151,7 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 2
 
 
 # Set the final number of models
-final_forest_size = 13
+final_forest_size = 5
 
 
 # Save the model

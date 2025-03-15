@@ -18,3 +18,7 @@ Experiment: http://localhost:8080/#/experiments/490730489596532803/runs/78d44d90
     * Testing when looking at the bayes variables and it improved the model fit.
 * SHAP importance from xgboost:
     * Keep ussing random forest. Models didn't fit as well
+* col subsample in xgboost:
+    * Using the col subsample within xgboost resulted in slightly better metrics in CV. 
+* bagging in xgboost forest:
+    * **enable**: Saw a significant improvement in logloss and EV MSE when enabling bagging to increase sample sizes in v15. But the model did go from doing slightly better in logloss in the test data to having slightly worse logloss in test data than train, but still better overall logloss in test.
