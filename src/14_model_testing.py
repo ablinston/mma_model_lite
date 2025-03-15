@@ -74,14 +74,14 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Prep the data ready for model training as it was done in the overall model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data, config, test_size = config['test_proportion'])
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data)
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('OOT_testing_v2')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - recreating v1 method with updated data, all cols, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = 'XGB forest - new col sampling, all cols, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -163,10 +163,8 @@ for backtesting_params in [
         
         # Get the model input data
         X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
-            oot, 
-            config = {'oot_start_date': '2999-01-01', 'min_training_date': '1000-01-01', 'seed_all': 1}, 
-            split_or_other_flag = False, 
-            test_size = 1e-99)
+            oot,
+            oot_testing = True)
         
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)

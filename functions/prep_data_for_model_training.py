@@ -3,14 +3,14 @@
 # It returns 7 objects that can be output into env objects like
 # X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data)
 
-def prep_data_for_model_training(df, split_or_other_flag = False, upcoming_fights = False):
+def prep_data_for_model_training(df, split_or_other_flag = False, upcoming_fights = False, oot_testing = False):
     
     # pdb.set_trace()
         
     data = clean_inf_and_large(df.copy())
     
     # If we're prepping upcoming fights, take whole sample
-    if upcoming_fights:
+    if oot_testing:
         data['train_test_oot_flag'] = 'train'
     
     # Filter the OOT data and training data to be ignored
