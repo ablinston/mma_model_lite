@@ -695,6 +695,7 @@ merged_data = add_fighter_differentials(merged_data)
 ###########################################################################################
 # FLAG TRAIN/TEST/OOT
 
+np.random.seed(seed = config['seed_all'] + 985)
 merged_data = flag_train_test_oot(merged_data, config)
 
 

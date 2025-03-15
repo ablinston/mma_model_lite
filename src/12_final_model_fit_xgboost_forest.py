@@ -51,7 +51,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v12')
+mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v13')
 
 
 
@@ -61,7 +61,7 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v12')
 
 params = {
     'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.006, # Learning rate
+    'learning_rate': 0.0289, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
     'split_dec_or_other': model_hyper_params['split_or_other_exclude'],
     'subsample': 0.85,
@@ -85,7 +85,8 @@ params = {
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function'],
     'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
-    'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev']
+    'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev'],
+    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging']
 }
 
 # Set hyperparameters for the forest

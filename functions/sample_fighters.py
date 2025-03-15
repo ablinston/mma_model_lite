@@ -1,7 +1,9 @@
 # This function takes a data frame and selects a random sample of rows, but it does this by randomly selecting fighters then
-# selecting all their fights for the data
+# selecting all their fights for the data.
 
-def sample_fighters(df_complete = None, X = None, y = None, n_rows = 100):
+# rows_with_bagging is how many rows the final data should have after bagging 
+
+def sample_fighters(df_complete = None, X = None, y = None, n_rows = 100, rows_with_bagging = None):
     
     # pdb.set_trace()
     
@@ -31,6 +33,10 @@ def sample_fighters(df_complete = None, X = None, y = None, n_rows = 100):
     # Do a check to see if n rows is reasonable
     if abs(len(final_df) - n_rows) > (n_rows * 0.05):
         print(f"WARNING: sample_fighters() function returned a row number > 5% different from target. Sample is {(len(final_df) / n_rows) - 1} of data.")
+
+    # If doing bagging, expand the sample
+    if rows_with_bagging is not None:
+        final_df = resample(final_df, replace = True, n_samples = rows_with_bagging)
 
     # Now return the selected data
     if df_complete is None:

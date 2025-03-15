@@ -47,10 +47,10 @@ if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out 
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
 
-# Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
-var_importance = pd.read_csv('./results/shap_feature_importance_baseline.csv').sort_values('Mean SHAP Value', ascending = False)
+# # Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
+# var_importance = pd.read_csv('./results/shap_feature_importance_baseline.csv').sort_values('Mean SHAP Value', ascending = False)
 
-X_train = X_train[[col for col in X_train.columns if col not in var_importance['Feature'][5000:len(var_importance)].tolist()]]
+# X_train = X_train[[col for col in X_train.columns if col not in var_importance['Feature'][5000:len(var_importance)].tolist()]]
 
 # Now remove any columns that aren't wanted in a training dataset. At this point we don't remove non-true odds in order to see the rank in feature importance
 X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False)
@@ -79,13 +79,14 @@ mlflow.set_experiment('all_fights')
 params = {
     'nthread': 3, # Only applies to CPU cores
     'booster': 'gbtree',
-    'num_boost_round': 1, # to tell the package to train only 1 random forest
-    'colsample_bynode': np.sqrt(len(data.columns)) / len(data.columns), # fraction of columns to select for each tree
-    'num_parallel_tree': 1500, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
-    'learning_rate': 1, # Learning rate
+    'num_boost_round': 500, # to tell the package to train only 1 random forest
+    'colsample_bytree': 0.8,  # Fraction of columns for each split
+    # 'colsample_bynode': np.sqrt(len(data.columns)) / len(data.columns), # fraction of columns to select for each tree
+    # 'num_parallel_tree': 1500, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
+    'learning_rate': 0.05, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
-    # 'max_depth': 6,
+    'max_depth': 6,
     'max_bin': 175, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -126,8 +127,8 @@ with mlflow.start_run():
     else:
         rf_model = xgb.train(params, train)
 
-    # Save the model in case we want to use it later
-    rf_model.save_model("results/7.5_random_forest_model.xgb")
+    # # Save the model in case we want to use it later
+    # rf_model.save_model("results/7.5_random_forest_model.xgb")
     
     # Get feature importance scores
     importance = rf_model.get_score(importance_type='total_gain')
@@ -135,11 +136,11 @@ with mlflow.start_run():
     # Sort features by importance
     sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
     
-    # Save the variable importance plot to csv
-    with open('results/random_forest_variable_importance.csv', mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Feature", "Importance"])  # Write the header
-        writer.writerows(sorted_importance)
+    # # Save the variable importance plot to csv
+    # with open('results/random_forest_variable_importance.csv', mode='w', newline='') as file:
+    #     writer = csv.writer(file)
+    #     writer.writerow(["Feature", "Importance"])  # Write the header
+    #     writer.writerows(sorted_importance)
 
     # TreeSHAP calculation
     explainer = shap.TreeExplainer(rf_model)

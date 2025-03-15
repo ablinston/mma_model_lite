@@ -58,7 +58,11 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         
         # Randomly sample rows with replacement for the training set
         if subsample < 1:
-            X_train_df, y_train_df = sample_fighters(X = X, y = y, n_rows = int(len(X) * subsample))
+            X_train_df, y_train_df = sample_fighters(
+                X = X, 
+                y = y, 
+                n_rows = int(len(X) * subsample),
+                rows_with_bagging = None if not params['xgb_forest_bagging'] else len(X))
             # X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
         else:
             X_train_df = X.copy()
