@@ -185,8 +185,8 @@ for backtesting_params in [
 
 # If the model is good, then log it in the registery
 if model_approved:
-    # run_id = '17961756088941ce880360c3c0b8405b'
+    run_id = 'aa217e4b1bf442729c4f86abfba56f98'
     mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
 
 
-# test = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')
+test = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
