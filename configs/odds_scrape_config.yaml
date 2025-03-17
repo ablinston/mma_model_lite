@@ -8,3 +8,6 @@ odds_cell_class: but-sg
 # events_colnames: ['DraftKings', 'BetMGM', 'Caesars', 'BetRivers', 'FanDuel', 'BetWay', 'Bet365', 'Unibet', 'PointsBet'] 
 # The scraping function doesn't return odds in the correct column so make generic
 events_colnames: ['odds_co_1', 'odds_co_2', 'odds_co_3', 'odds_co_4', 'odds_co_5', 'odds_co_6', 'odds_co_7', 'odds_co_8', 'odds_co_9'] 
+
+# Set whether to scrape fast
+fast_scrape_update: True

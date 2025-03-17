@@ -10,7 +10,6 @@ def get_website_soup(
         gecko_driver = '' # Only needed for NOT fast):
     ):
     
-    
     if fast == True:
         
         response = requests.get(url, headers=headers, cookies=cookies)

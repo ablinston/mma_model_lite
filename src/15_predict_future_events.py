@@ -34,7 +34,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 # Set the model location
 # model_path = './results/final_xgboost_forest.joblib'
 # Load files
-rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')
+rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
 
 ##########################################################################################
 ### Update the upcoming event and odds data ###

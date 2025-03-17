@@ -84,7 +84,9 @@ def parallel_scrape_odds_fast(
             odds_urls_overide_df = odds_urls_overide_df,
             event_urls = event_urls,
             fast = False,
-            playwright = playwright
+            playwright = playwright,
+            firefox_binary = firefox_location,
+            gecko_driver = gecko_driver
         )
 
         # with ThreadPoolExecutor(max_workers = num_threads) as executor:
@@ -93,12 +95,11 @@ def parallel_scrape_odds_fast(
         with ThreadPoolExecutor(max_workers = num_threads) as executor:
             futures = {executor.submit(scrape_func, fighter_name): fighter_name for fighter_name in fighter_list}
 
-            scrape_results = []
             for future in as_completed(futures):
                 try:
                     odds_result, events_result = future.result()
                     odds_scrape_results.append(odds_result)  # Collect the result (url, title)
-                    events_scrape_results.append(events_result)  # Collect the result (url, title)
+                    event_scrape_results.append(events_result)  # Collect the result (url, title)
                 except Exception as e:
                     print(f"Error scraping {futures[future]}: {e}")  # Handle failures
                     
@@ -106,6 +107,9 @@ def parallel_scrape_odds_fast(
                 completed_count += 1
                 print(f"Completed {completed_count} out of {total_fighters} tasks")
 
+        # This ensures that all threads are done
+        executor.shutdown(wait=True)
+        
     # pdb.set_trace()    
     
     # Combine the results

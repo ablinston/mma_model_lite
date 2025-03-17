@@ -30,8 +30,11 @@ list_of_unparsed_events = [event for event in list_of_all_events if event not in
 # Get a list of upcoming events
 upcoming_events_df = parse_event_details(get_soup(config['upcoming_events_url']), upcoming = True)
 
+# # If missed the event start time
+# upcoming_events_df = pd.concat([new_event_details_df.iloc[[0]], upcoming_events_df], axis = 0, ignore_index = True).reset_index(drop = True)
+
 # Only look at the first two to save time
-upcoming_events_df = upcoming_events_df.iloc[0:2]
+upcoming_events_df = upcoming_events_df.iloc[0:1]
 
 # Parse upcoming fight details
 upcoming_fight_details_df = update_fight_details_data(
@@ -131,10 +134,23 @@ new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = updat
     list_of_unparsed_fighter_odds, 
     list_of_unparsed_event_dates, 
     config, 
+    fast_scrape = odds_scrape_config['fast_scrape_update'],
     num_threads = config['num_threads'])
     
+# Find which fighters didn't get odds properly
+found_fighters = new_parsed_odds_df[new_parsed_odds_df['date'].isin(list_of_unparsed_event_dates)]['fighter'].tolist()
+missing_fighters = [fighter for fighter in list_of_unparsed_fighter_odds if fighter not in found_fighters]
 
-
+# Scrape the odds again but a slow scrape
+new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = update_odds_data(
+    new_parsed_odds_df, 
+    new_parsed_event_odds_urls, 
+    new_parsed_event_odds_df,
+    missing_fighters, 
+    list_of_unparsed_event_dates, 
+    config, 
+    fast_scrape = False,
+    num_threads = config['num_threads'])
 
 ###############################################################################
 ##### Parse new fighter data #####
@@ -175,6 +191,9 @@ if len(unparsed_fighter_urls) > 0:
         parsed_fighter_tott_df
     ])
 
+else:
+    new_parsed_fighter_tott_df = parsed_fighter_tott_df
+    
 
 ###############################################################################
 ##### Data consistency checks #####

@@ -1,7 +1,7 @@
 # This function takes existing odds data and a list of fighters and adds the new fights to the data. 
 # It requires a list of dates for the events as well as the list of fighters that fought.
 
-def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odds, new_fighter_list, new_event_date_list, config, num_threads = 1):
+def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odds, new_fighter_list, new_event_date_list, config, fast_scrape = True, num_threads = 1):
 
     # pdb.set_trace()
     
@@ -15,7 +15,8 @@ def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odd
         firefox_location = config['firefox_location'], 
         gecko_driver = config['gecko_driver_location'],
         odds_urls_overide_df = fighter_odds_urls,
-        event_urls = True)
+        event_urls = True,
+        fast = fast_scrape)
         
     # Get the date list and expand it to include dates on either side due to timezone differences potentially causing discrepencies
     full_date_list = list(new_event_date_list.copy())
@@ -68,7 +69,7 @@ def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odd
         num_threads = config['num_threads'], 
         firefox_location = config['firefox_location'], 
         gecko_driver = config['gecko_driver_location'],
-        fast = True)
+        fast = fast_scrape)
     
     # Concat and replace duplicates
     final_event_urls = pd.concat([new_events_to_scrape, existing_event_urls]).drop_duplicates()
