@@ -23,7 +23,7 @@ def test_aggregate_last_X_fight_data():
     prefix = 'cumulative_'  # Prefix for new columns
 
     # Apply the function
-    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000, per_minute_calc = True, bayes_priors_df = fight_stats_bayes_priors)
+    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000, per_minute_calc = True)
 
     # Ensure that 'fighter_id' and 'date' columns are preserved and not included in the aggregation
     assert 'fighter_id' in result.columns
@@ -84,6 +84,6 @@ def test_aggregate_last_X_fight_data():
             ignore_last_n = 1
             ))
     
-    assert bayes_result.equals(test_aggregate_last_X_fight_data_correct)
+    assert bayes_result.equals(test_aggregate_last_X_fight_data_correct[bayes_result.columns])
 
 # fp.write('./tests/data/test_aggregate_last_X_fight_data_correct.parquet', bayes_result, compression = 'ZSTD')

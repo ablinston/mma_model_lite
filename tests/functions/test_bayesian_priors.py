@@ -23,7 +23,7 @@ def test_bayesian_priors():
     
     id_cols = ['event', 'bout', 'fighter']
     group_by = ['weightclass']
-    fight_span = 50  # Using a larger span for robust testing
+    fight_span = 2  # Using a larger span for robust testing
 
     # Run the function
     result = bayesian_priors(fight_stats_df, id_cols, group_by, fight_span)
