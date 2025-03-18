@@ -10,7 +10,7 @@ def prep_data_for_model_training(df, split_or_other_flag = False, upcoming_fight
     data = clean_inf_and_large(df.copy())
     
     # If we're prepping upcoming fights, take whole sample
-    if oot_testing:
+    if oot_testing or upcoming_fights:
         data['train_test_oot_flag'] = 'train'
     
     # Filter the OOT data and training data to be ignored

@@ -1,7 +1,6 @@
-,date,event,fighter1,fighter2,fighter1_best_closing_odds,fighter2_best_closing_odds,Fighter1_win_prob,Fighter2_win_prob,Fighter1_win_EV,Fighter2_win_EV,Bet_trigger,Final_bet,Potential_win
-9200,2025-02-08,ufc312:duplessisvsstrickland2,jakematthews,franciscoprado,1.4587155963302751,2.8,73.2,25.3,0.07,-0.29,jakematthews,119.74022781606672,54.92671000737005
-9201,2025-02-08,ufc312:duplessisvsstrickland2,jackjenkins,gabrielsantos,3.0,1.5,51.9,46.3,0.56,-0.31,jackjenkins,133.3055089454949,266.6110178909898
-9205,2025-02-08,ufc312:duplessisvsstrickland2,tomnolan,viacheslavborshchev,2.25,1.704225352112676,56.0,42.3,0.26,-0.28,tomnolan,125.82897085331082,157.28621356663854
-9206,2025-02-08,ufc312:duplessisvsstrickland2,hyunsungpark,nyamjargaltumendemberel,1.4587155963302751,2.8,76.0,22.5,0.11,-0.37,hyunsungpark,129.03652516071617,59.19106658748447
-9207,2025-02-08,ufc312:duplessisvsstrickland2,dricusduplessis,seanstrickland,1.5050505050505052,2.75,64.9,33.5,-0.02,-0.08,None,0.0,0.0
-9219,2025-02-15,ufcfightnight:cannoniervsrodrigues,jaredcannonier,gregoryrodrigues,2.3,1.6451612903225805,39.1,59.2,-0.1,-0.03,None,0.0,0.0
+,date,event,fighter1,fighter2,fighter1_backtesting_odds,fighter2_backtesting_odds,Fighter1_win_prob,Fighter2_win_prob,Fighter1_win_EV,Fighter2_win_EV,Bet_trigger,Final_bet,Potential_win,Bet_breakeven_odds
+9265,2025-03-22,ufcfightnight:edwardsvsbrady,janblachowicz,carlosulberg,3.2,1.4444444444444444,28.5,69.3,-0.09,0.0,carlosulberg,104.60229618119449,46.48990941386422,1.4430014
+9266,2025-03-22,ufcfightnight:edwardsvsbrady,gunnarnelson,kevinholland,1.8,2.15,57.2,40.5,0.03,-0.13,gunnarnelson,108.04841954382509,86.43873563506008,1.7482517
+9269,2025-03-22,ufcfightnight:edwardsvsbrady,nathanielwood,morgancharriere,2.4299999999999997,1.5376344086021505,47.6,50.0,0.16,-0.23,None,0.0,0.0,
+9270,2025-03-22,ufcfightnight:edwardsvsbrady,marcintybura,mickparkin,1.9523809523809523,1.9523809523809523,54.8,43.0,0.07,-0.16,marcintybura,111.90701078428924,106.57810550884689,1.8248175
+9277,2025-03-22,ufcfightnight:edwardsvsbrady,leonedwards,seanbrady,2.3600000000000003,1.6329113924050633,46.7,51.0,0.1,-0.17,None,0.0,0.0,

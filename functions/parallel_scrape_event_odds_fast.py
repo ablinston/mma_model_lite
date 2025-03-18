@@ -56,6 +56,9 @@ def parallel_scrape_event_odds_fast(
             
     # This ensures that all threads are done
     executor.shutdown(wait=True)
-
-    # Combine the results
-    return pd.concat(scrape_results, ignore_index = True)
+    
+    if len(scrape_results) == 0:
+        return pd.DataFrame()
+    else:    
+        # Combine the results
+        return pd.concat(scrape_results, ignore_index = True)

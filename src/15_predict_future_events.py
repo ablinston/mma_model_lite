@@ -72,10 +72,7 @@ upcoming_fights = forecasting_data[forecasting_data['outcome'].isna()]
 
 # Get the data ready for the model
 X_upcoming, temp1, temp6, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
-    upcoming_fights, 
-    config = {'oot_start_date': '2999-01-01', 'min_training_date': '1000-01-01', 'seed_all': 1}, 
-    split_or_other_flag = False, 
-    test_size = 0,
+    upcoming_fights,
     upcoming_fights = True)
 
 # Get the model predictions
