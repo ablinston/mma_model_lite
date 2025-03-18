@@ -4,6 +4,10 @@ Based on the test results of the first xg boost forest, on the test dataset, the
 
 Experiment: http://localhost:8080/#/experiments/490730489596532803/runs/78d44d90d4224a1fb9ee2f3f1f017815
 
+# Betting parameters
+
+Version 2 XGB Forest model shows much better correlation between EV predictions and actuals profits and losses in bet testing v15 in MLflow. Highest P&L was with 0 and 0 min probs and EVs (both in OOT and Test), but max drawdown was too large. 0.49 and 0 as prob and EV mins was the next highest overall P&L for both OOT and Test with much more tolerable drawdowns.
+
 # Modelling parameters
 
 * Split decisions and other results:
