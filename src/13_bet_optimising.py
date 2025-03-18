@@ -20,7 +20,7 @@ model_path = './results/final_xgboost_forest.joblib'
 # Read in the data for training
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 # Load files
-rf_xgb_model = joblib.load(model_path)[0:26]
+rf_xgb_model = joblib.load(model_path)
 
 ##########################################################################################
 ### Feature selection using config ###
@@ -71,14 +71,14 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Prep the data ready for model training as it was done in the overall model training
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data, config, test_size = config['test_proportion'])
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data)
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_bet_testing_v2')
+mlflow.set_experiment('final_models_bet_testing_v15')
 
 # Set this model's description for MLflow
-model_description = 'XGB single model, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' all features'
+model_description = 'XGB forest, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -90,8 +90,8 @@ breakdown_metrics= ['Logloss', 'EV MSE', 'Avg WL only AUC', 'X Odds Avg WL only 
 target = 'outcome'
 
 # Loop through all the minimum probabilities and ex[ected values to bet
-for min_prob_to_bet in [0, 0.5]: # np.arange(0.1, 0.7, 0.1):
-    for min_ev_to_bet in [0, 0.2]: # np.arange(0, 0.2, 0.05):
+for min_prob_to_bet in [0, 0.49]: # np.arange(0.1, 0.7, 0.1):
+    for min_ev_to_bet in [0, 0.1, 0.2]: # np.arange(0, 0.2, 0.05):
         for max_bet_size in [1]:#np.arange(0.1, 0.4, 0.02):
             for min_bet_size in [1]:#np.arange(0.01, 0.1, 0.01):
             
@@ -151,15 +151,13 @@ for min_prob_to_bet in [0, 0.5]: # np.arange(0.1, 0.7, 0.1):
                 # # Run the metrics on the OOT data
                 # with mlflow.start_run():
                     
-                    # # Log parameters
-                    # mlflow.log_params(backtesting_params)
+                #     # Log parameters
+                #     mlflow.log_params(backtesting_params)
                     
                 #     # Get the model input data
                 #     X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
                 #         oot, 
-                #         config = {'oot_start_date': '2999-01-01', 'min_training_date': '1000-01-01', 'seed_all': 1}, 
-                #         split_or_other_flag = False, 
-                #         test_size = 1e-99)
+                #         oot_testing = True)
                     
                 #     # Get the model predictions
                 #     prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)
