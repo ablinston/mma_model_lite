@@ -21,8 +21,8 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
         'outcome': ['L/W', 'L/W', 'W/L', 'L/W', 'W/L', 'W/L', 'OTH'],
         'date': pd.to_datetime(['2024-01-01'] * 7),
         'weightclass': ['light', 'heavy', 'light', 'heavy', 'light', 'heavy', 'middle'],
-        'fighter1_best_closing_odds': [9e99, 9e99, 1.0000000001, 9e99, 1.0000000001, 1.0000000001, 9e99],
-        'fighter2_best_closing_odds': [1.0000000001, 1.0000000001, 9e99, 1.0000000001, 9e99, 9e99, 9e99], 
+        'fighter1_backtesting_odds': [9e99, 9e99, 1.0000000001, 9e99, 1.0000000001, 1.0000000001, 9e99],
+        'fighter2_backtesting_odds': [1.0000000001, 1.0000000001, 9e99, 1.0000000001, 9e99, 9e99, 9e99], 
         'fighter1': ['A'] * 7,
         'fighter2': ['B'] * 7,
     })
@@ -42,7 +42,7 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
     mlflow_description = 'Test perfect predictions'
 
     # First look at the calculated metrics
-    calc_metrics = calculate_metrics(prediction_probabilities, clean_target_column(actuals_data['outcome']))
+    calc_metrics = calculate_metrics(prediction_probabilities, clean_target_column(actuals_data['outcome']), actuals_data['fighter1_backtesting_odds'], actuals_data['fighter2_backtesting_odds'])
     calc_odds_metrics = calculate_metrics_odds(actuals_data.iloc[0:6,], clean_target_column(actuals_data['outcome'])[0:6])
     
     # Call the function with synthetic data
@@ -68,6 +68,7 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
      'Avg WL only AUC': 1.0,
      'Hmean WL only Accuracy': 1.0,
      'Logloss': 2.220446049250313e-16,
+     'EV MSE': 0.0,
      'Sample Size': 7}
     
     assert calc_odds_metrics == {'X Odds Accuracy': 1.0,
@@ -77,6 +78,8 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
      'X Odds L/W Accuracy': 1.0,
      'X Odds Avg WL only AUC': 1.0,
      'X Odds Logloss': 2.220446049250313e-16,
+     'X Odds EV MSE': 0.3333333334, # something strange about the way odds go to probabilities with extremely low and large numbers
      'X Odds Hmean WL only Accuracy': 1.0}
 
     assert test_results['win_percent'][0] == 100.0
+    assert np.round(test_results['profit_loss'].iloc[0], 11) == 6e-10 # odds are all 1.000000001

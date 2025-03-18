@@ -1,5 +1,23 @@
-E:
+@echo off
+set "MLFLOW_DIR=E:\Google Drive\MLflow"
 
-cd Repos/mma_model_lite/
+echo Cleaning up MLflow garbage...
 
-mlflow server --host 0.0.0.0 --port 8080 --backend-store-uri /mlruns/ --default-artifact-root /mlartifacts/
+:: Delete MLflow runs from .trash
+if exist "%MLFLOW_DIR%\mlruns\.trash" (
+    echo Deleting MLflow runs trash...
+    rmdir /s /q "%MLFLOW_DIR%\mlruns\.trash"
+)
+
+:: Delete MLflow artifacts from .trash
+if exist "%MLFLOW_DIR%\mlartifacts\.trash" (
+    echo Deleting MLflow artifacts trash...
+    rmdir /s /q "%MLFLOW_DIR%\mlartifacts\.trash"
+)
+
+echo Cleanup complete.
+echo Starting MLflow server...
+
+mlflow server --host 0.0.0.0 --port 8080 --backend-store-uri "file:///%MLFLOW_DIR%/mlruns/" --default-artifact-root "file:///%MLFLOW_DIR%/mlartifacts/"
+
+pause

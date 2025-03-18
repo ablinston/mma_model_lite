@@ -1,6 +1,8 @@
 # Load all the packages and functions needed
 exec(open('global.py').read())
 
+# Load what answers are expected
+test_aggregate_last_X_fight_data_correct = fp.ParquetFile('./tests/data/test_aggregate_last_X_fight_data_correct.parquet').to_pandas()
 
 # This test looks at a specific URL for an historic event and checks that the results match what is expected
 def test_aggregate_last_X_fight_data():
@@ -21,7 +23,7 @@ def test_aggregate_last_X_fight_data():
     prefix = 'cumulative_'  # Prefix for new columns
 
     # Apply the function
-    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000)
+    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000, per_minute_calc = True)
 
     # Ensure that 'fighter_id' and 'date' columns are preserved and not included in the aggregation
     assert 'fighter_id' in result.columns
@@ -46,3 +48,42 @@ def test_aggregate_last_X_fight_data():
     # Compare the result to the expected dataframe
     pd.testing.assert_frame_equal(result[['fighter_id', 'opponent', 'date', 'cumulative_score', 'cumulative_hits']], expected_df)
     
+    
+    #################
+    # Now test Bayesian
+    
+    data = {
+        "event": ["E" + str(i) for i in range(1, 25)],
+        "date": pd.date_range(start="2024-01-01", periods=24, freq="D"),
+        "bout": [f"b{i}" for i in range(1, 25)],
+        "fighter": ["f" + str(i) for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 
+                                           1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]],
+        "weightclass": ["light"] * 6 + ["mid"] * 2 + ["light"] * 2 + ["mid"] * 2 + 
+                       ["light"] * 2 + ["mid"] * 2 + ["light"] * 2 + ["mid"] * 2 + 
+                       ["light"] * 2 + ["mid"] * 2,
+        "allrounds_hit": [5, 2, 3, 4, 15, 48, 84, 5, 1, 25, 5, 4, 5, 1, 16, 5, 2, 1, 2, 85, 55, 3, 58, 4],
+        "allrounds_hit_against": [2, 5, 4, 3, 48, 15, 5, 84, 25, 1, 4, 5, 1, 5, 5, 16, 1, 2, 85, 2, 3, 55, 4, 58],
+        "allrounds_fight_minutes": [5] * 24
+    }
+    
+    df = pd.DataFrame(data)
+
+
+    bayes_result = aggregate_last_X_fight_data(
+        df, 
+        ignore_cols = ['event', 'bout', 'date', 'fighter', 'weightclass'], 
+        group_by = ['fighter'], 
+        prefix = 'test_', 
+        X = 3, 
+        per_minute_calc = True, 
+        bayes_priors_df = bayesian_priors(
+            df,
+            id_cols = ['event', 'bout', 'fighter'], 
+            group_by = ['weightclass'], 
+            fight_span = 3,
+            ignore_last_n = 1
+            ))
+    
+    assert bayes_result.equals(test_aggregate_last_X_fight_data_correct[bayes_result.columns])
+
+# fp.write('./tests/data/test_aggregate_last_X_fight_data_correct.parquet', bayes_result, compression = 'ZSTD')

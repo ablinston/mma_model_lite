@@ -2,7 +2,7 @@
 
 # It returns the odds data with the correct event and bout matched along with a correct date
 
-def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
+def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_check = '2010-01-01'):
     
     # # debug
     # odds_df = parsed_odds_df.copy()
@@ -10,6 +10,12 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
     # stats_df = parsed_fight_stats_df.copy()
     # pdb.set_trace()
     
+    # First create event and bout dummies if not there
+    if 'event' not in odds_df.columns:
+        odds_df['event'] = np.nan
+    if 'bout' not in odds_df.columns:
+        odds_df['bout'] = np.nan
+        
     # Convert the event details date to a datetime
     event_dates = event_details_df.copy()[['event', 'date']]
     if pd.api.types.is_datetime64_any_dtype(event_dates['date']):
@@ -49,10 +55,10 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
     opponents_df = opponents_df[['event', 'bout', 'event_date', 'fighter', 'opponent']]
     
     # Remove all rows that have duplicates i.e. where fighters have fought more than once
-    duplicates = opponents_df.duplicated(subset=['fighter', 'opponent'], keep=False)
-    opponents_df = opponents_df[~duplicates]
+    opponents_df = opponents_df.drop_duplicates(subset = ['fighter', 'opponent'], keep = False)
+
     
-    # Replace events and bouts with those from the opponents data
+    # Replace events and bouts with those from the opponents data #  Removed this because it caused issues with duplicates
     new_odds_df = replace_event_and_bout_odds(odds_df = new_odds_df, stats_df = opponents_df, join_on = ['fighter', 'opponent'], day_shift = 0, odds_event_priority = False)
     
     # Now, working from 2 days down to one, fill the missing events
@@ -68,14 +74,14 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df):
         return None
         
     # Do a check to see where we have not found UFC events
-    ufc_bouts_missing_odds = new_stats_df[new_stats_df['event_date'] > '2010-01-01']['bout'][~new_stats_df['bout'].isin(new_odds_df['bout'].tolist())]
-    ufc_events_missing_odds = new_stats_df[new_stats_df['event_date'] > '2010-01-01']['event'][~new_stats_df['event'].isin(new_odds_df['event'].tolist())]
+    ufc_bouts_missing_odds = new_stats_df[new_stats_df['event_date'] > date_check]['bout'][~new_stats_df['bout'].isin(new_odds_df['bout'].tolist())]
+    ufc_events_missing_odds = new_stats_df[new_stats_df['event_date'] > date_check]['event'][~new_stats_df['event'].isin(new_odds_df['event'].tolist())]
     
     # Give a warning about any that haven't been matched to an event and bout
     if len(ufc_events_missing_odds) > 0:
         print(f"The following events after 01-01-2010 are missing odds data: {set(ufc_events_missing_odds)}")
     
     # Remove columns no longer needed    
-    new_odds_df = new_odds_df[['open_odds', 'closing_odds_low', 'closing_odds_high', 'event', 'bout', 'date', 'fighter', 'opponent']]
+    new_odds_df = new_odds_df[odds_df.columns]
         
     return new_odds_df

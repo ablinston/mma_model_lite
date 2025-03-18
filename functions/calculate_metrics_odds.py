@@ -2,8 +2,10 @@
 
 def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
 
+    # pdb.set_trace()    
+
     # First get the predictions from the ensemble
-    y_pred_prob = odds_to_probabilities(X_test['fighter1_best_closing_odds'], X_test['fighter2_best_closing_odds'])
+    y_pred_prob = odds_to_probabilities(X_test['fighter1_backtesting_odds'], X_test['fighter2_backtesting_odds'])
 
     # # Fill in nas
     # y_pred_prob['L/W'] = y_pred_prob['L/W'].fillna(0.499)
@@ -16,8 +18,11 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     # Convert the probabilities into a Numpy array
     y_pred_prob = y_pred_prob.to_numpy()
 
+    # Convert the predictions to object in case not already
+    y_test_fold = pd.Series(y_test.copy(), dtype="int")
+
     # Convert actual results to binarized format
-    y_test_bin = label_binarize(y_test, classes=classes)
+    y_test_bin = label_binarize(y_test_fold, classes=classes)
     y_pred_bin = label_binarize(y_pred, classes=classes)
 
     # AUC fails when only one class in observations, so try except
@@ -41,6 +46,15 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     # **Calculate LogLoss**
     log_loss_result = log_loss(y_test, y_pred_prob, labels = classes)    
 
+    # Calculate the MSE of the Expected value
+    ev_mse = ev_loss_function(
+        y_pred_prob,
+        y_test,
+        X_test['fighter1_backtesting_odds'], 
+        X_test['fighter2_backtesting_odds'],
+        return_loss = True,
+        input_probs = True)
+
     # Return the metrics
     
     return {
@@ -51,5 +65,6 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
         'X Odds L/W Accuracy': lw_accuracy,
         'X Odds Avg WL only AUC': np.mean([wl_auc, lw_auc]),
         'X Odds Logloss': log_loss_result,
+        'X Odds EV MSE': ev_mse,
         'X Odds Hmean WL only Accuracy': hmean([lw_accuracy, wl_accuracy])
     }

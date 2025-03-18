@@ -12,6 +12,11 @@ def merge_df_both_fighters(left_df, df_list):
     """
     # Loop through each df
     for df in df_list:
+        
+        # Skip if empty
+        if len(df) == 0:
+            continue
+        
         # Merge for fighter 1
         left_df = left_df.merge(
             df.add_prefix('fighter1_'),

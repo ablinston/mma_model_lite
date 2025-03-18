@@ -1,6 +1,6 @@
 # This function switches who is fighter1 and fighter2 on the merged final dataset
 
-def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None):
+def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None, for_model = True):
     """
     # This functions takes a dataframe and a filter of same length and switches fighter1 and fighter2 in the rows labelled 'True'
     
@@ -8,22 +8,42 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     
     """
     # pdb.set_trace()
+    
+    # First, check the type of y. It will be forced to int
+    if y is not None:
+        if y.dtype != 'int32':
+            print('Warning: y vector passed into switch_fighter1_fighter2() is not an int32 type. Output will be forced to int32')
+
+    # Make the filter an array from a list to avoid index issues
+    filter_boolean = np.array(list(filter_boolean))
 
     # Define the data to be switched
     if X is None:
-        df = df_original[filter_boolean].copy()
+        df = df_original.copy()
+        df = df[filter_boolean].copy()
     else:
-        df = X[filter_boolean].copy()
-        y_new = y[filter_boolean].copy()
+        df = X.copy()
+        df = df[filter_boolean].copy()
+        y_new = y.copy()
+        y_new = y_new[filter_boolean].copy()
 
-    # First rename fighter1 columns
-    df.columns = df.columns.str.replace('fighter1', 'fighterX')
+    final_cols = df.columns.tolist()
+        
+    # Undo any cleaning that's been done on the data
+    df = undo_clean_inf(df)
 
-    # Now rename fighter2
-    df.columns = df.columns.str.replace('fighter2', 'fighter1')
+    # Swap column names
+    swap_dict = {'fighter1': 'fighter2', 'fighter2': 'fighter1'}
+    df.columns = df.columns.str.replace(r'fighter1|fighter2', lambda x: swap_dict.get(x.group(0), x.group(0)), regex=True)
 
-    # Now create the final name for fighter1
-    df.columns = df.columns.str.replace('fighterX', 'fighter2')
+    # # First rename fighter1 columns
+    # df.columns = df.columns.str.replace('fighter1', 'fighterX')
+
+    # # Now rename fighter2
+    # df.columns = df.columns.str.replace('fighter2', 'fighter1')
+
+    # # Now create the final name for fighter1
+    # df.columns = df.columns.str.replace('fighterX', 'fighter2')
 
     # Now reverse and diff columns
     diff_columns = [col for col in df.columns if 'diff' in col and 'diff_ratio' not in col]
@@ -45,25 +65,72 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         
     # Now combine this data with the rows not switched
     if X is None:
-        final_df = pd.concat([df, df_original[~filter_boolean]])
+        final_df = pd.concat([df, df_original.copy().reset_index(drop = True)[~filter_boolean]])
     else:
-        final_df = pd.concat([df, X[~filter_boolean]])
+        # # Create the filtered original data for those records not adjusted
+        # X_filtered = X.copy()[~filter_boolean]
+        
+        # # Now re-align the columns of the new data
+        # df = df.reindex(columns=X_filtered.columns)
+        
+        # final_df = pd.DataFrame(index=range(len(df) + len(X_filtered)), columns=df.columns)
+        # final_df.loc[: len(df) - 1] = df.values
+        # final_df.loc[len(df) :] = X_filtered.values
+        
+        # # Set column types to match the original df
+        # final_df = final_df.astype(df.dtypes.to_dict())
+
+        final_df = pd.concat([df.copy(), X.copy()[~filter_boolean]])
     
     # Handle cases where we have X, y input instead of a single data frame
     if y is not None: # Check this works with W/L and isn't 0, 1, 2
-        y_new = pd.Series(np.where(y_new == '2', '0', np.where(y_new == '0', '2', y_new)))
+        y_new = y_new.astype('int32')
+        y_df = pd.DataFrame(y_new)
+        y_df.iloc[:, 0] = np.where(y_df.iloc[:, 0] == 2, 0, np.where(y_df.iloc[:, 0] == 0, 2, y_df.iloc[:, 0]))
         
         # Now combine this data with the rows not switched
-        y_new = pd.concat([y_new, y[~filter_boolean]])
+        y_new = pd.concat([y_df.iloc[:, 0], y[~filter_boolean]])
+        
+    # pdb.set_trace()
+    # Recalculate diff columns because Infs etc might have been cleaned before. Only keep the columns needed
+    diff_df = add_fighter_differentials(final_df)
     
-
+    # Keep the diff in dates from the original data and use the diffs from the rest of the data
+    diff_df = pd.concat([
+        diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]], 
+        final_df[[col for col in final_cols if ('date' in col or 'dob' in col) or col not in diff_df.columns]]
+        ], axis = 1)
+    
+    final_df = diff_df.loc[:, final_cols].copy()
+    
+    # Clean columns of infs if necessary
+    if for_model:
+        final_df = clean_inf_and_large(final_df)
+        final_df = format_cols_for_model(final_df)
+        
+    # Make sure the data types of the columns are as before
+    if X is None:
+        final_df = final_df.astype(df_original.dtypes.to_dict())
+    else:
+        final_df = final_df.astype(X.dtypes.to_dict())
+        y_new = y_new.astype('int32')
+    
     # Check we have the correct number of rows and columns
     if X is None:
         stop_if_not(final_df.shape == df_original.shape, 'Dataset length check')
     else:
         stop_if_not(final_df.shape == X.shape, 'Dataset length check')
 
+    # # Ensure the old index is preserved
+    # ## CAN'T GET IT TO WORK
+    # if X is None:
+    #     final_df = final_df.loc[df_original.index]
+    # else:
+    #     final_df2 = final_df.loc[X.index]
+    #     y_new2 = y_new.loc[y.index.values]
+    
+
     if y is None:
-        return final_df
+        return final_df.copy()
     else:
-        return final_df.reset_index(drop = True), y_new.reset_index(drop = True)
+        return final_df.copy(), y_new.copy()

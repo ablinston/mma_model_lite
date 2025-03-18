@@ -1,4 +1,4 @@
-def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X):
+def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute_calc = False, bayes_priors_df = None):
     """
     Convert fight data into cumulative fight history for the last 3 entries (excluding the current entry).
 
@@ -8,24 +8,64 @@ def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X):
     group_by: a list of columns to be aggregated by
     prefix: a str to be added to the start of stat columns
     X: the number of historic fights to include
-
+    per_minute_calc (bool): whether to add the per minute stats to the data or not
+    bayes_priors_df: a data frame containing the bayes priods from the basian_priors() function. Only required if doing per minute calcs
+    
     returns:S
     data frame showing the sum for the last 3 entries for each column excluding the current date.
     """
+    
+    # pdb.set_trace()
+    
     # Get columns for grouping and stats
     id_columns = list(set(ignore_cols + group_by))
     stat_columns = [col for col in df.columns if col not in id_columns]
     
     # Sort DataFrame by group_by columns and date for ordered cumulative calculation
     df_sorted = df.sort_values(by=group_by + ['date']).reset_index(drop=True)
-
+    
+    # pdb.set_trace()
+    
     # Group by the group_by columns and calculate rolling sums for the last 3 entries
     rolling_data = (
-        df_sorted.groupby(group_by)[stat_columns]
-        .apply(lambda x: x.shift(1).rolling(window=X, min_periods=1).sum())
+        df_sorted.groupby(group_by)
+        .apply(lambda x: x[stat_columns].shift(1).rolling(window=X, min_periods=1).sum(), include_groups = False)
         .reset_index(level=group_by, drop=True)
     )
     
+    # Rename the adj columns to make it clear what they are
+    rolling_data.rename(columns={col: col[:-4] + "_adjsum" if col.endswith("_adj") else col for col in df.columns}, inplace=True)
+    
+    rolling_mean_data = (
+        df_sorted.groupby(group_by)
+        .apply(lambda x: x[[stat for stat in stat_columns if '_adj' in stat]].shift(1).rolling(window=X, min_periods=1).mean(), include_groups = False)
+        .reset_index(level=group_by, drop=True)
+    )
+    
+    # Rename the adj columns to make it clear what they are
+    rolling_mean_data.rename(columns={col: col[:-4] + "_adjmean" if col.endswith("_adj") else col for col in df.columns}, inplace=True)
+    
+    # Combine the dataset
+    rolling_data = pd.concat([rolling_data, rolling_mean_data], axis = 1)
+    
+    # # Convert your pandas DataFrame to a Dask DataFrame
+    # ddf = dd.from_pandas(df_sorted, npartitions=4)  # Adjust the number of partitions as needed
+
+    # # Ensure the data is sorted by the group key to allow for proper rolling
+    # ddf = ddf.sort_values(by=group_by + ['date'])
+
+    # # Perform the shift and rolling sum
+    # def apply_rolling(group):
+    #     group[stat_columns] = group[stat_columns].shift(1)
+    #     return group[stat_columns].rolling(window=X, min_periods=1).sum()
+
+    # # Apply the rolling operation with a custom meta to avoid the warning
+    # rolling_data = (
+    #     ddf.groupby(group_by, group_keys=False)
+    #     .apply(apply_rolling, meta={col: 'f8' for col in stat_columns})  # Specify the meta here
+    #     .compute()  # Convert back to pandas
+    # )
+        
     # If fights column is in, replace NAs with 0
     if 'fights' in stat_columns:
         rolling_data['fights'] = rolling_data['fights'].fillna(0)
@@ -34,4 +74,10 @@ def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X):
     rolling_data = rolling_data.rename(columns=lambda x: prefix + x)
     df_rolling = pd.concat([df_sorted[id_columns].reset_index(drop=True), rolling_data.reset_index(drop=True)], axis=1)
 
+    # Calculate per minute stats if needed
+    if per_minute_calc:
+        df_rolling = calculate_per_minute_stats(df_rolling)
+        if bayes_priors_df is not None:
+            df_rolling = calculate_per_minute_bayesian_stats(df_rolling, bayes_priors_df)
+    
     return df_rolling

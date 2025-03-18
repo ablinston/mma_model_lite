@@ -2,11 +2,15 @@
 
 def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df):
 
+    # pdb.set_trace()
+
     # First get the predictions from the ensemble
     y_pred_prob, y_pred = predict_xgboost_ensemble(models, X_test_df, y_test_df)
 
     # Get the outcomes of the test data
-    y_test_fold = y_test_df.copy()
+    # Convert the predictions to object in case not already
+    y_test_fold = pd.Series(y_test_df.copy(), dtype="int")
+    y_pred = pd.Series(y_pred.copy(), dtype="int")
 
     # Convert actual results to binarized format
     y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
@@ -27,6 +31,14 @@ def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df):
 
     # **Calculate LogLoss**
     log_loss_result = log_loss(y_test_df, y_pred_prob)
+    
+    ev_mse = ev_loss_function(
+        y_pred_prob,
+        y_test_fold,
+        X_test_df['fighter1_backtesting_odds'],
+        X_test_df['fighter2_backtesting_odds'],
+        return_loss = True,
+        input_probs = True)
 
     # Log the outcome in MLflow
     mlflow.log_metric('Accuracy', accuracy_score(y_test_fold, y_pred))
@@ -37,3 +49,4 @@ def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df):
     mlflow.log_metric('Avg WL only AUC', np.mean([wl_auc, lw_auc]))
     mlflow.log_metric('Hmean WL only Accuracy', hmean([lw_accuracy, wl_accuracy]))
     mlflow.log_metric('Logloss', log_loss_result)
+    mlflow.log_metric('EV MSE', ev_mse)

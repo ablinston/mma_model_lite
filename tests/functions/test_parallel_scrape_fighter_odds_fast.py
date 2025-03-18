@@ -20,7 +20,7 @@ def test_parallel_scrape_odds_fast():
         config = config,
         num_threads = config['num_threads'], 
         firefox_location = config['firefox_location'],
-        gecko_driver = './data/firefox_driver_32bit/geckodriver.exe',
+        gecko_driver = config['gecko_driver_location'],
         odds_urls_overide_df = fighter_odds_urls)
     
 

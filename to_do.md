@@ -4,7 +4,9 @@
 
 # To do scripts
 
-* Merge odds based on date +- 2 as well as date +- 1
+* Add slippage to the odds when backtesting to allow for some differences between final and earlier bets
+
+* Change odds scraping to collect all the event urls using the fighter pages, then scrape all the event urls to get a wider range of odds. This will give more stable odds in the runup to an event??
 
 * Change the ELO parameter choices so that it accounts for the scale of how wrong the ELO is, not just predicting binary. Turn ELO into a probability and use logloss?
 

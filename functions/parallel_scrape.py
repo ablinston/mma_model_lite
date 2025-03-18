@@ -1,5 +1,3 @@
-import pandas as pd
-
 def parallel_scrape(url_list, parse_function, output_df = pd.DataFrame(), num_threads = 1, **kwargs):
     """
     scrape from a list of urls

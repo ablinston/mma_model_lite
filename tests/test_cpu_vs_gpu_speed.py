@@ -10,7 +10,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Read in the data for training
-data = concat_parquets_fastparquet('./data/final_dataset/')
+data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 data.replace([np.inf], 99999, inplace = True)
 data.replace([-np.inf], -99999, inplace = True)

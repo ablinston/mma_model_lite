@@ -9,6 +9,9 @@ upcoming_events_url: http://ufcstats.com/statistics/events/upcoming?page=all
 firefox_location: C:/Program Files/Mozilla Firefox/firefox.exe
 firefox_location_pi: /usr/bin/firefox
 
+# Gecko driver to use
+gecko_driver_location: './data/firefox_driver_32bit/geckodriver0_36.exe'
+
 # Numer of CPU threads to use for concurrent processes
 num_threads: 3
 
@@ -17,9 +20,6 @@ seed_all: 42
 
 # Set the earliest data on which validation checks are to be carried out from
 start_date_validation_checks: '2010-01-01'
-
-# Set whether the odds should be normalised as part of the data processing. This ensures we don't have discrepencies
-normalise_odds_in_processing: True
 
 # file names for parsed data
 event_details_file_name: ufc_event_details.parquet
@@ -31,6 +31,7 @@ fight_stats_file_name: ufc_fight_stats.parquet
 fighter_details_file_name: ufc_fighter_details.parquet
 fighter_tott_file_name: ufc_fighter_tott.parquet
 fighter_odds_file_name: fight_odds_data.parquet
+event_odds_file_name: event_odds.parquet
 
 # Define log of parsed events
 parsed_events_log: ./data/parsed_events_log.parquet
@@ -40,6 +41,11 @@ final_data_stats_log: ./data/final_data_stats_log.csv
 
 # Set the location of the fighter odds urls manual overide
 fighter_odds_urls: ./data/fighter_odds_urls.csv
+
+# Bayesian group by. This is what we group the Bayesian smooting of stats by
+bayesian_groupby: ['weightclass']
+bayesian_fightspan: 50
+
 
 # columns names for extracted details
 fight_details_column_names:
@@ -172,7 +178,7 @@ test_proportion: 0.2
 
 # Set the cut off dates for the training data
 min_training_date: '2014-01-01'
-oot_start_date: '2024-01-01'
+oot_start_date: '2024-02-19'
 
 
 # Set the starting ELO for each fighter
@@ -187,16 +193,16 @@ fighter_type_thresholds:
   striker:
     hist_allrounds_sig.str._attempt: 20
   wrestler:
-    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_allrounds_ctrl_minutes_per_minute: 0.15 # 10 secs in 60 average ctrl time
   # submitter:
   #   hist_wins_Submission_per_fight: 0.1 # 1 in 10 fights won by submission or more
   wrestler-submitter:
-    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_allrounds_ctrl_minutes_per_minute: 0.15 # 10 secs in 60 average ctrl time
     hist_wins_Submission_per_fight: 0.1
   mma:
-    hist_allrounds_ctrl_minutes_per_minute: 0.1 # 10 secs in 60 average ctrl time
+    hist_allrounds_ctrl_minutes_per_minute: 0.15 # 10 secs in 60 average ctrl time
     hist_wins_Submission_per_fight: 0.1
     hist_wins_KO/TKO_per_fight: 0.1 # has some knockout success
 
 
-google_maps_api_key: AIzaSyDT1kFhElcN_vKjHc3l_Ej999ONUcCQ0aw
+google_maps_api_key: AIzaSyDBR27XFwqI6gLalE2bSVQBtdYcynWmeX4

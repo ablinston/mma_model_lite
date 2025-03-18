@@ -1,5 +1,5 @@
 
-def calculate_metrics(y_pred_prob, y_test_df, classes = np.array([0, 1, 2])):
+def calculate_metrics(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, classes = np.array([0, 1, 2])):
     
     """
     Take a set of predictions and actuals and calculates a series of metrics
@@ -17,8 +17,12 @@ def calculate_metrics(y_pred_prob, y_test_df, classes = np.array([0, 1, 2])):
 
     y_pred = np.argmax(y_pred_prob, axis = 1)
 
+    # Convert the predictions to object in case not already
+    y_test_fold = pd.Series(y_test_df.copy(), dtype="int")
+    y_pred = pd.Series(y_pred.copy(), dtype="int")
+    
     # Convert actual results to binarized format
-    y_test_bin = label_binarize(y_test_df, classes = classes)
+    y_test_bin = label_binarize(y_test_fold, classes = classes)
     y_pred_bin = label_binarize(y_pred, classes = classes)
 
     # AUC fails when only one class in observations, so try except
@@ -42,6 +46,14 @@ def calculate_metrics(y_pred_prob, y_test_df, classes = np.array([0, 1, 2])):
     # **Calculate LogLoss**
     log_loss_result = log_loss(y_test_df, y_pred_prob, labels = classes)
 
+    ev_mse = ev_loss_function(
+        y_pred_prob,
+        y_test_df,
+        fighter1_odds, 
+        fighter2_odds,
+        return_loss = True,
+        input_probs = True)
+
     # Return the metrics    
     return {
         'Accuracy': accuracy_score(y_test_df, y_pred),
@@ -52,5 +64,6 @@ def calculate_metrics(y_pred_prob, y_test_df, classes = np.array([0, 1, 2])):
         'Avg WL only AUC': np.mean([wl_auc, lw_auc]),
         'Hmean WL only Accuracy': hmean([lw_accuracy, wl_accuracy]),
         'Logloss': log_loss_result,
+        'EV MSE': ev_mse,
         'Sample Size': len(y_pred)
     }
