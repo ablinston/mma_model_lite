@@ -108,7 +108,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v17')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v18')
 
 
 ##########################################################################################
