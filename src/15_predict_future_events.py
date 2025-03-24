@@ -78,6 +78,9 @@ X_upcoming, temp1, temp6, temp2, temp3, temp4, temp5 = prep_data_for_model_train
 # Get the model predictions
 prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
 
+# Add formatted fighters
+upcoming_fights = add_formatted_fighter_names(upcoming_fights, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)
+
 # Summarise the model predictions and betting decisions using the config
 betting_data = summarise_model_predictions(
     actuals_data_df = upcoming_fights, 
@@ -89,13 +92,19 @@ betting_data = summarise_model_predictions(
 
 # Add the final bet size based on balance
 if bet_config['constant_bets'] == False:
-    betting_data['Final_bet'] = betting_data['bets'] * betting_data['bet_size'] * bet_config['start_balance']
+    betting_data['Final_bet'] = np.round((betting_data['bets'] * betting_data['bet_size'] * bet_config['start_balance']) / 5) * 5
 else:
-    betting_data['Final_bet'] = betting_data['bets'] * betting_data['bet_size']
+    betting_data['Final_bet'] = np.round((betting_data['bets'] * betting_data['bet_size']) / 5) * 5
 
-betting_data['Potential_win'] = betting_data['bets'] * betting_data['Final_bet'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'] - 1, betting_data['fighter2_backtesting_odds'] - 1)
+betting_data['Potential_win'] = np.round(betting_data['bets'] * betting_data['Final_bet'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'] - 1, betting_data['fighter2_backtesting_odds'] - 1), 2)
 
-summary_data = betting_data[['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Fighter1_win_prob', 'Fighter2_win_prob', 'Fighter1_win_EV', 'Fighter2_win_EV', 'Bet_trigger', 'Final_bet', 'Potential_win', 'Bet_breakeven_odds']]
+betting_data['bet_assumed_odds'] = betting_data['bets'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'], betting_data['fighter2_backtesting_odds'])
+
+summary_data = betting_data[['date', 'event', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_breakeven_odds', 'Final_bet', 'Potential_win']]
+
+# Round odds columns
+for col in [cols for cols in summary_data.columns if 'odds' in cols]:
+    summary_data.loc[:, col] = np.round(summary_data[col], 2)
 
 print(
       summary_data

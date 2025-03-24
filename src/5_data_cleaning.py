@@ -30,6 +30,10 @@ fighters['height'] = pd.to_numeric(fighters['feet']) * 30.48 + pd.to_numeric(fig
 fighters = to_numeric(fighters, ['weight', 'reach'])
 fight_stats = to_numeric(fight_stats, ['kd'])
 
+# Get cleaned versions of the columns
+fighters['Fighter'] = fighters['fighter'].copy()
+
+
 # Remove spaces in events to avoid merge errors
 for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds, event_odds]:
     try:
@@ -48,6 +52,10 @@ for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight
         df[['opponent']] = clean_text_columns(df[['opponent']])
     except:
         pass
+
+# Save the fighter formatted names separately
+fighter_names = fighters[['fighter', 'Fighter']].drop_duplicates(subset = ['fighter'])
+fighters.drop(columns = ['Fighter'], inplace = True)
 
 # Compute the control time in minutes
 fight_stats['ctrl_minutes'] = time_to_minutes_decimal(fight_stats['ctrl'])
@@ -239,4 +247,8 @@ fp.write('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clea
 
 fp.write('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
          event_odds,
+         compression = 'ZSTD')
+
+fp.write('./data/' + config['fighter_names_file_name'],
+         fighter_names,
          compression = 'ZSTD')
