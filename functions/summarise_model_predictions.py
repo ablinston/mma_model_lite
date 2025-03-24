@@ -1,6 +1,6 @@
 # This function takes a dataset of actuals and prediction probabilities (which must correspond in rows to each other)
 # It returns a data frame with added columns for the EVs of each bet and bet sizing
-def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, return_triggers = False):
+def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, return_triggers = False, keep_scrape_dates = False):
 
     
     # ###

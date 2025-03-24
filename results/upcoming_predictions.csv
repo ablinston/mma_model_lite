@@ -1,6 +1,6 @@
 ,date,event,fighter1,fighter2,fighter1_backtesting_odds,fighter2_backtesting_odds,Fighter1_win_prob,Fighter2_win_prob,Fighter1_win_EV,Fighter2_win_EV,Bet_trigger,Final_bet,Potential_win,Bet_breakeven_odds
-9265,2025-03-22,ufcfightnight:edwardsvsbrady,janblachowicz,carlosulberg,3.2,1.4444444444444444,28.5,69.3,-0.09,0.0,carlosulberg,104.60229618119449,46.48990941386422,1.4430014
-9266,2025-03-22,ufcfightnight:edwardsvsbrady,gunnarnelson,kevinholland,1.8,2.15,57.2,40.5,0.03,-0.13,gunnarnelson,108.04841954382509,86.43873563506008,1.7482517
-9269,2025-03-22,ufcfightnight:edwardsvsbrady,nathanielwood,morgancharriere,2.4299999999999997,1.5376344086021505,47.6,50.0,0.16,-0.23,None,0.0,0.0,
-9270,2025-03-22,ufcfightnight:edwardsvsbrady,marcintybura,mickparkin,1.9523809523809523,1.9523809523809523,54.8,43.0,0.07,-0.16,marcintybura,111.90701078428924,106.57810550884689,1.8248175
-9277,2025-03-22,ufcfightnight:edwardsvsbrady,leonedwards,seanbrady,2.3600000000000003,1.6329113924050633,46.7,51.0,0.1,-0.17,None,0.0,0.0,
+9265,2025-03-22,ufcfightnight:edwardsvsbrady,janblachowicz,carlosulberg,3.8,1.4444444444444444,24.9,73.0,-0.06,0.06,carlosulberg,156.487,69.54977777777778,1.369863
+9266,2025-03-22,ufcfightnight:edwardsvsbrady,gunnarnelson,kevinholland,1.8333333333333335,2.1799999999999997,57.2,40.5,0.05,-0.12,gunnarnelson,156.487,130.40583333333336,1.7482517
+9269,2025-03-22,ufcfightnight:edwardsvsbrady,nathanielwood,morgancharriere,2.2,1.847457627118644,50.2,47.5,0.1,-0.12,nathanielwood,156.487,187.78440000000003,1.9920318
+9270,2025-03-22,ufcfightnight:edwardsvsbrady,marcintybura,mickparkin,2.3600000000000003,1.6756756756756757,51.2,46.5,0.21,-0.22,marcintybura,156.487,212.82232000000005,1.953125
+9277,2025-03-22,ufcfightnight:edwardsvsbrady,leonedwards,seanbrady,2.2,1.7142857142857144,47.0,50.8,0.03,-0.13,None,0.0,0.0,
