@@ -35,7 +35,7 @@ def process_odds_data(fight_df, event_df, odds_scrape_config, average_odds_model
     new_fight_df['odds_change'] = new_fight_df['mean_closing_odds'] - new_fight_df['open_odds']
     
     # Keep only the columns we need, and remove duplicates (these duplicates are where the event and bout are empty)
-    new_fight_df = new_fight_df[['event', 'bout', 'fighter', 'open_odds', 'mean_closing_odds', 'best_closing_odds', 'odds_change']].drop_duplicates(subset = ['event', 'bout', 'fighter'])
+    new_fight_df = new_fight_df[['event', 'bout', 'fighter', 'open_odds', 'mean_closing_odds', 'best_closing_odds', 'odds_change', 'notformodel_date_fighter_odd_scrape']].drop_duplicates(subset = ['event', 'bout', 'fighter'])
     
     # Add on a flag to say whether the odds have changed by more than 0.1
     new_fight_df['odds_change_gt_0'] = np.where(new_fight_df['odds_change'] < 0, -1, np.where(new_fight_df['odds_change'] > 0, 1, 0))     

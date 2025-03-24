@@ -100,18 +100,21 @@ betting_data['Potential_win'] = np.round(betting_data['bets'] * betting_data['Fi
 
 betting_data['bet_assumed_odds'] = betting_data['bets'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'], betting_data['fighter2_backtesting_odds'])
 
-summary_data = betting_data[['date', 'event', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_breakeven_odds', 'Final_bet', 'Potential_win']]
-
 # Round odds columns
-for col in [cols for cols in summary_data.columns if 'odds' in cols]:
-    summary_data.loc[:, col] = np.round(summary_data[col], 2)
+for col in [cols for cols in betting_data.columns if 'odds' in cols]:
+    betting_data.loc[:, col] = np.round(betting_data[col], 2)
+
+betting_data.rename(columns = {'fighter1_notformodel_date_fighter_odd_scrape': 'f1_scrape_date', 'fighter2_notformodel_date_fighter_odd_scrape': 'f2_scrape_date'}, inplace = True)
+
+summary_data = betting_data[['date', 'event', 'f1_scrape_date', 'f2_scrape_date', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_breakeven_odds', 'Final_bet', 'Potential_win']]
+
 
 print(
-      summary_data
+      summary_data.to_string()
 )
 
 print(
-      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['date', 'event', 'fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Bet_trigger', 'Final_bet', 'Potential_win', 'Bet_breakeven_odds']]
+      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Bet_trigger', 'bet_assumed_odds', 'Final_bet', 'Potential_win', 'Bet_breakeven_odds']].to_string()
 )
 
 # Output the results

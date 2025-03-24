@@ -45,8 +45,8 @@ def add_fighter_differentials(df):
     #######################
     # Add in some combination of differentials for an overall fight
     # Get the fighter columns
-    fighter1_cols = [col for col in merged_data.columns if col.startswith('fighter1_')]
-    fighter2_cols = [col for col in merged_data.columns if col.startswith('fighter2_')]
+    fighter1_cols = [col for col in merged_data.columns if col.startswith('fighter1_') and 'notformodel' not in col]
+    fighter2_cols = [col for col in merged_data.columns if col.startswith('fighter2_') and 'notformodel' not in col]
 
     # Remove string columns
     # Identify string columns
