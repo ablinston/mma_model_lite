@@ -103,7 +103,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training = final_model_features,
-    num_models = 5,
+    num_models = 50,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
@@ -113,7 +113,7 @@ xgboost_rf = train_ensemble_xgboost(
 
 # Try different numbers of trees
 # for num_trees in [1]:
-for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 20)):
+for num_trees_i in list(range(, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 20)):
         
     if len(xgboost_rf) >= num_trees_i:
         
@@ -151,7 +151,7 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 2
 
 
 # Set the final number of models
-final_forest_size = 5
+final_forest_size = 29
 
 
 # Save the model

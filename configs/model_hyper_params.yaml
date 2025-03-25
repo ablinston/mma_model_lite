@@ -19,7 +19,7 @@ differential_features_only: False
 loss_function: logloss
 
 # Set whether to add some random noise to the odds as part of the XGB forest. This will be based on a fixed distribution. Should really only use true odds in model when doing this as strange things can happen
-add_noise_to_odds: False
+add_noise_to_odds: True
 # Set the standard deviation of the normaly distributed noise to be added
 odds_noise_standard_dev: 0.085 # From odds testing script
 
