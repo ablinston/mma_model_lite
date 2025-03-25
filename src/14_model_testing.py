@@ -24,6 +24,7 @@ model_path = './results/final_xgboost_forest.joblib'
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 # Load files
 rf_xgb_model = joblib.load(model_path)
+# rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/1')._model_impl.python_model.model
 
 ##########################################################################################
 ### Feature selection using config ###
