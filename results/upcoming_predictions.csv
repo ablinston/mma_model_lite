@@ -1,6 +1,8 @@
-,date,event,fighter1,fighter2,fighter1_backtesting_odds,fighter2_backtesting_odds,Fighter1_win_prob,Fighter2_win_prob,Fighter1_win_EV,Fighter2_win_EV,Bet_trigger,Final_bet,Potential_win,Bet_breakeven_odds
-9265,2025-03-22,ufcfightnight:edwardsvsbrady,janblachowicz,carlosulberg,3.8,1.4444444444444444,24.9,73.0,-0.06,0.06,carlosulberg,156.487,69.54977777777778,1.369863
-9266,2025-03-22,ufcfightnight:edwardsvsbrady,gunnarnelson,kevinholland,1.8333333333333335,2.1799999999999997,57.2,40.5,0.05,-0.12,gunnarnelson,156.487,130.40583333333336,1.7482517
-9269,2025-03-22,ufcfightnight:edwardsvsbrady,nathanielwood,morgancharriere,2.2,1.847457627118644,50.2,47.5,0.1,-0.12,nathanielwood,156.487,187.78440000000003,1.9920318
-9270,2025-03-22,ufcfightnight:edwardsvsbrady,marcintybura,mickparkin,2.3600000000000003,1.6756756756756757,51.2,46.5,0.21,-0.22,marcintybura,156.487,212.82232000000005,1.953125
-9277,2025-03-22,ufcfightnight:edwardsvsbrady,leonedwards,seanbrady,2.2,1.7142857142857144,47.0,50.8,0.03,-0.13,None,0.0,0.0,
+,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
+0,2025-03-29,ufcfightnight:morenovserceg,2025-03-27 17:12:08.393718,2025-03-27 17:12:08.393718,Manuel Torres,2.02,50.4,0.02,Drew Dober,1.91,47.4,-0.1,Manuel Torres,2.02,1.98,175.0,178.5
+1,2025-03-29,ufcfightnight:morenovserceg,2025-03-27 17:12:08.393718,2025-03-27 17:12:08.393718,Raul Rosas Jr.,1.21,74.6,-0.1,Vince Morales,4.7,23.3,0.09,None,0.0,,0.0,0.0
+2,2025-03-29,ufcfightnight:morenovserceg,2025-03-27 17:09:29.654814,2025-03-27 17:09:29.654814,Ronaldo Rodriguez,1.68,52.7,-0.12,Kevin Borjas,2.28,45.1,0.03,None,0.0,,0.0,0.0
+3,2025-03-29,ufcfightnight:morenovserceg,2025-03-27 17:09:29.654814,2025-03-27 17:09:29.654814,Christian Rodriguez,1.62,50.5,-0.18,Melquizael Costa,2.45,47.2,0.16,None,0.0,,0.0,0.0
+4,2025-03-29,ufcfightnight:morenovserceg,2025-03-27 17:09:29.654814,2025-03-27 17:09:29.654814,Rafa Garcia,1.21,80.0,-0.03,Vinc Pichel,4.7,18.1,-0.15,None,0.0,,0.0,0.0
+5,2025-03-29,ufcfightnight:morenovserceg,2025-03-27 17:09:29.654814,2025-03-27 17:09:29.654814,Jamall Emmers,1.29,73.8,-0.05,Gabriel Miranda,4.0,24.1,-0.04,None,0.0,,0.0,0.0
+6,2025-03-29,ufcfightnight:morenovserceg,2025-03-27 17:12:08.393718,2025-03-27 17:12:08.393718,Brandon Moreno,1.43,69.9,0.0,Steve Erceg,3.0,27.9,-0.16,Brandon Moreno,1.43,1.43,175.0,76.09

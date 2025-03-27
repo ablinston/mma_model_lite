@@ -23,10 +23,12 @@ if not os.name == "nt":
 
 # Use this to skip update of data if it's already been done recently
 skip_data_update = False
+skip_full_data_update = True
 skip_save_data = True
 
 # Read in the data for training
-forecasting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+data_path = './data/final_dataset/'
+
 
 # # Load files
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
@@ -47,7 +49,16 @@ if not skip_data_update:
     exec(open('./src/5_data_cleaning.py').read())
     
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
-    if True: # unparsed_events: Hard coded this to always run because fights can change if fighters drop out and otherwise they wont have the hist stats
+    if skip_full_data_update:
+        forecasting_data = update_odds_on_merged_data(
+                cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
+                cleaned_event_odds_data_path = './data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
+                events_path = './data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
+                final_data_folder = data_path,
+                average_odds_model_path = './results/average_odds_model.joblib',
+                config = config
+                )
+    else:
         exec(open('./src/7_data_processing.py').read())
         # Refresh the dataset
         forecasting_data = merged_data.copy()
