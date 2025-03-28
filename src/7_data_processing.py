@@ -24,6 +24,9 @@ average_odds_model = joblib.load('./results/average_odds_model.joblib')
 ###########################################################################################
 # UPCOMING
 
+# Add upcoming fights to fight stats
+fight_stats = add_upcoming_to_fight_stats(fight_stats, upcoming_fight_details, events, upcoming_events)
+
 # Add upcoming events
 events = pd.concat([upcoming_events, events], axis = 0)
 
@@ -33,13 +36,7 @@ upcoming_fight_details = upcoming_fight_details.merge(upcoming_events[['event', 
 # Add upcoming fights to the results with empty results
 fight_results = pd.concat([upcoming_fight_details.drop('url', axis = 1), fight_results])
 
-# Create empty stats rows for each fight
-upcoming_fight_details[['fighter1', 'fighter2']] = upcoming_fight_details['bout'].str.split('vs\\.', expand = True)
-upcoming_fight_stats = pd.concat([
-    upcoming_fight_details[['event', 'bout', 'fighter1']].rename(columns = {'fighter1': 'fighter'}),
-    upcoming_fight_details[['event', 'bout', 'fighter2']].rename(columns = {'fighter2': 'fighter'})
-    ])
-fight_stats = pd.concat([upcoming_fight_stats, fight_stats])
+
 
 ###########################################################################################
 # CALCULATE ELOs
@@ -719,11 +716,13 @@ merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper
 # OUTPUT DATA
 
 # Remove columns not needed, or that are all na
-cols_to_remove = [col for col in merged_data.columns if any(substring in col for substring in ['bout', 'level_0'])]
+cols_to_remove = [col for col in merged_data.columns if any(substring in col for substring in ['level_0'])]
 # cols_to_remove.append('date')
 
 merged_data.drop(columns = cols_to_remove, inplace = True)
-merged_data.dropna(axis = 1, how = 'all', inplace = True)
+
+# # Drop any columns that are all NA. Commented out as it affects
+# merged_data.dropna(axis = 1, how = 'all', inplace = True)
 
 # print(merged_data.columns)
 merged_data.reset_index(drop = True, inplace = True)

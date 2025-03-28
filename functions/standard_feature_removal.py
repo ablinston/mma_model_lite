@@ -1,17 +1,17 @@
 # This function removes columns from training data that seem arbitrary and could lead to over-fitting
 
-def standard_feature_removal(df, differentials_only = False, true_odds_only = False):
+def standard_feature_removal(df, open_odds_only, differentials_only = False, true_odds_only = False):
 
     data = df.copy()
     
-    # pdb.set_trace()
+    pdb.set_trace()
     
     # Remove cols that shouldn't really affect the fight.
     # Remove dates because they can overfit. Leave date minuses, which are days since
     cols_to_remove = [col for col in data.columns if ('date' in col) & (('diff' not in col) & ('minus' not in col) & (col != 'date'))]
 
     # Remove event
-    cols_to_remove = cols_to_remove + ['event']
+    cols_to_remove = cols_to_remove + ['event', 'bout']
     
     # Get rid of dob and reach. Seem arbitrary
     cols_to_remove = cols_to_remove + ['fighter1_dob', 'fighter2_dob', 'fighter1_reach', 'fighter2_reach', 'diff_reach', 'fighter1_open_odds', 'fighter2_open_odds']

@@ -30,3 +30,5 @@ Version 2 XGB Forest model shows much better correlation between EV predictions 
     * Didn't improve the forest fit in v16, but didn't see any evidence of overfitting so that makes sense.
 * min bucket size:
     * **keep at 15**: Tried making it variable but seem to lead to some overfitting
+* Randomising odds in training data:
+    * **Don't use**: it didn't improve overall fit, didn't really reduce variance when testing randomised odds. Just ensure to do the sensitivity testing for the model to check what possible returns would have been.

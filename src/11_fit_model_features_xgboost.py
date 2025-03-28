@@ -100,7 +100,7 @@ columns_in_order = pd.Series(columns_in_order).drop_duplicates().tolist()
 X_train_master = X_train_master.loc[:, ~X_train_master.columns.duplicated()].copy()[columns_in_order]
 
 # Now remove any columns that aren't wanted in a training dataset
-X_train_master = standard_feature_removal(X_train_master, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = model_hyper_params['true_odds_only'])
+X_train_master = standard_feature_removal(X_train_master, open_odds_only = model_hyper_params['open_odds_only'], differentials_only = model_hyper_params['differential_features_only'], true_odds_only = model_hyper_params['true_odds_only'])
 
 # Create the empty training data for the inner optimisations
 X_train = None
@@ -108,7 +108,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v17')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v19')
 
 
 ##########################################################################################

@@ -153,6 +153,11 @@ fight_stats_agg = fight_stats_agg[fight_stats_agg['fighter'] != '0']
 ###########################################
 ## Fighter odds cleaning
 
+# Add upcoming to events df
+all_events = pd.concat([upcoming_events, events], axis = 0)
+# Add upcoming to fight stats for new events and bouts
+fight_stats_all = add_upcoming_to_fight_stats(fight_stats, upcoming_fight_details, events, upcoming_events)
+
 # List out the odds columns
 odds_columns = ['open_odds', 'closing_odds_low', 'closing_odds_high']
 
@@ -175,7 +180,7 @@ fighter_odds = fighter_odds[(fighter_odds['closing_odds_low'].notna()) & ~(fight
 fighter_odds.loc[:, ['fighter', 'opponent']] = clean_text_columns(fighter_odds[['fighter', 'opponent']])
 
 # Add the correct event and bout to the odds data
-fighter_odds = add_event_and_bout_to_odds_data(fighter_odds, events, fight_stats)
+fighter_odds = add_event_and_bout_to_odds_data(fighter_odds, all_events, fight_stats_all)
 
 
 ###########################################
@@ -187,7 +192,7 @@ event_odds_cols = odds_scrape_config['events_colnames']
 # event_odds[event_odds_cols] = event_odds[event_odds_cols].apply(pd.to_numeric, errors = 'coerce')
 
 # Add event and bout to the data
-event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
+event_odds = add_event_and_bout_to_odds_data(event_odds, all_events, fight_stats_all, date_check = '2018-01-01')
 
 # Remove empty rows
 event_odds = event_odds.dropna(subset = event_odds_cols, how = 'all')

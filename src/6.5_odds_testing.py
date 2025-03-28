@@ -59,3 +59,33 @@ lm.features = ['closing_odds_low', 'closing_odds_high']
 
 # Output this model to use later to impute missing average odds
 joblib.dump(lm, './results/average_odds_model.joblib', compress = 9)
+
+
+######################
+## Randomised odds both directions
+
+
+# Work out the differences between high and lows at closing to get a rough idea how much odds vary leading up to a fight
+rands = np.random.uniform(0, 1, len(fight_odds))
+
+# Take random swapping of odds to try to get differences mean 0
+odds_1 = np.vectorize(american_odds_to_decimal)(np.where(rands > 0.5, fight_odds['closing_odds_low'], fight_odds['closing_odds_high']))
+odds_2 = np.vectorize(american_odds_to_decimal)(np.where(rands <= 0.5, fight_odds['closing_odds_low'], fight_odds['closing_odds_high']))
+
+# Work out mean and std of population
+np.mean(odds_1 / odds_2) 
+np.std(odds_1 / odds_2, ddof = 0) # to get population rather than sample std
+
+
+######################
+## Randomised odds one directions
+
+# Take random swapping of odds to try to get differences mean 0
+odds_1 = np.vectorize(american_odds_to_decimal)(fight_odds['closing_odds_low'])
+odds_2 = np.vectorize(american_odds_to_decimal)(fight_odds['closing_odds_high'])
+
+# Work out mean and std of population
+np.mean(odds_1 / odds_2) 
+np.std(odds_1 / odds_2, ddof = 0) # to get population rather than sample std
+
+np.random.normal(0.96123, 0.051772, 100)

@@ -45,8 +45,8 @@ def add_fighter_differentials(df):
     #######################
     # Add in some combination of differentials for an overall fight
     # Get the fighter columns
-    fighter1_cols = [col for col in merged_data.columns if col.startswith('fighter1_') and 'notformodel' not in col]
-    fighter2_cols = [col for col in merged_data.columns if col.startswith('fighter2_') and 'notformodel' not in col]
+    fighter1_cols = [col for col in merged_data.columns if col.startswith('fighter1_') and 'notformodel' not in col and 'backtesting' not in col]
+    fighter2_cols = [col for col in merged_data.columns if col.startswith('fighter2_') and 'notformodel' not in col and 'backtesting' not in col]
 
     # Remove string columns
     # Identify string columns
@@ -75,7 +75,7 @@ def add_fighter_differentials(df):
     stop_if_not(check_identical_excl_string(fighter1_cols_no_dates, fighter2_cols_no_dates, 'fighter1_', 'fighter2_', check_both = True))
 
     # Create differential columns
-    diff_columns = pd.DataFrame(merged_data[fighter1_cols_no_dates].to_numpy() - merged_data[fighter2_cols_no_dates].to_numpy(),
+    diff_columns = pd.DataFrame(np.subtract(merged_data[fighter1_cols_no_dates].to_numpy(), merged_data[fighter2_cols_no_dates].to_numpy()),
                                 columns = [col.replace('fighter1_', 'diff_').replace('fighter2_', '') for col in fighter1_cols_no_dates],
                                 index = merged_data.index)
 
