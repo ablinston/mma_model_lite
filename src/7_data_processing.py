@@ -460,18 +460,18 @@ del(fight_stats_no_na)
 # Filter for fight formats to be included
 fight_results = fight_results[((fight_results['time format'].isna()) | (fight_results['time format'].isin(config['time_format_filter']))) & fight_results['weightclass'].isin(config['weightclass_filter'])]
 
-# Add elevation data to fight results
-events['fight_elevation'] = get_elevation_series(events['location'], config['google_maps_api_key'])
+# # Add elevation data to fight results
+# events['fight_elevation'] = get_elevation_series(events['location'], config['google_maps_api_key'])
 
-# Merge onto the fight results
-fight_results = fight_results.merge(
-    events[['event', 'fight_elevation']],
-    on = 'event',
-    how = 'left'
-    )
+# # Merge onto the fight results
+# fight_results = fight_results.merge(
+#     events[['event', 'fight_elevation']],
+#     on = 'event',
+#     how = 'left'
+#     )
 
-# Check there are no missing elevations
-stop_if_not(fight_results['fight_elevation'].isna().sum() == 0, "Event elevation missing data check")
+# # Check there are no missing elevations
+# stop_if_not(fight_results['fight_elevation'].isna().sum() == 0, "Event elevation missing data check")
 
 ###########################################################################################
 # FIGHT ODDS PROCESSING
@@ -487,7 +487,7 @@ fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, avera
 # MERGE DATA
 
 merged_data = merge_df_both_fighters(
-    left_df =  fight_results[['event', 'bout', 'fighter1', 'fighter2', 'outcome', 'method', 'weightclass', 'date', 'time format', 'fighter1_start_elo', 'fighter2_start_elo', 'fight_elevation']],
+    left_df =  fight_results[['event', 'bout', 'fighter1', 'fighter2', 'outcome', 'method', 'weightclass', 'date', 'time format', 'fighter1_start_elo', 'fighter2_start_elo']],
     df_list = [
         fight_stats[['event', 'bout', 'fighter', 'date_last_fight']],
         dates_knocked_out,

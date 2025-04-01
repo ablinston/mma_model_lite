@@ -23,8 +23,8 @@ if not os.name == "nt":
 
 # Use this to skip update of data if it's already been done recently
 skip_data_update = False
-skip_full_data_update = True
-skip_save_data = True
+skip_full_data_update = False
+skip_save_data = False
 
 # Read in the data for training
 data_path = './data/final_dataset/'
@@ -62,9 +62,9 @@ if not skip_data_update:
         exec(open('./src/7_data_processing.py').read())
         # Refresh the dataset
         forecasting_data = merged_data.copy()
-    else:
-        pass
-        # add in only odds update
+    # else:
+    #     pass
+    #     # add in only odds update
     
 
 # Apply standard filters
@@ -124,9 +124,20 @@ print(
       summary_data.to_string()
 )
 
-print(
-      betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())][['fighter1', 'fighter2', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'Bet_trigger', 'bet_assumed_odds', 'Final_bet', 'Potential_win', 'Bet_breakeven_odds']].to_string()
-)
+# Get only the bets to place
+bets_to_place = betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())].copy()
+bets_to_place['bet_win_prob'] = np.where(bets_to_place['Bet_trigger'] == bets_to_place['fighter1'], bets_to_place['Fighter1_win_prob'], bets_to_place['Fighter2_win_prob'])
+
+try:
+    del round
+except:
+    pass
+
+for i in range(0, len(bets_to_place)):
+    print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}")
+    print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
+    print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
+    print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
 
 # Output the results
 summary_data.to_csv('./results/upcoming_predictions.csv')

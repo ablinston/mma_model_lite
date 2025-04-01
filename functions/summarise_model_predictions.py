@@ -43,11 +43,12 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     # Add the EV for later breakdowns
     actuals_data['bet_ev'] = np.where(actuals_data['bets'] == 0, np.nan, wl_trigger * ev_wl + lw_trigger * ev_lw)
     #  Convert it into buckets
-    bucket_width = 0.1
-    col_min = np.round(np.floor(actuals_data['bet_ev'].min() / bucket_width) * bucket_width, 2)
-    col_max = np.round(np.ceil(actuals_data['bet_ev'].max() / bucket_width) * bucket_width, 2)
+    # bucket_width = 0.1
+    # col_min = np.round(np.floor(actuals_data['bet_ev'].min() / bucket_width) * bucket_width, 2)
+    # col_max = np.round(np.ceil(actuals_data['bet_ev'].max() / bucket_width) * bucket_width, 2)
     actuals_data['bet_ev_band'] = pd.cut(actuals_data['bet_ev'],
-                                    bins=np.arange(col_min, col_max + bucket_width, bucket_width))
+                                    bins=[0, 0.1, 0.2, np.inf],
+                                    labels=['0 - 0.1', '0.1 - 0.2', '0.2+'])
     
     
     ## Determine the bet size. Begin with the minimum, then add on the confidence of the bet
@@ -70,6 +71,8 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     stop_if_not(actuals_data['bet_size'].max() <= max_bet_size, 'Max bet check')
     
     # Summarise key outputs
+    actuals_data['Bet_breakeven_odds'] = np.where(wl_trigger == 1, 1 / prediction_probabilities[:, 2],
+                                                  np.where(lw_trigger == 1, 1 / prediction_probabilities[:, 0], np.nan))    # checked the maths and this is how it works out
     actuals_data['Fighter1_win_prob'] = np.round(prediction_probabilities[:, 2] * 100, 1)
     actuals_data['Fighter1_win_EV'] = np.round(ev_wl, 2)
     actuals_data['Fighter2_win_prob'] = np.round(prediction_probabilities[:, 0] * 100, 1)
@@ -80,8 +83,7 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
                                              np.where((actuals_data['Fighter2_win_prob'] > actuals_data['Fighter1_win_prob']) & (actuals_data['fighter2_backtesting_odds'] > actuals_data['fighter1_backtesting_odds']),
                                              'Underdog to win',
                                              'Favourite to win'))
-    actuals_data['Bet_breakeven_odds'] = np.where(wl_trigger == 1, 100 / actuals_data['Fighter1_win_prob'],
-                                                  np.where(lw_trigger == 1, 100 / actuals_data['Fighter2_win_prob'], np.nan))    # checked the maths and this is how it works out
+    
     if return_triggers:
         return [actuals_data, wl_trigger, lw_trigger]
     else:
