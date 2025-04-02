@@ -1,14 +1,14 @@
 # This script fits XGBoost models to the future events data after refreshing data scrape
 
-import gc
-import h2o
-from h2o.automl import H2OAutoML
-from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisation functions
-from hyperopt.atpe import suggest as atpe_suggest
-import itertools
-import lightgbm as lgb
+# import gc
+# import h2o
+# from h2o.automl import H2OAutoML
+# from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisation functions
+# from hyperopt.atpe import suggest as atpe_suggest
+# import itertools
+# import lightgbm as lgb
 import mlflow
-import pickle
+# import pickle
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import LabelEncoder, label_binarize
@@ -20,11 +20,17 @@ exec(open('global.py').read())
 # Replace the firefox location if we're not on windows
 if not os.name == "nt":
     config['firefox_location'] = config['firefox_location_pi']
+    config['gecko_driver_location'] = config['gecko_driver_location_pi']
+    config['num_threads'] = 1
 
-# Use this to skip update of data if it's already been done recently
-skip_data_update = False
-skip_full_data_update = False
-skip_save_data = False
+    # Use this to skip update of data if it's already been done recently
+    skip_data_update = False
+    skip_full_data_update = True
+    skip_save_data = True
+else:
+    skip_data_update = False
+    skip_full_data_update = False
+    skip_save_data = True
 
 # Read in the data for training
 data_path = './data/final_dataset/'
