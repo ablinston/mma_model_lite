@@ -22,7 +22,7 @@ if not os.name == "nt":
     config['firefox_location'] = config['firefox_location_pi']
 
 # Use this to skip update of data if it's already been done recently
-skip_data_update = False
+skip_data_update = True
 skip_save_data = True
 
 # Read in the data for training
@@ -120,7 +120,7 @@ X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
 
 # Set which columns and metrics we're interested in
 breakdown_cols = ['weightclass', 'year', 'month_year', 'time_format', 'fighter_history', 'date']
-breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Logloss', 'X Odds Logloss', 'Sample Size']
+breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Logloss', 'X Odds Logloss', 'EV MSE', 'X Odds EV MSE', 'Sample Size']
 target = 'outcome'
 
 backtesting_params = {

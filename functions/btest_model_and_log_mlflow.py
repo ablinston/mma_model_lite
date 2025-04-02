@@ -107,6 +107,16 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
         summary_df.index.name = 'Group'
         summary_df.to_csv('results/temp/summary.csv')
         mlflow.log_artifact('results/temp/summary.csv', col + ' metrics')
+        
+        # Create chart of logloss and EV MSE
+        if 'Logloss' in breakdown_metrics and 'X Odds Logloss' in breakdown_metrics:
+            fig, ax = metric_chart(x = summary_df['group'], y_model = summary_df['Logloss'], y_odds = summary_df['X Odds Logloss'], x_label = 'Group', y_label = 'Logloss')
+            mlflow.log_figure(fig, col +  " metrics/logloss_chart.png")
+        
+        if 'EV MSE' in breakdown_metrics and 'X Odds EV MSE' in breakdown_metrics:
+            fig, ax = metric_chart(x = summary_df['group'], y_model = summary_df['EV MSE'], y_odds = summary_df['X Odds EV MSE'], x_label = 'Group', y_label = 'EV MSE')
+            mlflow.log_figure(fig, col +  " metrics/ev_mse_chart.png")
+
     
     # Finally, get the backtesting results
     backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params)

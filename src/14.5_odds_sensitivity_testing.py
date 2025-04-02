@@ -22,8 +22,8 @@ model_path = './results/final_xgboost_forest.joblib'
 # Read in the data for training
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 # Load files
-rf_xgb_model = joblib.load(model_path)
-# rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')._model_impl.python_model.model
+# rf_xgb_model = joblib.load(model_path)
+rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')._model_impl.python_model.model
 
 ##########################################################################################
 ### Feature selection using config ###
@@ -74,10 +74,10 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Set up experiment training
-mlflow.set_experiment('rand_odds_testing_v2')
+mlflow.set_experiment('rand_odds_testing_v3')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest, rand odds, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
+model_description = 'XGB forest v2 - ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
 
 ##########################################################################################
 ### Calculating metrics ###
