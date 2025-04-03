@@ -149,8 +149,15 @@ for i in range(0, len(bets_to_place)):
     print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
 
 # Output the results
-summary_data.to_csv('./results/upcoming_predictions.csv')
+summary_data.to_csv(f'./results/upcoming_predictions_{datetime.today()}.csv')
 
 # If on Raspberry Pi, output to Gdrive
 if not os.name == "nt":
     summary_data.to_csv('/home/andy/to_gdrive/upcoming_predictions.csv')
+    with open("/home/andy/to_gdrive/bets_to_place.txt", "r") as file:
+    for line in file:
+        print("")
+        print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}")
+        print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
+        print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
+        print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
