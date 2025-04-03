@@ -12,16 +12,12 @@
 # from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 # from sklearn.model_selection import train_test_split, KFold
 # from sklearn.preprocessing import LabelEncoder, label_binarize
-import xgboost as xgb
 
 # Read in global objects and packages
 exec(open('global.py').read())
 
 # Replace the firefox location if we're not on windows
 if not os.name == "nt":
-    config['firefox_location'] = config['firefox_location_pi']
-    config['gecko_driver_location'] = config['gecko_driver_location_pi']
-    config['num_threads'] = 1
 
     # Use this to skip update of data if it's already been done recently
     skip_data_update = False
@@ -30,17 +26,12 @@ if not os.name == "nt":
 else:
     skip_data_update = False
     skip_full_data_update = False
-    skip_save_data = True
-
-# Read in the data for training
-data_path = './data/final_dataset/'
+    skip_save_data = False
 
 
 # # Load files
 # mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/3')
-# Set the model location
-model_path = './models/xgb_forest_v2.joblib'
 
 
 ##########################################################################################
@@ -53,13 +44,19 @@ if not skip_data_update:
     exec(open('./src/4_scrape_all_unparsed_data.py').read())
     exec(open('./src/5_data_cleaning.py').read())
     
+    # Clear out memory
+    globals().clear()
+    # Read in global objects and packages
+    exec(open('global.py').read())
+    gc.collect()
+    
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if skip_full_data_update:
         forecasting_data = update_odds_on_merged_data(
                 cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
                 cleaned_event_odds_data_path = './data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
                 events_path = './data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
-                final_data_folder = data_path,
+                final_data_folder = config['final_data_path'],
                 average_odds_model_path = './results/average_odds_model.joblib',
                 config = config
                 )
@@ -93,7 +90,7 @@ X_upcoming, temp1, y_upcoming, temp2, temp3, temp4, temp5 = prep_data_for_model_
 
 # Load files
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
-rf_xgb_model = joblib.load(model_path)
+rf_xgb_model = joblib.load(bet_config['model_to_use'])
 
 # Get the model predictions
 # prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
