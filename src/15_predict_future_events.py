@@ -43,15 +43,16 @@ if not skip_data_update:
     # Run these scripts to scrape then clean the raw data
     exec(open('./src/4_scrape_all_unparsed_data.py').read())
     exec(open('./src/5_data_cleaning.py').read())
-    
-    # Clear out memory
-    globals().clear()
-    # Read in global objects and packages
-    exec(open('global.py').read())
-    gc.collect()
-    
+        
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if skip_full_data_update:
+        
+        # Clear out memory
+        globals().clear()
+        # Read in global objects and packages
+        exec(open('global.py').read())
+        gc.collect()
+        
         forecasting_data = update_odds_on_merged_data(
                 cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
                 cleaned_event_odds_data_path = './data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
@@ -141,11 +142,15 @@ except:
     pass
 
 for i in range(0, len(bets_to_place)):
+    print("")
     print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}")
     print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
     print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
     print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
-    print("")
 
 # Output the results
 summary_data.to_csv('./results/upcoming_predictions.csv')
+
+# If on Raspberry Pi, output to Gdrive
+if not os.name == "nt":
+    summary_data.to_csv('/home/andy/to_gdrive/upcoming_predictions.csv')
