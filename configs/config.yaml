@@ -11,6 +11,7 @@ firefox_location_pi: /usr/bin/firefox
 
 # Gecko driver to use
 gecko_driver_location: './data/firefox_driver_32bit/geckodriver0_36.exe'
+gecko_driver_location_pi: './data/firefox_driver_64bitARM/geckodriver0_36'
 
 # Numer of CPU threads to use for concurrent processes
 num_threads: 3

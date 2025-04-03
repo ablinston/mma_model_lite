@@ -2,7 +2,7 @@
 # It will scrape the data and perform consistency checks to ensure all datasets are consistent before
 # saving them and overwriting existing files.
 
-exec(open('global.py').read())
+# exec(open('global.py').read())
 
 ### check if there are any unparsed events ###
 

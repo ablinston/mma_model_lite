@@ -2,20 +2,20 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 import copy
-import csv
+# import csv
 from datetime import datetime, date, timedelta
-import datatable as dt
-from datatable import f
-from fake_useragent import UserAgent
+# import datatable as dt
+# from datatable import f
+# from fake_useragent import UserAgent
 import fastparquet as fp
 from functools import partial
 import gc
-from hyperopt.early_stop import no_progress_loss
-import importlib
+# from hyperopt.early_stop import no_progress_loss
+# import importlib
 import inspect
-import itertools
+# import itertools
 import joblib
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import mlflow.pyfunc
 import numpy as np
 import os
@@ -31,16 +31,16 @@ import random
 import re
 from re import sub
 import requests
-from scipy.stats import hmean
-import seaborn as sns
+# from scipy.stats import hmean
+# import seaborn as sns
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
-from sklearn.utils import resample
-from sklearn.metrics import log_loss
+# from sklearn.utils import resample
+# from sklearn.metrics import log_loss
 import string
-import sys
-import time
+# import sys
+# import time
 from yaml import safe_load, dump
 
 # Load the config files

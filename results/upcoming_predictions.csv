@@ -1,7 +1,7 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
-0,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-01 21:04:14.419123,2025-04-01 21:04:14.419123,Pat Sabatini,3.0,33.8,0.01,Joanderson Brito,1.46,63.9,-0.07,None,0.0,,0.0,0.0
-1,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-01 21:04:14.419123,2025-04-01 21:04:14.419123,Cortavious Romious,2.2,43.9,-0.03,ChangHo Lee,1.78,53.9,-0.04,None,0.0,,0.0,0.0
-2,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-01 21:04:14.419123,2025-04-01 21:04:14.419123,Kennedy Nzechukwu,1.33,70.1,-0.06,Martin Buday,3.7,27.7,0.02,None,0.0,,0.0,0.0
-3,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-01 21:04:14.419123,2025-04-01 21:04:14.419123,Brad Tavares,1.4,69.7,-0.02,Gerald Meerschaert,3.1,28.1,-0.13,None,0.0,,0.0,0.0
-4,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-01 21:04:14.419123,2025-04-01 21:04:14.419123,Davey Grant,2.3,35.2,-0.19,Daniel Santos,1.69,62.6,0.06,Daniel Santos,1.69,1.6,175.0,120.69
-5,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-01 21:04:14.419123,2025-04-01 21:04:14.419123,Josh Emmett,3.7,14.5,-0.46,Lerone Murphy,1.31,83.6,0.09,Lerone Murphy,1.31,1.2,175.0,53.85
+0,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-03 14:42:29.494780,2025-04-03 14:42:29.494780,Pat Sabatini,3.05,33.8,0.03,Joanderson Brito,1.44,63.9,-0.08,None,0.0,,0.0,0.0
+1,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-03 14:42:29.494780,2025-04-03 14:42:29.494780,Cortavious Romious,2.2,43.9,-0.03,ChangHo Lee,1.8,53.9,-0.03,None,0.0,,0.0,0.0
+2,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-03 14:42:29.494780,2025-04-03 14:42:29.494780,Kennedy Nzechukwu,1.3,70.1,-0.09,Martin Buday,3.9,27.7,0.08,None,0.0,,0.0,0.0
+3,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-03 14:42:29.494780,2025-04-03 14:42:29.494780,Brad Tavares,1.48,69.7,0.03,Gerald Meerschaert,3.1,28.1,-0.13,Brad Tavares,1.48,1.43,175.0,83.33
+4,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-03 14:42:29.494780,2025-04-03 14:42:29.494780,Davey Grant,2.3,35.2,-0.19,Daniel Santos,1.68,62.6,0.05,Daniel Santos,1.68,1.6,175.0,118.24
+5,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-03 14:42:29.494780,2025-04-03 14:42:29.494780,Josh Emmett,3.65,14.5,-0.47,Lerone Murphy,1.32,83.6,0.11,Lerone Murphy,1.32,1.2,175.0,56.45

@@ -1,17 +1,17 @@
 # This script fits XGBoost models to the future events data after refreshing data scrape
 
-import gc
-import h2o
-from h2o.automl import H2OAutoML
-from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisation functions
-from hyperopt.atpe import suggest as atpe_suggest
-import itertools
-import lightgbm as lgb
-import mlflow
-import pickle
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
-from sklearn.model_selection import train_test_split, KFold
-from sklearn.preprocessing import LabelEncoder, label_binarize
+# import gc
+# import h2o
+# from h2o.automl import H2OAutoML
+# from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisation functions
+# from hyperopt.atpe import suggest as atpe_suggest
+# import itertools
+# import lightgbm as lgb
+# import mlflow
+# import pickle
+# from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+# from sklearn.model_selection import train_test_split, KFold
+# from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
 
 # Read in global objects and packages
@@ -20,23 +20,28 @@ exec(open('global.py').read())
 # Replace the firefox location if we're not on windows
 if not os.name == "nt":
     config['firefox_location'] = config['firefox_location_pi']
+    config['gecko_driver_location'] = config['gecko_driver_location_pi']
+    config['num_threads'] = 1
 
-# Use this to skip update of data if it's already been done recently
-skip_data_update = False
-skip_full_data_update = False
-skip_save_data = False
+    # Use this to skip update of data if it's already been done recently
+    skip_data_update = False
+    skip_full_data_update = True
+    skip_save_data = True
+else:
+    skip_data_update = False
+    skip_full_data_update = False
+    skip_save_data = True
 
 # Read in the data for training
 data_path = './data/final_dataset/'
 
 
 # # Load files
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+# mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/3')
 # Set the model location
-# model_path = './results/final_xgboost_forest.joblib'
-# Load files
-rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
+model_path = './models/xgb_forest_v2.joblib'
+
 
 ##########################################################################################
 ### Update the upcoming event and odds data ###
@@ -82,12 +87,17 @@ upcoming_fights = forecasting_data[forecasting_data['outcome'].isna()]
 ##########################################################################################
 
 # Get the data ready for the model
-X_upcoming, temp1, temp6, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
+X_upcoming, temp1, y_upcoming, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
     upcoming_fights,
     upcoming_fights = True)
 
+# Load files
+# rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
+rf_xgb_model = joblib.load(model_path)
+
 # Get the model predictions
-prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
+# prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
+prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_upcoming, [0] * len(y_upcoming))
 
 # Add formatted fighters
 upcoming_fights = add_formatted_fighter_names(upcoming_fights, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)
@@ -138,6 +148,7 @@ for i in range(0, len(bets_to_place)):
     print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
     print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
     print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
+    print("")
 
 # Output the results
 summary_data.to_csv('./results/upcoming_predictions.csv')
