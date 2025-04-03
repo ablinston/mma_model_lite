@@ -156,10 +156,12 @@ if not os.name == "nt":
     
     summary_data.to_csv(f'/home/andy/to_gdrive/upcoming_predictions_{datetime.today()}.csv')
     
-    with open("/home/andy/to_gdrive/bets_to_place.txt", "r") as file:
-        for line in file:
-            print("")
-            print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}")
-            print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
-            print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
-            print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
+    # Create text file with the bet summaries
+    text_file_path = "/home/andy/to_gdrive/bets_to_place.txt"
+    
+    with open(text_file_path, "w") as file:
+        print("", file = file)
+        print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}", file = file)
+        print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%", file = file)
+        print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds", file = file)
+        print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}", file = file)
