@@ -160,8 +160,9 @@ if not os.name == "nt":
     text_file_path = "/home/andy/to_gdrive/bets_to_place.txt"
     
     with open(text_file_path, "w") as file:
-        print("", file = file)
-        print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}", file = file)
-        print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%", file = file)
-        print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds", file = file)
-        print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}", file = file)
+        for i in range(0, len(bets_to_place)):
+            print("", file = file)
+            print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}", file = file)
+            print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%", file = file)
+            print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds", file = file)
+            print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}", file = file)
