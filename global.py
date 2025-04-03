@@ -25,7 +25,7 @@ import pandas as pd
 import pdb
 # from playwright.sync_api import sync_playwright
 # from playwright.async_api import async_playwright
-# import pyarrow.parquet as pq
+import pyarrow.parquet as pq
 # from pycaret.classification import *
 import random
 import re
