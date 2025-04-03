@@ -30,10 +30,11 @@ list_of_unparsed_events = [event for event in list_of_all_events if event not in
 # Get a list of upcoming events
 upcoming_events_df = parse_event_details(get_soup(config['upcoming_events_url']), upcoming = True)
 
-# # If missed the event start time
-# upcoming_events_df = pd.concat([new_event_details_df.iloc[[0]], upcoming_events_df], axis = 0, ignore_index = True).reset_index(drop = True)
-# new_event_details_df = new_event_details_df.iloc[1:, :]
-# list_of_unparsed_events = []
+# # If missed the event start time because it is today, move it to the upcoming data
+if pd.to_datetime(new_event_details_df.iloc[0]['DATE']) == pd.to_datetime(datetime.today().strftime('%Y-%m-%d')):
+    upcoming_events_df = pd.concat([new_event_details_df.iloc[[0]], upcoming_events_df], axis = 0, ignore_index = True).reset_index(drop = True)
+    new_event_details_df = new_event_details_df.iloc[1:, :]
+    list_of_unparsed_events = []
 
 # Only look at the first two to save time
 upcoming_events_df = upcoming_events_df.iloc[0:1]
