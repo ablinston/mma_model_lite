@@ -21,8 +21,11 @@ def update_odds_on_merged_data(
     # Load in the datasets
     fight_odds = fp.ParquetFile(cleaned_fight_odds_data_path).to_pandas()
     event_odds = fp.ParquetFile(cleaned_event_odds_data_path).to_pandas()
-    merged_data_original = pq.ParquetDataset(final_data_folder).read().to_pandas()
+    merged_data = pq.ParquetDataset(final_data_folder).read().to_pandas()
     average_odds_model = joblib.load(average_odds_model_path)
+    
+    # Save original shape for later
+    original_shape = merged_data.shape
     
     # pdb.set_trace()
     
@@ -31,11 +34,11 @@ def update_odds_on_merged_data(
     fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, average_odds_model)
     
     # Remove the columns that will be replaced
-    cols_to_remove = [col for col in merged_data_original.columns if col.replace('fighter1_', '').replace('fighter2_', '') in fight_odds.columns]
+    cols_to_remove = [col for col in merged_data.columns if col.replace('fighter1_', '').replace('fighter2_', '') in fight_odds.columns]
     cols_to_remove = [col for col in cols_to_remove if col not in ['event', 'bout', 'date']]
 
     # Remove old columns
-    merged_data = merged_data_original.drop(columns = cols_to_remove).copy()
+    merged_data.drop(columns = cols_to_remove, inplace = True)
     
     # Merge on the new odds
     merged_data = merge_df_both_fighters(
@@ -53,6 +56,6 @@ def update_odds_on_merged_data(
     merged_data = add_fighter_differentials(merged_data)
     
     # Check on data
-    stop_if_not(merged_data.shape == merged_data_original.shape)
+    stop_if_not(merged_data.shape == original_shape)
 
     return merged_data

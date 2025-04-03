@@ -9,12 +9,12 @@ from datetime import datetime, date, timedelta
 # from fake_useragent import UserAgent
 import fastparquet as fp
 from functools import partial
-# import gc
+import gc
 # from hyperopt.early_stop import no_progress_loss
 # import importlib
 import inspect
 # import itertools
-# import joblib
+import joblib
 # import matplotlib.pyplot as plt
 import mlflow.pyfunc
 import numpy as np
