@@ -65,9 +65,9 @@ if not skip_data_update:
         exec(open('./src/7_data_processing.py').read())
         # Refresh the dataset
         forecasting_data = merged_data.copy()
-    # else:
-    #     pass
-    #     # add in only odds update
+else:
+    forecasting_data = fp.ParquetDataset(config['final_data_path']).read().to_pandas()
+    # add in only odds update
     
 
 # Apply standard filters
