@@ -41,6 +41,7 @@ from selenium.webdriver.firefox.service import Service
 import string
 # import sys
 # import time
+import xgboost as xgb
 from yaml import safe_load, dump
 
 # Load the config files
@@ -71,3 +72,8 @@ for file in listdir('./functions/'):
 # Settings so that data frames always display in full in terminal
 pd.set_option('display.max_columns', None)
 
+# Change configs for Raspberry Pi
+if not os.name == "nt":
+    config['firefox_location'] = config['firefox_location_pi']
+    config['gecko_driver_location'] = config['gecko_driver_location_pi']
+    config['num_threads'] = 2
