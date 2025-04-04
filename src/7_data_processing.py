@@ -5,6 +5,9 @@ This script takes the cleaned data, merges it and aggregates necessary backgroun
 
 '''
 
+import datatable as dt
+from datatable import f
+
 # imports
 exec(open('global.py').read())
 

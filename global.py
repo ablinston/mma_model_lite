@@ -4,8 +4,6 @@ from concurrent.futures import as_completed
 import copy
 # import csv
 from datetime import datetime, date, timedelta
-# import datatable as dt
-# from datatable import f
 # from fake_useragent import UserAgent
 import fastparquet as fp
 from functools import partial
