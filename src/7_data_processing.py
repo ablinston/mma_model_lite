@@ -130,7 +130,7 @@ if data_processing_config['add_bayes_stats_columns']:
         fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
         id_cols = ['event', 'bout', 'fighter'], 
         group_by = config['bayesian_groupby'], 
-        fight_span = 50
+        fight_span = data_processing_config['bayes_fightspan']
     )
     
 else:
@@ -144,7 +144,8 @@ fight_stats_hist = aggregate_last_X_fight_data(
     prefix = "hist_",
     X = 100,
     per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors
+    bayes_priors_df = fight_stats_bayes_priors,
+    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase']
 ).drop(columns = ['date'])
 
 # Check that all first fights are 0 stats
@@ -163,7 +164,7 @@ del fight_stats_hist_check
 # ADJUSTED STATISTICS
 
 if data_processing_config['add_bayes_stats_columns'] and data_processing_config['add_adj_bayes_columns']:
-    fight_stats_bayes = calculate_per_minute_bayesian_stats(fight_stats, fight_stats_bayes_priors, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute'])
+    fight_stats_bayes = calculate_per_minute_bayesian_stats(fight_stats, fight_stats_bayes_priors, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute'], bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase'])
     
     # Adding on adjusted stats to the fight stats
     fight_stats_plus_adj = add_adjusted_bayes_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'])
@@ -179,7 +180,8 @@ fight_stats_hist = aggregate_last_X_fight_data(
     prefix = "hist_",
     X = 100,
     per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors
+    bayes_priors_df = fight_stats_bayes_priors,
+    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase']
 ).drop(columns = ['date'])
 
 
@@ -199,7 +201,8 @@ fight_stats_hist_last_3 = aggregate_last_X_fight_data(
     prefix = "hist_last_3_fights_",
     X = 3,
     per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors
+    bayes_priors_df = fight_stats_bayes_priors,
+    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase']
 ).drop(columns = ['date'])
 
 # Check that all first fights are NaN
@@ -243,7 +246,8 @@ fight_stats_hist_opponent_stance = aggregate_last_X_fight_data(
     prefix = 'hist_opp_stance_',
     X = 100,
     per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors
+    bayes_priors_df = fight_stats_bayes_priors,
+    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase']
 ).drop(columns = ['date', 'opponent', 'opponent_stance'])
 
 # Check the row numbers are correct
@@ -340,7 +344,8 @@ fight_stats_hist_opponent_type = aggregate_last_X_fight_data(
     prefix = 'hist_opp_type_',
     X = 100,
     per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors
+    bayes_priors_df = fight_stats_bayes_priors,
+    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase']
 ).drop(columns = ['date', 'opponent', 'opponent_stance', 'fighter_type', 'opponent_type'])
 
 
@@ -553,7 +558,7 @@ merged_data['fighter2_true_odds_change'] = merged_data['fighter2_true_closing_od
 ###########################################################################################
 # PERCENTAGE CALCULATIONS
 
-merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors)
+merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase'])
 
 
 ###########################################################################################

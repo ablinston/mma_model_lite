@@ -2,7 +2,7 @@
 
 # Can set some excluded strings to not include columns containing those phrases
 
-def calculate_per_minute_bayesian_stats(fight_stats_hist, bayes_priors_df, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute', 'baye']):
+def calculate_per_minute_bayesian_stats(fight_stats_hist, bayes_priors_df, bayes_alpha_plus_beta_rebase, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute', 'baye']):
 
     # Merge the bayesian prios onto the data
     stats_df = fight_stats_hist.merge(bayes_priors_df, on = ['event', 'bout'], how = 'left')
@@ -38,14 +38,17 @@ def calculate_per_minute_bayesian_stats(fight_stats_hist, bayes_priors_df, exclu
         
         # Work out the associated bayes columns for numerator and denominator
         if prefix == '':
-            bayes_numerators = ['bayes_total_' + item.replace('_against', '') for item in round_columns]
+            bayes_numerator_cols = ['bayes_total_' + item.replace('_against', '') for item in round_columns]
         else:
-            bayes_numerators = [item.replace('_against', '').replace(prefix, 'bayes_total_') for item in round_columns]
+            bayes_numerator_cols = [item.replace('_against', '').replace(prefix, 'bayes_total_') for item in round_columns]
+        
+        # Now calculate the alpha values based on the rebased number of minutes
+        bayes_alphas = stats_df[bayes_numerator_cols] * bayes_alpha_plus_beta_rebase / stats_df['bayes_total_' + round + '_fight_minutes'].to_numpy()[:, np.newaxis]
         
         # Calculate the per minute stats and merged onto data
         new_stats_df = pd.concat([
             new_stats_df,
-            pd.DataFrame((stats_df[round_columns] + stats_df[bayes_numerators].to_numpy()).div(stats_df[prefix + round + '_fight_minutes'].to_numpy() + stats_df['bayes_total_' + round + '_fight_minutes'].to_numpy(), axis = 0).to_numpy(),
+            pd.DataFrame((stats_df[round_columns] + bayes_alphas.to_numpy()).div(stats_df[prefix + round + '_fight_minutes'].to_numpy() + bayes_alpha_plus_beta_rebase, axis = 0).to_numpy(),
                          columns = [(col + '_per_minute_bayes') for col in round_columns]),          
         ], axis = 1)
     

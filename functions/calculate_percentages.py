@@ -1,6 +1,6 @@
 # This function takes the merged data and calculates percentages
 
-def calculate_percentages(merged_data_df, fight_stats_bayes_priors):
+def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase):
 
     merged_data = merged_data_df.copy()
     
@@ -55,9 +55,13 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors):
         # Calculate the bayes percentage accuracies
         new_bayes_percent_cols = [col.replace('_attempt', '_bayes_accuracy_percent') for col in percent_columns]
         
+        # Calculate the bayes alphas rebased to the required number
+        bayes_alphas = merged_data_bayes[bayes_numerators] * bayes_alpha_plus_beta_rebase / merged_data_bayes[bayes_denominators].to_numpy()
+        
+        # Calculate the bayes percentages
         new_data = pd.DataFrame(safe_divide_np(
-            merged_data_bayes[landed_columns].to_numpy() + merged_data_bayes[bayes_numerators].to_numpy(), 
-            merged_data_bayes[percent_columns].to_numpy() + merged_data_bayes[bayes_denominators].to_numpy(), 
+            merged_data_bayes[landed_columns].fillna(0).to_numpy() + bayes_alphas.to_numpy(), 
+            merged_data_bayes[percent_columns].fillna(0).to_numpy() + bayes_alpha_plus_beta_rebase, 
             zero_zero_fill = np.nan
             ), 
             columns = new_bayes_percent_cols
