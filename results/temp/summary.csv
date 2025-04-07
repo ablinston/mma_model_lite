@@ -1,2 +1,4 @@
-total,Group,fights,bets,wins,bet_size,profit_loss,max_bet_size,percent_bet_on,win_percent,max_drawdown,max_losing_streak,roi
-Total,Total,299,125,92,6.25,1486.2093092779046,0.05,41.80602006688963,73.6,-0.18049668102521277,,0.7312681494751061
+Group,group,Avg WL only AUC,X Odds Avg WL only AUC,Hmean WL only Accuracy,X Odds Hmean WL only Accuracy,Logloss,X Odds Logloss,Diff Avg WL only AUC,Diff Hmean WL only Accuracy,Diff Logloss
+0,heavy,1.0,1.0,1.0,1.0,2.220446049250313e-16,2.220446049250313e-16,0.0,0.0,0.0
+1,light,1.0,1.0,1.0,1.0,2.220446049250313e-16,2.220446049250313e-16,0.0,0.0,0.0
+2,middle,,,,,2.220446049250313e-16,36.04365338911715,,,-36.04365338911715

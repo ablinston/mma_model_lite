@@ -5,6 +5,8 @@ exec(open('global.py').read())
 # Load what answers are expected
 test_bayesian_priors_correct = fp.ParquetFile('./tests/data/test_bayesian_priors_correct.parquet').to_pandas()
 
+random.seed(123)
+
 def test_bayesian_priors():
     # Create a larger mock dataset
     num_fights = 1000

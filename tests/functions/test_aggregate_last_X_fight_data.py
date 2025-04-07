@@ -53,9 +53,9 @@ def test_aggregate_last_X_fight_data():
     # Now test Bayesian
     
     data = {
-        "event": ["E" + str(i) for i in range(1, 25)],
+        "event": ["E" + str(i) for i in range(1, 13) for _ in range(2)],
         "date": pd.date_range(start="2024-01-01", periods=24, freq="D"),
-        "bout": [f"b{i}" for i in range(1, 25)],
+        "bout": [f"b{i}" for i in range(1, 13) for _ in range(2)],
         "fighter": ["f" + str(i) for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 
                                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]],
         "weightclass": ["light"] * 6 + ["mid"] * 2 + ["light"] * 2 + ["mid"] * 2 + 
@@ -82,7 +82,8 @@ def test_aggregate_last_X_fight_data():
             group_by = ['weightclass'], 
             fight_span = 3,
             ignore_last_n = 1
-            ))
+            ),
+        bayes_alpha_plus_beta_rebase = 10)
     
     assert bayes_result.equals(test_aggregate_last_X_fight_data_correct[bayes_result.columns])
 

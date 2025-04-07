@@ -130,7 +130,8 @@ if data_processing_config['add_bayes_stats_columns']:
         fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
         id_cols = ['event', 'bout', 'fighter'], 
         group_by = config['bayesian_groupby'], 
-        fight_span = data_processing_config['bayes_fightspan']
+        fight_span = data_processing_config['bayes_fightspan'],
+        ignore_last_n = 15
     )
     
 else:
