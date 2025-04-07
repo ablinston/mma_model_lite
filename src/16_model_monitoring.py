@@ -7,11 +7,13 @@ from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisat
 from hyperopt.atpe import suggest as atpe_suggest
 import itertools
 import lightgbm as lgb
+import matplotlib.pyplot as plt
 import mlflow
 import pickle
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import LabelEncoder, label_binarize
+import seaborn as sns
 import xgboost as xgb
 
 # Read in global objects and packages
@@ -22,8 +24,8 @@ if not os.name == "nt":
     config['firefox_location'] = config['firefox_location_pi']
 
 # Use this to skip update of data if it's already been done recently
-skip_data_update = True
-skip_save_data = True
+skip_data_update = False
+skip_save_data = False
 
 # Read in the data for training
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()

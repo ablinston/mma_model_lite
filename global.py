@@ -11,10 +11,10 @@ import gc
 # from hyperopt.early_stop import no_progress_loss
 # import importlib
 import inspect
-# import itertools
+import itertools
 import joblib
-# import matplotlib.pyplot as plt
-import mlflow.pyfunc
+import mlflow
+# import mlflow.pyfunc
 import numpy as np
 import os
 from os import listdir, makedirs
@@ -29,13 +29,12 @@ import random
 import re
 from re import sub
 import requests
-# from scipy.stats import hmean
-# import seaborn as sns
+from scipy.stats import hmean
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 # from sklearn.utils import resample
-# from sklearn.metrics import log_loss
+from sklearn.metrics import log_loss
 import string
 # import sys
 # import time

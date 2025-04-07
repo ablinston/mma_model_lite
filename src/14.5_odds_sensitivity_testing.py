@@ -17,13 +17,13 @@ exec(open('global.py').read())
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
 # Set the model location
-model_path = './results/final_xgboost_forest.joblib'
+model_path = './models/xgb_forest_v2.joblib'
 
 # Read in the data for training
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 # Load files
-# rf_xgb_model = joblib.load(model_path)
-rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')._model_impl.python_model.model
+rf_xgb_model = joblib.load(model_path)
+# rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')._model_impl.python_model.model
 
 ##########################################################################################
 ### Feature selection using config ###
@@ -74,7 +74,7 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Set up experiment training
-mlflow.set_experiment('rand_odds_testing_v3')
+mlflow.set_experiment('rand_odds_testing_v1')
 
 # Set this model's description for MLflow
 model_description = 'XGB forest v2 - ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
@@ -106,8 +106,9 @@ for i in range(0, 10):
     backtesting_params = {
         'min_prob_to_bet': 0.49,
         'min_ev_to_bet': 0.0,
-        'max_bet_size': 100,
-        'min_bet_size': 100
+        'max_bet_size': 0.05,
+        'min_bet_size': 0.05,
+        'constant_bets': False
     }
     
     # Run the metrics on the training data
