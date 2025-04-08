@@ -27,7 +27,7 @@ def test_calculate_percentages():
         "bayes_total_kick_landed": [1, 1, 2, 2]
     })
     
-    result = calculate_percentages(merged_data_df, fight_stats_bayes_priors)
+    result = calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = 10)
 
     # Ensure the function runs and returns a DataFrame
     assert isinstance(result, pd.DataFrame), "Function must return a DataFrame"
@@ -44,8 +44,8 @@ def test_calculate_percentages():
     assert np.allclose(result["fighter1_kick_accuracy_percent"], expected_kick_acc, atol=1e-3)
 
     # Expected Bayesian accuracy values
-    expected_punch_bayes = [(5+2)/(10+20), (10+2)/(20+20), (7+3)/(15+30), (15+3)/(30+30)]
-    expected_kick_bayes = [(4+1)/(8+10), (8+1)/(16+10), (6+2)/(12+20), (12+2)/(24+20)]
+    expected_punch_bayes = [(5+2*10/20)/(10+10), (10+2*10/20)/(20+10), (7+3*10/30)/(15+10), (15+3*10/30)/(30+10)]
+    expected_kick_bayes = [(4+1)/(8+10), (8+1)/(16+10), (6+2*10/20)/(12+10), (12+2*10/20)/(24+10)]
 
     # Validate Bayesian computed percentages
     assert np.allclose(result["fighter1_punch_bayes_accuracy_percent"], expected_punch_bayes, atol=1e-3)

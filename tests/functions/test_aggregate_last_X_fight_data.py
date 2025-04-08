@@ -81,7 +81,7 @@ def test_aggregate_last_X_fight_data():
             id_cols = ['event', 'bout', 'fighter'], 
             group_by = ['weightclass'], 
             fight_span = 3,
-            ignore_last_n = 1
+            ignore_last_n_fights = 1
             ),
         bayes_alpha_plus_beta_rebase = 10)
     
