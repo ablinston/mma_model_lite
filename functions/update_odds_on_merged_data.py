@@ -5,7 +5,6 @@
 def update_odds_on_merged_data(
         cleaned_fight_odds_data_path: str,
         cleaned_event_odds_data_path: str,
-        events_path: str,
         final_data_folder: str,
         average_odds_model_path,
         config
@@ -27,7 +26,7 @@ def update_odds_on_merged_data(
     # Save original shape for later
     original_shape = merged_data.shape
     
-    # pdb.set_trace()
+    pdb.set_trace()
     
     # Assume that the event and bout have been added correctly as part of the data cleaning process.
     # Process the data

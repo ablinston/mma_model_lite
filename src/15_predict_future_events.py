@@ -56,7 +56,7 @@ if not skip_data_update:
         forecasting_data = update_odds_on_merged_data(
                 cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
                 cleaned_event_odds_data_path = './data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
-                events_path = './data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
+                # events_path = './data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
                 final_data_folder = config['final_data_path'],
                 average_odds_model_path = './results/average_odds_model.joblib',
                 config = config
