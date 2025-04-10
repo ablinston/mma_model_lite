@@ -47,7 +47,7 @@ def scrape_fighter_odds_fast(
                 'User-Agent': random_user_agent(), #'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0', # UserAgent().random,  # Randomize user-agent
                 'TE': 'Trailers'  # Added to mimic more realistic behavior
             }
-   
+    
         # Extract the page source and convert to xml
         soup = get_website_soup(
             url = 'https://www.bestfightodds.com/search?query=' + fighter_name,

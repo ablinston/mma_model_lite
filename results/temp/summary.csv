@@ -1,4 +1,9 @@
-Group,group,Avg WL only AUC,X Odds Avg WL only AUC,Hmean WL only Accuracy,X Odds Hmean WL only Accuracy,Logloss,X Odds Logloss,Diff Avg WL only AUC,Diff Hmean WL only Accuracy,Diff Logloss
-0,heavy,1.0,1.0,1.0,1.0,2.220446049250313e-16,2.220446049250313e-16,0.0,0.0,0.0
-1,light,1.0,1.0,1.0,1.0,2.220446049250313e-16,2.220446049250313e-16,0.0,0.0,0.0
-2,middle,,,,,2.220446049250313e-16,36.04365338911715,,,-36.04365338911715
+,Group,fights,bets,wins,bet_size,profit_loss,max_bet_size,percent_bet_on,win_percent,max_drawdown,max_losing_streak,roi
+Total,Total,7,6,6,6.0,6.000000496442226e-10,1.0,85.71428571428571,100.0,0.0,0.0,1.000000082740371e-08
+0 - 0.1,0 - 0.1,6,6,6,6.0,6.000000496442226e-10,1.0,100.0,100.0,,,1.000000082740371e-08
+0.1 - 0.2,0.1 - 0.2,0,0,0,0.0,0.0,,,,,,
+0.2+,0.2+,0,0,0,0.0,0.0,,,,,,
+Favourite to win,Favourite to win,7,6,6,6.0,6.000000496442226e-10,1.0,85.71428571428571,100.0,,,1.000000082740371e-08
+heavy,heavy,3,3,3,3.0,3.000000248221113e-10,1.0,100.0,100.0,,,1.000000082740371e-08
+light,light,3,3,3,3.0,3.000000248221113e-10,1.0,100.0,100.0,,,1.000000082740371e-08
+middle,middle,1,0,0,0.0,0.0,0.0,0.0,,,,

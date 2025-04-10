@@ -26,7 +26,7 @@ def update_odds_on_merged_data(
     # Save original shape for later
     original_shape = merged_data.shape
     
-    pdb.set_trace()
+    # pdb.set_trace()
     
     # Assume that the event and bout have been added correctly as part of the data cleaning process.
     # Process the data

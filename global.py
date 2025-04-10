@@ -25,6 +25,7 @@ import pdb
 # from playwright.async_api import async_playwright
 import pyarrow.parquet as pq
 # from pycaret.classification import *
+from rapidfuzz import fuzz
 import random
 import re
 from re import sub
