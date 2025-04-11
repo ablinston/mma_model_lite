@@ -75,10 +75,10 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_bet_testing_v15')
+mlflow.set_experiment('final_models_bet_testing_v2')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
+model_description = 'Added bayes base 10 - ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
 
 ##########################################################################################
 ### Calculating metrics ###
