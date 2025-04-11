@@ -11,4 +11,7 @@ min_bet_size: 0.05
 max_bet_size: 0.05
 
 # Starting balance when sizing bets
-start_balance: 3653
+start_balance: 3716
+
+# Set the commission or slippage to be included when calculating breakeven odds as a proportion.
+exchange_commission: 0.02

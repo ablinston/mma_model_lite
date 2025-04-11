@@ -1,6 +1,6 @@
 # This function takes a dataset of actuals and prediction probabilities (which must correspond in rows to each other)
 # It returns a data frame with added columns for the EVs of each bet and bet sizing
-def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, return_triggers = False, keep_scrape_dates = False):
+def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, exchange_commission = 0, return_triggers = False, keep_scrape_dates = False):
 
     
     # ###
@@ -73,6 +73,8 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     # Summarise key outputs
     actuals_data['Bet_breakeven_odds'] = np.where(wl_trigger == 1, 1 / prediction_probabilities[:, 2],
                                                   np.where(lw_trigger == 1, 1 / prediction_probabilities[:, 0], np.nan))    # checked the maths and this is how it works out
+    actuals_data['Bet_breakeven_exchange_odds'] = np.where(wl_trigger == 1, (1 / prediction_probabilities[:, 2] - 1) / (1 - exchange_commission) + 1,
+                                                  np.where(lw_trigger == 1, (1 / prediction_probabilities[:, 0] - 1) / (1 - exchange_commission) + 1, np.nan))   
     actuals_data['Fighter1_win_prob'] = np.round(prediction_probabilities[:, 2] * 100, 1)
     actuals_data['Fighter1_win_EV'] = np.round(ev_wl, 2)
     actuals_data['Fighter2_win_prob'] = np.round(prediction_probabilities[:, 0] * 100, 1)
