@@ -107,7 +107,8 @@ betting_data = summarise_model_predictions(
     min_prob_to_bet = bet_config['min_prob_to_bet'], 
     min_ev_to_bet = bet_config['min_ev_to_bet'], 
     min_bet_size = bet_config['min_bet_size'], 
-    max_bet_size = bet_config['max_bet_size'])
+    max_bet_size = bet_config['max_bet_size'],
+    exchange_commission = bet_config['exchange_commission'])
 
 # Add the final bet size based on balance
 if bet_config['constant_bets'] == False:
@@ -147,6 +148,7 @@ for i in range(0, len(bets_to_place)):
     print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
     print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
     print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
+    print(f"Breakeven exchange odds: {bets_to_place.iloc[i]['Bet_breakeven_exchange_odds']:.2f}")
 
 # Output the results
 summary_data.to_csv('./results/upcoming_predictions.csv')
@@ -166,3 +168,4 @@ if not os.name == "nt":
             print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%", file = file)
             print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds", file = file)
             print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}", file = file)
+            print(f"Breakeven exchange odds: {bets_to_place.iloc[i]['Bet_breakeven_exchange_odds']:.2f}", file = file)
