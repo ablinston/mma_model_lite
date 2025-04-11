@@ -12,3 +12,4 @@ bayes_alpha_plus_beta_rebase: 10
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats)
 add_adj_bayes_columns: False
+

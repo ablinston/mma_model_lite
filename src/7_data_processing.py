@@ -131,12 +131,12 @@ if data_processing_config['add_bayes_stats_columns']:
         id_cols = ['event', 'bout', 'fighter'], 
         group_by = config['bayesian_groupby'], 
         fight_span = data_processing_config['bayes_fightspan'],
-        ignore_last_n = 15
+        ignore_last_n_fights = 30 if config['bayesian_groupby'] == [] else 10
     )
     
 else:
     fight_stats_bayes_priors = None
-    
+
 # Now aggrgate
 fight_stats_hist = aggregate_last_X_fight_data(
     fight_stats,
