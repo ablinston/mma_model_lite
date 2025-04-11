@@ -73,8 +73,8 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     # Summarise key outputs
     actuals_data['Bet_breakeven_odds'] = np.where(wl_trigger == 1, 1 / prediction_probabilities[:, 2],
                                                   np.where(lw_trigger == 1, 1 / prediction_probabilities[:, 0], np.nan))    # checked the maths and this is how it works out
-    actuals_data['Bet_breakeven_exchange_odds'] = np.where(wl_trigger == 1, (1 / prediction_probabilities[:, 2] - 1) * (1 - exchange_commission) + 1,
-                                                  np.where(lw_trigger == 1, (1 / prediction_probabilities[:, 0] - 1) * (1 - exchange_commission) + 1, np.nan))   
+    actuals_data['Bet_breakeven_exchange_odds'] = np.where(wl_trigger == 1, (1 / prediction_probabilities[:, 2] - 1) / (1 - exchange_commission) + 1,
+                                                  np.where(lw_trigger == 1, (1 / prediction_probabilities[:, 0] - 1) / (1 - exchange_commission) + 1, np.nan))   
     actuals_data['Fighter1_win_prob'] = np.round(prediction_probabilities[:, 2] * 100, 1)
     actuals_data['Fighter1_win_EV'] = np.round(ev_wl, 2)
     actuals_data['Fighter2_win_prob'] = np.round(prediction_probabilities[:, 0] * 100, 1)
