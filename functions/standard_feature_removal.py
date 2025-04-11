@@ -4,7 +4,7 @@ def standard_feature_removal(df, open_odds_only, differentials_only = False, tru
 
     data = df.copy()
     
-    pdb.set_trace()
+    # pdb.set_trace()
     
     # Remove cols that shouldn't really affect the fight.
     # Remove dates because they can overfit. Leave date minuses, which are days since

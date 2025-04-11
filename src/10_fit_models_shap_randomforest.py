@@ -1,5 +1,5 @@
 
-
+import csv
 import gc
 import h2o
 from h2o.automl import H2OAutoML
@@ -53,7 +53,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 # X_train = X_train[[col for col in X_train.columns if col not in var_importance['Feature'][5000:len(var_importance)].tolist()]]
 
 # Now remove any columns that aren't wanted in a training dataset. At this point we don't remove non-true odds in order to see the rank in feature importance
-X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False)
+X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False, open_odds_only = False)
 
 # Check data types
 data.dtypes.value_counts()

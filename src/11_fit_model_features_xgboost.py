@@ -5,6 +5,7 @@ import h2o
 from h2o.automl import H2OAutoML
 from hyperopt import hp, STATUS_OK, tpe, fmin, rand, Trials # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
+from hyperopt.early_stop import no_progress_loss
 import hyperopt
 import itertools
 import lightgbm as lgb
@@ -108,7 +109,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v19')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v2')
 
 
 ##########################################################################################
@@ -120,7 +121,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [80, 90, 100, 110, 120]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [51, 76, 86, 101, 111, 126]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
     'hyperopt_early_stopping': 30
 }
@@ -151,7 +152,8 @@ params_inner = {
      'exclude_split_other_from_train': hp.choice('exclude_split_other_from_train', [True, False]),
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': hp.choice('win_loss_only', [True, False]),
-     'loss_function' : model_hyper_params['loss_function']
+     'loss_function' : model_hyper_params['loss_function'],
+     'trim_model_features': model_hyper_params['trim_model_features']
 }
 
 best = fmin(fn = objective_xgboost_features_mlflow,
@@ -165,7 +167,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:80]
+column_names = X_train_master.columns.tolist()[0:100]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)
