@@ -47,11 +47,6 @@ final_data_stats_log: ./data/final_data_stats_log.csv
 # Set the location of the fighter odds urls manual overide
 fighter_odds_urls: ./data/fighter_odds_urls.csv
 
-# Bayesian group by. This is what we group the Bayesian smooting of stats by
-bayesian_groupby: [] # ['weightclass']
-bayesian_fightspan: 50
-
-
 # columns names for extracted details
 fight_details_column_names:
   - EVENT

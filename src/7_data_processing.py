@@ -9,7 +9,7 @@ import datatable as dt
 from datatable import f
 
 # imports
-exec(open('global.py').read())
+# exec(open('global.py').read())
 
 # Read in the data
 events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
@@ -129,9 +129,9 @@ if data_processing_config['add_bayes_stats_columns']:
     fight_stats_bayes_priors = bayesian_priors(
         fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
         id_cols = ['event', 'bout', 'fighter'], 
-        group_by = config['bayesian_groupby'], 
+        group_by = data_processing_config['bayesian_groupby'], 
         fight_span = data_processing_config['bayes_fightspan'],
-        ignore_last_n_fights = 30 if config['bayesian_groupby'] == [] else 10
+        ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
     )
     
 else:
