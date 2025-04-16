@@ -73,10 +73,6 @@ columns_in_order = var_importance['Feature'].tolist()
 # Get rid of the last X results
 columns_in_order = [col for col in columns_in_order if not ('_last_' in col and '_results' in col)]
 
-# Trim additional columns if necessary
-if model_hyper_params['trim_model_features']:
-    columns_in_order = trim_column_list(columns_in_order)
-
 # Add on the split indicator if needed
 columns_in_order = columns_in_order + ['notformodel_split_dec_or_other']
     
@@ -109,7 +105,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v2')
+mlflow.set_experiment('2014+_mens_fights_gt2_split_exc_rand_fighters_mean_odds_v4')
 
 
 ##########################################################################################
@@ -121,9 +117,9 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [51, 76, 86, 101, 111, 126]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [50, 75, 85, 100, 120, 130, 140, 150, 175, 200, 250, 300]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
-    'hyperopt_early_stopping': 30
+    'hyperopt_early_stopping': 35
 }
 
 # Set the hyperopt parameters for the inner optimisation
@@ -153,7 +149,7 @@ params_inner = {
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': hp.choice('win_loss_only', [True, False]),
      'loss_function' : model_hyper_params['loss_function'],
-     'trim_model_features': model_hyper_params['trim_model_features']
+     'trim_model_features': hp.choice('trim_model_features', [True, False])
 }
 
 best = fmin(fn = objective_xgboost_features_mlflow,
@@ -162,15 +158,18 @@ best = fmin(fn = objective_xgboost_features_mlflow,
             max_evals = 20,
             trials = trials)
 
- 
+
 
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:110]
+column_names = X_train_master.columns.tolist()[0:140]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)
+
+if trim_model_features:
+    column_names = trim_column_list(column_names)
 
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:

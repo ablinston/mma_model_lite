@@ -21,11 +21,12 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('bayes_base_testing_rf')
 
 # Choose a new base for the bayes variables
-for bayes_base in [100]:
+for bayes_base_per_minute, bayes_base_percent in [(10, 450), (110, 450)]:
     
     # Overwrite the base
-    data_processing_config['bayes_alpha_plus_beta_rebase'] = bayes_base
-    data_processing_config['bayesian_groupby'] = ['weightclass']
+    data_processing_config['bayes_alpha_plus_beta_rebase_per_minute'] = bayes_base_per_minute
+    data_processing_config['bayes_alpha_plus_beta_rebase_percent'] = bayes_base_percent
+    data_processing_config['bayesian_groupby'] = []
 
     # Run the data processing
     skip_save_data = True
@@ -121,7 +122,8 @@ for bayes_base in [100]:
         # Log the params
         mlflow.log_params(params)
         mlflow.log_param('model', "RandomForest")
-        mlflow.log_param('bayes_base', bayes_base)
+        mlflow.log_param('bayes_base_per_minute', bayes_base_per_minute)
+        mlflow.log_param('bayes_base_percent', bayes_base_percent)
         mlflow.log_param('bayes_groupby', data_processing_config['bayesian_groupby'])
         
         # Train the model

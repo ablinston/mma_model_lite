@@ -1,5 +1,6 @@
 @echo off
-set "MLFLOW_DIR=E:\MLflow - old\"
+:: set "MLFLOW_DIR=E:\MLflow - old\"
+set "MLFLOW_DIR=E:\Backup\MLflow - before accidental delete 2025-03"
 
 echo Cleaning up MLflow garbage...
 

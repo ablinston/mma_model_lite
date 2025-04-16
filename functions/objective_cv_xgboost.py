@@ -24,11 +24,17 @@ def objective_cv_xgboost(
         for param in ['max_bin', 'min_child_weight', 'max_depth', 'num_iterations']:
             params[param] = int(params[param])
         
+        # Trim the model features for similar columns if set to
+        if params['trim_model_features']:
+            X_train_trim = X_train[trim_column_list(X_train.columns)].copy()
+        else:
+            X_train_trim = X_train.copy()
+            
         ## Precompute DMatrix objects using ThreadPoolExecutor
         # If the training data is to have split decs and other results excluded, then use the custom function to do that
         # if params['exclude_split_other_from_train'] == False:
         with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
-            futures = {executor.submit(create_dmatrix, X_train, y_train, train_idx, test_idx, params['win_loss_only'], params['exclude_split_other_from_train']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
+            futures = {executor.submit(create_dmatrix, X_train, y_train, train_idx, test_idx, params['win_loss_only'], params['exclude_split_other_from_train']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train_trim)}
             dmatrix_data = [future.result() for future in as_completed(futures)]   
         # else:
         #     with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
