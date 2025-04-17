@@ -7,11 +7,13 @@ from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisat
 from hyperopt.atpe import suggest as atpe_suggest
 import itertools
 import lightgbm as lgb
+import matplotlib.pyplot as plt
 import mlflow
 import pickle
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import LabelEncoder, label_binarize
+import seaborn as sns
 import xgboost as xgb
 
 # Read in global objects and packages
@@ -19,6 +21,7 @@ exec(open('global.py').read())
 
 # Set the model location
 model_path = './results/final_xgboost_forest.joblib'
+# model_path = './models/xgb_forest_v2.joblib'
 
 # Read in the data for training
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -79,10 +82,10 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('OOT_testing_v2')
+mlflow.set_experiment('OOT_testing')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest - add noise to odds ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = 'XGB forest w bayes,  ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###

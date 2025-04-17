@@ -1,5 +1,5 @@
 
-def bayesian_priors(fight_stats_df, id_cols, group_by, fight_span, ignore_last_n = 15):
+def bayesian_priors(fight_stats_df, id_cols, group_by, fight_span, ignore_last_n_fights = 15):
     
     """
     Takes a historical dataset and calculates the bayesian priors for each stat that will be needed to calculate
@@ -31,7 +31,10 @@ def bayesian_priors(fight_stats_df, id_cols, group_by, fight_span, ignore_last_n
     numeric_columns = stats_df.select_dtypes(include = ['number', 'float']).columns.tolist()
     
     # Get the aggregate figures for each fight. Excluded the last 15 just to ensure no data from the same date is used. 2 * fightspan because we have a row per fighter
-    total_stats = stats_df.groupby('weightclass', group_keys = False).apply(lambda x: x[numeric_columns].rolling(window = 2 * fight_span).sum().shift(ignore_last_n), include_groups = False)
+    if len(group_by) > 0:
+        total_stats = stats_df.groupby(group_by, group_keys = False).apply(lambda x: x[numeric_columns].rolling(window = 2 * fight_span).sum().shift(ignore_last_n_fights * 2 + 1), include_groups = False) # Shift 1 to not include current observation, then 2 * n fighters
+    else:
+        total_stats = stats_df[numeric_columns].rolling(window = 2 * fight_span).sum().shift(ignore_last_n_fights * 2 + 1) # Shift 1 to not include current observation, then 2 * n fighters
    
     # Rename the columns
     total_stats.columns = ['bayes_total_' + col for col in total_stats.columns]

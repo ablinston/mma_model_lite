@@ -2,13 +2,11 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 import copy
-# import csv
 from datetime import datetime, date, timedelta
 # from fake_useragent import UserAgent
 import fastparquet as fp
 from functools import partial
 import gc
-# from hyperopt.early_stop import no_progress_loss
 # import importlib
 import inspect
 import itertools
@@ -25,6 +23,7 @@ import pdb
 # from playwright.async_api import async_playwright
 import pyarrow.parquet as pq
 # from pycaret.classification import *
+from rapidfuzz import fuzz
 import random
 import re
 from re import sub

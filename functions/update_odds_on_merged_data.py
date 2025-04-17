@@ -5,7 +5,6 @@
 def update_odds_on_merged_data(
         cleaned_fight_odds_data_path: str,
         cleaned_event_odds_data_path: str,
-        events_path: str,
         final_data_folder: str,
         average_odds_model_path,
         config

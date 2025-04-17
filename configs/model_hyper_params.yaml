@@ -28,7 +28,7 @@ odds_noise_standard_dev: 0.05177 # From odds testing script
 true_odds_only: True
 
 # Set whether to exclude all but open odds
-# open_odds_only: False
+open_odds_only: False
 
 # Set whether to use the mean_closing_odds or best_closing_odds in the backtesting
 odds_to_use: best_closing_odds

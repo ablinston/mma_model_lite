@@ -121,10 +121,10 @@ def objective_xgboost_features_mlflow(
             
             # Log the metrics of the best fit
             mlflow.log_metrics(trials_inner.best_trial['result']['metrics'])
-            
+    
     if model_hyper_params['loss_function'] == 'ev_loss_function':
         # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-        return {'loss': trials_inner.best_trial['result']['metrics']['EV MSE'], 'params': params.update(best), 'status': STATUS_OK}  #  Add on the inner params
+        return {'loss': trials_inner.best_trial['result']['metrics']['EV MSE'], 'params': params.update(best | trials_inner.best_trial['result']['params']), 'status': STATUS_OK}  #  Add on the inner params
     else:
         # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
-        return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params.update(best), 'status': STATUS_OK}
+        return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params.update(best | trials_inner.best_trial['result']['params']), 'status': STATUS_OK}

@@ -41,6 +41,14 @@ def betfightodds_table_to_df(table, fighter):
     headers = [fighter if fighter.lower() == item.lower() else item for item in headers]
 
     df['fighter'] = fighter
-    df['opponent'] = [item for item in headers if clean_name_for_odds_search(item) not in ['matchup', 'open', 'closingrange', 'movement', '', 'event', clean_name_for_odds_search(fighter), clean_name_for_odds_search(max(set(headers), key=headers.count))]] # exclude the most common element as it is usually their name
+    
+    # Find the most common element, it's usually a different spelling of the fighters name
+    mode_name = clean_name_for_odds_search(max(set(headers), key=headers.count))
+    
+    # Check it at least semi matches, otherwise wipe it
+    if fuzz.ratio(mode_name, clean_name_for_odds_search(fighter)) < 80:
+        mode_name = ''
+    
+    df['opponent'] = [item for item in headers if clean_name_for_odds_search(item) not in ['matchup', 'open', 'closingrange', 'movement', '', 'event', clean_name_for_odds_search(fighter), mode_name]] # exclude the most common element as it is usually their name
 
     return df

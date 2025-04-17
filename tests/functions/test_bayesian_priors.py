@@ -5,14 +5,16 @@ exec(open('global.py').read())
 # Load what answers are expected
 test_bayesian_priors_correct = fp.ParquetFile('./tests/data/test_bayesian_priors_correct.parquet').to_pandas()
 
+np.random.seed(123)
+
 def test_bayesian_priors():
     # Create a larger mock dataset
-    num_fights = 1000
+    num_fights = 100
     data = {
         'event': np.repeat([f'E{i}' for i in range(1, num_fights//2 + 1)], 2),
         'bout': np.repeat(np.arange(1, num_fights//2 + 1), 2),
         'fighter': [f'F{i}' for i in range(1, num_fights + 1)],
-        'weightclass': np.random.choice(['Lightweight', 'Welterweight', 'Middleweight'], num_fights),
+        'weightclass': np.repeat(np.random.choice(['Lightweight', 'Welterweight', 'Middleweight'], int(num_fights / 2)), 2),
         'date': pd.date_range(start='2022-01-01', periods=num_fights, freq='D'),
         'stat1': [1] * num_fights,
         'stat2': [2, 2, 2, 4] * int(num_fights/4),
@@ -26,7 +28,7 @@ def test_bayesian_priors():
     fight_span = 2  # Using a larger span for robust testing
 
     # Run the function
-    result = bayesian_priors(fight_stats_df, id_cols, group_by, fight_span)
+    result = bayesian_priors(fight_stats_df, id_cols, group_by, fight_span, ignore_last_n_fights = 1)
     
     # Assertions
     assert isinstance(result, pd.DataFrame), "Output should be a DataFrame"

@@ -1,4 +1,4 @@
-def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute_calc = False, bayes_priors_df = None):
+def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute_calc = False, bayes_priors_df = None, bayes_alpha_plus_beta_rebase = None):
     """
     Convert fight data into cumulative fight history for the last 3 entries (excluding the current entry).
 
@@ -78,6 +78,6 @@ def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute
     if per_minute_calc:
         df_rolling = calculate_per_minute_stats(df_rolling)
         if bayes_priors_df is not None:
-            df_rolling = calculate_per_minute_bayesian_stats(df_rolling, bayes_priors_df)
+            df_rolling = calculate_per_minute_bayesian_stats(df_rolling, bayes_priors_df, bayes_alpha_plus_beta_rebase = bayes_alpha_plus_beta_rebase)
     
     return df_rolling

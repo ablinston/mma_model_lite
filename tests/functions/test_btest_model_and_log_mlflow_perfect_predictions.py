@@ -6,6 +6,8 @@ from unittest.mock import patch
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import LabelEncoder, label_binarize
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 # mlflow.set_experiment('test')
