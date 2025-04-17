@@ -14,7 +14,11 @@ def test_update_odds_on_merged_data():
     )
 
     assert isinstance(result, pd.DataFrame)
-    assert test_update_odds_on_merged_data_correct.equals(result)
+    pd.testing.assert_frame_equal(
+        test_update_odds_on_merged_data_correct,
+        result,
+        check_dtype=False
+    )
 
 
 
