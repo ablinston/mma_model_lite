@@ -1,5 +1,9 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
-0,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:21:33.784763,Pat Sabatini,2.8,35.4,-0.01,Joanderson Brito,1.49,62.3,-0.07,None,0.0,,0.0,0.0
-1,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:21:33.784763,Cortavious Romious,2.3,43.9,0.01,ChangHo Lee,1.7,53.8,-0.08,None,0.0,,0.0,0.0
-2,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:18:36.543773,Brad Tavares,1.61,59.1,-0.05,Gerald Meerschaert,2.45,38.7,-0.05,None,0.0,,0.0,0.0
-3,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:21:33.784763,Josh Emmett,3.6,14.7,-0.47,Lerone Murphy,1.33,83.5,0.11,Lerone Murphy,1.33,1.2,185.0,61.67
+0,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 18:00:41.842947,2025-04-19 18:00:41.842947,Anthony Smith,4.8,22.2,0.06,Zhang Mingyang,1.21,75.7,-0.09,None,0.0,,0.0,0.0
+1,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 18:00:41.842947,2025-04-19 18:00:41.842947,Giga Chikadze,2.54,42.1,0.07,David Onama,1.56,55.6,-0.14,None,0.0,,0.0,0.0
+2,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 18:00:41.842947,2025-04-19 18:00:41.842947,Michel Pereira,1.67,51.2,-0.15,Abus Magomedov,2.36,46.5,0.1,None,0.0,,0.0,0.0
+3,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 18:00:41.842947,2025-04-19 18:00:41.842947,Randy Brown,1.47,70.9,0.04,Nicolas Dalby,2.96,26.9,-0.2,Randy Brown,1.47,1.41,165.0,76.74
+4,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 18:00:41.842947,2025-04-19 18:00:41.842947,Ikram Aliskerov,1.15,70.1,-0.19,Andre Muniz,5.8,27.7,0.61,None,0.0,,0.0,0.0
+5,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 17:57:04.866374,2025-04-19 17:57:04.866374,Matt Schnell,1.34,73.8,-0.01,Jimmy Flick,3.5,24.1,-0.16,None,0.0,,0.0,0.0
+6,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 17:57:04.866374,2025-04-19 17:57:04.866374,Chris Gutierrez,1.83,55.2,0.01,John Castaneda,2.02,42.5,-0.14,Chris Gutierrez,1.83,1.81,165.0,137.5
+7,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-19 18:00:41.842947,2025-04-19 18:00:41.842947,Ian Machado Garry,1.8,55.7,0.0,Carlos Prates,2.14,42.0,-0.1,Ian Machado Garry,1.8,1.79,165.0,132.0

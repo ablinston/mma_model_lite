@@ -12,3 +12,6 @@ max_bet_size: 0.05
 
 # Starting balance when sizing bets
 start_balance: 3290.70
+
+# Set the commission the exchange will charge on winnings
+exchange_commission: 0.02
