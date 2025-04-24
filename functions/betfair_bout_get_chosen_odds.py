@@ -36,6 +36,7 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
 
     # Check the length is 2 so we have both fighters
     if len(output_df) != 2:
+        print("Error: Data is not the length expected")
         pdb.set_trace()
 
     return output_df

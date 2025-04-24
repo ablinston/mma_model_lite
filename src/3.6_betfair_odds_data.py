@@ -2,6 +2,7 @@ import betfairlightweight
 from betfairlightweight import StreamListener
 from betfairlightweight.filters import market_filter, price_projection
 import bz2
+from pathlib import Path
 import orjson
 import os
 
@@ -94,52 +95,12 @@ for file in file_list:
     print(download)
 
 
-# Get a list of files in the directory
-bz2_folder = './data/raw_betfair/2025/'
-# file_list = [file for file in os.listdir(decompressed_dir) if '.bz2.' in file]
 
-file_list = []
-for path, subdirs, files in os.walk(bz2_folder):
-    for name in files:
-        file_list.append(path.replace('\\', '/') + '/' + name)
-
-new_files_df = pd.DataFrame({'filepath': file_list, 'fight_flag': np.nan})
-
-# Loop through the files to check which are fights and flag them on the data
-for i in range(0, len(new_files_df)):
-    
-    if i % 100 == 0:
-        print('Running ' + str(i))
-        
-    with bz2.open(new_files_df['filepath'][i], "rt", encoding="utf-8") as f:
-        for line in f:
-            if "Fight Result" in line:
-                new_files_df.loc[i, 'fight_flag'] = 1
-                break
-        
-            new_files_df.loc[i, 'fight_flag'] = 0
-        
-
-# fp.write('./data/betfair_fileflags.parquet', new_files_df)
-
-fight_files = new_files_df[new_files_df['fight_flag'] == 1]
+############################################
+## PROCESS DOWNLOADED FILES
 
 
-# Loop through the fight files and extract them into the decompressed folder
-output_dir = './data/raw_betfair/decompressed_fight_files'
-
-for i in range(0, len(fight_files)):
-    
-    bz2_file_path = fight_files['filepath'].iloc[i]
-    
-    # === Create output filename by stripping .bz2 extension ===
-    filename = os.path.basename(bz2_file_path).replace(".bz2", "")
-    output_file_path = os.path.join(output_dir, filename).replace("\\", "/")
-    
-    # === Decompress to output directory ===
-    with bz2.open(bz2_file_path, 'rb') as f_in:
-        with open(output_file_path, 'wb') as f_out:
-            f_out.write(f_in.read())
+bz2_file_log = betfair_filter_bz2_for_fights('./data/raw_betfair/historic/', './data/raw_betfair/decompressed_fight_files/')
 
 
 
@@ -154,19 +115,27 @@ for i in range(0, len(fight_files)):
 # create listener
 listener = StreamListener(max_latency=None)
 
-# Go through each file in the decompressed folder and load the data into data frames
+## Go through each file in the decompressed folder and load the data into data frames
+
+# Create an empty list for the datasets
+betfair_odds_list = []
+
+# Loop through files
 for file in os.listdir(output_dir):
 
-# create historical stream (update file_path to your file location)
-stream = trading.streaming.create_historical_generator_stream(
-    file_path = "./data/raw_betfair/decompressed_fight_files/33954312",
-    listener = listener,
-)
+    # Create historical stream (update file_path to your file location)
+    stream = trading.streaming.create_historical_generator_stream(
+        file_path = output_dir + file,
+        listener = listener,
+    )
 
-# Convert the list of series into a data frame
-betfair_odds_df = betfair_stream_to_df(stream, historic = True)
+    # Convert the list of series into a data frame
+    betfair_odds_df = betfair_stream_to_df(stream, historic = True)
+    
+    # Get the last odds before the chosen cutoff time
+    betfair_odds_summary_df = betfair_bout_get_chosen_odds(betfair_odds_df, betfair_data_config['odds_cutoff_time'])
 
-betfair_odds_summary_df = betfair_bout_get_chosen_odds(betfair_odds_df, betfair_data_config['odds_cutoff_time'])
+    # Save the output to the list as a dictionary for faster combination later
+    betfair_odds_list.append(betfair_odds_summary_df)
 
-
-
+betfair_odds = pd.concat(betfair_odds_list, axis = 0)

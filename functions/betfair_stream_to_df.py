@@ -41,9 +41,11 @@ def betfair_stream_to_df(stream, historic = True, inplay = False, include_prop_b
     # Get rid of NA bets
     output_df = output_df[~output_df['last_price_traded'].isna()]
     
+    # pdb.set_trace()
+    
     # If no prop bets should be included, filter them out by looking for the fighters only in the runner column
     if not include_prop_bets:
-        output_df = output_df[output_df.apply(lambda row: row['runner'] in row['bout'], axis = 1)]
+        output_df = output_df[output_df.apply(lambda row: row['runner'].lower() in row['bout'].lower(), axis = 1)]
         output_df.rename(columns = {'runner': 'fighter'}, inplace = True)
     
     # Filter out in play
