@@ -48,7 +48,7 @@ def betfair_stream_to_df(stream, historic = True, inplay = False, include_prop_b
         
         try:
             # Exclude common strings from prop bets
-            exclusions = output_df['runner'].apply(lambda x: 1 if 'under' in x.lower() or 'over' in x.lower() or 'points' in x.lower() or '/' in x or ':' in x or ' round ' in x.lower() or ' by ' in x.lower() or 'draw ' in x.lower() else 0)
+            exclusions = output_df['runner'].apply(lambda x: 1 if 'under' in x.lower() or 'over' in x.lower() or 'points' in x.lower() or '/' in x or ':' in x or ' round ' in x.lower() or ' by ' in x.lower() or 'draw ' in x.lower() or x.lower() == 'draw' else 0)
             output_df = output_df[exclusions == 0]
             
             # Get the two most common bets. Assume these are the fighters

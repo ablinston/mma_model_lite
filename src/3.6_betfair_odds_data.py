@@ -153,5 +153,9 @@ betfair_odds = parallel_run_function(
         odds_cutoff_time = betfair_data_config['odds_cutoff_time'], 
         historic = True)
 
+
+# Change the date to a proper date to avoid parquet errors
+betfair_odds['event_date'] = pd.to_datetime(betfair_odds['event_date'], errors = 'coerce')
+
 # Output the data
-betfair_odds.to_parquet('./data/' + config['betfair_odds_file_name'], compression = 'ZSTD')
+fp.write('./data/' + config['betfair_odds_file_name'], betfair_odds, compression = 'ZSTD')

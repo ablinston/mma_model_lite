@@ -79,7 +79,7 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_ch
     
     # Give a warning about any that haven't been matched to an event and bout
     if len(ufc_events_missing_odds) > 0:
-        print(f"The following events after 01-01-2010 are missing odds data: {set(ufc_events_missing_odds)}")
+        print(f"The following events after {date_check} are missing odds data: {set(ufc_events_missing_odds)}")
     
     # Remove columns no longer needed    
     new_odds_df = new_odds_df[odds_df.columns]

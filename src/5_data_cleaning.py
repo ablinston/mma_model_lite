@@ -35,6 +35,11 @@ fight_stats = to_numeric(fight_stats, ['kd'])
 # Get cleaned versions of the columns
 fighters['Fighter'] = fighters['fighter'].copy()
 
+# Convert Yes/No fighters into names on betfair odds
+betfair_odds = betfair_yesno_to_names(betfair_odds)
+
+# Replace text in betfair odds bout to be consistent with other data
+betfair_odds['bout'] = betfair_odds['bout'].str.replace(" v ", " vs. ")
 
 # Remove spaces in events to avoid merge errors
 for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds, event_odds, betfair_odds]:
@@ -201,6 +206,23 @@ event_odds = event_odds.dropna(subset = event_odds_cols, how = 'all')
 event_odds = event_odds.dropna(subset = 'event')
 
 
+
+###########################################
+## Betfair odds cleaning
+
+# Replace fighter names with those that appear in stats where the dates match
+betfair_clean_fighter_names(betfair_odds, all_events, fight_stats_all, fuzz_threshold = 70, day_threshold = 2)
+
+# Change column name for matching
+betfair_odds.rename(columns = {'event_date': 'date'}, inplace = True)
+
+# Add opponent for matching events
+add_opponent_column(betfair_odds)
+
+# Add on events and bouts
+betfair_odds = add_event_and_bout_to_odds_data(betfair_odds, all_events, fight_stats_all, date_check = '2017-01-01')
+
+
 ###########################################
 # Remove multiple fights on same date - some events had fighters fight multiple times. This messes up the matching and some functions so we'll get rid of them
 
@@ -254,6 +276,10 @@ fp.write('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clea
 
 fp.write('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
          event_odds,
+         compression = 'ZSTD')
+
+fp.write('./data/' + config['betfair_odds_file_name'].replace('.parquet', '_clean.parquet'),
+         betfair_odds,
          compression = 'ZSTD')
 
 fp.write('./data/' + config['fighter_names_file_name'],
