@@ -10,6 +10,7 @@ fight_results = fp.ParquetFile('./data/' + config['fight_results_file_name']).to
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name']).to_pandas()
 fighter_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_pandas()
 event_odds = fp.ParquetFile('./data/' + config['event_odds_file_name']).to_pandas()
+betfair_odds = fp.ParquetFile('./data/' + config['betfair_odds_file_name']).to_pandas()
 
 # Convert all column names to lowercase
 events.columns = events.columns.str.lower()
@@ -20,6 +21,7 @@ fight_results.columns = fight_results.columns.str.lower()
 fight_stats.columns = fight_stats.columns.str.lower()
 fighter_odds.columns = fighter_odds.columns.str.lower()
 event_odds.columns = event_odds.columns.str.lower()
+betfair_odds.columns = betfair_odds.columns.str.lower()
 
 # Convert fighter data to numeric
 # Replace spaces and inches, then split and convert to cm
@@ -35,7 +37,7 @@ fighters['Fighter'] = fighters['fighter'].copy()
 
 
 # Remove spaces in events to avoid merge errors
-for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds, event_odds]:
+for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds, event_odds, betfair_odds]:
     try:
         df[['event']] = clean_text_columns(df[['event']])
     except:

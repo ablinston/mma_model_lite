@@ -34,6 +34,7 @@ fighter_tott_file_name: ufc_fighter_tott.parquet
 fighter_odds_file_name: fight_odds_data.parquet
 fighter_names_file_name: fighter_names.parquet
 event_odds_file_name: event_odds.parquet
+betfair_odds_file_name: betfair_odds.parquet
 
 # Set the path for the final datasets
 final_data_path: './data/final_dataset/'

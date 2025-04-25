@@ -35,8 +35,10 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
     output_df.rename(columns = {'last_price_traded': 'betfair_exch_odds'}, inplace = True)
 
     # Check the length is 2 so we have both fighters
-    if len(output_df) != 2:
+    if len(output_df) > 2:
         print("Error: Data is not the length expected")
         pdb.set_trace()
+    elif len(output_df) == 1:
+        return pd.DataFrame()
 
     return output_df

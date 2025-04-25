@@ -45,8 +45,20 @@ def betfair_stream_to_df(stream, historic = True, inplay = False, include_prop_b
     
     # If no prop bets should be included, filter them out by looking for the fighters only in the runner column
     if not include_prop_bets:
-        output_df = output_df[output_df.apply(lambda row: row['runner'].lower() in row['bout'].lower(), axis = 1)]
-        output_df.rename(columns = {'runner': 'fighter'}, inplace = True)
+        
+        try:
+            # Exclude common strings from prop bets
+            exclusions = output_df['runner'].apply(lambda x: 1 if 'under' in x.lower() or 'over' in x.lower() or 'points' in x.lower() or '/' in x or ':' in x or ' round ' in x.lower() or ' by ' in x.lower() or 'draw ' in x.lower() else 0)
+            output_df = output_df[exclusions == 0]
+            
+            # Get the two most common bets. Assume these are the fighters
+            two_modes = output_df['runner'].value_counts().head(2).index.tolist()
+            
+            # Filter only the two most common bets
+            output_df = output_df[output_df['runner'].isin(two_modes)]
+            output_df.rename(columns = {'runner': 'fighter'}, inplace = True)
+        except:
+            pdb.set_trace()
     
     # Filter out in play
     if not inplay:
