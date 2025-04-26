@@ -8,7 +8,7 @@ def betfair_filter_bz2_for_fights(input_folder, output_folder):
     
     """
     
-    # pdb.set_trace()
+    pdb.set_trace()
     
     # file_list = []
     # for path, subdirs, files in os.walk(input_folder):
@@ -16,7 +16,7 @@ def betfair_filter_bz2_for_fights(input_folder, output_folder):
     #         file_list.append(path.replace('\\', '/') + '/' + name)
     file_list = [str(p.resolve()) for p in Path(input_folder).rglob("*.bz2")]
 
-    new_files_df = pd.DataFrame({'filepath': file_list, 'fight_flag': np.nan})
+    # new_files_df = pd.DataFrame({'filepath': file_list, 'fight_flag': np.nan})
 
     # # Loop through the files to check which are fights and flag them on the data
     # for i in range(0, len(new_files_df)):
@@ -35,14 +35,15 @@ def betfair_filter_bz2_for_fights(input_folder, output_folder):
     # Get the flags as to whether the file is a fight or not
     fight_flags = parallel_run_function(
         func = betfair_flag_bz2_as_fight,
-        input_list = new_files_df['filepath'].tolist(),
+        input_list = file_list,
         max_workers = config['num_threads'],
         collapse_output_to_df = False)
             
-
+    fight_flags = pd.DataFrame(fight_flags)
+    
     # fp.write('./data/betfair_fileflags.parquet', new_files_df)
 
-    fight_files = new_files_df[pd.Series(fight_flags) == 1]
+    fight_files = fight_flags[fight_flags['fight_flag'] == 1]
 
     # for i in range(0, len(fight_files)):
         

@@ -128,7 +128,7 @@ bz2_file_log = betfair_filter_bz2_for_fights('./data/raw_betfair/historic/', out
 
 #     # Create historical stream (update file_path to your file location)
 #     stream = trading.streaming.create_historical_generator_stream(
-#         file_path = file,
+#         file_path = output_dir + '34181204',
 #         listener = listener,
 #     )
     
@@ -141,7 +141,7 @@ bz2_file_log = betfair_filter_bz2_for_fights('./data/raw_betfair/historic/', out
 #     # Save the output to the list as a dictionary for faster combination later
 #     betfair_odds_list.append(betfair_odds_summary_df)
 
-# betfair_odds = pd.concat(betfair_odds_list, axis = 0)
+# # betfair_odds = pd.concat(betfair_odds_list, axis = 0)
 
 list_of_decompressed_filepaths = [output_dir + file for file in os.listdir(output_dir)]
 

@@ -20,6 +20,7 @@ upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_detai
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 event_odds = fp.ParquetFile('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+betfair_odds = fp.ParquetFile('./data/' + config['betfair_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 
 # Read in the average odds model
 average_odds_model = joblib.load('./results/average_odds_model.joblib')
@@ -489,7 +490,7 @@ fight_results = fight_results[((fight_results['time format'].isna()) | (fight_re
 fight_odds = add_event_and_bout_to_odds_data(fight_odds, events, fight_stats)
 event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
 
-fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, average_odds_model)
+fight_odds = process_odds_data(fight_odds, event_odds, betfair_odds, odds_scrape_config, average_odds_model)
 
 
 ###########################################################################################
