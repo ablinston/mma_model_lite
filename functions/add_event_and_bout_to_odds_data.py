@@ -28,7 +28,7 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_ch
         
     # Clean the bouts and fighter columns
     new_stats_df[['bout', 'fighter']] = clean_text_columns(new_stats_df[['bout', 'fighter']])
-    odds_df.loc[['fighter', 'opponent']] = clean_text_columns(odds_df[['fighter', 'opponent']])
+    odds_df.loc[:,['fighter', 'opponent']] = clean_text_columns(odds_df[['fighter', 'opponent']])
     
     # Drop columns not needed and duplicates. Drop NA because they will affect the match
     new_stats_df = new_stats_df[['event', 'bout', 'fighter', 'event_date']].drop_duplicates()

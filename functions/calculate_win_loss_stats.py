@@ -1,6 +1,6 @@
 # This function takes the fighter results data (obtained after converting the fight results to be one row per fighter, not per fight) and derives various columns for win/loss stats and adds them to the data
 
-def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission']):
+def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission'], last_x_fights = 10):
 
     # pdb.set_trace()    
 
@@ -50,7 +50,7 @@ def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission'
             win_loss_stats['hist_losses_finishes'] += win_loss_stats['hist_losses_' + method]
 
     # Now calculate the win rate for the last X fights
-    for x in range(1, 21):
+    for x in range(1, (last_x_fights + 1)):
         win_loss_stats[f'hist_win_percent_{x}_fights'] = (
             win_loss_stats.groupby('fighter')['win']
             .transform(lambda s: s.shift().rolling(x, min_periods=x).mean())
@@ -90,9 +90,9 @@ def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission'
     cols = []
     for i in range(0, len(numerator_strings)):
         cols = cols + [col for col in win_loss_stats.columns if numerator_strings[i] in col]
-    win_loss_stats[[col + '_per_fight' for col in cols]] = win_loss_stats[cols].div(win_loss_stats['hist_fights'], axis = 0)
+    win_loss_stats.loc[:, [col + '_per_fight' for col in cols]] = win_loss_stats[cols].div(win_loss_stats['hist_fights'], axis = 0)
     # Deal with any infinities
-    win_loss_stats[[col + '_per_fight' for col in cols]] = win_loss_stats[[col + '_per_fight' for col in cols]].replace([np.inf, -np.inf], np.nan)
+    win_loss_stats.loc[:, [col + '_per_fight' for col in cols]] = win_loss_stats[[col + '_per_fight' for col in cols]].replace([np.inf, -np.inf], np.nan)
 
     ############################
     # Clean up columns
