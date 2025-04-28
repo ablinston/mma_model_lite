@@ -90,7 +90,14 @@ def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission'
     cols = []
     for i in range(0, len(numerator_strings)):
         cols = cols + [col for col in win_loss_stats.columns if numerator_strings[i] in col]
-    win_loss_stats.loc[:, [col + '_per_fight' for col in cols]] = win_loss_stats[cols].div(win_loss_stats['hist_fights'], axis = 0)
+    
+    new_cols = {col: col + '_per_fight' for col in cols}
+
+    win_loss_stats = win_loss_stats.assign(
+        **{new_col: win_loss_stats[old_col] / win_loss_stats['hist_fights'] 
+           for old_col, new_col in new_cols.items()}
+    )
+
     # Deal with any infinities
     win_loss_stats.loc[:, [col + '_per_fight' for col in cols]] = win_loss_stats[[col + '_per_fight' for col in cols]].replace([np.inf, -np.inf], np.nan)
 

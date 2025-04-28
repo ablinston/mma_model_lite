@@ -68,9 +68,9 @@ fighters.drop(columns = ['Fighter'], inplace = True)
 fight_stats['ctrl_minutes'] = time_to_minutes_decimal(fight_stats['ctrl'])
 
 # Format dates
-fighters['dob'] = pd.to_datetime(fighters['dob'], errors = 'coerce')
-events['date'] = pd.to_datetime(events['date'], errors = 'coerce')
-upcoming_events['date'] = pd.to_datetime(upcoming_events['date'], errors = 'coerce')
+fighters['dob'] = pd.to_datetime(fighters['dob'].str.replace("-", ""), format = '%b %d, %Y')
+events['date'] = pd.to_datetime(events['date'], format = '%B %d, %Y')
+upcoming_events['date'] = pd.to_datetime(upcoming_events['date'], format = '%B %d, %Y')
 
 # Add the event date to the fight results
 fight_results = fight_results.merge(events[['event', 'date']], on = 'event', how = 'left')

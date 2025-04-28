@@ -490,7 +490,7 @@ fight_results = fight_results[((fight_results['time format'].isna()) | (fight_re
 fight_odds = add_event_and_bout_to_odds_data(fight_odds, events, fight_stats)
 event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
 
-fight_odds = process_odds_data(fight_odds, event_odds, betfair_odds, odds_scrape_config, average_odds_model)
+fight_odds = process_odds_data(fight_odds.drop_duplicates(subset = ['event', 'bout', 'fighter']), event_odds, betfair_odds, odds_scrape_config, average_odds_model)
 
 
 ###########################################################################################
@@ -547,6 +547,11 @@ duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 
 ###########################################################################################
 # FURTHER FEATURE PROCESSING
+
+# Impute odds if required
+if data_processing_config['impute_missing_betfair']:
+    merged_data['fighter1_betfair_exch_odds'] = np.where(merged_data['fighter1_betfair_exch_odds'].isna(), merged_data['fighter1_best_closing_odds'], merged_data['fighter1_betfair_exch_odds'])
+    merged_data['fighter2_betfair_exch_odds'] = np.where(merged_data['fighter2_betfair_exch_odds'].isna(), merged_data['fighter2_best_closing_odds'], merged_data['fighter2_betfair_exch_odds'])
 
 # Change odds into true odds
 merged_data[['fighter1_true_closing_odds', 'fighter2_true_closing_odds']] = calculate_true_odds(merged_data, 'fighter1_' + data_processing_config['odds_suffix_for_true_odds'], 'fighter2_' + data_processing_config['odds_suffix_for_true_odds'])
@@ -647,7 +652,7 @@ for fighter in ['fighter1', 'fighter2']:
     # Deal with any infinities
     new_data.replace([np.inf, -np.inf], np.nan, inplace=True)
     new_data.columns = [col + '_per_fight' for col in cols]
-
+    
     # Merge with the data
     merged_data = pd.concat([merged_data, new_data], axis = 1)
 
@@ -687,7 +692,7 @@ cols = ['_date_last_fight', '_date_last_knocked_out', '_date_last_loss', '_date_
 # Do each fighters per fight calcs separately
 for fighter in ['fighter1', 'fighter2']:
     for col in cols:
-        merged_data[fighter + '_date_minus' + col] = (merged_data['date'] - pd.to_datetime(merged_data[fighter + col]).copy().fillna('1900-01-01')).dt.days
+        merged_data[fighter + '_date_minus' + col] = (merged_data['date'] - pd.to_datetime(merged_data[fighter + col]).copy()).dt.days
 
         # Fill in NAs with arbitrary early date
         # merged_data[fighter + '_date_minus' + col] = merged_data[fighter + '_date_minus' + col].fillna(99999).astype(int)
@@ -716,6 +721,7 @@ merged_data['womens'] = np.where(merged_data['weightclass'].apply(lambda x: np.w
 
 # Add the matchup
 merged_data['matchup'] = merged_data['fighter1_fighter_type'] + '-vs-' + merged_data['fighter2_fighter_type']
+
 
 # Add what odds are to be used in model training and backtesting
 merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()
