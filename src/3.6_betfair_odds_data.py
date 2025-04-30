@@ -30,14 +30,14 @@ trading.login()
 file_list = trading.historic.get_file_list(
     "Other Sports",
     "Basic Plan",
-    from_day=26,
+    from_day=23,
     from_month=4,
     from_year=2025,
     to_day=26,
     to_month=4,
     to_year=2025,
     market_types_collection=["MATCH_ODDS"],
-    countries_collection=["GB"],
+    # countries_collection=["GB"],
     file_type_collection=["M"],
 )
 
@@ -102,8 +102,7 @@ betfair_odds = parallel_run_function(
         input_list = list_of_decompressed_filepaths,
         max_workers = config['num_threads'],
         collapse_output_to_df = True,
-        odds_cutoff_time = betfair_data_config['odds_cutoff_time'], 
-        historic = True)
+        odds_cutoff_time = betfair_data_config['odds_cutoff_time'])
 
 
 # Change the date to a proper date to avoid parquet errors

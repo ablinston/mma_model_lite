@@ -1,4 +1,4 @@
-def betfair_file_to_final_odds(file_path, odds_cutoff_time, historic):
+def betfair_file_to_final_odds(file_path, odds_cutoff_time):
     
     """
     This function takes a path to a betfair file that has been extracted from bz2 and turns it into a dataframe
@@ -17,7 +17,7 @@ def betfair_file_to_final_odds(file_path, odds_cutoff_time, historic):
     )
 
     # Convert the list of series into a data frame
-    betfair_odds_df = betfair_stream_to_df(stream, historic = historic)
+    betfair_odds_df = betfair_stream_to_df(stream = stream)
     
     if len(betfair_odds_df) > 0:
         # Get the last odds before the chosen cutoff time
