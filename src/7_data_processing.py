@@ -705,13 +705,6 @@ merged_data = add_fighter_differentials(merged_data)
 
 
 ###########################################################################################
-# FLAG TRAIN/TEST/OOT
-
-np.random.seed(seed = config['seed_all'] + 985)
-merged_data = flag_train_test_oot(merged_data, config)
-
-
-###########################################################################################
 # Formatting tweaks
 # Remove any white spaces in names
 merged_data.columns = merged_data.columns.str.replace(" ", "_")
@@ -726,6 +719,14 @@ merged_data['matchup'] = merged_data['fighter1_fighter_type'] + '-vs-' + merged_
 # Add what odds are to be used in model training and backtesting
 merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()
 merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper_params['odds_to_use']].copy()
+
+
+###########################################################################################
+# FLAG TRAIN/TEST/OOT
+
+np.random.seed(seed = config['seed_all'] + 985)
+merged_data = flag_train_test_oot(merged_data, config)
+
 
 
 ###########################################################################################

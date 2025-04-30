@@ -10,9 +10,7 @@ import lightgbm as lgb
 import matplotlib.pyplot as plt
 import mlflow
 import pickle
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
-from sklearn.preprocessing import LabelEncoder, label_binarize
 import seaborn as sns
 import xgboost as xgb
 
