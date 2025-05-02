@@ -3,3 +3,13 @@ odds_cutoff_time: "17:00"
 
 # This is the event code of MMA from the live Betfair data stream
 betfair_mma_event_id: '26420387'
+
+# Give the location of the certificates
+certs_location: './data/betfair_certs'
+
+# Set the download folder for the latest Betfair exchange downloads. This folder should be kept clear
+download_folder: './data/raw_betfair/historic/'
+
+# Set the folder for decompressed fight files, both temp for the updates, and for the final destination
+decompressed_temp_output_dir: './data/raw_betfair/temp_decompressed_files/'
+decompressed_output_dir: './data/raw_betfair/decompressed_fight_files/'

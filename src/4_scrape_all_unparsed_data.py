@@ -1,6 +1,14 @@
 # This script will update the existing parsed data with new UFC events and fighters.
 # It will scrape the data and perform consistency checks to ensure all datasets are consistent before
 # saving them and overwriting existing files.
+import betfairlightweight
+from betfairlightweight import StreamListener
+from betfairlightweight.filters import market_filter, price_projection, streaming_market_filter, streaming_market_data_filter
+import bz2
+from pathlib import Path
+import queue
+import threading
+import time
 
 # exec(open('global.py').read())
 
@@ -74,6 +82,7 @@ parsed_fight_stats_df = fp.ParquetFile('./data/' + config['fight_stats_file_name
 parsed_odds_df = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_pandas()
 parsed_event_odds_urls = fp.ParquetFile('./data/event_odds_urls.parquet').to_pandas()
 parsed_event_odds_df = fp.ParquetFile('./data/' + config['event_odds_file_name']).to_pandas()
+parsed_betfair_odds_df = fp.ParquetFile('./data/' + config['betfair_odds_file_name']).to_pandas()
 
 if unparsed_events == True:
     
@@ -156,6 +165,31 @@ new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = updat
     num_threads = config['num_threads'])
 
 ###############################################################################
+##### Update the Betfair odds #####
+###############################################################################
+
+#Initiate the trading object
+trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = './data/betfair_certs')
+
+trading.login()
+
+if 'skip_betfair_history' not in globals():
+    skip_betfair_history = False
+
+if not skip_betfair_history:
+    # Update the odds
+    new_parsed_betfair_odds_df = update_betfair_odds(
+        parsed_betfair_odds_df, 
+        betfair_login_config, 
+        download_folder = betfair_data_config['download_folder'], 
+        decompressed_output_dir = betfair_data_config['decompressed_output_dir'], 
+        decompressed_temp_output_dir = betfair_data_config['decompressed_temp_output_dir']
+    )
+
+# Get the upcoming Betfair odds data
+upcoming_betfair_odds = betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config)
+
+###############################################################################
 ##### Parse new fighter data #####
 ###############################################################################
 
@@ -214,6 +248,10 @@ if unparsed_events:
         all_fighter_details_df,
         new_parsed_fighter_tott_df,
         new_parsed_event_odds_df,
+        new_parsed_betfair_odds_df,
+        upcoming_events_df,
+        upcoming_fight_details_df,
+        upcoming_betfair_odds,
         config)
     
     # Check new rows have been added

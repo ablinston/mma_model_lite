@@ -4,13 +4,9 @@ from betfairlightweight.filters import market_filter, price_projection, streamin
 import os
 import logging
 import queue
+import time
 import threading
 
-import betfairlightweight
-from betfairlightweight.filters import (
-    streaming_market_filter,
-    streaming_market_data_filter,
-)
 
 exec(open('global.py').read())
 
@@ -21,7 +17,7 @@ exec(open('global.py').read())
 ## Betfair standard setup
 
 # Open the connection with Betfair. This requires the betfair config which is not tracked by git because it contains passwords
-trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = './data/betfair_certs')
+trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_login_config['certs_location'])
 
 trading.login()
 
@@ -88,5 +84,7 @@ market_books = listener.snap()
 # Save the results to a df
 betfair_latest_future_odds = betfair_stream_to_df(stream_snapshot = market_books, market_catalogues = market_catalogues)
 
-
+fp.write('./data/' + config['betfair_upcoming_odds_file_name'],
+         betfair_latest_future_odds,
+         compression = 'ZSTD')
 

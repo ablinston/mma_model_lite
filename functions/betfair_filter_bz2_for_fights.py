@@ -8,7 +8,7 @@ def betfair_filter_bz2_for_fights(input_folder, output_folder):
     
     """
     
-    pdb.set_trace()
+    # pdb.set_trace()
     
     # file_list = []
     # for path, subdirs, files in os.walk(input_folder):
@@ -69,4 +69,4 @@ def betfair_filter_bz2_for_fights(input_folder, output_folder):
         collapse_output_to_df = False,
         output_folder = output_folder)
                 
-    return new_files_df
+    return fight_flags

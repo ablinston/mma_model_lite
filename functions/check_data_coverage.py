@@ -3,7 +3,7 @@
 
 # It returns a data frame detailing the checks done and whether they passed (True) or not (False)
 
-def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fight_stats_df, fight_odds_df, fighter_details_df, fighter_tott_df, event_odds_df, config):
+def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fight_stats_df, fight_odds_df, fighter_details_df, fighter_tott_df, event_odds_df, betfair_odds_df, upcoming_events_df, upcoming_fight_details_df, betfair_upcoming_odds_df, config):
     
     # # Debug
     # event_details = parsed_event_details_df.copy()
@@ -23,28 +23,45 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     fight_results = fight_results_df.copy()
     fight_stats = fight_stats_df.copy()
     fight_odds = fight_odds_df.copy()
+    event_odds = event_odds_df.copy()
     fighter_details = fighter_details_df.copy()
     fighter_tott = fighter_tott_df.copy()
-
+    betfair_odds = betfair_odds_df.copy()
+    upcoming_events = upcoming_events_df.copy()
+    upcoming_fight_details = upcoming_fight_details_df.copy()
+    betfair_upcoming_odds = betfair_upcoming_odds_df.copy()
+    
+    # Clean all the datasets
+    cleaned_dict = clean_all_raw_data(event_details, upcoming_events, upcoming_fight_details, fighter_tott, fight_results, fight_stats, fight_odds, event_odds, betfair_odds, betfair_upcoming_odds)
+    
     # Change the column names to lower
-    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds_df]:
+    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds_df, betfair_odds]:
         df.columns = df.columns.str.lower()
                 
-    # Add event and bout data onto odds
-    fight_odds = add_event_and_bout_to_odds_data(fight_odds, event_details, fight_stats)
-    event_odds = add_event_and_bout_to_odds_data(event_odds_df, event_details, fight_stats, date_check = '2018-01-01')
         
-    # Clean all the columns that we wish to use
-    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds]:
-        for col in ['event', 'bout', 'fighter']:
-            try:
-                df[[col]] = clean_text_columns(df[[col]])
-            except:
-                continue
+    # ##################################
+    # #### Betfair data cleaning prior to checks
+    # ##################################
+    
+    # # Add event and bout data onto odds
+    # fight_odds = add_event_and_bout_to_odds_data(fight_odds, event_details, fight_stats)
+    # event_odds = add_event_and_bout_to_odds_data(event_odds_df, event_details, fight_stats, date_check = '2018-01-01')
+    
+    ##################################
+    #### Data cleaning
+    ##################################
+    
+    # # Clean all the columns that we wish to use
+    # for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds]:
+    #     for col in ['event', 'bout', 'fighter']:
+    #         try:
+    #             df[[col]] = clean_text_columns(df[[col]])
+    #         except:
+    #             continue
             
     # Process the odds data to combine events
     fight_odds.loc[:, ['open_odds', 'closing_odds_low', 'closing_odds_high']] = fight_odds[['open_odds', 'closing_odds_low', 'closing_odds_high']].apply(pd.to_numeric, errors = 'coerce')
-    fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, impute_missing_averages = False)
+    fight_odds = process_odds_data(cleaned_dict['fighter_odds'].drop_duplicates(subset = ['event', 'bout', 'fighter']), cleaned_dict['event_odds'], cleaned_dict['betfair_odds'], odds_scrape_config, impute_missing_averages = False)
     
     ## The events data is the first updated, so is assumed to be complete
     # Check that all the events have some fight details in the data
@@ -89,7 +106,7 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
         
     # Check the event dates on the odds data to see if any are missing
     # We only consider events after 2010 as betting odds generally aren't available in early UFC
-    event_details['date'] = event_details['date'].apply(lambda x: datetime.strptime(x, '%B %d, %Y'))
+    # event_details['date'] = event_details['date'].apply(lambda x: datetime.strptime(x, '%B %d, %Y'))
     post_2010_events = event_details['event'][event_details['date'] > config['start_date_validation_checks']]
     
     # Only keep UFC events
@@ -145,5 +162,9 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     if (len(missing_fighter_tott) > 0):
         print(f"Error: The following fighters are missing from the fighter_tott data: {missing_fighter_tott}")
         all_checks_passed = False
+    
+    # Check where we have missing Betfair odds
+    fight_odds
+    
     
     return all_checks_passed

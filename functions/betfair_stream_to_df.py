@@ -14,7 +14,8 @@ def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, 
         return None
     
     # Process the market catalogues if present
-    runners_dict = {k: v for d in map(betfair_get_runner_info_from_marketcatalogue, market_catalogues) for k, v in d.items()}
+    if market_catalogues is not None:
+        runners_dict = {k: v for d in map(betfair_get_runner_info_from_marketcatalogue, market_catalogues) for k, v in d.items()}
     
     if stream is not None:
         # create generator

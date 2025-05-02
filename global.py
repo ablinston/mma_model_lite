@@ -32,6 +32,7 @@ from scipy.stats import hmean
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+import shutil
 # from sklearn.utils import resample
 from sklearn.metrics import log_loss, accuracy_score, f1_score, roc_auc_score
 from sklearn.preprocessing import LabelEncoder, label_binarize

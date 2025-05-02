@@ -4,6 +4,9 @@
 
 # To do scripts
 
+
+* 2025-05-02 Am up to adding the upcoming bouts to the clean data function. Then need to finish adding some checks to the check_data_coverage function
+
 * Add slippage to the odds when backtesting to allow for some differences between final and earlier bets
 
 * Change odds scraping to collect all the event urls using the fighter pages, then scrape all the event urls to get a wider range of odds. This will give more stable odds in the runup to an event??
