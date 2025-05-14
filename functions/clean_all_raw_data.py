@@ -197,7 +197,7 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     
     ###########################################
     ## Betfair odds cleaning
-    pdb.set_trace()
+    
     # Replace fighter names with those that appear in stats where the dates match
     betfair_clean_fighter_names(betfair_odds, all_events, fight_stats_all, fuzz_threshold = 70, day_threshold = 2)
     
@@ -209,7 +209,12 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     
     # Add on events and bouts
     betfair_odds = add_event_and_bout_to_odds_data(betfair_odds, all_events, fight_stats_all, date_check = '2017-01-01')
-    # betfair_upcoming_odds = add_event_and_bout_to_odds_data(betfair_upcoming_odds, all_events, fight_stats_all, date_check = '2017-01-01')
+    
+    ## Now clean the UPCOMING BOUTS
+    
+    # First get the bout information and sync to the stats data
+    betfair_upcoming_odds = betfair_add_upcoming_bouts_details(betfair_upcoming_odds, upcoming_fight_details)
+    
     
     ###########################################
     # Remove multiple fights on same date - some events had fighters fight multiple times. This messes up the matching and some functions so we'll get rid of them

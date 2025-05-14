@@ -56,6 +56,10 @@ fp.write('./data/' + config['betfair_odds_file_name'].replace('.parquet', '_clea
          cleaned_dict['betfair_odds'],
          compression = 'ZSTD')
 
+fp.write('./data/' + config['betfair_upcoming_odds_file_name'].replace('.parquet', '_clean.parquet'),
+         cleaned_dict['betfair_upcoming_odds'],
+         compression = 'ZSTD')
+
 fp.write('./data/' + config['fighter_names_file_name'],
          cleaned_dict['fighter_names'],
          compression = 'ZSTD')

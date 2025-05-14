@@ -185,6 +185,8 @@ if not skip_betfair_history:
         decompressed_output_dir = betfair_data_config['decompressed_output_dir'], 
         decompressed_temp_output_dir = betfair_data_config['decompressed_temp_output_dir']
     )
+else:
+    new_parsed_betfair_odds_df = parsed_betfair_odds_df
 
 # Get the upcoming Betfair odds data
 upcoming_betfair_odds = betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config)
@@ -295,6 +297,10 @@ if unparsed_events:
         fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
         fp.write('./data/event_odds_urls.parquet', new_parsed_event_odds_urls, compression = 'ZSTD')
         fp.write('./data/' + config['event_odds_file_name'], new_parsed_event_odds_df, compression = 'ZSTD')
+        
+        fp.write('./data/' + config['betfair_odds_file_name'], new_parsed_betfair_odds_df, compression = 'ZSTD')
+        fp.write('./data/' + config['betfair_upcoming_odds_file_name'], upcoming_betfair_odds, compression = 'ZSTD')
+        
         fp.write('./data/' + config['fighter_details_file_name'], all_fighter_details_df, compression = 'ZSTD')
         fp.write('./data/' + config['fighter_tott_file_name'], new_parsed_fighter_tott_df, compression = 'ZSTD')
         
@@ -324,6 +330,9 @@ else:
         # write new fight details to file
         fp.write('./data/' + config['upcoming_event_details_file_name'], upcoming_events_df, compression = 'ZSTD')
         fp.write('./data/' + config['upcoming_fight_details_file_name'], upcoming_fight_details_df, compression = 'ZSTD')
+        
+        fp.write('./data/' + config['betfair_odds_file_name'], new_parsed_betfair_odds_df, compression = 'ZSTD')
+        fp.write('./data/' + config['betfair_upcoming_odds_file_name'], upcoming_betfair_odds, compression = 'ZSTD')
 
         fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
         fp.write('./data/event_odds_urls.parquet', new_parsed_event_odds_urls, compression = 'ZSTD')

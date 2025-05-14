@@ -16,7 +16,7 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     
     # Create a flag to say whether checks passed
     all_checks_passed = True
-    # pdb.set_trace()
+    pdb.set_trace()
     # Make copies so we don't overwrite any of the original data frames
     event_details = event_details_df.copy()
     fight_details = fight_details_df.copy()
@@ -35,18 +35,10 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     cleaned_dict = clean_all_raw_data(event_details, upcoming_events, upcoming_fight_details, fighter_tott, fight_results, fight_stats, fight_odds, event_odds, betfair_odds, betfair_upcoming_odds)
     
     # Change the column names to lower
-    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds_df, betfair_odds]:
+    for df in [event_details, fight_details, fight_results, fight_stats, fight_odds, fighter_details, fighter_tott, event_odds_df, betfair_odds, betfair_upcoming_odds]:
         df.columns = df.columns.str.lower()
                 
-        
-    # ##################################
-    # #### Betfair data cleaning prior to checks
-    # ##################################
-    
-    # # Add event and bout data onto odds
-    # fight_odds = add_event_and_bout_to_odds_data(fight_odds, event_details, fight_stats)
-    # event_odds = add_event_and_bout_to_odds_data(event_odds_df, event_details, fight_stats, date_check = '2018-01-01')
-    
+            
     ##################################
     #### Data cleaning
     ##################################
@@ -164,7 +156,24 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
         all_checks_passed = False
     
     # Check where we have missing Betfair odds
-    fight_odds
+    merged_betfair_odds = cleaned_dict['fight_stats_agg'][['event', 'bout', 'fighter', 'date']].merge(
+        cleaned_dict['betfair_odds'][['event', 'bout', 'fighter', 'betfair_exch_odds']],
+        on = ['event', 'bout', 'fighter'],
+        how = 'left'
+    )
     
+    # Check how many fighters after 2017 have missing betfair odds
+    merged_betfair_odds = merged_betfair_odds[merged_betfair_odds['date'] > config['min_training_date']]
+    percent_missing_betfair = merged_betfair_odds['betfair_exch_odds'].isna().mean() * 100
+    
+    print(f"There are {percent_missing_betfair} % of fighters with missing Betfair exchange odds since {config['min_training_date']}")
+    
+    # Get the most missing fighters
+    missing_betfair_fighter_counts = merged_betfair_odds[merged_betfair_odds['betfair_exch_odds'].isna()]['fighter'].value_counts()
+    
+    print("The most missing fighters from Betfair exchange odds are:")
+    print(missing_betfair_fighter_counts.head(20))
+
+    te = merged_betfair_odds[merged_betfair_odds['betfair_exch_odds'].isna()]
     
     return all_checks_passed
