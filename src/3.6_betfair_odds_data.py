@@ -30,12 +30,12 @@ trading.login()
 file_list = trading.historic.get_file_list(
     "Other Sports",
     "Basic Plan",
-    from_day=26,
-    from_month=7,
-    from_year=2024,
-    to_day=28,
-    to_month=7,
-    to_year=2024,
+    from_day=4,
+    from_month=4,
+    from_year=2025,
+    to_day=5,
+    to_month=4,
+    to_year=2025,
     market_types_collection=["MATCH_ODDS"],
     # countries_collection=["GB"],
     file_type_collection=["L", "M"],
@@ -65,7 +65,7 @@ bz2_file_log = betfair_filter_bz2_for_fights(download_folder, decompressed_outpu
 # for /r "E:\Repos\mma_model_lite\data\raw_betfair\" %f in (*.bz2) do "C:\Program Files\7-Zip\7z.exe" x "%f" -o"E:\Repos\mma_model_lite\data\raw_betfair\decompressed_files" -y
 
 
-# # # create listener
+# # create listener
 # listener = StreamListener(max_latency=None)
 
 # # ## Go through each file in the decompressed folder and load the data into data frames
@@ -78,17 +78,17 @@ bz2_file_log = betfair_filter_bz2_for_fights(download_folder, decompressed_outpu
 
 #     print(file)    
 
-#     # Create historical stream (update file_path to your file location)
-#     stream = trading.streaming.create_historical_generator_stream(
-#         file_path = decompressed_output_dir + '1.230915313',
-#         listener = listener,
-#     )
+    # # Create historical stream (update file_path to your file location)
+    # stream = trading.streaming.create_historical_generator_stream(
+    #     file_path = decompressed_output_dir + '1.241955374',
+    #     listener = listener,
+    # )
     
-#     # Convert the list of series into a data frame
-#     betfair_odds_df = betfair_stream_to_df(stream = stream)
+    # # Convert the list of series into a data frame
+    # betfair_odds_df = betfair_stream_to_df(stream = stream)
     
-#     # Get the last odds before the chosen cutoff time
-#     betfair_odds_summary_df = betfair_bout_get_chosen_odds(betfair_odds_df, betfair_data_config['odds_cutoff_time'])
+    # # Get the last odds before the chosen cutoff time
+    # betfair_odds_summary_df = betfair_bout_get_chosen_odds(betfair_odds_df, betfair_data_config['odds_cutoff_time'])
 
 #     # Save the output to the list as a dictionary for faster combination later
 #     betfair_odds_list.append(betfair_odds_summary_df)

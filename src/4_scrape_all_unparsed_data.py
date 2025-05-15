@@ -319,6 +319,10 @@ else:
         all_fighter_details_df,
         parsed_fighter_tott_df,
         new_parsed_event_odds_df,
+        new_parsed_betfair_odds_df,
+        upcoming_events_df,
+        upcoming_fight_details_df,
+        upcoming_betfair_odds,
         config)
         
     #######################

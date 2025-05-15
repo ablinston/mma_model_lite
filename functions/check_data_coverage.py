@@ -16,7 +16,7 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     
     # Create a flag to say whether checks passed
     all_checks_passed = True
-    pdb.set_trace()
+    # pdb.set_trace()
     # Make copies so we don't overwrite any of the original data frames
     event_details = event_details_df.copy()
     fight_details = fight_details_df.copy()
@@ -164,9 +164,10 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     
     # Check how many fighters after 2017 have missing betfair odds
     merged_betfair_odds = merged_betfair_odds[merged_betfair_odds['date'] > config['min_training_date']]
-    percent_missing_betfair = merged_betfair_odds['betfair_exch_odds'].isna().mean() * 100
+    # Find the percentage missing where it is a UFC event
+    percent_missing_betfair = merged_betfair_odds[merged_betfair_odds['event'].str[0:3] == "ufc"]['betfair_exch_odds'].isna().mean() * 100
     
-    print(f"There are {percent_missing_betfair} % of fighters with missing Betfair exchange odds since {config['min_training_date']}")
+    print(f"There are {percent_missing_betfair} % of fighters with missing Betfair exchange odds in UFC events since {config['min_training_date']}")
     
     # Get the most missing fighters
     missing_betfair_fighter_counts = merged_betfair_odds[merged_betfair_odds['betfair_exch_odds'].isna()]['fighter'].value_counts()
@@ -174,6 +175,6 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     print("The most missing fighters from Betfair exchange odds are:")
     print(missing_betfair_fighter_counts.head(20))
 
-    te = merged_betfair_odds[merged_betfair_odds['betfair_exch_odds'].isna()]
+    # te = merged_betfair_odds[merged_betfair_odds['betfair_exch_odds'].isna()]
     
     return all_checks_passed

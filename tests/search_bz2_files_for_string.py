@@ -1,16 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed May 14 16:56:39 2025
-
-@author: Andy
-"""
+# This is a script to search bz2 files for a specific fighter string. This is what I used for searching for missing odds in investigative work.
 
 import bz2
 import os
 
 # === CONFIGURATION ===
 folder_path = download_folder  # <- CHANGE THIS
-search_string = 'kape'     # <- CHANGE THIS
+search_string = 'buday'     # <- CHANGE THIS
 
 # === SEARCH FUNCTION ===
 def search_bz2_files(folder, target):

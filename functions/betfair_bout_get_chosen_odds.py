@@ -27,10 +27,14 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
         cutoff_datetime = datetime.strptime(str(df['event_date'].iloc[0] - timedelta(days = 1)) + ":" + time_cutoff, "%Y-%m-%d:%H:%M")
     
     # Now filter the data after the cutoff time
-    df = df[df['GMT_datetime'] < cutoff_datetime]
+    df_cutoff = df[df['GMT_datetime'] < cutoff_datetime]
+    
+    # Check whether that has returned any rows. If not, take the earliest bets. This is when there are last minute replacement fights and bets don't seem to happen until on the day.
+    if len(df_cutoff) == 0 and len(df) > 0:
+        df_cutoff = df.drop_duplicates(subset = ['bout', 'fighter'])
     
     # And finally only keep one record per fighter
-    output_df = df.groupby('fighter').agg({'bout': 'first', 'event_date': 'first', 'last_price_traded': 'last'}).reset_index()
+    output_df = df_cutoff.groupby('fighter').agg({'bout': 'first', 'event_date': 'first', 'last_price_traded': 'last'}).reset_index()
 
     output_df.rename(columns = {'last_price_traded': 'betfair_exch_odds'}, inplace = True)          
 

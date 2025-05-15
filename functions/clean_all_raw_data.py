@@ -197,7 +197,7 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     
     ###########################################
     ## Betfair odds cleaning
-    
+    pdb.set_trace()
     # Replace fighter names with those that appear in stats where the dates match
     betfair_clean_fighter_names(betfair_odds, all_events, fight_stats_all, fuzz_threshold = 70, day_threshold = 2)
     
