@@ -21,6 +21,7 @@ fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace
 fight_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 event_odds = fp.ParquetFile('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 betfair_odds = fp.ParquetFile('./data/' + config['betfair_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+betfair_upcoming_odds = fp.ParquetFile('./data/' + config['betfair_upcoming_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 
 # Read in the average odds model
 average_odds_model = joblib.load('./results/average_odds_model.joblib')
@@ -490,6 +491,12 @@ fight_results = fight_results[((fight_results['time format'].isna()) | (fight_re
 fight_odds = add_event_and_bout_to_odds_data(fight_odds, events, fight_stats)
 event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
 
+# Add opponent to the upcoming odds. It already has the event and bout matched on.
+add_opponent_column(betfair_upcoming_odds)
+
+# Combine the upcoming odds with the historic odds
+betfair_odds = pd.concat([betfair_odds, betfair_upcoming_odds], axis = 0)
+
 fight_odds = process_odds_data(fight_odds.drop_duplicates(subset = ['event', 'bout', 'fighter']), event_odds, betfair_odds, odds_scrape_config, average_odds_model)
 
 
@@ -561,6 +568,10 @@ merged_data[['fighter1_true_open_odds', 'fighter2_true_open_odds']] = calculate_
 merged_data['fighter1_true_odds_change'] = merged_data['fighter1_true_closing_odds'] - merged_data['fighter1_true_open_odds']
 merged_data['fighter2_true_odds_change'] = merged_data['fighter2_true_closing_odds'] - merged_data['fighter2_true_open_odds']
 
+# Create a QA dataset showing where Betfair odds and scraped odds are showing large differences
+odds_qa_df = merged_data[(
+    merged_data['fighter1_betfair_exch_odds'] < 1.9) & (merged_data['fighter1_best_closing_odds'] > 2.1) | (
+        merged_data['fighter1_betfair_exch_odds'] > 2.1) & (merged_data['fighter1_best_closing_odds'] < 1.9)][['fighter1', 'fighter2', 'date', 'fighter1_betfair_exch_odds', 'fighter1_best_closing_odds', 'fighter2_betfair_exch_odds', 'fighter2_best_closing_odds']]
 
 ###########################################################################################
 # PERCENTAGE CALCULATIONS

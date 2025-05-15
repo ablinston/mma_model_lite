@@ -30,8 +30,11 @@ def betfair_add_upcoming_bouts_details(betfair_df, upcoming_bouts_df, threshold 
         upcoming_bouts_df[['fighter2', 'event', 'bout']].rename(columns = {'fighter2': 'fighter'})
         ])
     
+    # Keep the date as the date and time of the odds
+    df.rename(columns = {'gmt_datetime': 'notformodel_betfair_odds_datetime'}, inplace = True)
+    
     # Merge these onto the odds data
-    df = df[['fighter', 'last_price_traded']].merge(fighter_events, on = 'fighter', how = 'inner')
+    df = df[['fighter', 'last_price_traded', 'notformodel_betfair_odds_datetime']].merge(fighter_events, on = 'fighter', how = 'inner')
     
     # Clean names of column
     df.rename(columns = {'last_price_traded': 'betfair_exch_odds'}, inplace = True)

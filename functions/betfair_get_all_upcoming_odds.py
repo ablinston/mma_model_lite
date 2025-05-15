@@ -115,7 +115,7 @@ def betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config):
     # fp.write('./data/' + config['betfair_upcoming_odds_file_name'],
     #          betfair_latest_future_odds,
     #          compression = 'ZSTD')
-
+  
 
     # Return the dataframe of odds
     return betfair_latest_future_odds

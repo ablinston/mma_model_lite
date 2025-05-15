@@ -30,12 +30,12 @@ trading.login()
 file_list = trading.historic.get_file_list(
     "Other Sports",
     "Basic Plan",
-    from_day=4,
-    from_month=4,
-    from_year=2025,
-    to_day=5,
-    to_month=4,
-    to_year=2025,
+    from_day=9,
+    from_month=7,
+    from_year=2021,
+    to_day=11,
+    to_month=7,
+    to_year=2021,
     market_types_collection=["MATCH_ODDS"],
     # countries_collection=["GB"],
     file_type_collection=["L", "M"],
@@ -80,7 +80,7 @@ bz2_file_log = betfair_filter_bz2_for_fights(download_folder, decompressed_outpu
 
     # # Create historical stream (update file_path to your file location)
     # stream = trading.streaming.create_historical_generator_stream(
-    #     file_path = decompressed_output_dir + '1.241955374',
+    #     file_path = decompressed_output_dir + '1.172434143',
     #     listener = listener,
     # )
     

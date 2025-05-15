@@ -2,7 +2,7 @@
 
 def process_odds_data(fight_df, event_df, betfair_df, odds_scrape_config, average_odds_model = None, impute_missing_averages = True):
     
-    # pdb.set_trace()
+    pdb.set_trace()
      
     new_event_df = event_df.copy()
     
@@ -41,7 +41,7 @@ def process_odds_data(fight_df, event_df, betfair_df, odds_scrape_config, averag
     betfair_to_merge = betfair_df[~betfair_df['event'].isna()].drop_duplicates(subset = ['event', 'bout', 'fighter'])
     
     # Merge on the betfair odds
-    new_fight_df = new_fight_df.merge(betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds']], how = 'left')
+    new_fight_df = new_fight_df.merge(betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds', 'notformodel_betfair_odds_datetime']], on = ['event', 'bout', 'fighter'],  how = 'left')
     
     # Add on a flag to say whether the odds have changed by more than 0.1
     new_fight_df['odds_change_gt_0'] = np.where(new_fight_df['odds_change'] < 0, -1, np.where(new_fight_df['odds_change'] > 0, 1, 0))     

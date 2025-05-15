@@ -281,7 +281,8 @@ if unparsed_events:
                 'parsed_odds_df': new_parsed_odds_df, 
                 'parsed_event_odds_df' : new_parsed_event_odds_df,
                 'parsed_fighter_tott_df': new_parsed_fighter_tott_df,
-                'parsed_fight_stats_df': new_parsed_fight_stats_df},
+                'parsed_fight_stats_df': new_parsed_fight_stats_df,
+                'parsed_betfair_odds_df': new_parsed_betfair_odds_df},
             summary_date = datetime.today(),
             save_output = True)
         

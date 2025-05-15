@@ -6,7 +6,7 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     Returns: dict of cleaned datasets
     
     """
-            
+    # pdb.set_trace()
     # Convert all column names to lowercase
     for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds, event_odds, betfair_odds, betfair_upcoming_odds]:
         df.columns = df.columns.str.lower()
@@ -23,11 +23,30 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     # Get cleaned versions of the columns
     fighters['Fighter'] = fighters['fighter'].copy()
     
-    # Convert Yes/No fighters into names on betfair odds
-    betfair_odds = betfair_yesno_to_names(betfair_odds)
+    
+    ##################
+    ## Betfair initial processing
+    
+    # Remove any duplicates from the betfair data, de-prioritising Yes/No
+    betfair_odds['yesno'] = np.where(betfair_odds['fighter'].str.replace('.', '').str.lower().isin(['yes', 'no']), 1, 0)    
+    # # Convert Yes/No fighters into names on betfair odds # MANY WERE JUST DUPLICATES OF BOUTS WITH PROPER DATA
+    # betfair_odds = betfair_yesno_to_names(betfair_odds)
+    betfair_odds = betfair_odds[betfair_odds['yesno'] == 0]
+    
+    # Now sort and remove duplicates
+    # betfair_odds.sort_values(['yesno'], inplace = True)
+    betfair_odds = betfair_odds.drop_duplicates(subset = ['fighter', 'bout', 'event_date'])
+    betfair_odds.drop(columns = ['yesno'], inplace = True)
     
     # Replace text in betfair odds bout to be consistent with other data
     betfair_odds['bout'] = betfair_odds['bout'].str.replace(" v ", " vs. ")
+    
+    # Get the surnames on the betfair odds data for use later, before cleaning the spaces from the names
+    add_opponent_column(betfair_odds)
+    betfair_odds['fighter_surname'] = betfair_odds['fighter'].str.split().str[-1]
+    betfair_odds['opponent_surname'] = betfair_odds['opponent'].str.split().str[-1]
+    
+    ################################
     
     # Remove spaces in events to avoid merge errors
     for df in [events, upcoming_events, upcoming_fight_details, fight_results, fight_stats, fighters, fighter_odds, event_odds, betfair_odds, betfair_upcoming_odds]:
@@ -197,21 +216,18 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     
     ###########################################
     ## Betfair odds cleaning
-    pdb.set_trace()
+    
     # Replace fighter names with those that appear in stats where the dates match
     betfair_clean_fighter_names(betfair_odds, all_events, fight_stats_all, fuzz_threshold = 70, day_threshold = 2)
     
     # Change column name for matching
     betfair_odds.rename(columns = {'event_date': 'date'}, inplace = True)
-    
-    # Add opponent for matching events
-    add_opponent_column(betfair_odds)
-    
+        
     # Add on events and bouts
     betfair_odds = add_event_and_bout_to_odds_data(betfair_odds, all_events, fight_stats_all, date_check = '2017-01-01')
     
     ## Now clean the UPCOMING BOUTS
-    
+    # pdb.set_trace()
     # First get the bout information and sync to the stats data
     betfair_upcoming_odds = betfair_add_upcoming_bouts_details(betfair_upcoming_odds, upcoming_fight_details)
     

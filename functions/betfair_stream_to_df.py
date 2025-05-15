@@ -59,6 +59,11 @@ def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, 
     # Get rid of NA bets
     output_df = output_df[~output_df['last_price_traded'].isna()]
     
+    # # Remove any bets after the cutoff time ## THE LIVE STREAMS ONLY GIVE ONE SET OF ODDS PER FIGHT
+    # if cutoff_time is not None:
+    #     cutoff_date = datetime.strptime(str(output_df['GMT_datetime'].dt.date.max()) + "-" + cutoff_time, "%Y-%m-%d-%H:%M")
+    #     output_df = output_df[output_df['GMT_datetime'] <= cutoff_date]
+        
     # pdb.set_trace()
     
     # If no prop bets should be included, filter them out by looking for the fighters only in the runner column

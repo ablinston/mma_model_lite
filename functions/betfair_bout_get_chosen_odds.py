@@ -42,8 +42,46 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
     if len(output_df) > 2:
         print("Error: Data is not the length expected")
         pdb.set_trace()
+        
     elif len(output_df) == 1:
-        return pd.DataFrame()
+        
+        # If only have one fighter, then create the opposing odds by reversing the existing fighter's odds
+        fighters = output_df['bout'].str.replace("@", "v").str.split(' v ')[0]
+        
+        # Check if we have yes and no runners
+        if output_df['fighter'][0].replace('.', '').lower() in ['yes', 'no']:
+            if output_df['fighter'][0].replace('.', '').lower() == 'no':
+                output_df.loc[0, 'fighter'] = fighters[1]
+            else:
+                output_df.loc[0, 'fighter'] = fighters[0]
+        
+        # Initiate the missing fighter name
+        missing_fighter = ''
+        
+        # Check for surnames only
+        if fighters[0].split(' ')[-1] in output_df['fighter'][0] and fighters[0] != output_df['fighter'][0]:
+            missing_fighter = fighters[1]
+        elif fighters[1].split(' ')[-1] in output_df['fighter'][0] and fighters[1] != output_df['fighter'][0]:
+            missing_fighter = fighters[0]
+            
+        # Check the fighter we have is in the list
+        if missing_fighter == '' and output_df['fighter'][0] in fighters:
+            # Find the name of the missing fighter
+            missing_fighter = fighters[0] if output_df['fighter'][0] == fighters[1] else fighters[1]
+            
+        if missing_fighter != '':
+            
+            # Create the record for them
+            output_df = pd.concat([output_df, output_df], axis = 0).reset_index(drop = True)
+            output_df.loc[1, 'fighter'] = missing_fighter
+            output_df.loc[1, 'betfair_exch_odds'] = 1 / (1 - 1 / output_df.loc[0, 'betfair_exch_odds'])
+            
+        else:
+            print("Fighter name not matching")
+            # pdb.set_trace()
+            return pd.DataFrame() # After checking, they seem to be 'Decision' or 'Submission' and not relevant
+        
+        return output_df
     
     # Fix the bout name if it needs fixing
     if len(output_df) > 0:
