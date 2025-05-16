@@ -29,17 +29,20 @@ trading.login()
 ## HISTORIC DATA DOWNLOAD
 
 # ChatGPT says data is generally available 5 days after and event
+dday = 24
+dmonth = 2
+dyear = 2018
 
 # get file list
 file_list = trading.historic.get_file_list(
     "Other Sports",
     "Basic Plan",
-    from_day=3,
-    from_month=11,
-    from_year=2017,
-    to_day=5,
-    to_month=11,
-    to_year=2017,
+    from_day=(dday - 1),
+    from_month=dmonth,
+    from_year=dyear,
+    to_day=(dday + 1),
+    to_month=dmonth,
+    to_year=dyear,
     market_types_collection=["MATCH_ODDS"],
     # countries_collection=["GB"],
     file_type_collection=["L", "M"],
@@ -65,7 +68,7 @@ for file in file_list:
 
 # === CONFIGURATION ===
 folder_path = download_folder  # <- CHANGE THIS
-search_string = 'bisping'     # <- CHANGE THIS
+search_string = 'perez'     # <- CHANGE THIS
 
 # === SEARCH FUNCTION ===
 def search_bz2_files(folder, target):
@@ -88,8 +91,9 @@ def search_bz2_files(folder, target):
 results = search_bz2_files(folder_path, search_string)
 
 print(f"\nFound {len(results)} match(es):\n")
-for filename, line_number, line in results:
-    print(f"[{filename}] Line {line_number}: {line}")
+# for filename, line_number, line in results:
+#     print(f"[{filename}] Line {line_number}: {line}")
+
 
 
 
@@ -115,7 +119,7 @@ listener = StreamListener(max_latency=None)
 
 # Create historical stream (update file_path to your file location)
 stream = trading.streaming.create_historical_generator_stream(
-    file_path = decompressed_output_dir + '1.133115411',
+    file_path = decompressed_output_dir + results[0][0].replace('.bz2', ''),
     listener = listener,
 )
 
@@ -124,6 +128,3 @@ betfair_odds_df = betfair_stream_to_df(stream = stream)
 
 # Get the last odds before the chosen cutoff time
 betfair_odds_summary_df = betfair_bout_get_chosen_odds(betfair_odds_df, betfair_data_config['odds_cutoff_time'])
-
-# Save the output to the list as a dictionary for faster combination later
-betfair_odds_list.append(betfair_odds_summary_df)

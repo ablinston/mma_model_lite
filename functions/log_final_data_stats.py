@@ -10,7 +10,7 @@ def log_final_data_stats(df, log_csv_path, config):
     
     # Define which key columns we want to track NAs for
     # For all these cols, don't need to put fighter1_ fighter2_ prefix, 'diff' as they will be added later
-    na_cols = ['open_odds', 'best_closing_odds', 'mean_closing_odds', 'start_elo', 'reach', 'hist_times_knocked_out', 'hist_round3_body_landed_against_per_minute', 'hist_last_3_fights_round1_distance_accuracy_percent', 'hist_wins_per_fight', 'hist_opp_stance_round1_leg_accuracy_percent_against', 'hist_opp_type_allrounds_sig.str._landed_against',  'hist_last_3_fights_round1_distance_bayes_accuracy_percent', 'hist_opp_stance_round1_kd_per_minute_bayes_adjmean', 'hist_last_3_fights_round1_body_landed_against_per_minute_bayes_adjsum', 'date_minus_dob', 'subs_per_attempt']
+    na_cols = ['open_odds', 'best_closing_odds', 'mean_closing_odds', 'betfair_exch_odds', 'start_elo', 'reach', 'hist_times_knocked_out', 'hist_round3_body_landed_against_per_minute', 'hist_last_3_fights_round1_distance_accuracy_percent', 'hist_wins_per_fight', 'hist_opp_stance_round1_leg_accuracy_percent_against', 'hist_opp_type_allrounds_sig.str._landed_against',  'hist_last_3_fights_round1_distance_bayes_accuracy_percent', 'hist_opp_stance_round1_kd_per_minute_bayes_adjmean', 'hist_last_3_fights_round1_body_landed_against_per_minute_bayes_adjsum', 'date_minus_dob', 'subs_per_attempt']
     
     # Remove any cols to track if the col isn't in the data frame
     na_cols = [col for col in na_cols if ('fighter1_' + col) in df.columns]

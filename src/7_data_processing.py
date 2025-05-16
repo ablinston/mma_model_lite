@@ -557,8 +557,15 @@ duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 
 # Impute odds if required
 if data_processing_config['impute_missing_betfair']:
-    merged_data['fighter1_betfair_exch_odds'] = np.where(merged_data['fighter1_betfair_exch_odds'].isna(), merged_data['fighter1_best_closing_odds'], merged_data['fighter1_betfair_exch_odds'])
-    merged_data['fighter2_betfair_exch_odds'] = np.where(merged_data['fighter2_betfair_exch_odds'].isna(), merged_data['fighter2_best_closing_odds'], merged_data['fighter2_betfair_exch_odds'])
+    merged_data['fighter1_betfair_exch_odds_imputed'] = np.where(merged_data['fighter1_betfair_exch_odds'].isna(), merged_data['fighter1_best_closing_odds'], merged_data['fighter1_betfair_exch_odds'])
+    merged_data['fighter2_betfair_exch_odds_imputed'] = np.where(merged_data['fighter2_betfair_exch_odds'].isna(), merged_data['fighter2_best_closing_odds'], merged_data['fighter2_betfair_exch_odds'])
+    
+    # If we're using these in true odds, use the imputed
+    if data_processing_config['odds_suffix_for_true_odds'] == 'betfair_exch_odds':
+        data_processing_config['odds_suffix_for_true_odds'] = 'betfair_exch_odds_imputed'
+        
+    if model_hyper_params['odds_to_use'] == 'betfair_exch_odds':
+        model_hyper_params['odds_to_use'] = 'betfair_exch_odds_imputed'
 
 # Change odds into true odds
 merged_data[['fighter1_true_closing_odds', 'fighter2_true_closing_odds']] = calculate_true_odds(merged_data, 'fighter1_' + data_processing_config['odds_suffix_for_true_odds'], 'fighter2_' + data_processing_config['odds_suffix_for_true_odds'])
@@ -569,10 +576,13 @@ merged_data['fighter1_true_odds_change'] = merged_data['fighter1_true_closing_od
 merged_data['fighter2_true_odds_change'] = merged_data['fighter2_true_closing_odds'] - merged_data['fighter2_true_open_odds']
 
 # Create a QA dataset showing where Betfair odds and scraped odds are showing large differences
-odds_qa_df = merged_data[(
-    merged_data['fighter1_betfair_exch_odds'] < 1.9) & (merged_data['fighter1_best_closing_odds'] > 2.1) | (
-        merged_data['fighter1_betfair_exch_odds'] > 2.1) & (merged_data['fighter1_best_closing_odds'] < 1.9)][['fighter1', 'fighter2', 'date', 'fighter1_betfair_exch_odds', 'fighter1_best_closing_odds', 'fighter2_betfair_exch_odds', 'fighter2_best_closing_odds']]
+odds_qa_df = merged_data[((
+    merged_data['fighter1_betfair_exch_odds'] < 1.9) & (merged_data['fighter1_best_closing_odds'] > 2.1)) | ((
+        merged_data['fighter1_betfair_exch_odds'] > 2.1) & (merged_data['fighter1_best_closing_odds'] < 1.9)) | ((
+            merged_data['fighter1_betfair_exch_odds'] < 1.9) & (merged_data['fighter2_betfair_exch_odds'] < 1.9))][['fighter1', 'fighter2', 'date', 'fighter1_betfair_exch_odds', 'fighter1_best_closing_odds', 'fighter2_betfair_exch_odds', 'fighter2_best_closing_odds']]
 
+odds_qa_df.to_csv('./data/qa_merged_betfair_odds_out_of_sync.csv')   
+            
 ###########################################################################################
 # PERCENTAGE CALCULATIONS
 

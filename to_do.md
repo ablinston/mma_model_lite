@@ -5,8 +5,8 @@
 # To do scripts
 
 
-* 2025-05-15 - There are issues with the bets. replace_events_and_bouts also needs to replace dates and remove duplicates where the event date on odds is not matching closely enough to the event date on the UFC data.
-* check_data_coverage function needs fixing. I think I accidentally deleted the lines that added the date as a notformodel variable
+* 2025-05-15 - Issues with Betfair odds think resolved, but some oddities. Would it be better to take the average of the last 3 trades, rather than just the last trade before 5pm?
+* 45% of the Betfair odds are missing, through non-"UFC" events. Are things like DWCS included in the training data?
 
 * Betfair downloaded data only has the market info, but see if we can add available offers. The live pricing might help reduce the 20% missing data for the odds.
 Looking at (c:/Users/Andy/Desktop/1.241955374) which is missing in the processed odds data. Only has bets for a limited number of dates because I think it was a last minute replacement. But it was announced on April 3, but maybe there where no bets until later?

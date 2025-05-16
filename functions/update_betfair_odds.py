@@ -74,7 +74,7 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
             betfair_odds = parallel_run_function(
                     func = betfair_file_to_final_odds,
                     input_list = list_of_decompressed_filepaths,
-                    max_workers = config['num_threads'],
+                    max_workers = 1, # DO NOT USE MORE CORES FOR PROCESS. THE ODDS GO OFF MAYBE BECAUSE OF STREAM?
                     collapse_output_to_df = True,
                     odds_cutoff_time = betfair_data_config['odds_cutoff_time'])
             
