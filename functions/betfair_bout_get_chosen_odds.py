@@ -33,10 +33,16 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
     if len(df_cutoff) == 0 and len(df) > 0:
         df_cutoff = df.drop_duplicates(subset = ['bout', 'fighter'])
     
-    # And finally only keep one record per fighter
-    output_df = df_cutoff.groupby('fighter').agg({'bout': 'first', 'event_date': 'first', 'last_price_traded': 'last'}).reset_index()
+    # And finally only keep one record per fighter. Make it the average of the last 3 bets
+    output_df = df_cutoff.groupby('fighter').tail(3).groupby('fighter').agg({'bout': 'first', 'event_date': 'first', 'last_price_traded': 'mean'}).reset_index()
 
     output_df.rename(columns = {'last_price_traded': 'betfair_exch_odds'}, inplace = True)          
+
+    # Now get the best odds after the cutoff time
+    df_best_odds_after_cutoff = df[(df['GMT_datetime'] >= cutoff_datetime) & (df['inplay'] == False)].groupby('fighter').agg({'last_price_traded': 'max'}).rename(columns = {'last_price_traded': 'notformodel_best_betfair_odds_after_cutoff'})
+    
+    # Add on the best odds
+    output_df = output_df.merge(df_best_odds_after_cutoff, on = 'fighter', how = 'left')
 
     # Check the length is 2 so we have both fighters
     if len(output_df) > 2:
@@ -112,5 +118,7 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
                         output_df['bout'] = fighters[0] + " v " + fighters[1]
         except:
             pdb.set_trace()
-
+            
+    # Fill in any missing best odds?    
+    
     return output_df

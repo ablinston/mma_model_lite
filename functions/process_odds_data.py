@@ -42,7 +42,7 @@ def process_odds_data(fight_df, event_df, betfair_df, odds_scrape_config, averag
     
     # Get the columns needed
     if 'notformodel_betfair_odds_datetime' in betfair_to_merge.columns:
-        betfair_to_merge = betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds', 'notformodel_betfair_odds_datetime']]
+        betfair_to_merge = betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds', 'notformodel_betfair_odds_datetime', 'notformodel_best_betfair_odds_after_cutoff']]
     else:
         betfair_to_merge = betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds']]
     

@@ -18,8 +18,8 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the model location
-model_path = './results/final_xgboost_forest.joblib'
-# model_path = './models/xgb_forest_v2.joblib'
+# model_path = './results/final_xgboost_forest.joblib'
+model_path = './models/xgb_forest_v2.joblib'
 
 # Read in the data for training
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -83,7 +83,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('OOT_testing')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest with betfair odds, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(rf_xgb_model[0]['features'])) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = 'XGB forest v2 with betfair odds, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(rf_xgb_model[0]['features'])) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###

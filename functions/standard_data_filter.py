@@ -11,6 +11,9 @@ def standard_data_filter(df, include_upcoming = False):
     # Remove any data were odds are missing
     filtered_df = filtered_df[(~filtered_df['fighter1_true_closing_odds'].isna()) & (~filtered_df['fighter2_true_closing_odds'].isna())]
     
+    # Remove any unrealistic odds
+    filtered_df = filtered_df[(filtered_df['fighter1_true_closing_odds'] < 15) & (filtered_df['fighter2_true_closing_odds'] < 15)]
+    
     if not include_upcoming:
         filtered_df = filtered_df[(~filtered_df['outcome'].isna())]
         
