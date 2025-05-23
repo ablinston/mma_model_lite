@@ -111,7 +111,9 @@ for backtesting_params in [
             'min_ev_to_bet': 0.0,
             'max_bet_size': 100,
             'min_bet_size': 100,
-            'constant_bets': True
+            'constant_bets': True,
+            'point_in_time_only_odds': True
+            # 'target_ev_after_cutoff': 0.05
         }
         ]:
     
@@ -185,10 +187,10 @@ for backtesting_params in [
     mlflow.end_run()
 
 
-# If the model is good, then log it in the registery
-if model_approved:
-    run_id = 'aa217e4b1bf442729c4f86abfba56f98'
-    mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
+# # If the model is good, then log it in the registery
+# if model_approved:
+#     run_id = 'aa217e4b1bf442729c4f86abfba56f98'
+#     mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
 
 
-test = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
+# test = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
