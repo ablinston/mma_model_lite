@@ -6,6 +6,7 @@
 
 * Train the v2 model features model with the new betfair odds and compare
 * The upcoming betfair odds are the last but the historic are average of last 3. Need to be in the config to ensure consistent.
+* Fix unit tests
 
 * Betfair downloaded data only has the market info, but see if we can add available offers. The live pricing might help reduce the 20% missing data for the odds.
 Looking at (c:/Users/Andy/Desktop/1.241955374) which is missing in the processed odds data. Only has bets for a limited number of dates because I think it was a last minute replacement. But it was announced on April 3, but maybe there where no bets until later?
