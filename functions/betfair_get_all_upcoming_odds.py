@@ -15,7 +15,7 @@ def betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config):
     ## Betfair standard setup
     
     # Open the connection with Betfair. This requires the betfair config which is not tracked by git because it contains passwords
-    trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_data_config['certs_location'])
+    trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_login_config['certs_location'])
     
     trading.login()
     

@@ -76,7 +76,8 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
                     input_list = list_of_decompressed_filepaths,
                     max_workers = 1, # DO NOT USE MORE CORES FOR PROCESS. THE ODDS GO OFF MAYBE BECAUSE OF STREAM?
                     collapse_output_to_df = True,
-                    odds_cutoff_time = betfair_data_config['odds_cutoff_time'])
+                    odds_cutoff_time = betfair_data_config['odds_cutoff_time'],
+                    average_last_n = betfair_data_config['last_n_bets_to_average'])
             
             
             # Change the date to a proper date to avoid parquet errors
