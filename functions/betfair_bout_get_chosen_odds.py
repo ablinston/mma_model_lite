@@ -1,10 +1,11 @@
-def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
+def betfair_bout_get_chosen_odds(bout_df, time_cutoff, average_last_n):
     """
     This function takes a data frame of bets for a given bout and returns the chosen odds to be used in modelling
     
     Args:
         df (DataFrame): a data frame from the betfair_stream_to_df function
         time_cutoff (time): A time cut off in the lead up to the event
+        average_last_n (integer): the number of bets before cutoff to be averaged
     
     Returns:
         DataFrame: giving the bout information and the chosen betfair odds
@@ -34,7 +35,7 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff):
         df_cutoff = df.drop_duplicates(subset = ['bout', 'fighter'])
     
     # And finally only keep one record per fighter. Make it the average of the last 3 bets
-    output_df = df_cutoff.groupby('fighter').tail(3).groupby('fighter').agg({'bout': 'first', 'event_date': 'first', 'last_price_traded': 'mean'}).reset_index()
+    output_df = df_cutoff.groupby('fighter').tail(average_last_n).groupby('fighter').agg({'bout': 'first', 'event_date': 'first', 'last_price_traded': 'mean'}).reset_index()
 
     output_df.rename(columns = {'last_price_traded': 'betfair_exch_odds'}, inplace = True)          
 

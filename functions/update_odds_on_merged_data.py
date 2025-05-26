@@ -5,6 +5,7 @@
 def update_odds_on_merged_data(
         cleaned_fight_odds_data_path: str,
         cleaned_event_odds_data_path: str,
+        cleaned_betfair_odds_data_path: str,
         final_data_folder: str,
         average_odds_model_path,
         config
@@ -20,6 +21,7 @@ def update_odds_on_merged_data(
     # Load in the datasets
     fight_odds = fp.ParquetFile(cleaned_fight_odds_data_path).to_pandas()
     event_odds = fp.ParquetFile(cleaned_event_odds_data_path).to_pandas()
+    betfair_odds = fp.ParquetFile(cleaned_betfair_odds_data_path).to_pandas()
     merged_data = pq.ParquetDataset(final_data_folder).read().to_pandas()
     average_odds_model = joblib.load(average_odds_model_path)
     
@@ -30,7 +32,7 @@ def update_odds_on_merged_data(
     
     # Assume that the event and bout have been added correctly as part of the data cleaning process.
     # Process the data
-    fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, average_odds_model)
+    fight_odds = process_odds_data(fight_odds, event_odds, betfair_odds, odds_scrape_config, average_odds_model)
     
     # Remove the columns that will be replaced
     cols_to_remove = [col for col in merged_data.columns if col.replace('fighter1_', '').replace('fighter2_', '') in fight_odds.columns]

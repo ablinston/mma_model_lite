@@ -8,11 +8,11 @@ def test_calculate_target_lay_odds():
     np.random.seed(42)
 
     # Setup
-    n = 1e6
+    n = int(2e6)
     p = 0.4  # probability of event happening (i.e., lay bet loses)
     target_ev = 0.05
     commission = 0.05
-    probabilities = pd.Series([p] * n)
+    probabilities = pd.Series([p] * int(n))
 
     # Calculate lay odds that should give target EV
     lay_odds = calculate_target_lay_odds(probabilities, target_ev, commission)
@@ -37,7 +37,7 @@ def test_calculate_target_lay_odds():
     p = 0.8  # probability of event happening (i.e., lay bet loses)
     target_ev = 0.15
     commission = 0.0
-    probabilities = pd.Series([p] * n)
+    probabilities = pd.Series([p] * int(n))
 
     # Calculate lay odds that should give target EV
     lay_odds = calculate_target_lay_odds(probabilities, target_ev, commission)

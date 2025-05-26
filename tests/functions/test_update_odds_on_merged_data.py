@@ -8,6 +8,7 @@ def test_update_odds_on_merged_data():
     result = update_odds_on_merged_data(
         cleaned_fight_odds_data_path = './tests/data/test_update_odds_on_merged_data_fight_odds.parquet',
         cleaned_event_odds_data_path = './tests/data/test_update_odds_on_merged_data_event_odds.parquet',
+        cleaned_betfair_odds_data_path = './tests/data/test_update_odds_on_merged_data_cleaned_bf.parquet',
         final_data_folder = './tests/data/test_update_odds_on_merged_data/',
         average_odds_model_path = './results/average_odds_model.joblib',
         config = config
@@ -81,8 +82,12 @@ def test_update_odds_on_merged_data():
 #     'diff_ratio_open_odds': [float('nan')]
 # })
     
+# cleaned_bf = pd.DataFrame({'fighter':[ 'A', 'B'], 'bout': ['A vs B'] * 2, 'date': [pd.to_datetime('2025-04-13')] * 2, 'betfair_exch_odds':[1.5, 2.5], 'notformodel_best_betfair_odds_after_cutoff': [1.6, 2.6], 'opponent': ['B', 'A'], 'event': ['UFC 1'] * 2})
 
 # fp.write('./tests/data/test_update_odds_on_merged_data_fight_odds.parquet', fight_odds, compression = 'ZSTD')
 # fp.write('./tests/data/test_update_odds_on_merged_data_event_odds.parquet', event_odds, compression = 'ZSTD')
 # fp.write('./tests/data/test_update_odds_on_merged_data/merged_data.parquet', merged_data, compression = 'ZSTD')
+# fp.write('./tests/data/test_update_odds_on_merged_data_cleaned_bf.parquet', cleaned_bf, compression = 'ZSTD')
+# 
 # fp.write('./tests/data/test_update_odds_on_merged_data_correct.parquet', result, compression = 'ZSTD')
+

@@ -8,11 +8,11 @@ def test_calculate_target_odds():
     np.random.seed(42)
 
     # Setup
-    n = 1000000
+    n = 5000000
     p = 0.7  # fixed probability
     target_ev = 0.05
     commission = 0.0
-    probabilities = pd.Series([p] * n)
+    probabilities = pd.Series([p] * int(n))
 
     # Calculate target odds
     odds = calculate_target_odds(probabilities, target_ev, commission)
@@ -33,7 +33,7 @@ def test_calculate_target_odds():
     p = 0.6  # fixed probability
     target_ev = 0.15
     commission = 0.02
-    probabilities = pd.Series([p] * n)
+    probabilities = pd.Series([p] * int(n))
 
     # Calculate target odds
     odds = calculate_target_odds(probabilities, target_ev, commission)

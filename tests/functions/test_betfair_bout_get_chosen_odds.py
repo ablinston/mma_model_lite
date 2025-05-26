@@ -8,6 +8,7 @@ def test_betfair_bout_get_chosen_odds():
     data = {
         'fighter': ['A'] * 3 + ['B'] * 3,
         'bout': ['A vs B'] * 6,
+        'inplay': [False] * 6,
         'GMT_datetime': [
             datetime(2025, 4, 22, 15, 0),  # A - valid
             datetime(2025, 4, 22, 20, 0),  # A - valid, should be selected
@@ -22,7 +23,7 @@ def test_betfair_bout_get_chosen_odds():
     df = pd.DataFrame(data)
 
     # Cutoff at 16:15 means we'll use odds before 2025-04-22 16:15 (i.e., prior day cutoff)
-    result = betfair_bout_get_chosen_odds(df.copy(), "16:15")
+    result = betfair_bout_get_chosen_odds(df.copy(), "16:15", average_last_n = 1)
 
     # Basic shape and columns
     assert isinstance(result, pd.DataFrame)
@@ -36,3 +37,13 @@ def test_betfair_bout_get_chosen_odds():
     ])
 
     assert result['betfair_exch_odds'].equals(expected_odds)
+    
+    # Average last 3
+    result_3 = betfair_bout_get_chosen_odds(df.copy(), "16:15", average_last_n = 3)
+
+    expected_odds_3 = pd.Series([
+        2.2,  
+        2.0
+    ])
+    
+    assert np.allclose(result_3['betfair_exch_odds'], expected_odds_3)
