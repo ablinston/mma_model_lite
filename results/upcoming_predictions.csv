@@ -1,5 +1,6 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
-0,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:21:33.784763,Pat Sabatini,2.8,35.4,-0.01,Joanderson Brito,1.49,62.3,-0.07,None,0.0,,0.0,0.0
-1,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:21:33.784763,Cortavious Romious,2.3,43.9,0.01,ChangHo Lee,1.7,53.8,-0.08,None,0.0,,0.0,0.0
-2,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:18:36.543773,Brad Tavares,1.61,59.1,-0.05,Gerald Meerschaert,2.45,38.7,-0.05,None,0.0,,0.0,0.0
-3,2025-04-05,ufcfightnight:emmettvsmurphy,2025-04-05 17:21:33.784763,2025-04-05 17:21:33.784763,Josh Emmett,3.6,14.7,-0.47,Lerone Murphy,1.33,83.5,0.11,Lerone Murphy,1.33,1.2,185.0,61.67
+0,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Kurt Holobaugh,3.1,30.3,-0.06,Jordan Leavitt,1.48,67.5,-0.0,None,0.0,,0.0,0.0
+1,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-29 16:51:02.128022,Jafel Filho,2.32,42.3,-0.02,Allan Nascimento,1.76,55.4,-0.02,None,0.0,,0.0,0.0
+2,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Dustin Jacoby,1.53,57.9,-0.11,Bruno Lopes,2.88,39.8,0.15,None,0.0,,0.0,0.0
+3,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Billy Ray Goff,1.32,71.5,-0.06,Ramiz Brahimaj,3.75,26.3,-0.01,None,0.0,,0.0,0.0
+4,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Mateusz Gamrot,1.7,52.8,-0.1,Ludovit Klein,2.42,45.0,0.09,None,0.0,,0.0,0.0

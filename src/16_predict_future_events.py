@@ -41,8 +41,8 @@ else:
 if not skip_data_update:
     
     # Run these scripts to scrape then clean the raw data
-    exec(open('./src/4_scrape_all_unparsed_data.py').read())
-    exec(open('./src/5_data_cleaning.py').read())
+    exec(open('./src/5_scrape_all_unparsed_data.py').read())
+    exec(open('./src/6_data_cleaning.py').read())
         
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if skip_full_data_update:
@@ -62,7 +62,7 @@ if not skip_data_update:
                 config = config
                 )
     else:
-        exec(open('./src/7_data_processing.py').read())
+        exec(open('./src/8_data_processing.py').read())
         # Refresh the dataset
         forecasting_data = merged_data.copy()
 else:
@@ -125,6 +125,9 @@ for col in [cols for cols in betting_data.columns if 'odds' in cols]:
     betting_data.loc[:, col] = np.round(betting_data[col], 2)
 
 betting_data.rename(columns = {'fighter1_notformodel_date_fighter_odd_scrape': 'f1_scrape_date', 'fighter2_notformodel_date_fighter_odd_scrape': 'f2_scrape_date'}, inplace = True)
+
+# Flag whether odds Betfair imputed
+
 
 summary_data = betting_data[['date', 'event', 'f1_scrape_date', 'f2_scrape_date', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_breakeven_odds', 'Final_bet', 'Potential_win']]
 

@@ -1,4 +1,4 @@
-# Set whether to impute missing values of betfair to best_closing_odds
+# Set whether to impute missing values of betfair with best_closing_odds
 impute_missing_betfair: True
 
 # Set the suffix of what odds to use when calculating true odds

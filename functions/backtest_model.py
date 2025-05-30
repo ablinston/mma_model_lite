@@ -171,13 +171,17 @@ def backtest_model(
     results = pd.concat([pd.DataFrame({'Group': results.index}, index = results.index), results], axis=1)
     # results.rename(columns={'index': 'RowName'}, inplace=True)
     
+    # Get fight level output
+    actuals_data.sort_values('date', inplace = True)
+    
+    fight_output = actuals_data[['date', 'fighter1', 'Fighter1_win_prob', 'fighter1_backtesting_odds', 'fighter2', 'Fighter2_win_prob', 'fighter2_backtesting_odds', 'outcome', 'target', 'predictions', 'bets', 'bet_ev', 'profit_loss', 'bet_triggered_after_cutoff' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'total', 'fights', 'wins', 'y_pred_prob']]
+    
     # Output the underlying data if required
     if output_data_for_debug:
-        actuals_data.sort_values('date', inplace = True)
-        actuals_data[['date', 'fighter1', 'fighter2', 'outcome', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'bet_ev', 'bet_triggered_after_cutoff' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
+        fight_output.to_csv('results/backtesting_data_for_checking.csv')
     
     # Mpve column positions for better searching
     results = move_column(results, 'profit_loss', 1)
     results = move_column(results, 'roi', 2)
     
-    return results
+    return results, fight_output

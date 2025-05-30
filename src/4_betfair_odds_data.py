@@ -30,12 +30,12 @@ trading.login()
 file_list = trading.historic.get_file_list(
     "Other Sports",
     "Basic Plan",
-    from_day=9,
-    from_month=7,
-    from_year=2021,
-    to_day=11,
-    to_month=7,
-    to_year=2021,
+    from_day=1,
+    from_month=4,
+    from_year=2025,
+    to_day=30,
+    to_month=4,
+    to_year=2024,
     market_types_collection=["MATCH_ODDS"],
     # countries_collection=["GB"],
     file_type_collection=["L", "M"],
@@ -102,7 +102,8 @@ betfair_odds = parallel_run_function(
         input_list = list_of_decompressed_filepaths,
         max_workers = 1, # DO NOT USE MORE CORES FOR PROCESS. THE ODDS GO OFF MAYBE BECAUSE OF STREAM?
         collapse_output_to_df = True,
-        odds_cutoff_time = betfair_data_config['odds_cutoff_time'])
+        odds_cutoff_time = betfair_data_config['odds_cutoff_time'],
+        average_last_n = betfair_data_config['last_n_bets_to_average'])
 
 
 # Change the date to a proper date to avoid parquet errors
