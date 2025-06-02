@@ -4,6 +4,7 @@
 
 # To do scripts
 
+* UPDATE UPDATEODDSON MERGED DATA FUNCTION TO INCLUDE BETFAIR
 * Train the v2 model features model with the new betfair odds and compare
 * The upcoming betfair odds are the last but the historic are average of last 3. Need to be in the config to ensure consistent. COULDN'T DO IT
 
@@ -12,8 +13,6 @@ Looking at (c:/Users/Andy/Desktop/1.241955374) which is missing in the processed
 * 
 
 * Change the ELO parameter choices so that it accounts for the scale of how wrong the ELO is, not just predicting binary. Turn ELO into a probability and use logloss?
-
-* Add test scripts of the backtesting and for the odds to check it's working correctly.
 
 * Add a manual lookup list for betfair odds fighter names where there are small differences
 

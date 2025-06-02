@@ -1,6 +1,6 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
-0,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Kurt Holobaugh,3.1,30.3,-0.06,Jordan Leavitt,1.48,67.5,-0.0,None,0.0,,0.0,0.0
-1,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-29 16:51:02.128022,Jafel Filho,2.32,42.3,-0.02,Allan Nascimento,1.76,55.4,-0.02,None,0.0,,0.0,0.0
-2,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Dustin Jacoby,1.53,57.9,-0.11,Bruno Lopes,2.88,39.8,0.15,None,0.0,,0.0,0.0
-3,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Billy Ray Goff,1.32,71.5,-0.06,Ramiz Brahimaj,3.75,26.3,-0.01,None,0.0,,0.0,0.0
-4,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-30 16:16:26.930531,2025-05-30 16:16:26.930531,Mateusz Gamrot,1.7,52.8,-0.1,Ludovit Klein,2.42,45.0,0.09,None,0.0,,0.0,0.0
+0,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-31 17:41:42.136357,2025-05-31 17:41:42.136357,Kurt Holobaugh,3.1,29.2,-0.1,Jordan Leavitt,1.46,68.6,0.0,Jordan Leavitt,1.46,1.46,165.0,75.9
+1,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-31 17:41:42.136357,2025-05-31 17:41:42.136357,Jafel Filho,2.16,44.1,-0.05,Allan Nascimento,1.87,53.6,0.0,Allan Nascimento,1.87,1.87,165.0,143.55
+2,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-31 17:41:42.136357,2025-05-31 17:41:42.136357,Dustin Jacoby,1.57,55.8,-0.12,Bruno Lopes,2.76,41.9,0.16,None,0.0,,0.0,0.0
+3,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-31 17:41:42.136357,2025-05-31 17:41:42.136357,Billy Ray Goff,1.3,72.2,-0.06,Ramiz Brahimaj,4.5,25.6,0.15,None,0.0,,0.0,0.0
+4,2025-05-31,ufcfightnight:blanchfieldvsbarber,2025-05-31 17:41:42.136357,2025-05-31 17:41:42.136357,Mateusz Gamrot,1.71,54.0,-0.08,Ludovit Klein,2.4,43.8,0.05,None,0.0,,0.0,0.0
