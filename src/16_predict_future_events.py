@@ -56,6 +56,7 @@ if not skip_data_update:
         forecasting_data = update_odds_on_merged_data(
                 cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
                 cleaned_event_odds_data_path = './data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
+                cleaned_betfair_odds_data_path = './data/' + config['betfair_odds_file_name'].replace('.parquet', '_clean.parquet')
                 # events_path = './data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
                 final_data_folder = config['final_data_path'],
                 average_odds_model_path = './results/average_odds_model.joblib',
@@ -124,7 +125,7 @@ betting_data['bet_assumed_odds'] = betting_data['bets'] * np.where(betting_data[
 for col in [cols for cols in betting_data.columns if 'odds' in cols]:
     betting_data.loc[:, col] = np.round(betting_data[col], 2)
 
-betting_data.rename(columns = {'fighter1_notformodel_date_fighter_odd_scrape': 'f1_scrape_date', 'fighter2_notformodel_date_fighter_odd_scrape': 'f2_scrape_date'}, inplace = True)
+betting_data.rename(columns = {'fighter1_notformodel_true_odds_asat_datetime': 'f1_scrape_date', 'fighter2_notformodel_true_odds_asat_datetime': 'f2_scrape_date'}, inplace = True)
 
 # Flag whether odds Betfair imputed
 

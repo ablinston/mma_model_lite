@@ -5,6 +5,9 @@
 # To do scripts
 
 * UPDATE UPDATEODDSON MERGED DATA FUNCTION TO INCLUDE BETFAIR
+* UPDATE ODDS DATE IN FUTURE EVENTS OUTPUT TO BE WHICH ODDS HAVE BEEN USED
+
+
 * Train the v2 model features model with the new betfair odds and compare
 * The upcoming betfair odds are the last but the historic are average of last 3. Need to be in the config to ensure consistent. COULDN'T DO IT
 

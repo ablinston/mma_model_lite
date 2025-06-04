@@ -1,5 +1,5 @@
 
-exec(open('global.py').read())
+# exec(open('global.py').read())
 
 # Read in the data
 events = fp.ParquetFile('./data/' + config['event_details_file_name']).to_pandas()

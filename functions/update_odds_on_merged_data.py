@@ -8,7 +8,8 @@ def update_odds_on_merged_data(
         cleaned_betfair_odds_data_path: str,
         final_data_folder: str,
         average_odds_model_path,
-        config
+        config,
+        data_processing_config
         ):
     
     # #########
@@ -48,6 +49,9 @@ def update_odds_on_merged_data(
             fight_odds
         ]
     ).reset_index(drop = True)
+
+    # Recalculate all true odds
+    merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
 
     # Add what odds are to be used in model training and backtesting
     merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()

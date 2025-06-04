@@ -555,25 +555,12 @@ duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 ###########################################################################################
 # FURTHER FEATURE PROCESSING
 
-# Impute odds if required
-if data_processing_config['impute_missing_betfair']:
-    merged_data['fighter1_betfair_exch_odds_imputed'] = np.where(merged_data['fighter1_betfair_exch_odds'].isna(), merged_data['fighter1_best_closing_odds'], merged_data['fighter1_betfair_exch_odds'])
-    merged_data['fighter2_betfair_exch_odds_imputed'] = np.where(merged_data['fighter2_betfair_exch_odds'].isna(), merged_data['fighter2_best_closing_odds'], merged_data['fighter2_betfair_exch_odds'])
-    
-    # If we're using these in true odds, use the imputed
-    if data_processing_config['odds_suffix_for_true_odds'] == 'betfair_exch_odds':
-        data_processing_config['odds_suffix_for_true_odds'] = 'betfair_exch_odds_imputed'
-        
-    if model_hyper_params['odds_to_use'] == 'betfair_exch_odds':
-        model_hyper_params['odds_to_use'] = 'betfair_exch_odds_imputed'
+# Calculate all true odds
+merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
 
-# Change odds into true odds
-merged_data[['fighter1_true_closing_odds', 'fighter2_true_closing_odds']] = calculate_true_odds(merged_data, 'fighter1_' + data_processing_config['odds_suffix_for_true_odds'], 'fighter2_' + data_processing_config['odds_suffix_for_true_odds'])
-merged_data[['fighter1_true_open_odds', 'fighter2_true_open_odds']] = calculate_true_odds(merged_data, 'fighter1_open_odds', 'fighter2_open_odds')
-
-# Recalculate change
-merged_data['fighter1_true_odds_change'] = merged_data['fighter1_true_closing_odds'] - merged_data['fighter1_true_open_odds']
-merged_data['fighter2_true_odds_change'] = merged_data['fighter2_true_closing_odds'] - merged_data['fighter2_true_open_odds']
+# Fix model hyperparams where necessary to account for imputation being used
+if (data_processing_config['impute_missing_betfair'] == 'betfair_exch_odds') & (model_hyper_params['odds_to_use'] == 'betfair_exch_odds'):
+    model_hyper_params['odds_to_use'] = 'betfair_exch_odds_imputed'
 
 # Create a QA dataset showing where Betfair odds and scraped odds are showing large differences
 odds_qa_df = merged_data[((
