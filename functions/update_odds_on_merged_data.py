@@ -61,6 +61,8 @@ def update_odds_on_merged_data(
     merged_data = add_fighter_differentials(merged_data)
     
     # Check on data
-    stop_if_not(merged_data.shape == original_shape)
+    cols_that_should_be_in_original = [col for col in merged_data.columns if 'notformodel_true_odds_asat_datetime' not in col]
+    stop_if_not(len(merged_data) == original_shape[0])
+    stop_if_not(len(cols_that_should_be_in_original) == original_shape[1])
 
     return merged_data

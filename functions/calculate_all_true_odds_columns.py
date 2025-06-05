@@ -58,4 +58,7 @@ def calculate_all_true_odds_columns(merged_data, impute_missing_betfair, odds_su
         else:
             merged_data[fighter + '_notformodel_true_odds_asat_datetime'] = merged_data[fighter + '_notformodel_date_fighter_odd_scrape']
     
+    # Clean up columns
+    merged_data.drop(columns = ['fighter1_betfair_exch_odds_imputed', 'fighter2_betfair_exch_odds_imputed'], inplace = True)
+    
     return merged_data

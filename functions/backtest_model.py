@@ -144,11 +144,11 @@ def backtest_model(
         breakdown_cols = []
     
     ## Summarise the results
-    results = actuals_data.groupby('total').agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
+    results = actuals_data.groupby('total', observed = False).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
     for col in breakdown_cols:
         results = pd.concat([
             results,
-            actuals_data.groupby(col).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
+            actuals_data.groupby(col, observed = False).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
         ])
     
     # Calculate percentage info
@@ -174,7 +174,10 @@ def backtest_model(
     # Get fight level output
     actuals_data.sort_values('date', inplace = True)
     
-    fight_output = actuals_data[['date', 'fighter1', 'Fighter1_win_prob', 'fighter1_backtesting_odds', 'fighter2', 'Fighter2_win_prob', 'fighter2_backtesting_odds', 'outcome', 'target', 'predictions', 'bets', 'bet_ev', 'profit_loss', 'bet_triggered_after_cutoff' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'total', 'fights', 'wins', 'y_pred_prob']]
+    if 'y_pred_prob' in actuals_data.columns:
+        fight_output = actuals_data[['date', 'fighter1', 'Fighter1_win_prob', 'fighter1_backtesting_odds', 'fighter2', 'Fighter2_win_prob', 'fighter2_backtesting_odds', 'outcome', 'target', 'predictions', 'bets', 'bet_ev', 'profit_loss', 'bet_triggered_after_cutoff' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'total', 'fights', 'wins', 'y_pred_prob']]
+    else:
+        fight_output = None
     
     # Output the underlying data if required
     if output_data_for_debug:

@@ -4,8 +4,6 @@
 
 # To do scripts
 
-* UPDATE UPDATEODDSON MERGED DATA FUNCTION TO INCLUDE BETFAIR
-* UPDATE ODDS DATE IN FUTURE EVENTS OUTPUT TO BE WHICH ODDS HAVE BEEN USED
 
 
 * Train the v2 model features model with the new betfair odds and compare
