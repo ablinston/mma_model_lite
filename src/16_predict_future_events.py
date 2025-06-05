@@ -23,6 +23,8 @@ if not os.name == "nt":
     skip_data_update = False
     skip_full_data_update = True
     skip_save_data = True
+    skip_betfair_history = True
+    
 else:
     skip_data_update = False
     skip_full_data_update = False

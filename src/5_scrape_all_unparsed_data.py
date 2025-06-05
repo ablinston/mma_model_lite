@@ -173,7 +173,7 @@ new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = updat
 ###############################################################################
 
 # Initiate the trading object
-trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = './data/betfair_certs')
+trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_login_config['certs_location'])
 
 trading.login()
 
