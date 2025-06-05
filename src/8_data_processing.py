@@ -20,6 +20,8 @@ upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_detai
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 event_odds = fp.ParquetFile('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+betfair_odds = fp.ParquetFile('./data/' + config['betfair_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+betfair_upcoming_odds = fp.ParquetFile('./data/' + config['betfair_upcoming_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 
 # Read in the average odds model
 average_odds_model = joblib.load('./results/average_odds_model.joblib')
@@ -393,7 +395,7 @@ dates_knocked_out = dates_knocked_out[['event',
                                        'hist_times_knocked_out_round_5']]
 
 # Fill NAs with 0
-dates_knocked_out[['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']] = dates_knocked_out[['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']].fillna(0) 
+dates_knocked_out.loc[:, ['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']] = dates_knocked_out[['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']].fillna(0) 
 
 # Fill NAs in dates with arbitrary early date
 dates_knocked_out['date_last_knocked_out'] = pd.to_datetime(dates_knocked_out['date_last_knocked_out'].fillna('1900-01-01'))
@@ -489,7 +491,13 @@ fight_results = fight_results[((fight_results['time format'].isna()) | (fight_re
 fight_odds = add_event_and_bout_to_odds_data(fight_odds, events, fight_stats)
 event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
 
-fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, average_odds_model)
+# Add opponent to the upcoming odds. It already has the event and bout matched on.
+add_opponent_column(betfair_upcoming_odds)
+
+# Combine the upcoming odds with the historic odds
+betfair_odds = pd.concat([betfair_odds, betfair_upcoming_odds], axis = 0)
+
+fight_odds = process_odds_data(fight_odds.drop_duplicates(subset = ['event', 'bout', 'fighter']), event_odds, betfair_odds, odds_scrape_config, average_odds_model)
 
 
 ###########################################################################################
@@ -547,15 +555,21 @@ duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 ###########################################################################################
 # FURTHER FEATURE PROCESSING
 
-# Change odds into true odds
-merged_data[['fighter1_true_closing_odds', 'fighter2_true_closing_odds']] = calculate_true_odds(merged_data, 'fighter1_' + data_processing_config['odds_suffix_for_true_odds'], 'fighter2_' + data_processing_config['odds_suffix_for_true_odds'])
-merged_data[['fighter1_true_open_odds', 'fighter2_true_open_odds']] = calculate_true_odds(merged_data, 'fighter1_open_odds', 'fighter2_open_odds')
+# Calculate all true odds
+merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
 
-# Recalculate change
-merged_data['fighter1_true_odds_change'] = merged_data['fighter1_true_closing_odds'] - merged_data['fighter1_true_open_odds']
-merged_data['fighter2_true_odds_change'] = merged_data['fighter2_true_closing_odds'] - merged_data['fighter2_true_open_odds']
+# Fix model hyperparams where necessary to account for imputation being used
+if (data_processing_config['impute_missing_betfair'] == 'betfair_exch_odds') & (model_hyper_params['odds_to_use'] == 'betfair_exch_odds'):
+    model_hyper_params['odds_to_use'] = 'betfair_exch_odds_imputed'
 
+# Create a QA dataset showing where Betfair odds and scraped odds are showing large differences
+odds_qa_df = merged_data[((
+    merged_data['fighter1_betfair_exch_odds'] < 1.9) & (merged_data['fighter1_best_closing_odds'] > 2.1)) | ((
+        merged_data['fighter1_betfair_exch_odds'] > 2.1) & (merged_data['fighter1_best_closing_odds'] < 1.9)) | ((
+            merged_data['fighter1_betfair_exch_odds'] < 1.9) & (merged_data['fighter2_betfair_exch_odds'] < 1.9))][['fighter1', 'fighter2', 'date', 'fighter1_betfair_exch_odds', 'fighter1_best_closing_odds', 'fighter2_betfair_exch_odds', 'fighter2_best_closing_odds']]
 
+odds_qa_df.to_csv('./data/qa_merged_betfair_odds_out_of_sync.csv')   
+            
 ###########################################################################################
 # PERCENTAGE CALCULATIONS
 
@@ -646,7 +660,7 @@ for fighter in ['fighter1', 'fighter2']:
     # Deal with any infinities
     new_data.replace([np.inf, -np.inf], np.nan, inplace=True)
     new_data.columns = [col + '_per_fight' for col in cols]
-
+    
     # Merge with the data
     merged_data = pd.concat([merged_data, new_data], axis = 1)
 
@@ -686,7 +700,7 @@ cols = ['_date_last_fight', '_date_last_knocked_out', '_date_last_loss', '_date_
 # Do each fighters per fight calcs separately
 for fighter in ['fighter1', 'fighter2']:
     for col in cols:
-        merged_data[fighter + '_date_minus' + col] = (merged_data['date'] - pd.to_datetime(merged_data[fighter + col]).copy().fillna('1900-01-01')).dt.days
+        merged_data[fighter + '_date_minus' + col] = (merged_data['date'] - pd.to_datetime(merged_data[fighter + col]).copy()).dt.days
 
         # Fill in NAs with arbitrary early date
         # merged_data[fighter + '_date_minus' + col] = merged_data[fighter + '_date_minus' + col].fillna(99999).astype(int)
@@ -696,13 +710,6 @@ for fighter in ['fighter1', 'fighter2']:
 # FIGHTER DIFFERENTIAL CALCULATIONS
 
 merged_data = add_fighter_differentials(merged_data)
-
-
-###########################################################################################
-# FLAG TRAIN/TEST/OOT
-
-np.random.seed(seed = config['seed_all'] + 985)
-merged_data = flag_train_test_oot(merged_data, config)
 
 
 ###########################################################################################
@@ -716,9 +723,18 @@ merged_data['womens'] = np.where(merged_data['weightclass'].apply(lambda x: np.w
 # Add the matchup
 merged_data['matchup'] = merged_data['fighter1_fighter_type'] + '-vs-' + merged_data['fighter2_fighter_type']
 
+
 # Add what odds are to be used in model training and backtesting
 merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()
 merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper_params['odds_to_use']].copy()
+
+
+###########################################################################################
+# FLAG TRAIN/TEST/OOT
+
+np.random.seed(seed = config['seed_all'] + 985)
+merged_data = flag_train_test_oot(merged_data, config)
+
 
 
 ###########################################################################################

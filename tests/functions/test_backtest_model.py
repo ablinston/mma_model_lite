@@ -39,17 +39,17 @@ def test_backtest_model():
     min_ev_to_bet = -1
 
     # Test each scenario
-    results_perfect = backtest_model(
+    results_perfect, tmp = backtest_model(
         actuals_data.copy(), perfect_predictions, breakdown_cols, min_prob_to_bet, min_ev_to_bet, output_data_for_debug = False
     )
-    results_wrong = backtest_model(
+    results_wrong, tmp = backtest_model(
         actuals_data.copy(), wrong_predictions, breakdown_cols, min_prob_to_bet, min_ev_to_bet, output_data_for_debug = False
     )
-    results_odds_match = backtest_model(
+    results_odds_match, tmp = backtest_model(
         actuals_data.copy(), odds_match_predictions, breakdown_cols, min_prob_to_bet, min_ev_to_bet, output_data_for_debug = False
     )
 
-    results_odds_match_non_constant = backtest_model(
+    results_odds_match_non_constant, tmp = backtest_model(
         actuals_data.copy(), odds_match_predictions, breakdown_cols, min_prob_to_bet, min_ev_to_bet, min_bet_size = 0.1, max_bet_size = 0.5, constant_bets = False, output_data_for_debug = False
     )
     

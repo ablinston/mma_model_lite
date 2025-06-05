@@ -1,9 +1,7 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
-0,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:29:15.492840,2025-04-26 17:29:15.492840,Anthony Smith,4.7,22.2,0.04,Zhang Mingyang,1.25,75.7,-0.05,None,0.0,,0.0,0.0
-1,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:29:15.492840,2025-04-26 17:29:15.492840,Giga Chikadze,2.7,34.8,-0.06,David Onama,1.53,63.0,-0.04,None,0.0,,0.0,0.0
-2,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:29:15.492840,2025-04-26 17:29:15.492840,Michel Pereira,1.7,48.5,-0.17,Abus Magomedov,2.22,49.2,0.09,Abus Magomedov,2.22,2.03,165.0,201.3
-3,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:29:15.492840,2025-04-26 17:29:15.492840,Randy Brown,1.36,74.1,0.01,Nicolas Dalby,3.6,23.7,-0.15,Randy Brown,1.36,1.35,165.0,60.0
-4,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:29:15.492840,2025-04-26 17:29:15.492840,Ikram Aliskerov,1.21,69.6,-0.16,Andre Muniz,5.1,28.2,0.44,None,0.0,,0.0,0.0
-5,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:25:56.291980,2025-04-26 17:25:56.291980,Matt Schnell,1.62,60.5,-0.02,Jimmy Flick,2.43,37.2,-0.1,None,0.0,,0.0,0.0
-6,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:25:56.291980,2025-04-26 17:25:56.291980,Chris Gutierrez,1.7,57.2,-0.02,John Castaneda,2.26,40.5,-0.09,None,0.0,,0.0,0.0
-7,2025-04-26,ufcfightnight:machadogarryvsprates,2025-04-26 17:29:15.492840,2025-04-26 17:29:15.492840,Ian Machado Garry,1.66,57.6,-0.05,Carlos Prates,2.3,40.2,-0.08,None,0.0,,0.0,0.0
+0,2025-06-07,ufc316:dvalishvilivsomalley2,2025-06-05 18:33:32.557,2025-06-05 18:33:32.557,Vicente Luque,3.35,28.6,-0.04,Kevin Holland,1.43,69.1,-0.01,None,0.0,,0.0,0.0
+1,2025-06-07,ufc316:dvalishvilivsomalley2,2025-06-05 18:33:32.557,2025-06-05 18:33:32.557,Kelvin Gastelum,4.2,26.0,0.09,Joe Pyfer,1.31,71.8,-0.06,None,0.0,,0.0,0.0
+2,2025-06-07,ufc316:dvalishvilivsomalley2,2025-06-05 18:33:32.557,2025-06-05 18:33:32.557,Bruno Silva,6.2,15.6,-0.04,Joshua Van,1.19,82.5,-0.02,None,0.0,,0.0,0.0
+3,2025-06-07,ufc316:dvalishvilivsomalley2,2025-06-05 18:33:32.557,2025-06-05 18:33:32.557,Serghei Spivac,1.78,50.2,-0.11,Waldo Cortes-Acosta,2.24,47.5,0.06,None,0.0,,0.0,0.0
+4,2025-06-07,ufc316:dvalishvilivsomalley2,2025-06-05 18:33:32.557,2025-06-05 18:33:32.557,Azamat Murzakanov,1.2,82.5,-0.01,Brendson Ribeiro,6.0,15.6,-0.07,None,0.0,,0.0,0.0
+5,2025-06-07,ufc316:dvalishvilivsomalley2,2025-06-05 18:33:32.557,2025-06-05 18:33:32.557,Merab Dvalishvili,1.39,69.8,-0.03,Sean O'Malley,3.5,27.9,-0.02,None,0.0,,0.0,0.0

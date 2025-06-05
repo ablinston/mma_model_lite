@@ -5,9 +5,11 @@
 def update_odds_on_merged_data(
         cleaned_fight_odds_data_path: str,
         cleaned_event_odds_data_path: str,
+        cleaned_betfair_odds_data_path: str,
         final_data_folder: str,
         average_odds_model_path,
-        config
+        config,
+        data_processing_config
         ):
     
     # #########
@@ -20,6 +22,7 @@ def update_odds_on_merged_data(
     # Load in the datasets
     fight_odds = fp.ParquetFile(cleaned_fight_odds_data_path).to_pandas()
     event_odds = fp.ParquetFile(cleaned_event_odds_data_path).to_pandas()
+    betfair_odds = fp.ParquetFile(cleaned_betfair_odds_data_path).to_pandas()
     merged_data = pq.ParquetDataset(final_data_folder).read().to_pandas()
     average_odds_model = joblib.load(average_odds_model_path)
     
@@ -29,8 +32,19 @@ def update_odds_on_merged_data(
     # pdb.set_trace()
     
     # Assume that the event and bout have been added correctly as part of the data cleaning process.
+    # But need to remove any with event or bout still missing
+    fight_odds = fight_odds[(~fight_odds['event'].isna()) & (~fight_odds['bout'].isna())].copy()
+
+    # Replace any older odds on the data
+    fight_odds.sort_values('notformodel_date_fighter_odd_scrape', ascending = False, inplace = True)
+    fight_odds = fight_odds.drop_duplicates(subset = ['event', 'bout', 'fighter'])
+    
+    # Give placeholder column for betfair odds
+    if 'notformodel_best_betfair_odds_after_cutoff' not in betfair_odds.columns:
+        betfair_odds['notformodel_best_betfair_odds_after_cutoff'] = np.nan
+    
     # Process the data
-    fight_odds = process_odds_data(fight_odds, event_odds, odds_scrape_config, average_odds_model)
+    fight_odds = process_odds_data(fight_odds, event_odds, betfair_odds, odds_scrape_config, average_odds_model)
     
     # Remove the columns that will be replaced
     cols_to_remove = [col for col in merged_data.columns if col.replace('fighter1_', '').replace('fighter2_', '') in fight_odds.columns]
@@ -47,6 +61,9 @@ def update_odds_on_merged_data(
         ]
     ).reset_index(drop = True)
 
+    # Recalculate all true odds
+    merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
+
     # Add what odds are to be used in model training and backtesting
     merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()
     merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper_params['odds_to_use']].copy()
@@ -55,6 +72,8 @@ def update_odds_on_merged_data(
     merged_data = add_fighter_differentials(merged_data)
     
     # Check on data
-    stop_if_not(merged_data.shape == original_shape)
+    # cols_that_should_be_in_original = [col for col in merged_data.columns if 'notformodel_true_odds_asat_datetime' not in col]
+    stop_if_not(len(merged_data) == original_shape[0])
+    stop_if_not(len(merged_data.columns) == original_shape[1])
 
     return merged_data

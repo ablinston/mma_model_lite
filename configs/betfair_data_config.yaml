@@ -1,0 +1,16 @@
+# Set the time on the day of the event where odds will be taken 
+odds_cutoff_time: "17:00"
+
+# This is the event code of MMA from the live Betfair data stream
+betfair_mma_event_id: '26420387'
+
+# Set the download folder for the latest Betfair exchange downloads. This folder should be kept clear
+download_folder: './data/raw_betfair/historic/'
+
+# Set the folder for decompressed fight files, both temp for the updates, and for the final destination
+decompressed_temp_output_dir: './data/raw_betfair/temp_decompressed_files/'
+decompressed_output_dir: './data/raw_betfair/decompressed_fight_files/'
+
+# Set how many of the previous bets (before cutoff) to average when taking the Betfair odds (put 1 to just take the last one)
+# NB: The upcoming odds will always be the single last bet. There is no way to get the last n
+last_n_bets_to_average: 3

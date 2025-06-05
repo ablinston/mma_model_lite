@@ -34,6 +34,8 @@ fighter_tott_file_name: ufc_fighter_tott.parquet
 fighter_odds_file_name: fight_odds_data.parquet
 fighter_names_file_name: fighter_names.parquet
 event_odds_file_name: event_odds.parquet
+betfair_odds_file_name: betfair_odds.parquet
+betfair_upcoming_odds_file_name: betfair_upcoming_odds.parquet
 
 # Set the path for the final datasets
 final_data_path: './data/final_dataset/'
@@ -173,11 +175,11 @@ methods:
   - Decision-Split
   - Decision-Majority
 
-# Set the proportion of the data that should be reserved as a test dataset
-test_proportion: 0.2
+# Set the proportion of the fighters data that should be reserved as a test dataset
+test_proportion: 0.15 # Aim for 10% of fights
 
 # Set the cut off dates for the training data
-min_training_date: '2014-01-01'
+min_training_date: '2016-02-01'
 oot_start_date: '2024-02-19'
 
 

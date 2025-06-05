@@ -1,6 +1,17 @@
 # This function takes a dataset of actuals and prediction probabilities (which must correspond in rows to each other)
 # It returns a data frame with added columns for the EVs of each bet and bet sizing
-def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, exchange_commission = 0, return_triggers = False, keep_scrape_dates = False):
+def summarise_model_predictions(
+        actuals_data_df, 
+        prediction_probabilities, 
+        min_prob_to_bet, 
+        min_ev_to_bet, 
+        min_bet_size = 1, 
+        max_bet_size = 1, 
+        exchange_commission = 0.02, 
+        return_triggers = False, 
+        keep_scrape_dates = False, 
+        point_in_time_only_odds = True, # Whether to target a bet after cutoff using best odds
+        target_ev_after_cutoff = 0): # The EV that will be targetted after cutoff
 
     
     # ###
@@ -22,7 +33,7 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     # Odds are decimal odds, so represent the payout for a 1 unit bet e.g. odds of 2 means a (2 - 1) = 1 profit.
     ev_wl = (actuals_data['fighter1_backtesting_odds'] - 1) * prediction_probabilities[:, 2] - (1 - prediction_probabilities[:, 2])
     ev_lw = (actuals_data['fighter2_backtesting_odds'] - 1) * prediction_probabilities[:, 0] - (1 - prediction_probabilities[:, 0])
-    
+        
     # Now calculate bet triggers as 0 or 1 indicators
     ev_wl_trigger = ev_wl > min_ev_to_bet
     prob_wl_trigger = prediction_probabilities[:, 2] > min_prob_to_bet
@@ -36,7 +47,7 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     double_trigger = (lw_trigger + wl_trigger) > 1
     lw_trigger[double_trigger] = 0
     wl_trigger[double_trigger] = 0
-    
+        
     # Set whether a bet is made
     actuals_data['bets'] = wl_trigger + lw_trigger
     
@@ -57,7 +68,6 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     win_prob = wl_trigger * prediction_probabilities[:, 2] + lw_trigger * prediction_probabilities[:, 0]
     win_odds = wl_trigger * actuals_data['fighter1_backtesting_odds'] + lw_trigger * actuals_data['fighter2_backtesting_odds']
     
-    # Now calculate the kelly criterion
     actuals_data['kelly_criterion'] = win_prob - (1 - win_prob) / (win_odds - 1)
     
     # Perform a check that kelly is correct
@@ -70,6 +80,25 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
     # Check no bets breach the max
     stop_if_not(actuals_data['bet_size'].max() <= max_bet_size, 'Max bet check')
     
+    
+    #######################################
+    # Now calculate the target odds, for everyone, but especially those with no bets
+    wl_target_odds_inc_commission = calculate_target_odds(prediction_probabilities[:, 2], target_ev_after_cutoff, exchange_commission)
+    lw_target_odds_inc_commission = calculate_target_odds(prediction_probabilities[:, 0], target_ev_after_cutoff, exchange_commission)
+    
+    # And do the same for lay odds
+    wl_target_lay_odds_inc_commission = calculate_target_lay_odds(prediction_probabilities[:, 2], target_ev_after_cutoff, exchange_commission)
+    lw_target_lay_odds_inc_commission = calculate_target_lay_odds(prediction_probabilities[:, 0], target_ev_after_cutoff, exchange_commission) 
+    
+    # Calculate target betsizes
+    actuals_data['fighter1_target_bet_size'] = (min_bet_size + (max_bet_size - min_bet_size) * (
+        prediction_probabilities[:, 2] - (1 - prediction_probabilities[:, 2]) / (wl_target_odds_inc_commission - 1)))
+        
+    actuals_data['fighter2_target_bet_size'] = (min_bet_size + (max_bet_size - min_bet_size) * (
+        prediction_probabilities[:, 0] - (1 - prediction_probabilities[:, 0]) / (lw_target_odds_inc_commission - 1)))
+    
+    
+    #######################################
     # Summarise key outputs
     actuals_data['Bet_breakeven_odds'] = np.where(wl_trigger == 1, 1 / prediction_probabilities[:, 2],
                                                   np.where(lw_trigger == 1, 1 / prediction_probabilities[:, 0], np.nan))    # checked the maths and this is how it works out
@@ -85,6 +114,8 @@ def summarise_model_predictions(actuals_data_df, prediction_probabilities, min_p
                                              np.where((actuals_data['Fighter2_win_prob'] > actuals_data['Fighter1_win_prob']) & (actuals_data['fighter2_backtesting_odds'] > actuals_data['fighter1_backtesting_odds']),
                                              'Underdog to win',
                                              'Favourite to win'))
+    actuals_data['fighter1_target_exchange_odds'] = wl_target_odds_inc_commission
+    actuals_data['fighter2_target_exchange_odds'] = lw_target_odds_inc_commission
     
     if return_triggers:
         return [actuals_data, wl_trigger, lw_trigger]

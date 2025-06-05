@@ -1,4 +1,16 @@
-def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, min_prob_to_bet, min_ev_to_bet, min_bet_size = 1, max_bet_size = 1, constant_bets = True, start_balance = 1000, output_data_for_debug = True):
+def backtest_model(
+        actuals_data, 
+        prediction_probabilities, 
+        breakdown_columns, 
+        min_prob_to_bet, 
+        min_ev_to_bet, 
+        min_bet_size = 1, 
+        max_bet_size = 1, 
+        constant_bets = True, 
+        start_balance = 1000,
+        point_in_time_only_odds = True,
+        target_ev_after_cutoff = 0,
+        output_data_for_debug = True, ):
     """
     
     A function to backtest a model's predictions against actuals data that contain the odds'.
@@ -21,6 +33,10 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
         the minimum bet size in units. This should be left as 1 and only max varied unless wanting to model £ bets
     max_bet_size : float64
         the maximum bet size. Set this to 1 to give uniform betting regardless of the probability
+    point_in_time_only_odds : bool
+        A True or False flag to say whether we only use the backtesting odds to make bets. If False, it will also use the best Betfair odds after cutoff and make bets based on the min EV
+    target_ev_after_cutoff: float64
+        The minimum EV that the test will target for odds after the cutoff time only
 
     Returns
     -------
@@ -42,14 +58,59 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
     breakdown_cols = ['bet_ev_band', 'Predict_to_win'] + breakdown_columns.copy()
     
     # Use the new function to summarise the model predictions and bet triggers
-    actuals_data, wl_trigger, lw_trigger = summarise_model_predictions(actuals_data, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size, max_bet_size, return_triggers = True)
+    actuals_data, wl_trigger, lw_trigger = summarise_model_predictions(actuals_data, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size, max_bet_size, return_triggers = True, point_in_time_only_odds = point_in_time_only_odds, target_ev_after_cutoff = target_ev_after_cutoff)
     
+    # Record the odds that are to be used in backtesting. These may be edited next
+    fighter1_backtesting_odds = actuals_data['fighter1_backtesting_odds'].copy()
+    fighter2_backtesting_odds = actuals_data['fighter2_backtesting_odds'].copy()
+    
+    # Find any bets that occur after the cutoff if necessary by using target odds
+    if not point_in_time_only_odds:
+        
+        breakdown_cols = ['bet_triggered_after_cutoff'] + breakdown_cols
+        
+        # Check where the odds meet the requirement and a bet isn't triggered at the cutoff point
+        additional_wl_trigger = np.where((wl_trigger == 0) & (
+            actuals_data['fighter1_notformodel_best_betfair_odds_after_cutoff'] >=
+            actuals_data['fighter1_target_exchange_odds']) & (
+            actuals_data['Fighter1_win_prob'] >= min_prob_to_bet),
+                1, 0)
+                
+        additional_lw_trigger = np.where((lw_trigger == 0) & (
+            actuals_data['fighter2_notformodel_best_betfair_odds_after_cutoff'] >=
+            actuals_data['fighter2_target_exchange_odds']) & (
+            actuals_data['Fighter2_win_prob'] >= min_prob_to_bet),
+                1, 0)
+        
+        # Deal with double triggers
+        all_triggers = additional_wl_trigger + additional_lw_trigger
+        additional_wl_trigger = np.where(all_triggers == 2, 0, additional_wl_trigger)
+        additional_lw_trigger = np.where(all_triggers == 2, 0, additional_lw_trigger)
+                
+        # Now add these triggers and the odds to the existing vectors
+        fighter1_backtesting_odds = np.where(additional_wl_trigger == 1, actuals_data['fighter1_target_exchange_odds'], fighter1_backtesting_odds)
+        
+        fighter2_backtesting_odds = np.where(additional_lw_trigger == 1, actuals_data['fighter2_target_exchange_odds'], fighter2_backtesting_odds)
+        
+        wl_trigger = np.where(additional_wl_trigger == 1, 1, wl_trigger)
+        lw_trigger = np.where(additional_lw_trigger == 1, 1, lw_trigger)
+        
+        actuals_data['bet_triggered_after_cutoff'] = np.where(all_triggers == 1, 'Bet triggered after cutoff', 'Usual bet at cutoff')
+        
+        # Correct the bet count and amount
+        actuals_data['bets'] = np.where(additional_wl_trigger == 1, 1, actuals_data['bets'])
+        actuals_data['bet_size'] = np.where(additional_wl_trigger == 1, actuals_data['fighter1_target_bet_size'],
+                                            np.where(additional_lw_trigger == 1, actuals_data['fighter2_target_bet_size'], actuals_data['bet_size']))
+        
+    else:
+        actuals_data['bet_triggered_after_cutoff'] = 0
+        
     # Do a check that the inputs are consistent if doing a non constant bets. If using non constant bets, the bet sizing should be as proportions, not £ amounts
     if not constant_bets:
         stop_if_not((min_bet_size < 1) and (max_bet_size < 1), "Bet size for non-constant bets check")
         
     # Now calculate the returns if a bet was made
-    actuals_data['profit_loss'] = ((actuals_data['fighter1_backtesting_odds'] - 1) * wl_trigger * (actuals_data['outcome'] == 'W/L') - wl_trigger * (actuals_data['outcome'] != 'W/L') + (actuals_data['fighter2_backtesting_odds'] - 1) * lw_trigger * (actuals_data['outcome'] == 'L/W') - lw_trigger * (actuals_data['outcome'] != 'L/W')) * actuals_data['bet_size']
+    actuals_data['profit_loss'] = ((fighter1_backtesting_odds - 1) * wl_trigger * (actuals_data['outcome'] == 'W/L') - wl_trigger * (actuals_data['outcome'] != 'W/L') + (fighter2_backtesting_odds - 1) * lw_trigger * (actuals_data['outcome'] == 'L/W') - lw_trigger * (actuals_data['outcome'] != 'L/W')) * actuals_data['bet_size']
     
     if constant_bets:
         pass
@@ -83,11 +144,11 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
         breakdown_cols = []
     
     ## Summarise the results
-    results = actuals_data.groupby('total').agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
+    results = actuals_data.groupby('total', observed = False).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
     for col in breakdown_cols:
         results = pd.concat([
             results,
-            actuals_data.groupby(col).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
+            actuals_data.groupby(col, observed = False).agg({'fights': lambda x: len(x), 'bets': 'sum', 'wins': 'sum', 'bet_size': 'sum', 'profit_loss': 'sum', 'max_bet_size': 'max'})
         ])
     
     # Calculate percentage info
@@ -110,9 +171,20 @@ def backtest_model(actuals_data, prediction_probabilities, breakdown_columns, mi
     results = pd.concat([pd.DataFrame({'Group': results.index}, index = results.index), results], axis=1)
     # results.rename(columns={'index': 'RowName'}, inplace=True)
     
+    # Get fight level output
+    actuals_data.sort_values('date', inplace = True)
+    
+    if 'y_pred_prob' in actuals_data.columns:
+        fight_output = actuals_data[['date', 'fighter1', 'Fighter1_win_prob', 'fighter1_backtesting_odds', 'fighter2', 'Fighter2_win_prob', 'fighter2_backtesting_odds', 'outcome', 'target', 'predictions', 'bets', 'bet_ev', 'profit_loss', 'bet_triggered_after_cutoff' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'total', 'fights', 'wins', 'y_pred_prob']]
+    else:
+        fight_output = None
+    
     # Output the underlying data if required
     if output_data_for_debug:
-        actuals_data.sort_values('date', inplace = True)
-        actuals_data[['date', 'fighter1', 'fighter2', 'outcome', 'fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'predictions', 'y_pred_prob', 'target', 'bets', 'bet_ev' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'profit_loss', 'total', 'fights', 'wins']].to_csv('results/backtesting_data_for_checking.csv')
+        fight_output.to_csv('results/backtesting_data_for_checking.csv')
     
-    return results
+    # Mpve column positions for better searching
+    results = move_column(results, 'profit_loss', 1)
+    results = move_column(results, 'roi', 2)
+    
+    return results, fight_output

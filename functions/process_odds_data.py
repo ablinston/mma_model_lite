@@ -1,6 +1,6 @@
 # This function processes the cleaned odds data so that it is ready for merging with the other datasets
 
-def process_odds_data(fight_df, event_df, odds_scrape_config, average_odds_model = None, impute_missing_averages = True):
+def process_odds_data(fight_df, event_df, betfair_df, odds_scrape_config, average_odds_model = None, impute_missing_averages = True):
     
     # pdb.set_trace()
      
@@ -37,7 +37,22 @@ def process_odds_data(fight_df, event_df, odds_scrape_config, average_odds_model
     # Keep only the columns we need, and remove duplicates (these duplicates are where the event and bout are empty)
     new_fight_df = new_fight_df[['event', 'bout', 'fighter', 'open_odds', 'mean_closing_odds', 'best_closing_odds', 'odds_change', 'notformodel_date_fighter_odd_scrape']].drop_duplicates(subset = ['event', 'bout', 'fighter'])
     
+    # Process the betfair data ready for merging
+    betfair_to_merge = betfair_df[~betfair_df['event'].isna()].drop_duplicates(subset = ['event', 'bout', 'fighter'])
+    
+    # Get the columns needed
+    if 'notformodel_betfair_odds_datetime' in betfair_to_merge.columns:
+        betfair_to_merge = betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds', 'notformodel_betfair_odds_datetime', 'notformodel_best_betfair_odds_after_cutoff']]
+    else:
+        betfair_to_merge = betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds']]
+    
+    # Merge on the betfair odds
+    new_fight_df = new_fight_df.merge(betfair_to_merge, on = ['event', 'bout', 'fighter'],  how = 'left')
+    
     # Add on a flag to say whether the odds have changed by more than 0.1
     new_fight_df['odds_change_gt_0'] = np.where(new_fight_df['odds_change'] < 0, -1, np.where(new_fight_df['odds_change'] > 0, 1, 0))     
+    
+    # Check the number of rows
+    stop_if_not(len(new_fight_df) == len(fight_df), "Process odds length check")
     
     return new_fight_df

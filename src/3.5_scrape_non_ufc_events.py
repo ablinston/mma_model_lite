@@ -25,7 +25,7 @@ non_ufc_events = [url for url in full_list_u if url not in parsed_event_details_
 unparsed_event_details_df = parallel_scrape_event_details(non_ufc_events, num_threads = config['num_threads'])
 
 # Filter out any events that haven't happened yet
-unparsed_event_details_df['date_formatted'] = pd.to_datetime(unparsed_event_details_df['DATE'], errors = 'coerce')
+unparsed_event_details_df['date_formatted'] = pd.to_datetime(unparsed_event_details_df['DATE'])
 unparsed_event_details_df = unparsed_event_details_df[unparsed_event_details_df['date_formatted'] < (datetime.now() - timedelta(days=1))]
 
 # Updated the list of events

@@ -119,11 +119,13 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
 
     
     # Finally, get the backtesting results
-    backtesting = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params)
+    backtesting, backtesting_fight_output = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params)
     
     # Log the overall backtesting results
     backtesting.to_csv('results/temp/summary.csv', index = True)
     mlflow.log_artifact('results/temp/summary.csv', 'Backtesting results')
+    backtesting_fight_output.to_csv('results/temp/fight_backtesting.csv', index = True)
+    mlflow.log_artifact('results/temp/fight_backtesting.csv', 'Backtesting results')
  
     # Log the total metrics in MLflow
     mlflow.log_params(backtesting_params)

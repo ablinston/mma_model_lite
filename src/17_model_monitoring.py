@@ -47,12 +47,12 @@ for i in range(1, 3):
 if not skip_data_update:
     
     # Run these scripts to scrape then clean the raw data
-    exec(open('./src/4_scrape_all_unparsed_data.py').read())
-    exec(open('./src/5_data_cleaning.py').read())
+    exec(open('./src/5_scrape_all_unparsed_data.py').read())
+    exec(open('./src/6_data_cleaning.py').read())
     
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if True: # unparsed_events: Hard coded this to always run because fights can change if fighters drop out and otherwise they wont have the hist stats
-        exec(open('./src/7_data_processing.py').read())
+        exec(open('./src/8_data_processing.py').read())
         # Refresh the dataset
         backtesting_data = merged_data.copy()
     else:

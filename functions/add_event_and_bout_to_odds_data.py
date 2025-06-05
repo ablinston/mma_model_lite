@@ -28,7 +28,7 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_ch
         
     # Clean the bouts and fighter columns
     new_stats_df[['bout', 'fighter']] = clean_text_columns(new_stats_df[['bout', 'fighter']])
-    odds_df[['fighter', 'opponent']] = clean_text_columns(odds_df[['fighter', 'opponent']])
+    odds_df.loc[:,['fighter', 'opponent']] = clean_text_columns(odds_df[['fighter', 'opponent']])
     
     # Drop columns not needed and duplicates. Drop NA because they will affect the match
     new_stats_df = new_stats_df[['event', 'bout', 'fighter', 'event_date']].drop_duplicates()
@@ -58,8 +58,8 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_ch
     opponents_df = opponents_df.drop_duplicates(subset = ['fighter', 'opponent'], keep = False)
 
     
-    # Replace events and bouts with those from the opponents data #  Removed this because it caused issues with duplicates
-    new_odds_df = replace_event_and_bout_odds(odds_df = new_odds_df, stats_df = opponents_df, join_on = ['fighter', 'opponent'], day_shift = 0, odds_event_priority = False)
+    # # Replace events and bouts with those from the opponents data #  Removed this because it caused issues with duplicates
+    # new_odds_df = replace_event_and_bout_odds(odds_df = new_odds_df, stats_df = opponents_df, join_on = ['fighter', 'opponent'], day_shift = 0, odds_event_priority = False)
     
     # Now, working from 2 days down to one, fill the missing events
     new_odds_df = replace_event_and_bout_odds(odds_df = new_odds_df, stats_df = new_stats_df, join_on = ['fighter', 'date', 'opponent'], day_shift = 2, odds_event_priority = False)
@@ -79,7 +79,7 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_ch
     
     # Give a warning about any that haven't been matched to an event and bout
     if len(ufc_events_missing_odds) > 0:
-        print(f"The following events after 01-01-2010 are missing odds data: {set(ufc_events_missing_odds)}")
+        print(f"The following events after {date_check} are missing odds data: {set(ufc_events_missing_odds)}")
     
     # Remove columns no longer needed    
     new_odds_df = new_odds_df[odds_df.columns]

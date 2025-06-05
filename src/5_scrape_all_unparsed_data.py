@@ -1,6 +1,14 @@
 # This script will update the existing parsed data with new UFC events and fighters.
 # It will scrape the data and perform consistency checks to ensure all datasets are consistent before
 # saving them and overwriting existing files.
+import betfairlightweight
+from betfairlightweight import StreamListener
+from betfairlightweight.filters import market_filter, price_projection, streaming_market_filter, streaming_market_data_filter
+import bz2
+from pathlib import Path
+import queue
+import threading
+import time
 
 # exec(open('global.py').read())
 
@@ -74,6 +82,7 @@ parsed_fight_stats_df = fp.ParquetFile('./data/' + config['fight_stats_file_name
 parsed_odds_df = fp.ParquetFile('./data/' + config['fighter_odds_file_name']).to_pandas()
 parsed_event_odds_urls = fp.ParquetFile('./data/event_odds_urls.parquet').to_pandas()
 parsed_event_odds_df = fp.ParquetFile('./data/' + config['event_odds_file_name']).to_pandas()
+parsed_betfair_odds_df = fp.ParquetFile('./data/' + config['betfair_odds_file_name']).to_pandas()
 
 if unparsed_events == True:
     
@@ -140,8 +149,12 @@ new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = updat
     fast_scrape = odds_scrape_config['fast_scrape_update'],
     num_threads = config['num_threads'])
     
-# Find which fighters didn't get odds properly
-found_fighters = new_parsed_odds_df[new_parsed_odds_df['date'].isin(list_of_unparsed_event_dates)]['fighter'].tolist()
+# Find which fighters didn't get odds properly by looking at the dates of people found
+# Offsets of -1, 0, and +1 days
+offsets = [timedelta(days=delta) for delta in [-1, 0, 1]]
+# List comprehension to apply all offsets to all dates
+expanded_dates = sorted(set(date + offset for date in list_of_unparsed_event_dates for offset in offsets))
+found_fighters = new_parsed_odds_df[new_parsed_odds_df['date'].isin(expanded_dates)]['fighter'].tolist()
 missing_fighters = [fighter for fighter in list_of_unparsed_fighter_odds if fighter not in found_fighters]
 
 # Scrape the odds again but a slow scrape
@@ -154,6 +167,33 @@ new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = updat
     config, 
     fast_scrape = False,
     num_threads = config['num_threads'])
+
+###############################################################################
+##### Update the Betfair odds #####
+###############################################################################
+
+# Initiate the trading object
+trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_login_config['certs_location'])
+
+trading.login()
+
+if 'skip_betfair_history' not in globals():
+    skip_betfair_history = False
+
+if not skip_betfair_history:
+    # Update the odds
+    new_parsed_betfair_odds_df = update_betfair_odds(
+        parsed_betfair_odds_df, 
+        betfair_login_config, 
+        download_folder = betfair_data_config['download_folder'], 
+        decompressed_output_dir = betfair_data_config['decompressed_output_dir'], 
+        decompressed_temp_output_dir = betfair_data_config['decompressed_temp_output_dir']
+    )
+else:
+    new_parsed_betfair_odds_df = parsed_betfair_odds_df
+
+# Get the upcoming Betfair odds data
+upcoming_betfair_odds = betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config)
 
 ###############################################################################
 ##### Parse new fighter data #####
@@ -214,6 +254,10 @@ if unparsed_events:
         all_fighter_details_df,
         new_parsed_fighter_tott_df,
         new_parsed_event_odds_df,
+        new_parsed_betfair_odds_df,
+        upcoming_events_df,
+        upcoming_fight_details_df,
+        upcoming_betfair_odds,
         config)
     
     # Check new rows have been added
@@ -241,7 +285,8 @@ if unparsed_events:
                 'parsed_odds_df': new_parsed_odds_df, 
                 'parsed_event_odds_df' : new_parsed_event_odds_df,
                 'parsed_fighter_tott_df': new_parsed_fighter_tott_df,
-                'parsed_fight_stats_df': new_parsed_fight_stats_df},
+                'parsed_fight_stats_df': new_parsed_fight_stats_df,
+                'parsed_betfair_odds_df': new_parsed_betfair_odds_df},
             summary_date = datetime.today(),
             save_output = True)
         
@@ -257,6 +302,10 @@ if unparsed_events:
         fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
         fp.write('./data/event_odds_urls.parquet', new_parsed_event_odds_urls, compression = 'ZSTD')
         fp.write('./data/' + config['event_odds_file_name'], new_parsed_event_odds_df, compression = 'ZSTD')
+        
+        fp.write('./data/' + config['betfair_odds_file_name'], new_parsed_betfair_odds_df, compression = 'ZSTD')
+        fp.write('./data/' + config['betfair_upcoming_odds_file_name'], upcoming_betfair_odds, compression = 'ZSTD')
+        
         fp.write('./data/' + config['fighter_details_file_name'], all_fighter_details_df, compression = 'ZSTD')
         fp.write('./data/' + config['fighter_tott_file_name'], new_parsed_fighter_tott_df, compression = 'ZSTD')
         
@@ -275,6 +324,10 @@ else:
         all_fighter_details_df,
         parsed_fighter_tott_df,
         new_parsed_event_odds_df,
+        new_parsed_betfair_odds_df,
+        upcoming_events_df,
+        upcoming_fight_details_df,
+        upcoming_betfair_odds,
         config)
         
     #######################
@@ -286,6 +339,9 @@ else:
         # write new fight details to file
         fp.write('./data/' + config['upcoming_event_details_file_name'], upcoming_events_df, compression = 'ZSTD')
         fp.write('./data/' + config['upcoming_fight_details_file_name'], upcoming_fight_details_df, compression = 'ZSTD')
+        
+        fp.write('./data/' + config['betfair_odds_file_name'], new_parsed_betfair_odds_df, compression = 'ZSTD')
+        fp.write('./data/' + config['betfair_upcoming_odds_file_name'], upcoming_betfair_odds, compression = 'ZSTD')
 
         fp.write('./data/' + config['fighter_odds_file_name'], new_parsed_odds_df, compression = 'ZSTD')
         fp.write('./data/event_odds_urls.parquet', new_parsed_event_odds_urls, compression = 'ZSTD')

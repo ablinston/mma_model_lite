@@ -75,10 +75,10 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('final_models_bet_testing_v3')
+mlflow.set_experiment('final_model_v2_bet_testing')
 
 # Set this model's description for MLflow
-model_description = 'Added overall bayes base 10 - ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
+model_description = 'Odds to betfair 5pm ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -90,7 +90,7 @@ breakdown_metrics= ['Logloss', 'EV MSE', 'Avg WL only AUC', 'X Odds Avg WL only 
 target = 'outcome'
 
 # Loop through all the minimum probabilities and ex[ected values to bet
-for min_prob_to_bet in [0, 0.49]: # np.arange(0.1, 0.7, 0.1):
+for min_prob_to_bet in [0.3, 0.4, 0.49]: # np.arange(0.1, 0.7, 0.1):
     for min_ev_to_bet in [0, 0.1, 0.2]: # np.arange(0, 0.2, 0.05):
         for max_bet_size in [1]:#np.arange(0.1, 0.4, 0.02):
             for min_bet_size in [1]:#np.arange(0.01, 0.1, 0.01):

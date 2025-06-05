@@ -30,7 +30,7 @@ def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odd
     new_odds_data = new_odds_data[new_odds_data['date'].isin(full_date_list)]
     
     # Add on the date of the odds scrape
-    new_odds_data['notformodel_date_fighter_odd_scrape'] = datetime.now()
+    new_odds_data['notformodel_date_fighter_odd_scrape'] = pd.to_datetime("now", utc=True) # Give the datetime in GMT
     
     # Add this onto the existing odds data
     new_odds_data = pd.concat([new_odds_data, existing_odds_data])

@@ -18,7 +18,7 @@ def add_opponent_column(df):
     df['fighter_2'] = fighter_pairs[1]
 
     # Use np.where to assign 'opponent' based on whether 'fighter' matches 'fighter_1' or 'fighter_2'
-    df['opponent'] = np.where(df['fighter'] == df['fighter_1'], df['fighter_2'], df['fighter_1'])
+    df['opponent'] = np.where(df['fighter'].str.replace(' ', '') == df['fighter_1'].str.replace(' ', ''), df['fighter_2'], df['fighter_1'])
 
     # Drop the temporary columns used for the split
     df.drop(columns=['fighter_1', 'fighter_2'], inplace=True)

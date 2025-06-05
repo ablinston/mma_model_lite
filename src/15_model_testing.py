@@ -10,9 +10,7 @@ import lightgbm as lgb
 import matplotlib.pyplot as plt
 import mlflow
 import pickle
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
-from sklearn.preprocessing import LabelEncoder, label_binarize
 import seaborn as sns
 import xgboost as xgb
 
@@ -20,8 +18,8 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the model location
-model_path = './results/final_xgboost_forest.joblib'
-# model_path = './models/xgb_forest_v2.joblib'
+# model_path = './results/final_xgboost_forest.joblib'
+model_path = './models/xgb_forest_v2.joblib'
 
 # Read in the data for training
 backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -85,7 +83,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('OOT_testing')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest w bayes,  ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = 'XGB forest v2 with betfair odds, ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(rf_xgb_model[0]['features'])) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -99,22 +97,25 @@ target = 'outcome'
 
 # Backtest for both constant terms and non-constant bets
 for backtesting_params in [
-        # {
-        #     'min_prob_to_bet': 0.5,
-        #     'min_ev_to_bet': 0.0,
-        #     'max_bet_size': 0.2,
-        #     'min_bet_size': 0.1,
-        #     'start_balance': 2000,
-        #     'constant_bets': False
-        # }
-        # # ,
         {
             'min_prob_to_bet': 0.49,
             'min_ev_to_bet': 0.0,
-            'max_bet_size': 100,
-            'min_bet_size': 100,
-            'constant_bets': True
+            'max_bet_size': 0.05,
+            'min_bet_size': 0.05,
+            'start_balance': 2000,
+            'constant_bets': False,
+            'point_in_time_only_odds': True
         }
+        # # ,
+        # {
+        #     'min_prob_to_bet': 0.49,
+        #     'min_ev_to_bet': 0.0,
+        #     'max_bet_size': 100,
+        #     'min_bet_size': 100,
+        #     'constant_bets': True,
+        #     'point_in_time_only_odds': True
+        #     # 'target_ev_after_cutoff': 0.05
+        # }
         ]:
     
     # Run the metrics on the training data
@@ -187,10 +188,10 @@ for backtesting_params in [
     mlflow.end_run()
 
 
-# If the model is good, then log it in the registery
-if model_approved:
-    run_id = 'aa217e4b1bf442729c4f86abfba56f98'
-    mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
+# # If the model is good, then log it in the registery
+# if model_approved:
+#     run_id = 'aa217e4b1bf442729c4f86abfba56f98'
+#     mlflow.register_model(f'runs:/{run_id}/Model', name = 'xgb_forest_model')
 
 
-test = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
+# test = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')

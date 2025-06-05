@@ -23,6 +23,8 @@ if not os.name == "nt":
     skip_data_update = False
     skip_full_data_update = True
     skip_save_data = True
+    skip_betfair_history = True
+    
 else:
     skip_data_update = False
     skip_full_data_update = False
@@ -41,8 +43,8 @@ else:
 if not skip_data_update:
     
     # Run these scripts to scrape then clean the raw data
-    exec(open('./src/4_scrape_all_unparsed_data.py').read())
-    exec(open('./src/5_data_cleaning.py').read())
+    exec(open('./src/5_scrape_all_unparsed_data.py').read())
+    exec(open('./src/6_data_cleaning.py').read())
         
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if skip_full_data_update:
@@ -56,13 +58,15 @@ if not skip_data_update:
         forecasting_data = update_odds_on_merged_data(
                 cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
                 cleaned_event_odds_data_path = './data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
+                cleaned_betfair_odds_data_path = './data/' + config['betfair_upcoming_odds_file_name'].replace('.parquet', '_clean.parquet'),
                 # events_path = './data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
                 final_data_folder = config['final_data_path'],
                 average_odds_model_path = './results/average_odds_model.joblib',
-                config = config
+                config = config,
+                data_processing_config = data_processing_config
                 )
     else:
-        exec(open('./src/7_data_processing.py').read())
+        exec(open('./src/8_data_processing.py').read())
         # Refresh the dataset
         forecasting_data = merged_data.copy()
 else:
@@ -124,7 +128,10 @@ betting_data['bet_assumed_odds'] = betting_data['bets'] * np.where(betting_data[
 for col in [cols for cols in betting_data.columns if 'odds' in cols]:
     betting_data.loc[:, col] = np.round(betting_data[col], 2)
 
-betting_data.rename(columns = {'fighter1_notformodel_date_fighter_odd_scrape': 'f1_scrape_date', 'fighter2_notformodel_date_fighter_odd_scrape': 'f2_scrape_date'}, inplace = True)
+betting_data.rename(columns = {'fighter1_notformodel_true_odds_asat_datetime': 'f1_scrape_date', 'fighter2_notformodel_true_odds_asat_datetime': 'f2_scrape_date'}, inplace = True)
+
+# Flag whether odds Betfair imputed
+
 
 summary_data = betting_data[['date', 'event', 'f1_scrape_date', 'f2_scrape_date', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_breakeven_odds', 'Final_bet', 'Potential_win']]
 

@@ -6,15 +6,17 @@ __pycache__/
 # C extensions
 *.so
 
+data/raw_betfair/*
 mlruns/
 *xgb
 
 # Specific files
 results/7.5_random_forest_model.xgb
 # results/final_xgboost_forest.joblib
-/configs/betfair_login_config.yaml
 
+/configs/betfair_login_config.yaml
 /data/raw_betfair/*
+
 
 # Distribution / packaging
 .Python

@@ -41,5 +41,18 @@ AB note: couldn't get GPU training with LightGBM working at all on Windows. Used
 
 # Notes
 
-Decimal odds are how much is received back for every 1 bet. So for example 2 means you receive 2 (original bet + 1 profit)
 To undo stupid split in Spyder, use Alt + Shift + W
+
+## Odds
+
+Decimal odds are how much is received back for every 1 bet. So for example 2 means you receive 2 (original bet + 1 profit)
+
+## Betfair API
+
+The Betfair API is accessed through the `betfairlightweight` python package. It is relatively complex to navigate with little documentation.
+
+Betfair historical data needs to have packages purhcased manually on the website https://historicdata.betfair.com/#/home. Seems to be just needed on a calendar month basis which will then allow files to be downloaded during that month.
+
+Historic data has too many files so better to download online then extract the bz2 files.
+
+MMA is lumped with everything else so the scripts scan the files and see which ones are fights. Each file is a `market` which is the market for a specific outcome e.g. Fight Result for Conor vs Khabib. The package creates `MarketBook`s which are the details of a market, and `RunnerBook`s which are betting on a specific outcome e.g. Conor to win.
