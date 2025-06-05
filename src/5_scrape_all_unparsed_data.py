@@ -149,8 +149,12 @@ new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = updat
     fast_scrape = odds_scrape_config['fast_scrape_update'],
     num_threads = config['num_threads'])
     
-# Find which fighters didn't get odds properly
-found_fighters = new_parsed_odds_df[new_parsed_odds_df['date'].isin(list_of_unparsed_event_dates)]['fighter'].tolist()
+# Find which fighters didn't get odds properly by looking at the dates of people found
+# Offsets of -1, 0, and +1 days
+offsets = [timedelta(days=delta) for delta in [-1, 0, 1]]
+# List comprehension to apply all offsets to all dates
+expanded_dates = sorted(set(date + offset for date in list_of_unparsed_event_dates for offset in offsets))
+found_fighters = new_parsed_odds_df[new_parsed_odds_df['date'].isin(expanded_dates)]['fighter'].tolist()
 missing_fighters = [fighter for fighter in list_of_unparsed_fighter_odds if fighter not in found_fighters]
 
 # Scrape the odds again but a slow scrape

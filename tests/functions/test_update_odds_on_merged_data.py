@@ -79,7 +79,9 @@ def test_update_odds_on_merged_data():
 #     'fighter1_backtesting_odds': [2],
 #     'fighter2_backtesting_odds': [2],
 #     'fighter1_notformodel_betfair_odds_datetime':[datetime(2023, 4, 7, 8, 40, 13, 538626)],
-#     'fighter2_notformodel_betfair_odds_datetime':[datetime(2023, 4, 7, 8, 40, 13, 538626)]
+#     'fighter2_notformodel_betfair_odds_datetime':[datetime(2023, 4, 7, 8, 40, 13, 538626)],
+#     'fighter1_notformodel_best_betfair_odds_after_cutoff': [np.nan],
+#     'fighter2_notformodel_best_betfair_odds_after_cutoff': [np.nan]
 # })
     
 # merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
@@ -89,12 +91,12 @@ def test_update_odds_on_merged_data():
 
 
 
-# cleaned_bf = pd.DataFrame({'fighter':[ 'A', 'B'], 'bout': ['A vs B'] * 2, 'date': [pd.to_datetime('2025-04-13')] * 2, 'betfair_exch_odds':[1.5, 2.5], 'notformodel_best_betfair_odds_after_cutoff': [1.6, 2.6], 'opponent': ['B', 'A'], 'event': ['UFC 1'] * 2, 'notformodel_betfair_odds_datetime': [pd.to_datetime('2025-06-05')] * 2})
+# # cleaned_bf = pd.DataFrame({'fighter':[ 'A', 'B'], 'bout': ['A vs B'] * 2, 'date': [pd.to_datetime('2025-04-13')] * 2, 'betfair_exch_odds':[1.5, 2.5], 'notformodel_best_betfair_odds_after_cutoff': [1.6, 2.6], 'opponent': ['B', 'A'], 'event': ['UFC 1'] * 2, 'notformodel_betfair_odds_datetime': [pd.to_datetime('2025-06-05')] * 2})
 
-# fp.write('./tests/data/test_update_odds_on_merged_data_fight_odds.parquet', fight_odds, compression = 'ZSTD')
-# fp.write('./tests/data/test_update_odds_on_merged_data_event_odds.parquet', event_odds, compression = 'ZSTD')
+# # fp.write('./tests/data/test_update_odds_on_merged_data_fight_odds.parquet', fight_odds, compression = 'ZSTD')
+# # fp.write('./tests/data/test_update_odds_on_merged_data_event_odds.parquet', event_odds, compression = 'ZSTD')
 # fp.write('./tests/data/test_update_odds_on_merged_data/merged_data.parquet', merged_data, compression = 'ZSTD')
-# fp.write('./tests/data/test_update_odds_on_merged_data_cleaned_bf.parquet', cleaned_bf, compression = 'ZSTD')
-# 
+# # fp.write('./tests/data/test_update_odds_on_merged_data_cleaned_bf.parquet', cleaned_bf, compression = 'ZSTD')
+# # 
 # fp.write('./tests/data/test_update_odds_on_merged_data_correct.parquet', result, compression = 'ZSTD')
 

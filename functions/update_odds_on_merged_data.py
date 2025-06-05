@@ -32,6 +32,17 @@ def update_odds_on_merged_data(
     # pdb.set_trace()
     
     # Assume that the event and bout have been added correctly as part of the data cleaning process.
+    # But need to remove any with event or bout still missing
+    fight_odds = fight_odds[(~fight_odds['event'].isna()) & (~fight_odds['bout'].isna())].copy()
+
+    # Replace any older odds on the data
+    fight_odds.sort_values('notformodel_date_fighter_odd_scrape', ascending = False, inplace = True)
+    fight_odds = fight_odds.drop_duplicates(subset = ['event', 'bout', 'fighter'])
+    
+    # Give placeholder column for betfair odds
+    if 'notformodel_best_betfair_odds_after_cutoff' not in betfair_odds.columns:
+        betfair_odds['notformodel_best_betfair_odds_after_cutoff'] = np.nan
+    
     # Process the data
     fight_odds = process_odds_data(fight_odds, event_odds, betfair_odds, odds_scrape_config, average_odds_model)
     
@@ -61,8 +72,8 @@ def update_odds_on_merged_data(
     merged_data = add_fighter_differentials(merged_data)
     
     # Check on data
-    cols_that_should_be_in_original = [col for col in merged_data.columns if 'notformodel_true_odds_asat_datetime' not in col]
+    # cols_that_should_be_in_original = [col for col in merged_data.columns if 'notformodel_true_odds_asat_datetime' not in col]
     stop_if_not(len(merged_data) == original_shape[0])
-    stop_if_not(len(cols_that_should_be_in_original) == original_shape[1])
+    stop_if_not(len(merged_data.columns) == original_shape[1])
 
     return merged_data

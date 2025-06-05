@@ -53,12 +53,12 @@ def calculate_all_true_odds_columns(merged_data, impute_missing_betfair, odds_su
         if 'betfair_exch_odds' in odds_suffix_for_true_odds:
             merged_data[fighter + '_notformodel_true_odds_asat_datetime'] = np.where(
                 merged_data[fighter + '_betfair_exch_odds'].isna(),
-                merged_data[fighter + '_notformodel_date_fighter_odd_scrape'],
-                merged_data[fighter + '_notformodel_betfair_odds_datetime'])
+                merged_data[fighter + '_notformodel_date_fighter_odd_scrape'].astype(str),
+                merged_data[fighter + '_notformodel_betfair_odds_datetime'].astype(str))
         else:
-            merged_data[fighter + '_notformodel_true_odds_asat_datetime'] = merged_data[fighter + '_notformodel_date_fighter_odd_scrape']
+            merged_data[fighter + '_notformodel_true_odds_asat_datetime'] = merged_data[fighter + '_notformodel_date_fighter_odd_scrape'].astype(str)
     
-    # Clean up columns
-    merged_data.drop(columns = ['fighter1_betfair_exch_odds_imputed', 'fighter2_betfair_exch_odds_imputed'], inplace = True)
+    # # Clean up columns NEED THESE IN DATA PROCESSING FOR BACKTESTING ODDS
+    # merged_data.drop(columns = ['fighter1_betfair_exch_odds_imputed', 'fighter2_betfair_exch_odds_imputed'], inplace = True)
     
     return merged_data

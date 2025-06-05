@@ -4181,16 +4181,16 @@ fighter1_hist_losses_Decision-Unanimous_per_fight,0.0
 fighter1_hist_losses_Decision-Split_per_fight,0.0
 fighter1_hist_win_streak,10
 fighter1_hist_loss_streak,0
-fighter1_hist_W_Other,0
 fighter1_hist_W_Submission,2
 fighter1_hist_W_Decision-Split,0
 fighter1_hist_W_KO/TKO,2
 fighter1_hist_W_Decision-Unanimous,6
-fighter1_hist_L_Other,0
+fighter1_hist_W_Other,0
 fighter1_hist_L_Submission,0
 fighter1_hist_L_Decision-Split,0
 fighter1_hist_L_KO/TKO,0
 fighter1_hist_L_Decision-Unanimous,0
+fighter1_hist_L_Other,0
 fighter2_date_last_win,2016-11-12 00:00:00
 fighter2_date_last_loss,2016-03-05 00:00:00
 fighter2_hist_wins,9
@@ -4254,16 +4254,16 @@ fighter2_hist_losses_Decision-Unanimous_per_fight,0.0
 fighter2_hist_losses_Decision-Split_per_fight,0.0
 fighter2_hist_win_streak,2
 fighter2_hist_loss_streak,0
-fighter2_hist_W_Other,0
 fighter2_hist_W_Submission,0
 fighter2_hist_W_Decision-Split,1
 fighter2_hist_W_KO/TKO,7
 fighter2_hist_W_Decision-Unanimous,1
-fighter2_hist_L_Other,0
+fighter2_hist_W_Other,0
 fighter2_hist_L_Submission,1
 fighter2_hist_L_Decision-Split,0
 fighter2_hist_L_KO/TKO,0
 fighter2_hist_L_Decision-Unanimous,0
+fighter2_hist_L_Other,0
 fighter1_open_odds,1.4081632653061225
 fighter1_mean_closing_odds,1.5616700625979676
 fighter1_best_closing_odds,1.529100529100529
@@ -4300,8 +4300,8 @@ fighter1_true_open_odds,1.5120593692022264
 fighter2_true_open_odds,2.952898550724638
 fighter1_true_odds_change,0.1319196883893965
 fighter2_true_odds_change,-0.4000530222693537
-fighter1_notformodel_true_odds_asat_datetime,
-fighter2_notformodel_true_odds_asat_datetime,
+fighter1_notformodel_true_odds_asat_datetime,NaT
+fighter2_notformodel_true_odds_asat_datetime,NaT
 fighter1_hist_allrounds_body_accuracy_percent,0.6875
 fighter1_hist_allrounds_body_accuracy_percent_against,0.544
 fighter1_hist_allrounds_clinch_accuracy_percent,0.6944444444444444
