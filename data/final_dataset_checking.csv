@@ -4181,28 +4181,16 @@ fighter1_hist_losses_Decision-Unanimous_per_fight,0.0
 fighter1_hist_losses_Decision-Split_per_fight,0.0
 fighter1_hist_win_streak,10
 fighter1_hist_loss_streak,0
-fighter1_hist_W_Submission,2
 fighter1_hist_W_Decision-Split,0
+fighter1_hist_W_Other,0
+fighter1_hist_W_Submission,2
 fighter1_hist_W_KO/TKO,2
-<<<<<<< HEAD
-fighter1_hist_W_Decision-Split,0
-fighter1_hist_W_Submission,2
-fighter1_hist_W_Other,0
 fighter1_hist_W_Decision-Unanimous,6
-fighter1_hist_L_KO/TKO,0
 fighter1_hist_L_Decision-Split,0
-fighter1_hist_L_Submission,0
 fighter1_hist_L_Other,0
-fighter1_hist_L_Decision-Unanimous,0
-=======
-fighter1_hist_W_Decision-Unanimous,6
-fighter1_hist_W_Other,0
 fighter1_hist_L_Submission,0
-fighter1_hist_L_Decision-Split,0
 fighter1_hist_L_KO/TKO,0
 fighter1_hist_L_Decision-Unanimous,0
-fighter1_hist_L_Other,0
->>>>>>> betfair
 fighter2_date_last_win,2016-11-12 00:00:00
 fighter2_date_last_loss,2016-03-05 00:00:00
 fighter2_hist_wins,9
@@ -4266,33 +4254,21 @@ fighter2_hist_losses_Decision-Unanimous_per_fight,0.0
 fighter2_hist_losses_Decision-Split_per_fight,0.0
 fighter2_hist_win_streak,2
 fighter2_hist_loss_streak,0
-fighter2_hist_W_Submission,0
 fighter2_hist_W_Decision-Split,1
+fighter2_hist_W_Other,0
+fighter2_hist_W_Submission,0
 fighter2_hist_W_KO/TKO,7
-<<<<<<< HEAD
-fighter2_hist_W_Decision-Split,1
-fighter2_hist_W_Submission,0
-fighter2_hist_W_Other,0
 fighter2_hist_W_Decision-Unanimous,1
-fighter2_hist_L_KO/TKO,0
 fighter2_hist_L_Decision-Split,0
-fighter2_hist_L_Submission,1
 fighter2_hist_L_Other,0
-fighter2_hist_L_Decision-Unanimous,0
-=======
-fighter2_hist_W_Decision-Unanimous,1
-fighter2_hist_W_Other,0
 fighter2_hist_L_Submission,1
-fighter2_hist_L_Decision-Split,0
 fighter2_hist_L_KO/TKO,0
 fighter2_hist_L_Decision-Unanimous,0
-fighter2_hist_L_Other,0
->>>>>>> betfair
 fighter1_open_odds,1.4081632653061225
 fighter1_mean_closing_odds,1.5616700625979676
 fighter1_best_closing_odds,1.529100529100529
 fighter1_odds_change,0.15350679729184513
-fighter1_notformodel_date_fighter_odd_scrape,
+fighter1_notformodel_date_fighter_odd_scrape,NaT
 fighter1_betfair_exch_odds,1.64
 fighter1_notformodel_betfair_odds_datetime,
 fighter1_notformodel_best_betfair_odds_after_cutoff,1.64
@@ -4301,7 +4277,7 @@ fighter2_open_odds,2.75
 fighter2_mean_closing_odds,2.711663705118603
 fighter2_best_closing_odds,2.69
 fighter2_odds_change,-0.03833629488139678
-fighter2_notformodel_date_fighter_odd_scrape,
+fighter2_notformodel_date_fighter_odd_scrape,NaT
 fighter2_betfair_exch_odds,2.546666666666667
 fighter2_notformodel_betfair_odds_datetime,
 fighter2_notformodel_best_betfair_odds_after_cutoff,2.88
@@ -11613,12 +11589,7 @@ diff_date_last_fight,511.0
 diff_date_last_knocked_out,0.0
 diff_date_last_loss,
 diff_date_last_win,511.0
-<<<<<<< HEAD
-diff_dob,
-train_test_oot_flag,test
-=======
 diff_dob,68.0
->>>>>>> betfair
 womens,0
 matchup,mma-vs-striker
 fighter1_backtesting_odds,1.64
