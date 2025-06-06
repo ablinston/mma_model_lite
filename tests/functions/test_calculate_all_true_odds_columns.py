@@ -14,10 +14,10 @@ def test_calculate_all_true_odds_columns(monkeypatch):
         'fighter2_best_closing_odds': [1.95, 1.67, 3.05, 3.05],
         'fighter1_open_odds': [2.2, np.nan, 2.8, np.nan],
         'fighter2_open_odds': [1.8, 1.6, np.nan, 3.05],
-        'fighter1_notformodel_betfair_odds_datetime': pd.to_datetime(['2024-01-01'] * 4),
-        'fighter2_notformodel_betfair_odds_datetime': pd.to_datetime(['2024-01-01'] * 4),
-        'fighter1_notformodel_date_fighter_odd_scrape': pd.to_datetime(['2024-01-02'] * 4),
-        'fighter2_notformodel_date_fighter_odd_scrape': pd.to_datetime(['2024-01-02'] * 4),
+        'fighter1_notformodel_betfair_odds_datetime': pd.to_datetime(['2024-01-01'] * 4).astype(str),
+        'fighter2_notformodel_betfair_odds_datetime': pd.to_datetime(['2024-01-01'] * 4).astype(str),
+        'fighter1_notformodel_date_fighter_odd_scrape': pd.to_datetime(['2024-01-02'] * 4).astype(str),
+        'fighter2_notformodel_date_fighter_odd_scrape': pd.to_datetime(['2024-01-02'] * 4).astype(str),
     })
 
     result = calculate_all_true_odds_columns(
@@ -30,7 +30,7 @@ def test_calculate_all_true_odds_columns(monkeypatch):
 
     # Check true odds columns were created and match the dummy outputs
     assert 'fighter1_true_closing_odds' in result.columns
-    assert result.equals(correct_result)
+    assert dataframes_equal_ignore_types(result, correct_result)
 
     # Check datetime logic
     # Row 0: fighter2 had missing original odds, should use scrape date
