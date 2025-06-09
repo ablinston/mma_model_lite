@@ -41,6 +41,9 @@ import string
 # import time
 import xgboost as xgb
 from yaml import safe_load, dump
+import warnings
+
+np.warnings = warnings # to avoid ATPE error with hyperopt
 
 # Load the config files
 

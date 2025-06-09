@@ -28,7 +28,7 @@ skip_data_update = False
 skip_save_data = False
 
 # Read in the data for training
-backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 # # Load files
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")

@@ -19,7 +19,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Read in the data for training
-data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 # Apply standard filters
 data = standard_data_filter(data)

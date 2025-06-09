@@ -1,0 +1,5 @@
+outs:
+- md5: d6c3cb4d411e17c725a4d4f3541d5817
+  size: 477553
+  hash: md5
+  path: event_odds.parquet

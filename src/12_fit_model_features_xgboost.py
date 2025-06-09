@@ -23,7 +23,7 @@ exec(open('global.py').read())
 np.warnings = warnings # to avoid ATPE error with hyperopt
 
 # Read in the data for training
-data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 
 ##########################################################################################
