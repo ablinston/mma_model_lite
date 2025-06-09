@@ -63,6 +63,9 @@ def update_odds_on_merged_data(
 
     # Recalculate all true odds
     merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
+    
+    if (data_processing_config['impute_missing_betfair'] == True) & (model_hyper_params['odds_to_use'] == 'betfair_exch_odds'):
+        model_hyper_params['odds_to_use'] = 'betfair_exch_odds_imputed'
 
     # Add what odds are to be used in model training and backtesting
     merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()

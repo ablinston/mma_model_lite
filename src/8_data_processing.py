@@ -559,7 +559,7 @@ duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
 
 # Fix model hyperparams where necessary to account for imputation being used
-if (data_processing_config['impute_missing_betfair'] == 'betfair_exch_odds') & (model_hyper_params['odds_to_use'] == 'betfair_exch_odds'):
+if (data_processing_config['impute_missing_betfair'] == True) & (model_hyper_params['odds_to_use'] == 'betfair_exch_odds'):
     model_hyper_params['odds_to_use'] = 'betfair_exch_odds_imputed'
 
 # Create a QA dataset showing where Betfair odds and scraped odds are showing large differences

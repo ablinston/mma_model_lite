@@ -14,12 +14,12 @@ def calculate_all_true_odds_columns(merged_data, impute_missing_betfair, odds_su
     odds_suffix_for_true_odds: string
     the column suffix for the odds column to be used in calculating true odds
     
-    model_hyper_params: dict
-    the model hyperparameters dictionary
+    impute_one_sided_missing_odds: bool
+    whether to infer the odds where one fighter is missing but we have odds for the other
     
     Returns
     -------
-    Series of odds in decimal format
+    Data frame with the true odds columns added
     
     """
     
