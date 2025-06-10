@@ -158,15 +158,16 @@ found_fighters = new_parsed_odds_df[new_parsed_odds_df['date'].isin(expanded_dat
 missing_fighters = [fighter for fighter in list_of_unparsed_fighter_odds if fighter not in found_fighters]
 
 # Scrape the odds again but a slow scrape
-new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = update_odds_data(
-    new_parsed_odds_df, 
-    new_parsed_event_odds_urls, 
-    new_parsed_event_odds_df,
-    missing_fighters, 
-    list_of_unparsed_event_dates, 
-    config, 
-    fast_scrape = False,
-    num_threads = config['num_threads'])
+if len(missing_fighters) > 0:
+    new_parsed_odds_df, new_parsed_event_odds_urls, new_parsed_event_odds_df = update_odds_data(
+        new_parsed_odds_df, 
+        new_parsed_event_odds_urls, 
+        new_parsed_event_odds_df,
+        missing_fighters, 
+        list_of_unparsed_event_dates, 
+        config, 
+        fast_scrape = False,
+        num_threads = config['num_threads'])
 
 ###############################################################################
 ##### Update the Betfair odds #####
