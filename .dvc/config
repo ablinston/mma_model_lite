@@ -1,7 +1,0 @@
-[core]
-    remote = storage
-['remote "storage"']
-    url = s3://mma-model-lite
-    endpointurl = https://s3.eu-central-003.backblazeb2.com
-    access_key_id = 0037eef1310d56d0000000001
-    secret_access_key = K003B7KdbQWkohyfHPbyfOda9U8mB54
