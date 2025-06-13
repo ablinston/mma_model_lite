@@ -40,7 +40,7 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
         except:
             print(f"No betfair files found to download. Check that the current month, {new_date.month}, has been 'purchased'.")
             # file_list = []
-        
+    
         # Check there are files to parse
         if len(file_list) > 0:
             

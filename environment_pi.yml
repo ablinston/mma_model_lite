@@ -426,7 +426,6 @@ dependencies:
   - tzdata=2025b=h78e105d_0
   - ujson=5.10.0=py311h89d996e_1
   - unicodedata2=16.0.0=py311ha879c10_0
-  - urllib3=2.3.0=pyhd8ed1ab_0
   - watchdog=6.0.0=py311hfecb2dc_0
   - wcwidth=0.2.13=pyhd8ed1ab_1
   - webencodings=0.5.1=pyhd8ed1ab_3
@@ -470,7 +469,70 @@ dependencies:
   - zstandard=0.23.0=py311ha879c10_1
   - zstd=1.5.7=hbcf94c1_2
   - pip:
+      - aiobotocore==2.16.1
+      - aiohttp-retry==2.9.1
+      - aioitertools==0.12.0
+      - amqp==5.3.1
+      - annotated-types==0.7.0
+      - antlr4-python3-runtime==4.9.3
+      - appdirs==1.4.4
+      - atpublic==6.0.1
+      - billiard==4.2.1
+      - boto3==1.35.90
+      - botocore==1.35.88
+      - celery==5.5.3
+      - click-didyoumean==0.3.1
+      - click-plugins==1.1.1
+      - click-repl==0.3.0
+      - configobj==5.0.9
       - datetime==5.5
+      - dictdiffer==0.9.0
+      - diskcache==5.6.3
+      - distro==1.9.0
+      - dpath==2.2.0
+      - dulwich==0.22.8
+      - dvc==3.60.1
+      - dvc-data==3.16.10
+      - dvc-http==2.32.0
+      - dvc-objects==5.1.1
+      - dvc-render==1.0.2
+      - dvc-s3==3.2.1
+      - dvc-studio-client==0.21.0
+      - dvc-task==0.40.2
       - fake-useragent==2.1.0
+      - filelock==3.18.0
+      - flatten-dict==0.4.2
+      - flufl-lock==8.2.0
+      - funcy==2.0
+      - grandalf==0.8
+      - gto==1.7.2
+      - hydra-core==1.3.2
+      - iterative-telemetry==0.0.10
+      - jmespath==0.10.0
+      - kombu==5.5.4
+      - networkx==3.5
+      - omegaconf==2.3.0
+      - pydantic==2.11.6
+      - pydantic-core==2.33.2
+      - pydot==4.0.0
+      - pygit2==1.18.0
+      - pygtrie==2.5.0
+      - ruamel-yaml==0.18.14
+      - ruamel-yaml-clib==0.2.12
+      - s3fs==2025.3.2
+      - s3transfer==0.10.4
+      - scmrepo==3.3.11
+      - semver==3.0.4
+      - shellingham==1.5.4
+      - shortuuid==1.0.13
+      - shtab==1.7.2
+      - sqltrie==0.11.2
+      - tqdm==4.67.1
+      - typer==0.16.0
+      - typing-inspection==0.4.1
+      - urllib3==1.26.20
+      - vine==5.1.0
+      - voluptuous==0.15.2
+      - zc-lockfile==3.0.post1
       - zope-interface==7.2
 prefix: /home/andy/miniforge3/envs/mma_model_pi

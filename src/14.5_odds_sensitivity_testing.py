@@ -20,7 +20,7 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 model_path = './models/xgb_forest_v2.joblib'
 
 # Read in the data for training
-backtesting_data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 # Load files
 rf_xgb_model = joblib.load(model_path)
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')._model_impl.python_model.model

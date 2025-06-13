@@ -1,0 +1,5 @@
+outs:
+- md5: 517568112c8abc3aec50a084d9c0f137
+  size: 924
+  hash: md5
+  path: parsed_events_log.parquet

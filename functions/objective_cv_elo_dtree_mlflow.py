@@ -15,10 +15,10 @@ def objective_cv_elo_dtree_mlflow(params):
     if is_duplicate_run(params):
         
         # If the run existing, find what the loss was and return it without logging in mlflow
-        existing_metric = get_existing_metric(params, 'Avg of two accuracies')
+        existing_metric, all_params = get_existing_metric_and_params(params, 'Avg of two accuracies')
         
         print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
-        return {'loss': 1 - existing_metric, 'params': params, 'status': STATUS_OK}
+        return {'loss': 1 - existing_metric, 'params': all_params, 'status': STATUS_OK}
         
     else:
     

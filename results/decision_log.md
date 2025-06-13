@@ -4,9 +4,12 @@ Based on the test results of the first xg boost forest, on the test dataset, the
 
 Experiment: http://localhost:8080/#/experiments/490730489596532803/runs/78d44d90d4224a1fb9ee2f3f1f017815
 
+Have tried this again with newer model and it has a negative ROI on fights without both > 2 fights.
+
 # Data parameters
 
 * Betfair imputation: although 50% of records have Betfair data missing, only 5% of the final training data ends up being imputed because the missing events are outside the usual training sample.
+* Test/Train split odds loglos: Have found that it's best to have similar odds logloss in test and train so it can see overfitting.
 
 # Betting parameters
 

@@ -140,6 +140,8 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
                 obj = custom_loss,
                 custom_metric = custom_loss_test,
                 verbose_eval = verbose_eval)
+            
+            # model['model'].model_features = X_train_df.columns
         
         else:
             # Train an XGBoost model on the bootstrap sample with column sampling
@@ -151,9 +153,15 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
                 early_stopping_rounds=early_stopping_rounds,
                 verbose_eval = verbose_eval)
             
+        # # Manually set the list of model features
+        # model['model'].feature_names = list(X_train_df.columns)
+        
         # Join the feature names into a single string and save them as a model attribute
         model['features'] = selected_columns
-                
+        
+        # Save the parameters used
+        model['params'] = params
+        
         # Add model to the list
         models.append(model)
         

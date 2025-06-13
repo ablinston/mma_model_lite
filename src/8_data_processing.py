@@ -732,7 +732,7 @@ merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper
 ###########################################################################################
 # FLAG TRAIN/TEST/OOT
 
-np.random.seed(seed = config['seed_all'] + 985)
+np.random.seed(seed = config['seed_all'] + 7156)
 merged_data = flag_train_test_oot(merged_data, config)
 
 
@@ -763,8 +763,8 @@ if not skip_save_data:
     log_final_data_stats(merged_data, config['final_data_stats_log'], config)
     
     # Save the final data
-    split_by_year_and_save_fastparquet(merged_data, 'date', './data/final_dataset/', compression='ZSTD')
-    # fp.write('./data/final_dataset.parquet', merged_data, compression = 'GZIP')
+    # split_by_year_and_save_fastparquet(merged_data, 'date', './data/final_dataset/', compression='ZSTD')
+    fp.write('./data/final_dataset/final_dataset.parquet', merged_data, compression = 'ZSTD')
     
     # Output a single fight for checking purposes
     merged_data[(merged_data['fighter1'] == 'khabibnurmagomedov') & (merged_data['fighter2'] == 'conormcgregor')].T.to_csv('./data/final_dataset_checking.csv', index=True)

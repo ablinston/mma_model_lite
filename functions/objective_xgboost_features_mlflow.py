@@ -16,12 +16,12 @@ def objective_xgboost_features_mlflow(
         
         # If the run existing, find what the loss was and return it without logging in mlflow
         if model_hyper_params['loss_function'] == 'ev_loss_function':
-            existing_metric = get_existing_metric({'num_of_features': params['num_of_features']}, 'EV MSE')
+            existing_metric, all_params = get_existing_metric_and_params({'num_of_features': params['num_of_features']}, 'EV MSE')
         else:
-            existing_metric = get_existing_metric({'num_of_features': params['num_of_features']}, 'Logloss')
+            existing_metric, all_params = get_existing_metric_and_params({'num_of_features': params['num_of_features']}, 'Logloss')
         
         print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
-        return {'loss': existing_metric, 'params': params, 'status': STATUS_OK}
+        return {'loss': existing_metric, 'params': all_params, 'status': STATUS_OK}
         
     else:
         
@@ -108,6 +108,7 @@ def objective_xgboost_features_mlflow(
                                 early_stop_fn = no_progress_loss(params['hyperopt_early_stopping']))
                     break # exit loop if successful
                 except:
+                    # pdb.set_trace()
                     print('Error encountered')
                     error_count += 1
                     # pdb.set_trace()
@@ -121,6 +122,8 @@ def objective_xgboost_features_mlflow(
             
             # Log the metrics of the best fit
             mlflow.log_metrics(trials_inner.best_trial['result']['metrics'])
+    
+    # pdb.set_trace()
     
     # Add inner params
     params.update(best | trials_inner.best_trial['result']['params'])

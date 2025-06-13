@@ -1,0 +1,5 @@
+outs:
+- md5: 38e8518f266d4ed43cb6c5032c7a7bcf
+  size: 1314124
+  hash: md5
+  path: betfair_fileflags.parquet

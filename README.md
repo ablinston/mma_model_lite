@@ -56,3 +56,25 @@ Betfair historical data needs to have packages purhcased manually on the website
 Historic data has too many files so better to download online then extract the bz2 files.
 
 MMA is lumped with everything else so the scripts scan the files and see which ones are fights. Each file is a `market` which is the market for a specific outcome e.g. Fight Result for Conor vs Khabib. The package creates `MarketBook`s which are the details of a market, and `RunnerBook`s which are betting on a specific outcome e.g. Conor to win.
+
+# DVC Setup
+
+Set up, using Backblaze (https://secure.backblaze.com/b2_buckets.htm) with S3 is a bit of a nightmare. FIrst need to install dvc that is compatable, then there are some recent updates that don't allow dvc to push properly so need older versions of packages.
+
+```
+pip install dvc[s3]
+pip install boto3==1.35.90
+pip install aiobotocore==2.16.1
+pip install botocore==1.35.88
+```
+Then need to set up the remote. I have called it `storage`.
+
+```
+dvc remote add -d storage s3://mma-model-lite
+dvc remote modify storage endpointurl https://
+s3.eu-central-003.backblazeb2.com
+dvc remote modify storage access_key_id YOUR_KEY_ID_HERE
+dvc remote modify storage secret_access_key YOUR_APP_KEY_HERE
+```
+
+Push all git commits for dvc data with `dvc push -r storage --all-commits`. Otherwise, dvc will just push the datasets from the active commit. (doesn't seem to work right now so push frequently. Might start working if the latest version of DVC finally works with Backblaze.)

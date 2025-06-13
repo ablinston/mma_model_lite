@@ -1,0 +1,5 @@
+outs:
+- md5: abfaae7d158eae4eef0a18fa4e973f53
+  size: 1441
+  hash: md5
+  path: ufc_upcoming_event_details_clean.parquet

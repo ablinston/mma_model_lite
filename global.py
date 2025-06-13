@@ -9,6 +9,7 @@ from functools import partial
 import gc
 # import importlib
 import inspect
+import io
 import itertools
 import joblib
 import mlflow
@@ -41,6 +42,10 @@ import string
 # import time
 import xgboost as xgb
 from yaml import safe_load, dump
+import warnings
+import zstandard as zstd
+
+np.warnings = warnings # to avoid ATPE error with hyperopt
 
 # Load the config files
 
