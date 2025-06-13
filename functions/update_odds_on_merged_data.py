@@ -23,7 +23,7 @@ def update_odds_on_merged_data(
     fight_odds = fp.ParquetFile(cleaned_fight_odds_data_path).to_pandas()
     event_odds = fp.ParquetFile(cleaned_event_odds_data_path).to_pandas()
     betfair_odds = fp.ParquetFile(cleaned_betfair_odds_data_path).to_pandas()
-    merged_data = pq.ParquetDataset(final_data_folder).read().to_pandas()
+    merged_data = fp.ParquetFile(final_data_folder).read().to_pandas() # pq.ParquetDataset(final_data_folder).read().to_pandas()
     average_odds_model = joblib.load(average_odds_model_path)
     
     # Save original shape for later
