@@ -21,7 +21,15 @@ def get_website_soup(
             
             return ""
         
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # Check if the response is compressed
+        if response.headers.get("Content-Encoding") == 'zstd':
+            dctx = zstd.ZstdDecompressor()
+            stream = dctx.stream_reader(io.BytesIO(response.content))
+            text = stream.read().decode("utf-8")
+        else:
+            text = response.text
+        
+        soup = BeautifulSoup(text, 'html.parser')
         
     # Else, if we have a playwright context, we use that
     elif playwright_context is not None:
