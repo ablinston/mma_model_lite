@@ -193,6 +193,8 @@ if not skip_betfair_history:
 else:
     new_parsed_betfair_odds_df = parsed_betfair_odds_df
 
+time.sleep(5)
+
 # Get the upcoming Betfair odds data
 upcoming_betfair_odds = betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config)
 
