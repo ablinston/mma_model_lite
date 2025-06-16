@@ -14,3 +14,9 @@ decompressed_output_dir: './data/raw_betfair/decompressed_fight_files/'
 # Set how many of the previous bets (before cutoff) to average when taking the Betfair odds (put 1 to just take the last one)
 # NB: The upcoming odds will always be the single last bet. There is no way to get the last n
 last_n_bets_to_average: 3
+
+# Set what odds to use for the upcoming odds. either best_offer or last_price_traded. Default is LPT.
+upcoming_odds_to_use: best_offer
+
+# Set the minimum best offer to use for the upcoming odds for them to be counted.
+upcoming_min_best_offer: 5

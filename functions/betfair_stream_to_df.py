@@ -1,6 +1,6 @@
 # This function takes a Betfair stream and saves the data to a data frame
 
-def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, include_prop_bets = False, market_catalogues = None):
+def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, include_prop_bets = False, market_catalogues = None, upcoming_min_best_offer = 0, upcoming_odds_to_use = 'last_price_traded'):
     
     # pdb.set_trace()
     
@@ -42,6 +42,18 @@ def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, 
                 
                 # pdb.set_trace()
                 
+                # Get the odds to use
+                if upcoming_odds_to_use == 'best_offer':
+                    
+                    # Use the minium to filter out offers
+                    offers = [item for item in runner.ex.available_to_back if item.get('size', 0) > upcoming_min_best_offer]
+                    
+                    # Best offer is the first in the list
+                    best_odds = offers[0]['price']
+                    
+                else:
+                    best_odds = runner.last_price_traded
+                
                 # Add a dictionary to the odds list for this runner
                 betfair_odds_list.append({
                     'GMT_datetime': market_book.publish_time, # is technically in UTC but that is the same as GMT in 24H clock
@@ -50,7 +62,7 @@ def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, 
                     'status': market_book.status,
                     'inplay': market_book.inplay,
                     'runner': runners_dict[runner.selection_id],
-                    'last_price_traded': runner.last_price_traded
+                    'last_price_traded': best_odds
                 })
     
     # Get the date of the event
