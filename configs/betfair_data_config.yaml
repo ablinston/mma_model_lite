@@ -16,7 +16,7 @@ decompressed_output_dir: './data/raw_betfair/decompressed_fight_files/'
 last_n_bets_to_average: 3
 
 # Set what odds to use for the upcoming odds. either best_offer or last_price_traded. Default is LPT.
-upcoming_odds_to_use: best_offer
+upcoming_odds_to_use: last_price_traded
 
 # Set the minimum best offer to use for the upcoming odds for them to be counted.
 upcoming_min_best_offer: 5
