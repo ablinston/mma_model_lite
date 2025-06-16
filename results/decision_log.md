@@ -10,6 +10,7 @@ Have tried this again with newer model and it has a negative ROI on fights witho
 
 * Betfair imputation: although 50% of records have Betfair data missing, only 5% of the final training data ends up being imputed because the missing events are outside the usual training sample.
 * Test/Train split odds loglos: Have found that it's best to have similar odds logloss in test and train so it can see overfitting.
+* Chose to use Betfair odds at 10pm GMT as earlier than that doesn't seem to have much liquidity in the market so can't take advantage properly.
 
 # Betting parameters
 

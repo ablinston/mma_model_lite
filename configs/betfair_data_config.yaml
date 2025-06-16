@@ -1,5 +1,5 @@
 # Set the time on the day of the event where odds will be taken 
-odds_cutoff_time: "17:00"
+odds_cutoff_time: "21:00"
 
 # This is the event code of MMA from the live Betfair data stream
 betfair_mma_event_id: '26420387'
