@@ -30,7 +30,7 @@ true_odds_only: True
 # Set whether to exclude all but open odds
 open_odds_only: False
 
-# Set whether to use the mean_closing_odds or best_closing_odds in the backtesting
+# Set whether to use the mean_closing_odds or best_closing_odds in the backtesting i.e. to derive _backtesting_odds features.
 odds_to_use: betfair_exch_odds
 
 # Set whether to trim model features to try to remove duplicated similar but slightly different features. Just keep the highest importance version

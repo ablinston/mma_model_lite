@@ -1,6 +1,8 @@
 # This function takes new cleaned data and adds the odds to the existing merged data, recalculating differentials where needed
 
-# It returns the data frame with new odds data
+# It returns the data frame with new odds data.
+
+# THIS FUNCTION SHOULD ONLY BE USED FOR UPCOMING EVENTS DUE TO CONFIG CHOICES
 
 def update_odds_on_merged_data(
         cleaned_fight_odds_data_path: str,
@@ -62,7 +64,7 @@ def update_odds_on_merged_data(
     ).reset_index(drop = True)
 
     # Recalculate all true odds
-    merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
+    merged_data = calculate_all_true_odds_columns(merged_data, impute_missing_betfair = data_processing_config['impute_missing_betfair'], odds_suffix_for_true_odds = data_processing_config['upcoming_odds_suffix_for_true_odds'], impute_one_sided_missing_odds = data_processing_config['impute_one_sided_missing_odds'])
     
     if (data_processing_config['impute_missing_betfair'] == True) & (model_hyper_params['odds_to_use'] == 'betfair_exch_odds'):
         model_hyper_params['odds_to_use'] = 'betfair_exch_odds_imputed'

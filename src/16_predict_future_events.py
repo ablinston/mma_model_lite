@@ -27,9 +27,13 @@ if not os.name == "nt":
     
 else:
     skip_data_update = False
-    skip_full_data_update = False
+    skip_full_data_update = True
     skip_save_data = False
 
+
+# Set the odds to use as upcoming instead of as used in the regular data
+data_processing_config['odds_suffix_for_true_odds'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
+model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
 
 # # Load files
 # mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
@@ -54,6 +58,9 @@ if not skip_data_update:
         # Read in global objects and packages
         exec(open('global.py').read())
         gc.collect()
+        
+        # Make sure for the backtesting odds we use whatever upcoming because they're used to assess the model predictions later
+        model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
         
         forecasting_data = update_odds_on_merged_data(
                 cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
