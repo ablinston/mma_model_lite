@@ -30,40 +30,44 @@ def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, 
     # Create a file for each marketbook
     for market_books in all_market_books:
         for market_book in market_books:
+                   
+            try:
+                # Get a list of the runners names and put them into a dictionary if we don't have the market catalogue
+                if market_catalogues is None:
+                    runners_dict = {}
+                    for runner in market_book.market_definition.runners: # Runner names are contained in the marketbook
+                        runners_dict = runners_dict | {runner.selection_id: runner.name}
+                
+                # Now loop through the runners and get the odds data
+                for runner in market_book.runners:
+                    
+                    # pdb.set_trace()
+                    
+                    # Get the odds to use
+                    if upcoming_odds_to_use == 'best_offer':
                         
-            # Get a list of the runners names and put them into a dictionary if we don't have the market catalogue
-            if market_catalogues is None:
-                runners_dict = {}
-                for runner in market_book.market_definition.runners: # Runner names are contained in the marketbook
-                    runners_dict = runners_dict | {runner.selection_id: runner.name}
-            
-            # Now loop through the runners and get the odds data
-            for runner in market_book.runners:
-                
+                        # Use the minium to filter out offers
+                        offers = [item for item in runner.ex.available_to_back if item.get('size', 0) > upcoming_min_best_offer]
+                        
+                        # Best offer is the first in the list
+                        best_odds = offers[0]['price']
+                        
+                    else:
+                        best_odds = runner.last_price_traded
+                    
+                    # Add a dictionary to the odds list for this runner
+                    betfair_odds_list.append({
+                        'GMT_datetime': market_book.publish_time, # is technically in UTC but that is the same as GMT in 24H clock
+                        'market_id': market_book.market_id,
+                        'bout': market_book.market_definition.event_name,
+                        'status': market_book.status,
+                        'inplay': market_book.inplay,
+                        'runner': runners_dict[runner.selection_id],
+                        'last_price_traded': best_odds
+                    })
+            except:
                 # pdb.set_trace()
-                
-                # Get the odds to use
-                if upcoming_odds_to_use == 'best_offer':
-                    
-                    # Use the minium to filter out offers
-                    offers = [item for item in runner.ex.available_to_back if item.get('size', 0) > upcoming_min_best_offer]
-                    
-                    # Best offer is the first in the list
-                    best_odds = offers[0]['price']
-                    
-                else:
-                    best_odds = runner.last_price_traded
-                
-                # Add a dictionary to the odds list for this runner
-                betfair_odds_list.append({
-                    'GMT_datetime': market_book.publish_time, # is technically in UTC but that is the same as GMT in 24H clock
-                    'market_id': market_book.market_id,
-                    'bout': market_book.market_definition.event_name,
-                    'status': market_book.status,
-                    'inplay': market_book.inplay,
-                    'runner': runners_dict[runner.selection_id],
-                    'last_price_traded': best_odds
-                })
+                pass
     
     # Get the date of the event
     output_df = pd.DataFrame(betfair_odds_list)
