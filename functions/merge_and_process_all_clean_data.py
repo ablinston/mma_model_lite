@@ -11,10 +11,6 @@ def merge_and_process_all_clean_data(
     
     # pdb.set_trace()
 
-    import datatable as dt
-    from datatable import f
-
-
     # Read in the data
     events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
     upcoming_events = fp.ParquetFile('./data/' + config['upcoming_event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
@@ -536,12 +532,6 @@ def merge_and_process_all_clean_data(
 
     merged_data.drop(columns = ['fighter2_fighter', 'fighter1_fighter'], inplace = True)
 
-    # Cleanup
-    del betfair_odds, fight_results, fight_stats, dates_knocked_out, fight_stats_hist, fight_stats_hist_last_3, fight_stats_hist_opponent_stance, fight_stats_hist_opponent_type,  fighter_results, fight_odds, events, event_odds, fighters, fight_stats_bayes_priors
-        
-    gc.collect();
-    # pdb.set_trace()
-
     # Check for no duplicate columns that have been merged
     if len([col for col in merged_data.columns if "_x" in col]) == 0:
         print('Duplicate column check PASSED')
@@ -560,7 +550,11 @@ def merge_and_process_all_clean_data(
     # Check for duplicate column names
     duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 
-
+    # Cleanup
+    del betfair_odds, fight_results, fight_stats, dates_knocked_out, fight_stats_hist, fight_stats_hist_last_3, fight_stats_hist_opponent_stance, fight_stats_hist_opponent_type,  fighter_results, fight_odds, events, event_odds, fighters, fight_stats_bayes_priors
+                                        
+    gc.collect();
+    # pdb.set_trace()
 
     ###########################################################################################
     # FURTHER FEATURE PROCESSING
