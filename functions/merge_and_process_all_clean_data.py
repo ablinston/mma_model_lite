@@ -551,7 +551,7 @@ def merge_and_process_all_clean_data(
     duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
 
     # Cleanup
-    del betfair_odds, fight_results, fight_stats, dates_knocked_out, fight_stats_hist, fight_stats_hist_last_3, fight_stats_hist_opponent_stance, fight_stats_hist_opponent_type,  fighter_results, fight_odds, events, event_odds, fighters, fight_stats_bayes_priors
+    del betfair_odds, fight_results, fight_stats, dates_knocked_out, fight_stats_hist, fight_stats_hist_last_3, fight_stats_hist_opponent_stance, fight_stats_hist_opponent_type,  fighter_results, fight_odds, events, event_odds, fighters
                                         
     gc.collect();
     # pdb.set_trace()
