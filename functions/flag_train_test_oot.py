@@ -9,7 +9,7 @@ def flag_train_test_oot(df, config):
     data['train_test_oot_flag'] = np.where(
         (data['date'] >= config['min_training_date']) & (data['date'] < config['oot_start_date']),
         'train',
-        np.where(data['date'] >= config['oot_start_date'], 'oot', np.nan)
+        np.where(data['date'] >= config['oot_start_date'], 'oot', pd.NA)
     )
     
     # Get a separate data frame with only non-oot fighters

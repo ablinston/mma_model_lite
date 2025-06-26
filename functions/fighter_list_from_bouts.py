@@ -3,7 +3,7 @@
 
 def fighter_list_from_bouts(bout_series):
     
-    bout_series = upcoming_fight_details_df['BOUT']
+    # bout_series = upcoming_fight_details_df['BOUT']
     
     df = pd.DataFrame()
     

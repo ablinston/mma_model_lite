@@ -25,9 +25,12 @@ def betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config):
     # create stream listener
     listener = betfairlightweight.StreamListener(output_queue=output_queue)
     
+    time.sleep(5)
+    
     # create stream
     stream = trading.streaming.create_stream(listener=listener)
     
+    time.sleep(5)
     
     ############################################
     ## Get market catalogue to get runner names and event names
@@ -86,7 +89,7 @@ def betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config):
     t.start()
     
     # Give a short delay for the connection
-    time.sleep(2)
+    time.sleep(5)
     
     # Try to get the snapshot
     for attempt in range(20):
@@ -103,6 +106,8 @@ def betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config):
         except Exception as e:
             print(f"An error occurred: {e}")
             print(f"Attempt {attempt + 1} for getting snapshot failed. Retrying.")
+            # stream.stop()
+            # stream = trading.streaming.create_stream(listener=listener)
             time.sleep(5)
             
     # pdb.set_trace()
