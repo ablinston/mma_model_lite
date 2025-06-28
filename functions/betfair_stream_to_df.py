@@ -47,10 +47,10 @@ def betfair_stream_to_df(stream = None, stream_snapshot = None, inplay = False, 
                     if upcoming_odds_to_use == 'best_offer':
                         
                         # Use the minium to filter out offers
-                        offers = [item for item in runner.ex.available_to_back if item.get('size', 0) > upcoming_min_best_offer]
+                        offers = [item for item in runner.ex.available_to_back if item.size > upcoming_min_best_offer]
                         
                         # Best offer is the first in the list
-                        best_odds = offers[0]['price']
+                        best_odds = offers[0].price
                         
                     else:
                         best_odds = runner.last_price_traded
