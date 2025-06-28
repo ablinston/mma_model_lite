@@ -65,7 +65,7 @@ def betfair_get_all_upcoming_odds(betfair_login_config, betfair_data_config):
         event_type_ids=[betfair_data_config['betfair_mma_event_id']], market_types=["MATCH_ODDS"]
     )
     market_data_filter = streaming_market_data_filter(
-        fields=["EX_LTP", "EX_ALL_OFFERS", "EX_MARKET_DEF", "EX_BEST_OFFERS_DISP"], ladder_levels = 3 # Last traded price and market definitions
+        fields=["EX_LTP", "EX_MARKET_DEF", "EX_BEST_OFFERS_DISP"], ladder_levels = 3 # Last traded price and market definitions
     )
     
     # Try to get the stream

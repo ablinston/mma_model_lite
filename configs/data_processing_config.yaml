@@ -4,8 +4,8 @@ impute_missing_betfair: True
 # Set the suffix of what odds to use when calculating true odds
 odds_suffix_for_true_odds: betfair_exch_odds
 
-# Set which odds should be used for the upcoming fights only
-upcoming_odds_suffix_for_true_odds: best_closing_odds
+# Set which odds should be used for the upcoming fights only # betfair_exch_odds or best_closing_odds
+upcoming_odds_suffix_for_true_odds: betfair_exch_odds
 
 # Set whether to impute odds where we have one fighter's odds but for some reason the odds scrape has missing for the other fighter
 impute_one_sided_missing_odds: True
