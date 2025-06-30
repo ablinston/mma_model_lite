@@ -5,6 +5,11 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
     
     """
     # pdb.set_trace()
+    
+    # Initiate the trading object
+    trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_login_config['certs_location'])
+
+    trading.login()
             
     # Get the latest date of data we have available
     # latest_date = pd.to_datetime("2025-04-25")
@@ -77,7 +82,8 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
                     max_workers = 1, # DO NOT USE MORE CORES FOR PROCESS. THE ODDS GO OFF MAYBE BECAUSE OF STREAM?
                     collapse_output_to_df = True,
                     odds_cutoff_time = betfair_data_config['odds_cutoff_time'],
-                    average_last_n = betfair_data_config['last_n_bets_to_average'])
+                    average_last_n = betfair_data_config['last_n_bets_to_average'],
+                    trading = trading)
             
             
             # Change the date to a proper date to avoid parquet errors

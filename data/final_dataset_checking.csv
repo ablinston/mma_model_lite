@@ -4184,13 +4184,13 @@ fighter1_hist_loss_streak,0
 fighter1_hist_W_Other,0
 fighter1_hist_W_KO/TKO,2
 fighter1_hist_W_Submission,2
-fighter1_hist_W_Decision-Split,0
 fighter1_hist_W_Decision-Unanimous,6
+fighter1_hist_W_Decision-Split,0
 fighter1_hist_L_Other,0
 fighter1_hist_L_KO/TKO,0
 fighter1_hist_L_Submission,0
-fighter1_hist_L_Decision-Split,0
 fighter1_hist_L_Decision-Unanimous,0
+fighter1_hist_L_Decision-Split,0
 fighter2_date_last_win,2016-11-12 00:00:00
 fighter2_date_last_loss,2016-03-05 00:00:00
 fighter2_hist_wins,9
@@ -4257,17 +4257,17 @@ fighter2_hist_loss_streak,0
 fighter2_hist_W_Other,0
 fighter2_hist_W_KO/TKO,7
 fighter2_hist_W_Submission,0
-fighter2_hist_W_Decision-Split,1
 fighter2_hist_W_Decision-Unanimous,1
+fighter2_hist_W_Decision-Split,1
 fighter2_hist_L_Other,0
 fighter2_hist_L_KO/TKO,0
 fighter2_hist_L_Submission,1
-fighter2_hist_L_Decision-Split,0
 fighter2_hist_L_Decision-Unanimous,0
+fighter2_hist_L_Decision-Split,0
 fighter1_open_odds,1.4081632653061225
-fighter1_mean_closing_odds,1.5616700625979674
+fighter1_mean_closing_odds,1.5616700625979676
 fighter1_best_closing_odds,1.529100529100529
-fighter1_odds_change,0.1535067972918449
+fighter1_odds_change,0.15350679729184513
 fighter1_notformodel_date_fighter_odd_scrape,NaT
 fighter1_betfair_exch_odds,1.6133333333333333
 fighter1_notformodel_betfair_odds_datetime,
@@ -8437,7 +8437,7 @@ diff_last_3_fights_round4to3_total_strike_per_minute_ratio,-0.20358279651383104
 diff_last_3_fights_round5to4_total_strike_accuracy_ratio,0.2693917025224015
 diff_last_3_fights_round5to4_total_strike_per_minute_ratio,0.28144536134033493
 diff_moved_weightclass,0.0
-diff_odds_change,0.1918430921732417
+diff_odds_change,0.1918430921732419
 diff_odds_change_gt_0,2.0
 diff_offense_minus_defense_hist_allrounds_body_accuracy_percent,0.19365959872321026
 diff_offense_minus_defense_hist_allrounds_clinch_accuracy_percent,-0.24490933568934337
@@ -11323,9 +11323,9 @@ diff_ratio_last_3_fights_round4to3_total_strike_accuracy_ratio,0.671027994067482
 diff_ratio_last_3_fights_round4to3_total_strike_per_minute_ratio,0.8626999744441605
 diff_ratio_last_3_fights_round5to4_total_strike_accuracy_ratio,1.2424893847602465
 diff_ratio_last_3_fights_round5to4_total_strike_per_minute_ratio,1.5149851292610383
-diff_ratio_mean_closing_odds,0.5759084578408895
+diff_ratio_mean_closing_odds,0.5759084578408896
 diff_ratio_moved_weightclass,1.0
-diff_ratio_odds_change,-4.0042157899389546
+diff_ratio_odds_change,-4.00421578993896
 diff_ratio_odds_change_gt_0,-1.0
 diff_ratio_offense_minus_defense_hist_allrounds_body_accuracy_percent,2.374454678438277
 diff_ratio_offense_minus_defense_hist_allrounds_clinch_accuracy_percent,0.6067652919917585
