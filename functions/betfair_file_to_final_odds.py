@@ -1,4 +1,4 @@
-def betfair_file_to_final_odds(file_path, odds_cutoff_time, average_last_n):
+def betfair_file_to_final_odds(file_path, odds_cutoff_time, average_last_n, trading):
     
     """
     This function takes a path to a betfair file that has been extracted from bz2 and turns it into a dataframe

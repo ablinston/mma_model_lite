@@ -1,5 +1,5 @@
 outs:
-- md5: ea5e704df61a9b65d9a072988567e61a
-  size: 98243
+- md5: 307af8d86d9ceef674f9abfa7e418936
+  size: 96829
   hash: md5
   path: ufc_fighter_details.parquet

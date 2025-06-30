@@ -27,9 +27,6 @@ if not os.name == "nt":
 skip_data_update = False
 skip_save_data = False
 
-# Read in the data for training
-backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
-
 # # Load files
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('Model_Monitoring')
@@ -47,18 +44,28 @@ for i in range(1, 3):
 if not skip_data_update:
     
     # Run these scripts to scrape then clean the raw data
-    exec(open('./src/5_scrape_all_unparsed_data.py').read())
-    exec(open('./src/6_data_cleaning.py').read())
+    # Run these scripts to scrape then clean the raw data
+    scrape_all_unparsed_data(False, config, betfair_login_config)
+    clean_all_raw_data_and_save(config)
     
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if True: # unparsed_events: Hard coded this to always run because fights can change if fighters drop out and otherwise they wont have the hist stats
-        exec(open('./src/8_data_processing.py').read())
+
         # Refresh the dataset
-        backtesting_data = merged_data.copy()
-    else:
-        pass
-        # add in only odds update
-    
+        backtesting_data = merge_and_process_all_clean_data(
+                config,
+                elo_config,
+                data_processing_config,
+                odds_scrape_config,
+                model_hyper_params,
+                skip_save_data = skip_save_data # whether to skip the save data and just return merged data
+                )
+        
+else:
+        
+    backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+       
+
 
 
 ##########################################################################################
@@ -128,9 +135,9 @@ target = 'outcome'
 backtesting_params = {
     'min_prob_to_bet': bet_config['min_prob_to_bet'],
     'min_ev_to_bet': bet_config['min_ev_to_bet'],
-    'max_bet_size': 100,
-    'min_bet_size': 100,
-    'constant_bets': True
+    'max_bet_size': 0.05,
+    'min_bet_size': 0.05,
+    'constant_bets': False
 }
 
 

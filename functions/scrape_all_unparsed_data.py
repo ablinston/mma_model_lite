@@ -172,11 +172,6 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
     ##### Update the Betfair odds #####
     ###############################################################################
 
-    # Initiate the trading object
-    trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_login_config['certs_location'])
-
-    trading.login()
-
     if not skip_betfair_history:
         # Update the odds
         new_parsed_betfair_odds_df = update_betfair_odds(
