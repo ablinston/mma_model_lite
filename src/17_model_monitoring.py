@@ -135,9 +135,9 @@ target = 'outcome'
 backtesting_params = {
     'min_prob_to_bet': bet_config['min_prob_to_bet'],
     'min_ev_to_bet': bet_config['min_ev_to_bet'],
-    'max_bet_size': 0.05,
-    'min_bet_size': 0.05,
-    'constant_bets': False
+    'max_bet_size': 100,
+    'min_bet_size': 100,
+    'constant_bets': True
 }
 
 

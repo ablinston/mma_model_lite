@@ -1,9 +1,10 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
-0,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:00:52.731719+00:00,2025-06-29 13:00:52.731719+00:00,Stephen Thompson,4.1,28.2,0.16,Gabriel Bonfim,1.25,69.6,-0.13,None,0.0,,0.0,0.0
-1,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:01:42.165,2025-06-29 13:01:42.165,Calvin Kattar,2.32,36.3,-0.16,Steve Garcia,1.62,61.5,-0.0,None,0.0,,0.0,0.0
-2,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:00:52.731719+00:00,2025-06-29 13:00:52.731719+00:00,Nate Landwehr,2.9,34.2,-0.01,Morgan Charriere,1.43,63.6,-0.09,None,0.0,,0.0,0.0
-3,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:01:42.165,2025-06-29 13:01:42.165,Vitor Petrino,1.17,73.6,-0.14,Austen Lane,6.0,24.2,0.45,None,0.0,,0.0,0.0
-4,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:01:42.165,2025-06-29 13:01:42.165,Junior Tafa,1.03,56.7,-0.42,Tuco Tokkos,1.03,41.1,-0.58,None,0.0,,0.0,0.0
-5,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:01:42.165,2025-06-29 13:01:42.165,Jake Matthews,2.0,34.6,-0.31,Chidi Njokuani,1.88,63.3,0.19,Chidi Njokuani,1.88,1.58,165.0,145.2
-6,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:00:52.731719+00:00,2025-06-29 13:00:52.731719+00:00,Kennedy Nzechukwu,1.45,69.4,0.01,Valter Walker,2.8,28.5,-0.2,Kennedy Nzechukwu,1.45,1.44,165.0,75.0
-7,2025-07-12,ufcfightnight:lewisvsteixeira,2025-06-29 13:00:52.731719+00:00,2025-06-29 13:00:52.731719+00:00,Max Griffin,3.3,27.8,-0.08,Chris Curtis,1.38,70.0,-0.04,None,0.0,,0.0,0.0
+0,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Paulo Costa,3.1,35.7,0.11,Roman Kopylov,1.46,62.0,-0.09,None,0.0,,0.0,0.0
+1,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Kevin Holland,1.2,65.9,-0.21,Daniel Rodriguez,5.6,31.7,0.78,None,0.0,,0.0,0.0
+2,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Michael Johnson,6.0,30.4,0.83,Daniel Zellhuber,1.19,67.3,-0.2,None,0.0,,0.0,0.0
+3,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Kyler Phillips,2.2,45.3,-0.0,Vinicius Oliveira,1.77,52.4,-0.07,None,0.0,,0.0,0.0
+4,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Marvin Vettori,2.76,35.4,-0.02,Brendan Allen,1.55,62.2,-0.04,None,0.0,,0.0,0.0
+5,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Jimmy Crute,1.31,64.0,-0.16,Marcin Prachnio,4.2,33.7,0.41,None,0.0,,0.0,0.0
+6,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Ryan Spann,1.48,59.0,-0.13,Lukasz Brzeski,3.0,38.7,0.16,None,0.0,,0.0,0.0
+7,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Francisco Prado,1.75,44.3,-0.23,Nikolay Veretennikov,2.28,53.4,0.22,Nikolay Veretennikov,2.28,1.87,165.0,211.2
+8,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 14:27:04.715,2025-07-18 14:27:04.715,Max Holloway,1.79,57.7,0.03,Dustin Poirier,2.24,40.0,-0.1,Max Holloway,1.79,1.73,165.0,130.35

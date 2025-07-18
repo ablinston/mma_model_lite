@@ -27,24 +27,29 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
         
         # ChatGPT says data is generally available 5 days after and event
         
-        try:
-            # get file list
-            file_list = trading.historic.get_file_list(
-                "Other Sports",
-                "Basic Plan",
-                from_day = latest_date.day,
-                from_month = latest_date.month,
-                from_year = latest_date.year,
-                to_day = new_date.day,
-                to_month = new_date.month,
-                to_year = new_date.year,
-                market_types_collection=["MATCH_ODDS"],
-                # countries_collection=["GB"],
-                file_type_collection=["L", "M"],
-            )
-        except:
-            print(f"No betfair files found to download. Check that the current month, {new_date.month}, has been 'purchased'.")
-            # file_list = []
+        # Try to get the stream
+        for attempt in range(10):
+            try:
+                # get file list
+                file_list = trading.historic.get_file_list(
+                    "Other Sports",
+                    "Basic Plan",
+                    from_day = latest_date.day,
+                    from_month = latest_date.month,
+                    from_year = latest_date.year,
+                    to_day = new_date.day,
+                    to_month = new_date.month,
+                    to_year = new_date.year,
+                    market_types_collection=["MATCH_ODDS"],
+                    # countries_collection=["GB"],
+                    file_type_collection=["L", "M"],
+                )
+                if len(file_list) > 0:
+                    break
+            except:
+                print(f"No betfair files found to download. Check that the current month, {new_date.month}, has been 'purchased'.")
+                time.sleep(5)
+                # file_list = []
     
         # Check there are files to parse
         if len(file_list) > 0:
@@ -52,8 +57,17 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
             # download the files
             for file in file_list:
                 # print(file)
-                download = trading.historic.download_file(file_path = file, store_directory = download_folder)
-                # print(download)
+                # Make 5 attempts at download before quit
+                for attempt in range(5):
+                    try:
+                        download = trading.historic.download_file(file_path = file, store_directory = download_folder)
+                        break
+                    # print(download)
+                    except:
+                        continue
+                    
+                    # All 5 attempts failed
+                    pdb.set_trace()
             
             ## Tried parallel running but ends up with corrupted files
             # # download the files

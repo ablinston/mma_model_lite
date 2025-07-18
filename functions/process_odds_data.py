@@ -47,12 +47,12 @@ def process_odds_data(fight_df, event_df, betfair_df, odds_scrape_config, averag
         betfair_to_merge = betfair_to_merge[['event', 'bout', 'fighter', 'betfair_exch_odds']]
     
     # Merge on the betfair odds
-    new_fight_df = new_fight_df.merge(betfair_to_merge, on = ['event', 'bout', 'fighter'],  how = 'left')
+    new_fight_df = new_fight_df.merge(betfair_to_merge, on = ['event', 'bout', 'fighter'],  how = 'outer')
     
     # Add on a flag to say whether the odds have changed by more than 0.1
     new_fight_df['odds_change_gt_0'] = np.where(new_fight_df['odds_change'] < 0, -1, np.where(new_fight_df['odds_change'] > 0, 1, 0))     
     
     # Check the number of rows
-    stop_if_not(len(new_fight_df) == len(fight_df), "Process odds length check")
+    stop_if_not(len(new_fight_df) >= len(fight_df), "Process odds length check")
     
     return new_fight_df

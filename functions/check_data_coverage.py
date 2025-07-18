@@ -176,7 +176,7 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     print(missing_betfair_fighter_counts.head(20))
 
     # te = merged_betfair_odds[merged_betfair_odds['betfair_exch_odds'].isna()]
-
+    
     # Check how many upcoming bouts have missing odds
     merged_upcoming = cleaned_dict['upcoming_fight_details'].merge(cleaned_dict['betfair_upcoming_odds'], on = ['event', 'bout'], how = 'left')
     

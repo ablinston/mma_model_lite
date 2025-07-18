@@ -47,8 +47,8 @@ model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix
 if not skip_data_update:
     
     # Run these scripts to scrape then clean the raw data
-    exec(open('./src/5_scrape_all_unparsed_data.py').read())
-    exec(open('./src/6_data_cleaning.py').read())
+    scrape_all_unparsed_data(False, config, betfair_login_config)
+    clean_all_raw_data_and_save(config)
         
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if skip_full_data_update:
@@ -73,9 +73,14 @@ if not skip_data_update:
                 data_processing_config = data_processing_config
                 )
     else:
-        exec(open('./src/8_data_processing.py').read())
-        # Refresh the dataset
-        forecasting_data = merged_data.copy()
+        forecasting_data = merge_and_process_all_clean_data(
+                config,
+                elo_config,
+                data_processing_config,
+                odds_scrape_config,
+                model_hyper_params,
+                skip_save_data = skip_save_data # whether to skip the save data and just return merged data
+                )
 else:
     forecasting_data = pq.ParquetDataset(config['final_data_path']).read().to_pandas()
     # add in only odds update
