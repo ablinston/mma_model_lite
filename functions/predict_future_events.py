@@ -92,7 +92,7 @@ def predict_future_events(
     # pdb.set_trace()
             
     # Apply standard filters
-    forecasting_data = standard_data_filter(forecasting_data, include_upcoming = True)
+    forecasting_data = standard_data_filter(forecasting_data, include_upcoming = True, keep_rows_with_flag = True)
 
     ##########################################################################################
     ### Choose which events to predict ###
@@ -101,13 +101,15 @@ def predict_future_events(
     upcoming_fights = forecasting_data[forecasting_data['outcome'].isna()]
     # upcoming_fights = forecasting_data[forecasting_data['event'] == 'ufc311:makhachevvs.moicano']
 
+    upcoming_fights_for_model = upcoming_fights[upcoming_fights['notformodel_exclusion_reason'] == ''].copy()
+
     ##########################################################################################
     ### Get the models predictions ###
     ##########################################################################################
 
     # Get the data ready for the model
     X_upcoming, temp1, y_upcoming, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
-        upcoming_fights,
+        upcoming_fights_for_model,
         upcoming_fights = True)
 
     # Load files
@@ -119,13 +121,14 @@ def predict_future_events(
     prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_upcoming, [0] * len(y_upcoming))
 
     # Add formatted fighters
+    upcoming_fights_for_model = add_formatted_fighter_names(upcoming_fights_for_model, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)
     upcoming_fights = add_formatted_fighter_names(upcoming_fights, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)
 
     gc.collect();
 
     # Summarise the model predictions and betting decisions using the config
     betting_data = summarise_model_predictions(
-        actuals_data_df = upcoming_fights, 
+        actuals_data_df = upcoming_fights_for_model, 
         prediction_probabilities = prediction_probabilities, 
         min_prob_to_bet = bet_config['min_prob_to_bet'], 
         min_ev_to_bet = bet_config['min_ev_to_bet'], 
@@ -150,10 +153,15 @@ def predict_future_events(
     betting_data.rename(columns = {'fighter1_notformodel_true_odds_asat_datetime': 'f1_scrape_date', 'fighter2_notformodel_true_odds_asat_datetime': 'f2_scrape_date'}, inplace = True)
 
     # Flag whether odds Betfair imputed
-
+    
 
     summary_data = betting_data[['date', 'event', 'f1_scrape_date', 'f2_scrape_date', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_breakeven_odds', 'Final_bet', 'Potential_win']]
 
+    # Add the fights that haven't been modelled along with exclusion reason for info
+    summary_data = pd.concat([
+         summary_data,
+         upcoming_fights[upcoming_fights['notformodel_exclusion_reason'] != ''][['date', 'event', 'fighter1', 'fighter2', 'notformodel_exclusion_reason']]
+    ])
 
     print(
           summary_data.to_string()
