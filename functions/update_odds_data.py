@@ -27,58 +27,68 @@ def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odd
         full_date_list.append(date - timedelta(days = 2))
         
     # Filter only the fights that are on the specified dates
-    new_odds_data = new_odds_data[new_odds_data['date'].isin(full_date_list)]
+    if len(new_odds_data) > 0:
+        new_odds_data = new_odds_data[new_odds_data['date'].isin(full_date_list)]
     
-    # Add on the date of the odds scrape
-    new_odds_data['notformodel_date_fighter_odd_scrape'] = str(pd.to_datetime("now", utc=True)) # Give the datetime in GMT
+        # Add on the date of the odds scrape
+        new_odds_data['notformodel_date_fighter_odd_scrape'] = str(pd.to_datetime("now", utc=True)) # Give the datetime in GMT
+        
+        # Add this onto the existing odds data
+        new_odds_data = pd.concat([new_odds_data, existing_odds_data])
     
-    # Add this onto the existing odds data
-    new_odds_data = pd.concat([new_odds_data, existing_odds_data])
+        # Remove any duplicate records
+        new_odds_data = new_odds_data.drop_duplicates(subset = ['event', 'date', 'fighter', 'opponent'], keep = 'first', inplace = False)
+        
+        ###############################
+        # Deal with missing odds data
+        ###############################
+        
+        # Filter rows with NaT in 'date'
+        nat_date_rows = new_odds_data[new_odds_data['date'].isna()]
     
-    # Remove any duplicate records
-    new_odds_data = new_odds_data.drop_duplicates(subset = ['event', 'date', 'fighter', 'opponent'], keep = 'first', inplace = False)
+        # Total count of rows with NaT in 'date'
+        total_nat_count = nat_date_rows.shape[0]
     
-    ###############################
-    # Deal with missing odds data
-    ###############################
+        # Count and percentage for rows where 'event' contains "UFC"
+        ufc_nat_count = nat_date_rows[nat_date_rows['event'].str.contains("UFC", case=False, na=False)].shape[0]
+        ufc_nat_percent = (ufc_nat_count / total_nat_count * 100) if total_nat_count > 0 else 0
     
-    # Filter rows with NaT in 'date'
-    nat_date_rows = new_odds_data[new_odds_data['date'].isna()]
-
-    # Total count of rows with NaT in 'date'
-    total_nat_count = nat_date_rows.shape[0]
-
-    # Count and percentage for rows where 'event' contains "UFC"
-    ufc_nat_count = nat_date_rows[nat_date_rows['event'].str.contains("UFC", case=False, na=False)].shape[0]
-    ufc_nat_percent = (ufc_nat_count / total_nat_count * 100) if total_nat_count > 0 else 0
-
-    # Count and percentage for rows where 'event' does not contain "UFC"
-    non_ufc_nat_count = nat_date_rows[~nat_date_rows['event'].str.contains("UFC", case=False, na=False)].shape[0]
-    non_ufc_nat_percent = (non_ufc_nat_count / total_nat_count * 100) if total_nat_count > 0 else 0
-
-    print(f"Rows with NaT in 'date' and 'event' containing 'UFC': {ufc_nat_count} ({ufc_nat_percent:.2f}%)")
-    print(f"Rows with NaT in 'date' and 'event' not containing 'UFC': {non_ufc_nat_count} ({non_ufc_nat_percent:.2f}%)")
+        # Count and percentage for rows where 'event' does not contain "UFC"
+        non_ufc_nat_count = nat_date_rows[~nat_date_rows['event'].str.contains("UFC", case=False, na=False)].shape[0]
+        non_ufc_nat_percent = (non_ufc_nat_count / total_nat_count * 100) if total_nat_count > 0 else 0
+    
+        print(f"Rows with NaT in 'date' and 'event' containing 'UFC': {ufc_nat_count} ({ufc_nat_percent:.2f}%)")
+        print(f"Rows with NaT in 'date' and 'event' not containing 'UFC': {non_ufc_nat_count} ({non_ufc_nat_percent:.2f}%)")
+    
+    else:
+        # The scrape was unsuccessful
+        new_odds_data = existing_odds_data
     
     ###############################
     ### Update events data
     ###############################
     
-    # Get a list of events that haven't already been parsed
-    new_events_to_scrape = new_events_urls[(~new_events_urls['event_url'].isin(existing_event_urls['event_url'].tolist())) | (new_events_urls['event_date'] >= date.today())]
+    if len(new_events_urls) > 0:
+        # Get a list of events that haven't already been parsed
+        new_events_to_scrape = new_events_urls[(~new_events_urls['event_url'].isin(existing_event_urls['event_url'].tolist())) | (new_events_urls['event_date'] >= date.today())]
+            
+        # Scrape the new event odds
+        new_events_odds = parallel_scrape_event_odds_fast(
+            new_events_to_scrape, 
+            num_threads = config['num_threads'], 
+            firefox_location = config['firefox_location'], 
+            gecko_driver = config['gecko_driver_location'],
+            fast = fast_scrape)
         
-    # Scrape the new event odds
-    new_events_odds = parallel_scrape_event_odds_fast(
-        new_events_to_scrape, 
-        num_threads = config['num_threads'], 
-        firefox_location = config['firefox_location'], 
-        gecko_driver = config['gecko_driver_location'],
-        fast = fast_scrape)
-    
-    # Concat and replace duplicates
-    final_event_urls = pd.concat([new_events_to_scrape, existing_event_urls]).drop_duplicates()
-    final_event_odds = pd.concat([new_events_odds, existing_event_odds]).drop_duplicates(['date', 'fighter', 'opponent'], keep = 'first')
-    # Ensure format of final cols correct
-    final_event_odds.loc[:, odds_scrape_config['events_colnames']] = final_event_odds[odds_scrape_config['events_colnames']].apply(pd.to_numeric, errors = 'coerce')
-
+        # Concat and replace duplicates
+        final_event_urls = pd.concat([new_events_to_scrape, existing_event_urls]).drop_duplicates()
+        final_event_odds = pd.concat([new_events_odds, existing_event_odds]).drop_duplicates(['date', 'fighter', 'opponent'], keep = 'first')
+        # Ensure format of final cols correct
+        final_event_odds.loc[:, odds_scrape_config['events_colnames']] = final_event_odds[odds_scrape_config['events_colnames']].apply(pd.to_numeric, errors = 'coerce')
+        
+    else:
+        # The scrape was unsuccesful
+        final_event_urls = existing_event_urls
+        final_event_odds = existing_event_odds
         
     return new_odds_data, final_event_urls, final_event_odds

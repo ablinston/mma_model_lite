@@ -112,12 +112,21 @@ def parallel_scrape_odds_fast(
         
     # pdb.set_trace()    
     
+    # Combine into a df
+    if len(odds_scrape_results) > 0:
+        all_fighter_odds = pd.concat(odds_scrape_results)
+    else:
+        all_fighter_odds = pd.DataFrame()
+    
     # Combine the results
     if event_urls:
         
         # Get rid of duplicate events and keep the most common date for the event
-        event_urls_odds_agg = pd.concat(event_scrape_results).groupby('event_url', as_index=False)['event_date'].apply(lambda x: x.mode().iloc[0])
+        if len(event_scrape_results) > 0:
+            event_urls_odds_agg = pd.concat(event_scrape_results).groupby('event_url', as_index=False)['event_date'].apply(lambda x: x.mode().iloc[0])
+        else:
+            event_urls_odds_agg = pd.DataFrame()
         
-        return pd.concat(odds_scrape_results), event_urls_odds_agg
+        return all_fighter_odds, event_urls_odds_agg
     else:
-        return pd.concat(odds_scrape_results)
+        return all_fighter_odds
