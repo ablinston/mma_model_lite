@@ -78,3 +78,21 @@ dvc remote modify storage secret_access_key YOUR_APP_KEY_HERE
 ```
 
 Push all git commits for dvc data with `dvc push -r storage --all-commits`. Otherwise, dvc will just push the datasets from the active commit. (doesn't seem to work right now so push frequently. Might start working if the latest version of DVC finally works with Backblaze.)
+
+## Clearing cache
+
+It's good to clear the remote cache and delete datasets in deleted branches. Most live updates should be deleted as they aren't needed and dvc commits to main minimised.
+ 
+To clear the remote cache, run
+
+```
+# Ensure all commits local
+dvc pull --all-branches --all-tags --run-cache
+
+# Show what will be deleted
+dvc gc --workspace --cloud --dry
+
+# Delete, but keeping all commits from all branches
+dvc gc --all-branches --all-tags --cloud
+
+```
