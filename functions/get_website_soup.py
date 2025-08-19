@@ -1,6 +1,10 @@
 # This function gets the response soup from a website either using selenium or a fast response
 
+from bs4 import BeautifulSoup
 import requests
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 
 def get_website_soup(
         url, 

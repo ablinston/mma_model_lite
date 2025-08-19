@@ -1,4 +1,5 @@
 # This function gets a random user agent
+import random
 
 def random_user_agent():
 
