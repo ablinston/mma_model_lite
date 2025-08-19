@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mma_model',  # This becomes your package name
-    version='0.1.1',
+    version='0.1.2',
     packages=['functions'],
     package_dir={'functions': 'functions'},
     description='Reusable functions from MMA model',
