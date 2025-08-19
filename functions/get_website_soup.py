@@ -25,7 +25,7 @@ def get_website_soup(
             print("Blocked! Try changing User-Agent, IP, or waiting.")
             print(f"Using user agent: {headers['User-Agent']}")
             
-            return ""
+            fast = False
         
         # Check if the response is compressed
         if response.headers.get("Content-Encoding") == 'zstd':
@@ -48,7 +48,7 @@ def get_website_soup(
         page.close()
         
     # Otherwise, use selenium, which is the slowest
-    else:
+    if fast == False:
         
         ###########
         # Setup headless Firefox for getting odds information
