@@ -67,6 +67,14 @@ pip install boto3==1.35.90
 pip install aiobotocore==2.16.1
 pip install botocore==1.35.88
 ```
+
+Or, I've succcessfully installed it with conda with less trouble.
+
+```
+conda install dvc[s3]
+conda install dvc-s3
+```
+
 Then need to set up the remote. I have called it `storage`.
 
 ```
