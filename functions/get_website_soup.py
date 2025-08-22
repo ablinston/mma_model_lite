@@ -29,9 +29,14 @@ def get_website_soup(
         
         # Check if the response is compressed
         if response.headers.get("Content-Encoding") == 'zstd':
-            dctx = zstd.ZstdDecompressor()
-            stream = dctx.stream_reader(io.BytesIO(response.content))
-            text = stream.read().decode("utf-8")
+            # Sometimes the test isn't actually compressed, so use try
+            try:
+                dctx = zstd.ZstdDecompressor()
+                stream = dctx.stream_reader(io.BytesIO(response.content))
+                text = stream.read().decode("utf-8")
+            except:
+                text = response.text
+                
         else:
             text = response.text
         
