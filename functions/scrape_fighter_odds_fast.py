@@ -34,7 +34,7 @@ def scrape_fighter_odds_fast(
             
             # Get headers for the website request. This is a copy and paste from a manual visit
             headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Encoding':'gzip, deflate, br, zstd',
+                'Accept-Encoding':'gzip, deflate, br',
                 'Accept-Language':'en-US,en;q=0.5',
                 'Connection':'keep-alive',
                 'Host':'www.bestfightodds.com',
