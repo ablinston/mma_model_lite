@@ -28,8 +28,9 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
         ]
     ).reset_index().drop(columns = ['index'])
 
-    # Remove any results that aren't wins or losses by DQ. Remove anything before start_date because of multiple fights per date
-    merged_data = merged_data[(merged_data['method'].isin(['Decision-Unanimous', 'KO/TKO', 'Submission', 'Decision-Split'])) & (merged_data['date'] >= start_date)]
+    # Remove any results that aren't wins or losses by DQ. Remove anything before start_date because of multiple fights per date.
+    # Keep np.nan because these are future events we want ELOs for
+    merged_data = merged_data[(merged_data['method'].isin(['Decision-Unanimous', 'KO/TKO', 'Submission', 'Decision-Split', np.nan])) & (merged_data['date'] >= start_date)]
 
     # Cleanup
     del([fight_results, fight_stats])
