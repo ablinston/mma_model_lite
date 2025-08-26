@@ -1,15 +1,13 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Paulo Costa,3.1,35.7,0.11,Roman Kopylov,1.46,62.0,-0.09,None,0.0,,0.0,0.0,
-1,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Kevin Holland,1.2,65.9,-0.21,Daniel Rodriguez,5.6,31.7,0.78,None,0.0,,0.0,0.0,
-2,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Michael Johnson,5.9,30.4,0.8,Daniel Zellhuber,1.19,67.3,-0.2,None,0.0,,0.0,0.0,
-3,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Kyler Phillips,2.28,45.3,0.03,Vinicius Oliveira,1.77,52.4,-0.07,None,0.0,,0.0,0.0,
-4,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Marvin Vettori,2.76,35.4,-0.02,Brendan Allen,1.55,62.2,-0.04,None,0.0,,0.0,0.0,
-5,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Jimmy Crute,1.3,64.0,-0.17,Marcin Prachnio,4.2,33.7,0.41,None,0.0,,0.0,0.0,
-6,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Ryan Spann,1.48,59.0,-0.13,Lukasz Brzeski,3.0,38.7,0.16,None,0.0,,0.0,0.0,
-7,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Francisco Prado,1.75,44.3,-0.23,Nikolay Veretennikov,2.28,53.4,0.22,Nikolay Veretennikov,2.28,1.87,165.0,211.2,
-8,2025-07-19,ufc318:hollowayvspoirier3,2025-07-18 15:15:22.985,2025-07-18 15:15:22.985,Max Holloway,1.79,57.7,0.03,Dustin Poirier,2.24,40.0,-0.1,Max Holloway,1.79,1.73,165.0,130.35,
-2,2025-07-19,ufc318:hollowayvspoirier3,,,Dan Ige,,,,Patricio Freire,,,,,,,,,Fights < 3
-6,2025-07-19,ufc318:hollowayvspoirier3,,,Adam Fugitt,,,,Islam Dulatov,,,,,,,,,Fights < 3
-7,2025-07-19,ufc318:hollowayvspoirier3,,,Ateba Gautier,,,,Robert Valentin,,,,,,,,,Fights < 3
-10,2025-07-19,ufc318:hollowayvspoirier3,,,Brunno Ferreira,,,,Jackson McVey,,,,,,,,,Fights < 3
-11,2025-07-19,ufc318:hollowayvspoirier3,,,Carli Judice,,,,Nicolle Caliari,,,,,,,,,Womens
+0,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 13:05:53.484091+00:00,2025-08-26 13:05:53.484091+00:00,Benoit Saint Denis,2.88,34.4,-0.01,Mauricio Ruffy,1.5,63.3,-0.05,None,0.0,,0.0,0.0,
+1,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 13:05:53.484091+00:00,2025-08-26 13:05:53.484091+00:00,Bolaji Oki,2.5,40.7,0.02,Mason Jones,1.62,57.0,-0.07,None,0.0,,0.0,0.0,
+2,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 13:05:53.484091+00:00,2025-08-26 13:05:53.484091+00:00,Modestas Bukauskas,1.36,86.0,0.17,Paul Craig,3.5,11.9,-0.58,Modestas Bukauskas,1.36,1.16,165.0,60.0,
+3,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 13:05:53.484091+00:00,2025-08-26 13:05:53.484091+00:00,Fares Ziam,1.36,75.8,0.03,Kaue Fernandes,3.75,22.2,-0.17,Fares Ziam,1.36,1.32,165.0,60.0,
+4,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 13:05:53.484091+00:00,2025-08-26 13:05:53.484091+00:00,Oumar Sy,1.29,91.5,0.18,Brendson Ribeiro,4.1,7.1,-0.71,Oumar Sy,1.29,1.09,165.0,47.83,
+5,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 13:05:53.484091+00:00,2025-08-26 13:05:53.484091+00:00,Sam Patterson,1.57,36.3,-0.43,Trey Waters,2.63,61.0,0.61,Trey Waters,2.63,1.64,165.0,268.95,
+6,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 13:06:23.967,NaT,Nassourdine Imavov,2.0,53.0,0.06,Caio Borralho,2.0,44.8,-0.1,Nassourdine Imavov,2.0,1.89,165.0,165.0,
+5,2025-09-06,ufcfightnight:imavovvsborralho,,,William Gomis,,,,Robert Ruchala,,,,,,,,,Fights < 3
+6,2025-09-06,ufcfightnight:imavovvsborralho,,,Andreas Gustafsson,,,,Rinat Fakhretdinov,,,,,,,,,Fights < 3
+8,2025-09-06,ufcfightnight:imavovvsborralho,,,Brad Tavares,,,,Robert Bryczek,,,,,,,,,Fights < 3
+9,2025-09-06,ufcfightnight:imavovvsborralho,,,Shauna Bannon,,,,Sam Hughes,,,,,,,,,Womens
+10,2025-09-06,ufcfightnight:imavovvsborralho,,,Marcin Tybura,,,,Ante Delija,,,,,,,,,Fights < 3

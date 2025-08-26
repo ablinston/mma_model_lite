@@ -46,34 +46,7 @@ def merge_and_process_all_clean_data(
     ###########################################################################################
     # CALCULATE ELOs
 
-    # Get the starting data
-    start_elo, elo_fight_data = prep_stats_for_elo_calc(fight_results, fight_stats, config, start_date = '2000-01-01', remove_nas = False)
-
-    # Dderive the ELO for the params in the config
-    elo_data, elo_fight_data_welo = derive_start_elos(start_elo, elo_fight_data, elo_config)
-
-    # Create two versions to be added onto the results data
-    fighter1_elo = elo_data.copy().to_pandas().drop(['fight_number'], axis = 1).rename(columns = {'fighter': 'fighter1', 'start_elo': 'fighter1_start_elo'}).sort_values(['date']).reset_index(drop=True)
-    fighter2_elo = elo_data.copy().to_pandas().drop(['fight_number'], axis = 1).rename(columns = {'fighter': 'fighter2', 'start_elo': 'fighter2_start_elo'}).sort_values(['date']).reset_index(drop=True)
-
-    # Merge this onto the fight results data, because this is a merge to the nearest date before or on the fight date. Can't merged elo_fight_data because draws etc were filtered out.
-
-    fight_results = fight_results.sort_values(['date']).reset_index(drop=True)
-
-    fight_results = pd.merge_asof(
-        fight_results,
-        fighter1_elo,
-        on = 'date',
-        by = 'fighter1',
-        direction = 'backward'
-    )
-    fight_results = pd.merge_asof(
-        fight_results,
-        fighter2_elo,
-        on = 'date',
-        by = 'fighter2',
-        direction = 'backward'
-    )
+    fight_results = add_start_elo_to_fight_results(fight_results, fight_stats, config, elo_config)
 
     # Recode missing to the default starting. There will be some missing if their first fight was a DQ, D/D or NC.
 
@@ -86,7 +59,6 @@ def merge_and_process_all_clean_data(
     fight_results['fighter1_start_elo'] = fight_results['fighter1_start_elo'].fillna(config['start_elo'])
     fight_results['fighter2_start_elo'] = fight_results['fighter2_start_elo'].fillna(config['start_elo'])
 
-    del([start_elo, elo_fight_data, elo_data, elo_fight_data_welo, fighter1_elo, fighter2_elo])
 
     ###########################################################################################
     # FIGHT STATS PROCESSING
@@ -356,57 +328,11 @@ def merge_and_process_all_clean_data(
     stop_if_not(len(fight_stats_hist_opponent_type) == len(fight_stats_hist), 'Opponent type row count check')
 
     # test = fight_stats_hist_opponent_type[fight_stats_hist_opponent_type['fighter']=='ConorMcGregor'][['bout', 'fighter', 'opponent', 'opponent_type', 'hist_opp_type_allrounds_fight_minutes']]
-
+    
     ###########################################################################################
     # Calculate the date was last knocked out
-    dates_knocked_out = fighter_results.copy()
-    dates_knocked_out['knocked_out'] = np.where((dates_knocked_out['method'] == 'KO/TKO') & (dates_knocked_out['result'] == 'L'), 1, 0)
-    dates_knocked_out['date_knocked_out'] = np.where(dates_knocked_out['knocked_out'] == 1, dates_knocked_out['date'], np.datetime64('NaT'))
-
-    dates_knocked_out.sort_values(by = ['fighter', 'date'], inplace = True)
-
-    # Calculate date last knocked out
-    dates_knocked_out['date_last_knocked_out'] = dates_knocked_out.groupby(['fighter'])['date_knocked_out'].shift(1)
-    dates_knocked_out['date_last_knocked_out'] = dates_knocked_out.groupby(['fighter'])['date_last_knocked_out'].ffill()
-
-    # Calculate the number times knocked out previously
-    dates_knocked_out['hist_times_knocked_out'] = dates_knocked_out.groupby(['fighter'])['knocked_out'].cumsum() - dates_knocked_out['knocked_out']
-
-    row_check = len(dates_knocked_out)
-
-    # Calculate how many times each round they've been knocked out
-    for round in [1, 2, 3, 4, 5]:
-        round_knocked_out = dates_knocked_out[(dates_knocked_out['round'] == round) & dates_knocked_out['knocked_out'] == 1].copy()
-        round_knocked_out['hist_times_knocked_out_round_' + str(round)] = round_knocked_out.groupby(['fighter'])['knocked_out'].cumsum() - 1
-        dates_knocked_out = dates_knocked_out.merge(round_knocked_out[['event', 'bout', 'fighter', 'hist_times_knocked_out_round_' + str(round)]], 
-                                                    on = ['event', 'bout', 'fighter'], 
-                                                    how = 'left')
-        del(round_knocked_out)
-
-    dates_knocked_out = dates_knocked_out[['event',
-                                           'bout',
-                                           'fighter', 
-                                           'date_last_knocked_out', 
-                                           'hist_times_knocked_out',
-                                           'hist_times_knocked_out_round_1',
-                                           'hist_times_knocked_out_round_2',
-                                           'hist_times_knocked_out_round_3',
-                                           'hist_times_knocked_out_round_4',
-                                           'hist_times_knocked_out_round_5']]
-
-    # Fill NAs with 0
-    dates_knocked_out.loc[:, ['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']] = dates_knocked_out[['hist_times_knocked_out', 'hist_times_knocked_out_round_1', 'hist_times_knocked_out_round_2', 'hist_times_knocked_out_round_3', 'hist_times_knocked_out_round_4', 'hist_times_knocked_out_round_5']].fillna(0) 
-
-    # Fill NAs in dates with arbitrary early date
-    dates_knocked_out['date_last_knocked_out'] = pd.to_datetime(dates_knocked_out['date_last_knocked_out'].fillna('1900-01-01'))
-
-    # Check number of rows hasn't changed
-    if len(dates_knocked_out) == row_check:
-        print('Merge row check PASSED')
-    else:
-        print('Merge row check FAILED')
-        raise SystemExit
-    del(row_check)
+    
+    dates_knocked_out = calculate_knocked_out_stats(fighter_results)
 
     ###########################################################################################
     # Calculate win and loss streaks
@@ -492,10 +418,11 @@ def merge_and_process_all_clean_data(
     event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
 
     # Add opponent to the upcoming odds. It already has the event and bout matched on.
-    add_opponent_column(betfair_upcoming_odds)
+    if len(betfair_upcoming_odds) > 0:
+        add_opponent_column(betfair_upcoming_odds)
 
-    # Combine the upcoming odds with the historic odds
-    betfair_odds = pd.concat([betfair_odds, betfair_upcoming_odds], axis = 0)
+        # Combine the upcoming odds with the historic odds
+        betfair_odds = pd.concat([betfair_odds, betfair_upcoming_odds], axis = 0)
 
     fight_odds = process_odds_data(fight_odds.drop_duplicates(subset = ['event', 'bout', 'fighter']), event_odds, betfair_odds, odds_scrape_config, average_odds_model)
 
