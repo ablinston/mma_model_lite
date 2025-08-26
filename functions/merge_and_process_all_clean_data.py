@@ -464,10 +464,11 @@ def merge_and_process_all_clean_data(
     event_odds = add_event_and_bout_to_odds_data(event_odds, events, fight_stats, date_check = '2018-01-01')
 
     # Add opponent to the upcoming odds. It already has the event and bout matched on.
-    add_opponent_column(betfair_upcoming_odds)
+    if len(betfair_upcoming_odds) > 0:
+        add_opponent_column(betfair_upcoming_odds)
 
-    # Combine the upcoming odds with the historic odds
-    betfair_odds = pd.concat([betfair_odds, betfair_upcoming_odds], axis = 0)
+        # Combine the upcoming odds with the historic odds
+        betfair_odds = pd.concat([betfair_odds, betfair_upcoming_odds], axis = 0)
 
     fight_odds = process_odds_data(fight_odds.drop_duplicates(subset = ['event', 'bout', 'fighter']), event_odds, betfair_odds, odds_scrape_config, average_odds_model)
 
