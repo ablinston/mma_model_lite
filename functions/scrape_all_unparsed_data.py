@@ -305,6 +305,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
             
         else:
             print("Data checks not passed. Data not saved. See previous output messages for more information.")
+            raise SystemExit
 
     else:
 
@@ -343,6 +344,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
             
         else:
             print("Data checks not passed. Data not saved. See previous output messages for more information.")
+            raise SystemExit
 
     return "Raw data scrape complete."
         
