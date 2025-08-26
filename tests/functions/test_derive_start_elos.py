@@ -65,9 +65,9 @@ def test_derive_start_elos():
     start_elo = add_start_elo_to_fight_results(fight_results, fight_stats, config, elo_config)
 
     # Compare starting elos on second fight after first result
-    assert start_elo[start_elo['event'] == 'UFC3']['fighter1_start_elo'] < int(elo_config['starting_elo'])
-    assert start_elo[start_elo['event'] == 'UFC4']['fighter1_start_elo'] > int(elo_config['starting_elo'])
-    assert start_elo[start_elo['event'] == 'UFC4']['fighter2_start_elo'] > int(elo_config['starting_elo'])
-    assert start_elo[start_elo['event'] == 'UFC3']['fighter2_start_elo'] == int(elo_config['starting_elo'])
+    assert all(start_elo[start_elo['event'] == 'UFC3']['fighter1_start_elo'] < int(elo_config['starting_elo']))
+    assert all(start_elo[start_elo['event'] == 'UFC4']['fighter1_start_elo'] > int(elo_config['starting_elo']))
+    assert all(start_elo[start_elo['event'] == 'UFC4']['fighter2_start_elo'] > int(elo_config['starting_elo']))
+    assert all(start_elo[start_elo['event'] == 'UFC3']['fighter2_start_elo'] == int(elo_config['starting_elo']))
 
 # fp.write('./tests/data/update_fighter_odds_data_data_correct3.parquet', result3, compression = 'ZSTD')
