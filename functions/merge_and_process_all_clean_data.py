@@ -663,8 +663,8 @@ def merge_and_process_all_clean_data(
 
     ###########################################################################################
     # FLAG TRAIN/TEST/OOT
-
-    np.random.seed(seed = config['seed_all'] + 7156)
+    # pdb.set_trace()
+    np.random.seed(seed = config['seed_all'] + 715)
     merged_data = flag_train_test_oot(merged_data, config)
 
 
