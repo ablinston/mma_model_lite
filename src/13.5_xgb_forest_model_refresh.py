@@ -226,7 +226,7 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 1
             mlflow.set_tag('Sample', 'Train')
                         
             # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_train, y_train)
+            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_train, y_train)
             
             # Log the predictions just from the odds for info
             log_metrics_odds_mlflow(X_train, y_train)
@@ -242,14 +242,14 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 1
             mlflow.set_tag('Sample', 'Test')
                         
             # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_test, y_test)
+            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_test, y_test)
             
             # Log the predictions just from the odds for info
             log_metrics_odds_mlflow(X_test, y_test)
 
 
 # Set the final number of models
-final_forest_size = 45
+final_forest_size = 2
 
 
 # Save the model

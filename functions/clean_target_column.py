@@ -15,10 +15,10 @@ def clean_target_column(target_column):
     cleaned_target = np.where(target_column.isna(), np.nan, np.where((target_column == "D/D") | (target_column == "NC/NC"), "OTH", target_column))
     
     # Convert the target into a labelled column ready for multiclass modelling
-    le = LabelEncoder()
-    cleaned_target = le.fit_transform(cleaned_target)
+    oe = OrdinalEncoder(categories = [['L/W', 'OTH', 'W/L']])
+    cleaned_target = oe.fit_transform(np.array(cleaned_target).reshape(-1, 1)).astype(int).ravel()
     
-    # Stop if the classes aren't as expected. These are hardcoded in other functions so need to be in this order
-    stop_if_not(le.classes_.tolist() == ['L/W', 'OTH', 'W/L'], "Target class check")
+    # # Stop if the classes aren't as expected. These are hardcoded in other functions so need to be in this order
+    # stop_if_not(le.classes_.tolist() == ['L/W', 'OTH', 'W/L'], "Target class check")
 
     return cleaned_target
