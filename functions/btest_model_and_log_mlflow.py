@@ -120,7 +120,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
     
     # Finally, get the backtesting results
     backtesting, backtesting_fight_output = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params)
-    
+    pdb.set_trace() ## ADD IN ROI FROM PREDICTED EV BANDS
     # Log the overall backtesting results
     backtesting.to_csv('results/temp/summary.csv', index = True)
     mlflow.log_artifact('results/temp/summary.csv', 'Backtesting results')

@@ -127,6 +127,9 @@ for backtesting_params in [
         
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
+
+        # Log the SHAP values for the model
+        log_shap_values_mlflow(rf_xgb_model, X_train)
         
         btest_model_and_log_mlflow(
             X_train[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
@@ -154,6 +157,9 @@ for backtesting_params in [
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test)
         
+        # Log the SHAP values for the model
+        log_shap_values_mlflow(rf_xgb_model, X_test)
+        
         btest_model_and_log_mlflow(
             X_test[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
             prediction_probabilities, 
@@ -174,6 +180,9 @@ for backtesting_params in [
         X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
             oot,
             oot_testing = True)
+        
+        # Log the SHAP values for the model
+        log_shap_values_mlflow(rf_xgb_model, X_oot)
         
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)

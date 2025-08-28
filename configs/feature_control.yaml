@@ -1,0 +1,13 @@
+# This config set lists of strings that are to be both included and excluded from model features when training models.
+
+# Any features containing these substrings will be excluded when training models
+exclude_strings:
+  - open_odds
+  - backtesting
+  - diff_true_closing_odds
+
+# List the precise feature name to be included in EVERY model that will be trained
+include_features:
+  - fighter1_date_minus_dob
+  - fighter2_date_minus_dob
+  - diff_hist_allrounds_kd_per_minute
