@@ -123,7 +123,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [115]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [116]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
     'hyperopt_early_stopping': 35
 }
@@ -131,11 +131,11 @@ space = {
 # Set the hyperopt parameters for the inner optimisation
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
-     'learning_rate': hp.uniform('learning_rate', 0.001, 0.2), # Learning rate #  0.01-0.2 is considered low-moderate learning rates
+     'learning_rate': hp.uniform('learning_rate', 0.005, 0.2), # Learning rate #  0.01-0.2 is considered low-moderate learning rates
      'min_child_weight': 15, # hp.quniform('min_child_weight', 8, 21, 1), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'colsample_bytree': hp.quniform('colsample_bytree', 0.05, 1, 0.05),
-     'max_depth': hp.quniform('max_depth', 1, 8, 1),
+     'max_depth': hp.quniform('max_depth', 1, 5, 1),
      'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
      'eval_metric': 'mlogloss',       # Evaluation metric
@@ -169,7 +169,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:115]
+column_names = X_train_master.columns.tolist()[0:116]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

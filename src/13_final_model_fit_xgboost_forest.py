@@ -19,7 +19,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the new model version number
-new_version_number = "3.0.3"
+new_version_number = "3.0.4"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -65,11 +65,11 @@ mlflow.set_experiment('gt2_fights_xgboost_forest_v' + new_version_number)
 
 params = {
     # 'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.01, # Learning rate
+    'learning_rate': 0.02883, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
     'split_dec_or_other': True, # whether to exclude them
     'subsample': 0.85,
-    'colsample_bytree': 0.1,
+    'colsample_bytree': 0.05,
     'max_depth': 2,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective

@@ -1,5 +1,5 @@
 def calculate_knocked_out_stats_old(fighter_results):
-    
+   pdb.set_trace()
     ###########################################################################################
    # Calculate the date was last knocked out
    dates_knocked_out = fighter_results.copy()
@@ -18,6 +18,7 @@ def calculate_knocked_out_stats_old(fighter_results):
    row_check = len(dates_knocked_out)
 
    # Calculate how many times each round they've been knocked out
+   ## IT LOOKS LIKE THE HISTORIC STATS ARE CORRECT, BUT THEY ARE ONLY APPEARING WHEN A FIGHTER GETS KOd IN ROUND 1 IN THE FIGHT WE WANT TO PREDICT
    for round in [1, 2, 3, 4, 5]:
        round_knocked_out = dates_knocked_out[(dates_knocked_out['round'] == round) & dates_knocked_out['knocked_out'] == 1].copy()
        round_knocked_out['hist_times_knocked_out_round_' + str(round)] = round_knocked_out.groupby(['fighter'])['knocked_out'].cumsum() - 1
