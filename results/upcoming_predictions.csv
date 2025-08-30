@@ -1,13 +1,15 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 19:51:46.317802+00:00,2025-08-26 19:51:46.317802+00:00,Benoit Saint Denis,2.8,36.2,0.01,Mauricio Ruffy,1.54,61.5,-0.05,None,0.0,,0.0,0.0,
-1,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 19:51:46.317802+00:00,2025-08-26 19:51:46.317802+00:00,Bolaji Oki,2.4,41.2,-0.01,Mason Jones,1.67,56.4,-0.06,None,0.0,,0.0,0.0,
-2,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 19:51:46.317802+00:00,2025-08-26 19:51:46.317802+00:00,Modestas Bukauskas,1.36,86.0,0.17,Paul Craig,3.5,11.9,-0.58,Modestas Bukauskas,1.36,1.16,165.0,60.0,
-3,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 19:51:46.317802+00:00,2025-08-26 19:51:46.317802+00:00,Fares Ziam,1.36,75.8,0.03,Kaue Fernandes,3.75,22.2,-0.17,Fares Ziam,1.36,1.32,165.0,60.0,
-4,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 19:51:46.317802+00:00,2025-08-26 19:51:46.317802+00:00,Oumar Sy,1.3,91.5,0.19,Brendson Ribeiro,4.1,7.1,-0.71,Oumar Sy,1.3,1.09,165.0,50.0,
-5,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 19:51:46.317802+00:00,2025-08-26 19:51:46.317802+00:00,Sam Patterson,1.57,36.3,-0.43,Trey Waters,2.62,61.1,0.6,Trey Waters,2.62,1.64,165.0,267.3,
-6,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-26 19:52:19.613,2025-08-26 19:52:19.613,Nassourdine Imavov,1.01,67.6,-0.32,Caio Borralho,1.9,30.2,-0.43,None,0.0,,0.0,0.0,
+0,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-29 14:41:33.423244+00:00,2025-08-29 14:41:33.423244+00:00,Benoit Saint Denis,2.7,36.3,-0.02,Mauricio Ruffy,1.51,61.3,-0.07,None,0.0,,0.0,0.0,
+1,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-29 14:41:33.423244+00:00,2025-08-29 14:41:33.423244+00:00,Bolaji Oki,2.38,41.2,-0.02,Mason Jones,1.67,56.4,-0.06,None,0.0,,0.0,0.0,
+2,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-29 14:41:33.423244+00:00,2025-08-29 14:41:33.423244+00:00,Modestas Bukauskas,1.36,86.2,0.17,Paul Craig,3.7,11.8,-0.56,Modestas Bukauskas,1.36,1.16,165.0,60.0,
+3,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-29 14:41:33.423244+00:00,2025-08-29 14:41:33.423244+00:00,Fares Ziam,1.32,76.3,0.01,Kaue Fernandes,3.75,21.7,-0.19,Fares Ziam,1.32,1.31,165.0,53.23,
+4,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-29 14:41:33.423244+00:00,2025-08-29 14:41:33.423244+00:00,Sam Patterson,1.61,32.1,-0.48,Trey Waters,2.44,65.4,0.6,Trey Waters,2.44,1.53,165.0,237.6,
+5,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-29 14:41:33.423244+00:00,2025-08-29 14:41:33.423244+00:00,Oumar Sy,1.26,91.5,0.15,Brendson Ribeiro,4.1,7.1,-0.71,Oumar Sy,1.26,1.09,165.0,42.31,
+6,2025-09-06,ufcfightnight:imavovvsborralho,2025-08-29 14:42:00.824,2025-08-29 14:42:00.824,Nassourdine Imavov,2.14,52.8,0.13,Caio Borralho,1.84,45.1,-0.17,Nassourdine Imavov,2.14,1.9,165.0,188.1,
+4,2025-09-06,ufcfightnight:imavovvsborralho,,,Patricio Freire,,,,Losene Keita,,,,,,,,,Fights < 3
 5,2025-09-06,ufcfightnight:imavovvsborralho,,,William Gomis,,,,Robert Ruchala,,,,,,,,,Fights < 3
-6,2025-09-06,ufcfightnight:imavovvsborralho,,,Andreas Gustafsson,,,,Rinat Fakhretdinov,,,,,,,,,Fights < 3
-8,2025-09-06,ufcfightnight:imavovvsborralho,,,Brad Tavares,,,,Robert Bryczek,,,,,,,,,Fights < 3
-9,2025-09-06,ufcfightnight:imavovvsborralho,,,Shauna Bannon,,,,Sam Hughes,,,,,,,,,Womens
-10,2025-09-06,ufcfightnight:imavovvsborralho,,,Marcin Tybura,,,,Ante Delija,,,,,,,,,Fights < 3
+6,2025-09-06,ufcfightnight:imavovvsborralho,,,Rhys McKee,,,,,,,,,,,,,Fights < 3
+7,2025-09-06,ufcfightnight:imavovvsborralho,,,Marcin Tybura,,,,Ante Delija,,,,,,,,,Fights < 3
+9,2025-09-06,ufcfightnight:imavovvsborralho,,,Brad Tavares,,,,Robert Bryczek,,,,,,,,,Fights < 3
+10,2025-09-06,ufcfightnight:imavovvsborralho,,,Andreas Gustafsson,,,,Rinat Fakhretdinov,,,,,,,,,Fights < 3
+11,2025-09-06,ufcfightnight:imavovvsborralho,,,Shauna Bannon,,,,Sam Hughes,,,,,,,,,Womens

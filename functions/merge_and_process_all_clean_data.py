@@ -6,6 +6,7 @@ def merge_and_process_all_clean_data(
         data_processing_config,
         odds_scrape_config,
         model_hyper_params,
+        test_fighter_list = [],
         skip_save_data = False # whether to skip the save data and just return merged data
         ):
     
@@ -665,7 +666,7 @@ def merge_and_process_all_clean_data(
     # FLAG TRAIN/TEST/OOT
     # pdb.set_trace()
     np.random.seed(seed = config['seed_all'] + 715)
-    merged_data = flag_train_test_oot(merged_data, config)
+    merged_data = flag_train_test_oot(merged_data, config, test_fighter_list)
 
 
 
