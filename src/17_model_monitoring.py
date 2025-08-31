@@ -58,6 +58,7 @@ if not skip_data_update:
                 data_processing_config,
                 odds_scrape_config,
                 model_hyper_params,
+                test_fighter_list = test_fighters,
                 skip_save_data = skip_save_data # whether to skip the save data and just return merged data
                 )
         
