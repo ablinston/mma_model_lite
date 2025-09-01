@@ -1,3 +1,11 @@
+# Import functions from my scraper library
+import sys
+sys.path.append('E:/Repos/custom_tools')
+
+from model_tools.k_fold_id_by_runner import k_fold_id_by_runner
+
+# from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
+
 import betfairlightweight
 from betfairlightweight import StreamListener
 from betfairlightweight.filters import market_filter, price_projection, streaming_market_filter, streaming_market_data_filter
@@ -20,6 +28,7 @@ import itertools
 import joblib
 import mlflow
 # import mlflow.pyfunc
+from numba import njit
 import numpy as np
 import os
 from os import listdir, makedirs

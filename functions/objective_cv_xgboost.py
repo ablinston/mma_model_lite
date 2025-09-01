@@ -6,8 +6,6 @@ def objective_cv_xgboost(
     # pdb.set_trace()
     
     try:
-        # Create n folds of the training data
-        kf = KFold(n_splits = params['n_folds'], shuffle = True, random_state = params['random_state'])
     
         # Create lists that will be used to store models and test datasets
         avg_aucs = []
@@ -34,7 +32,13 @@ def objective_cv_xgboost(
         # If the training data is to have split decs and other results excluded, then use the custom function to do that
         # if params['exclude_split_other_from_train'] == False:
         with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
-            futures = {executor.submit(create_dmatrix, X_train, y_train, train_idx, test_idx, params['win_loss_only'], params['exclude_split_other_from_train']): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train_trim)}
+            futures = {executor.submit(create_dmatrix, 
+                                       X_train, 
+                                       y_train, 
+                                       X_train[X_train['notformodel_fold_id'] != fold_id].index, 
+                                       X_train[X_train['notformodel_fold_id'] == fold_id].index, 
+                                       params['win_loss_only'], 
+                                       params['exclude_split_other_from_train']): fold_id for fold_id in range(0, 5)}
             dmatrix_data = [future.result() for future in as_completed(futures)]   
         # else:
         #     with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:

@@ -46,6 +46,8 @@ else:
         np.random.seed(seed = config['seed_all'] + 8451)
         data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
 
+# Compute what k-fold each fight is in for cross-validation
+data['notformodel_fold_id'] = k_fold_id_by_runner(5, data['fighter1'], data['fighter2'])
 
 
 ##########################################################################################
@@ -73,8 +75,8 @@ columns_in_order = var_importance['Feature'].tolist()
 # Get rid of the last X results
 columns_in_order = [col for col in columns_in_order if not ('_last_' in col and '_results' in col)]
 
-# Add on the split indicator if needed
-columns_in_order = columns_in_order + ['notformodel_split_dec_or_other']
+# Add on other columns needed
+columns_in_order = columns_in_order + [col for col in X_train_master.columns if 'notformodel' in col and col not in columns_in_order]
     
 if model_hyper_params['odds_to_use'] == 'best_closing_odds':
     columns_in_order = [col for col in columns_in_order if 'mean_closing_odds' not in col]
@@ -111,7 +113,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_custom_features_+bayesian_adj')
+mlflow.set_experiment('fights_gt2_custom_features_+bayesian_adj_2')
 
 
 ##########################################################################################
@@ -144,7 +146,6 @@ params_inner = {
      'predictor': 'gpu_predictor',   # Use GPU for prediction
      'verbosity': 1,
      'num_class': no_of_classes,
-     'n_folds': 5,                   # Number of folds for the cross-validation
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
      'early_stopping_rounds': 50,

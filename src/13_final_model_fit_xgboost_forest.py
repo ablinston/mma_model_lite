@@ -155,7 +155,7 @@ for num_trees_i in list(range(1, 21, 2)) + list(range(25, 51, 5)) + list(range(6
 
 
 # Set the final number of models
-final_forest_size = 100
+final_forest_size = 11
 
 
 # Save the model
