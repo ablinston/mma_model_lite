@@ -70,7 +70,7 @@ def objective_xgboost_features_mlflow(
             X_train['fighter1_odds_for_loss'] = X_train_master['fighter1_backtesting_odds']
             X_train['fighter2_odds_for_loss'] = X_train_master['fighter2_backtesting_odds']
             
-            X_train = pd.concat([X_train, X_train_master[['notformodel_split_dec_or_other']]], axis = 1)
+            # X_train = pd.concat([X_train, X_train_master[['notformodel_split_dec_or_other']]], axis = 1)
             
             X_train.reset_index(drop = True, inplace = True)
             y_train.reset_index(drop = True, inplace = True)

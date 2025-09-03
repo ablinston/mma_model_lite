@@ -36,7 +36,8 @@ def objective_cv_xgboost(
                                        X_train, 
                                        y_train, 
                                        X_train[X_train['notformodel_fold_id'] != fold_id].index, 
-                                       X_train[X_train['notformodel_fold_id'] == fold_id].index, 
+                                       X_train[X_train['notformodel_fold_id'] == fold_id].index,
+                                       params['base_margin_cols'],
                                        params['win_loss_only'], 
                                        params['exclude_split_other_from_train']): fold_id for fold_id in range(0, 5)}
             dmatrix_data = [future.result() for future in as_completed(futures)]   
@@ -151,9 +152,7 @@ def objective_cv_xgboost(
             'Logloss': np.mean(log_losses),
             'EV MSE': np.mean(ev_mses)
         }
-            
-        del kf
-    
+                
         if model_hyper_params['loss_function'] == 'ev_loss_function':
             return {'loss': np.mean(ev_mses), 'params': params, 'status': STATUS_OK, 'metrics': metrics} 
         else:

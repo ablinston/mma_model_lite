@@ -101,8 +101,12 @@ params = {
 # Remove any objects not for modelling
 X_train = X_train[[col for col in X_train if 'notformodel' not in col]]
 
+# Get base margin cols if needed
+base_margin_train = get_base_margin(X_train, model_hyper_params['base_margin_cols'])
+
 # Prepare data
-train = xgb.DMatrix(X_train, label = y_train)
+train = xgb.DMatrix(X_train, label = y_train, base_margin = base_margin_train)
+
 
 # Add the odds in case we're using custom loss
 # train.set_info(fighter1_backtesting_odds=X_train['fighter1_backtesting_odds'].values,

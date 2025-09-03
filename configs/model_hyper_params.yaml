@@ -38,3 +38,8 @@ trim_model_features: False
 
 # Set whether to use bootstrapping and bagging on the training data, or just use the training dataset. If enabled, the model will take the subsample and increase the sample size back to the original dataset through bootstrapping
 xgb_forest_bagging: True
+
+# These are the odds columns that will be used as base margin for each of the outcomes. They should be in the same order as the outcome labels. 
+# To asign a flat % probability, input a dictionary such as {'flat_prob': 0.01}. 
+# To not use any, input None
+base_margin_cols: ['notformodel_lw_base_margin', {'flat_prob': 0.01}, 'notformodel_wl_base_margin'] 

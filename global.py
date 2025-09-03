@@ -46,6 +46,7 @@ import random
 import re
 from re import sub
 import requests
+from scipy.special import logit
 from scipy.stats import hmean
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options

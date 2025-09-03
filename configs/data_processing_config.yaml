@@ -7,6 +7,10 @@ odds_suffix_for_true_odds: betfair_exch_odds
 # Set which odds should be used for the upcoming fights only # betfair_exch_odds or best_closing_odds
 upcoming_odds_suffix_for_true_odds: betfair_exch_odds
 
+# Set which odds to use for base margin in modelling (i.e. which odds to use when modelling a delta to odds rather than direct probs of winning)
+# Should generally just be whatever is used for backtesting. This will be calculated after the backtesting columns
+odds_suffix_for_base_margin: backtesting_odds
+
 # Set whether to impute odds where we have one fighter's odds but for some reason the odds scrape has missing for the other fighter
 impute_one_sided_missing_odds: True
 

@@ -661,6 +661,10 @@ def merge_and_process_all_clean_data(
     merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()
     merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper_params['odds_to_use']].copy()
 
+    # Add on odds to be used for base
+    merged_data['notformodel_wl_base_margin'] = merged_data['fighter1_' + data_processing_config['odds_suffix_for_base_margin']].copy()
+    merged_data['notformodel_lw_base_margin'] = merged_data['fighter2_' + data_processing_config['odds_suffix_for_base_margin']].copy()
+    
 
     ###########################################################################################
     # FLAG TRAIN/TEST/OOT

@@ -157,7 +157,7 @@ params.update({
     # 'nthread': 3, # Only applies to CPU cores
     # 'learning_rate': 0.0225, # Learning rate
     # 'min_child_weight': 15,                 # The min observations that should be left in a leaf node
-    'split_dec_or_other': params['exclude_split_other_from_train'],
+    # 'split_dec_or_other': params['exclude_split_other_from_train'],
     # 'subsample': 0.85,
     # 'colsample_bytree': 0.95,
     # 'max_depth': 1,
