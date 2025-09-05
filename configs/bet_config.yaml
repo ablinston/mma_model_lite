@@ -1,5 +1,5 @@
 # Set which version of the model to use for predicting upcoming fights
-model_to_use: './models/xgb_forest_v2.joblib'
+model_to_use: './models/xgb_forest_v3.0.10.joblib'
 
 # Set the minimum values to trigger a bet when predicting upcoming events. Works as strictly greater than
 min_prob_to_bet: 0.49

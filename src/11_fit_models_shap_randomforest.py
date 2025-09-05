@@ -98,11 +98,12 @@ params = {
     'random_state': config['seed_all'] + 38
 }
 
-# Remove any objects not for modelling
-X_train = X_train[[col for col in X_train if 'notformodel' not in col]]
 
 # Get base margin cols if needed
 base_margin_train = get_base_margin(X_train, model_hyper_params['base_margin_cols'])
+
+# Remove any objects not for modelling
+X_train = X_train[[col for col in X_train if 'notformodel' not in col]]
 
 # Prepare data
 train = xgb.DMatrix(X_train, label = y_train, base_margin = base_margin_train)

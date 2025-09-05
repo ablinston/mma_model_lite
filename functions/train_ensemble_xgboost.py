@@ -95,8 +95,6 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         
         # # Make sure both fighter1 and figher2 versions of columns in there or switch will fail
         # selected_columns = list(set(selected_columns + list_swap_fighter1_fighter2(selected_columns)))
-                
-        X_train_df =  X_train_df[selected_columns + ['id', 'train_fighter1_odds', 'train_fighter2_odds']]
         
         # Filter win loss only if applicable
         if params['win_loss_only'] == True:
@@ -115,14 +113,20 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         test_fighter1_odds = X_val['train_fighter1_odds'].to_numpy()
         test_fighter2_odds = X_val['train_fighter2_odds'].to_numpy()
 
+        # Get the base margins
+        base_margin_train = get_base_margin(X_train_df, params['base_margin_cols'])
+        base_margin_val = get_base_margin(X_val, params['base_margin_cols'])
+
+        X_train_df =  X_train_df[selected_columns + ['id', 'train_fighter1_odds', 'train_fighter2_odds']]
+
         # Drop the ID column
         cols_to_drop = [col for col in X_train_df.columns if 'train_fighter' in col or 'backtesting' in col or col == 'id' or 'notformodel' in col]
         X_train_df.drop(cols_to_drop, axis = 1, inplace = True)
         X_val.drop(cols_to_drop, axis = 1, inplace = True)
         
         # Create the DMatrix for XGBoost with the bootstrap sample for training and the full remaining data for validation
-        dmatrix_train = xgb.DMatrix(X_train_df, label=y_train_df)
-        dmatrix_val = xgb.DMatrix(X_val[X_train_df.columns], label=y_val)
+        dmatrix_train = xgb.DMatrix(X_train_df, label=y_train_df, base_margin = base_margin_train)
+        dmatrix_val = xgb.DMatrix(X_val[X_train_df.columns], label=y_val, base_margin = base_margin_val)
         
         # Train the model
         if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored

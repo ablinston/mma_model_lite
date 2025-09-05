@@ -19,7 +19,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the new model version number
-new_version_number = "3.0.11"
+new_version_number = "3.0.15"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -90,7 +90,8 @@ params = {
     'loss_function' : model_hyper_params['loss_function'],
     'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
     'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev'],
-    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging']
+    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging'],
+    'base_margin_cols': model_hyper_params['base_margin_cols']
 }
 
 # Set hyperparameters for the forest
@@ -155,7 +156,7 @@ for num_trees_i in list(range(1, 21, 2)) + list(range(25, 51, 5)) + list(range(6
 
 
 # Set the final number of models
-final_forest_size = 50
+final_forest_size = 70
 
 
 # Save the model

@@ -180,7 +180,8 @@ params.update({
     # 'loss_function' : model_hyper_params['loss_function'],
     'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
     'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev'],
-    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging']
+    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging'],
+    'base_margin_cols': model_hyper_params['base_margin_cols'] 
 }
 )
 

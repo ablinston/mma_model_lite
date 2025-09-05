@@ -1,6 +1,6 @@
 def create_dmatrix(X_train, y_train, train_idx, test_idx, base_margin_cols, win_loss_only = False, split_dec_or_other_filter = False):
     
-    pdb.set_trace()
+    # pdb.set_trace()
     # Convert train_idx to a boolean mask
     mask = pd.Series(False, index=X_train.index)
     mask.iloc[train_idx] = True  # Set True for indices in train_idx

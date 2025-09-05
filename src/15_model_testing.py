@@ -18,8 +18,8 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the model location
-model_path = './results/final_xgboost_forest.joblib'
-# model_path = './models/xgb_forest_v2.joblib'
+# model_path = './results/final_xgboost_forest.joblib'
+model_path = './models/xgb_forest_v3.0.10.joblib'
 
 # # Set the version number to be used in outputs
 # new_version_number = ''
@@ -126,7 +126,7 @@ for backtesting_params in [
     with mlflow.start_run() as run:
         
         # Get the model predictions
-        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train, model_hyper_params)
 
         # Log the SHAP values for the model
         log_shap_values_mlflow(rf_xgb_model, X_train)

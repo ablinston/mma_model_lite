@@ -1,5 +1,5 @@
 
-def predict_xgboost_ensemble(models, X_test_df, y_test_df = None):
+def predict_xgboost_ensemble(models, X_test_df, y_test_df = None, model_hyper_params = {}):
     """
     Generates multi-class predictions from an ensemble of XGBoost models.
 
@@ -21,8 +21,11 @@ def predict_xgboost_ensemble(models, X_test_df, y_test_df = None):
         # Clean the test features
         X_test_df = clean_inf_and_large(X_test_df).copy()
         
+        # Get base margin
+        base_margin_test = get_base_margin(X_test_df, model_hyper_params['base_margin_cols'])
+        
         # Create the DMatrix for predictions
-        dmatrix_test = xgb.DMatrix(X_test_df[model['model'].feature_names], label = y_test_df)
+        dmatrix_test = xgb.DMatrix(X_test_df[model['model'].feature_names], label = y_test_df, base_margin = base_margin_test)
         
         preds = model['model'].predict(dmatrix_test)
         model_predictions.append(preds)
