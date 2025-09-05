@@ -1,7 +1,7 @@
 import pandas as pd
 import polars as pl
 
-def merge_df_both_fighters_polars(left_df: pd.DataFrame, df_list: list[pd.DataFrame]) -> pd.DataFrame:
+def merge_df_both_fighters(left_df: pd.DataFrame, df_list: list[pd.DataFrame]) -> pd.DataFrame:
     """
     Merge fighter-related dataframes onto a main dataframe using Polars for efficiency.
 
@@ -39,9 +39,6 @@ def merge_df_both_fighters_polars(left_df: pd.DataFrame, df_list: list[pd.DataFr
     # Convert left_df to Polars
     left_pl = pl.from_pandas(left_df)
 
-    fighter1_dfs = []
-    fighter2_dfs = []
-
     for df in df_list:
         if len(df) == 0:
             continue
@@ -49,34 +46,28 @@ def merge_df_both_fighters_polars(left_df: pd.DataFrame, df_list: list[pd.DataFr
         df_pl = pl.from_pandas(df)
 
         # Fighter 1 prefixed version
-        f1 = df_pl.rename({c: f"fighter1_{c}" for c in df_pl.columns})
-        fighter1_dfs.append(f1)
+        f1 = df_pl.rename({c: f"fighter1_{c}" for c in df_pl.columns}).rename({
+            "fighter1_event": "event", "fighter1_bout": "bout", "fighter1_fighter":"fighter1"})
 
         # Fighter 2 prefixed version
-        f2 = df_pl.rename({c: f"fighter2_{c}" for c in df_pl.columns})
-        fighter2_dfs.append(f2)
-
-    # Concatenate all fighter1/2 dfs (if any)
-    fighter1_all = pl.concat(fighter1_dfs) if fighter1_dfs else None
-    fighter2_all = pl.concat(fighter2_dfs) if fighter2_dfs else None
-
-    # Merge fighter1 data
-    if fighter1_all is not None:
+        f2 = df_pl.rename({c: f"fighter2_{c}" for c in df_pl.columns}).rename({
+            "fighter2_event": "event", "fighter2_bout": "bout", "fighter2_fighter":"fighter2"})
+        
+        # Merge fighter1 data
         left_pl = left_pl.join(
-            fighter1_all,
-            left_on=["event", "bout", "fighter1"],
-            right_on=["fighter1_event", "fighter1_bout", "fighter1_fighter"],
-            how="left",
-        ).drop(["fighter1_event", "fighter1_bout", "fighter1_fighter"])
+                f1,
+                on=["event", "bout", "fighter1"],
+                how="left",
+            )
 
-    # Merge fighter2 data
-    if fighter2_all is not None:
+        # Merge fighter2 data
         left_pl = left_pl.join(
-            fighter2_all,
-            left_on=["event", "bout", "fighter2"],
-            right_on=["fighter2_event", "fighter2_bout", "fighter2_fighter"],
-            how="left",
-        ).drop(["fighter2_event", "fighter2_bout", "fighter2_fighter"])
-
+                f2,
+                on=["event", "bout", "fighter2"],
+                how="left",
+            )
+        
+        del [f1, f2]
+        
     # Convert back to Pandas
     return left_pl.to_pandas()

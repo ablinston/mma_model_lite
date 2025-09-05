@@ -54,7 +54,7 @@ def update_odds_on_merged_data(
 
     # Remove old columns
     merged_data.drop(columns = cols_to_remove, inplace = True)
-    
+    pdb.set_trace()
     # Merge on the new odds
     merged_data = merge_df_both_fighters(
         left_df =  merged_data,
