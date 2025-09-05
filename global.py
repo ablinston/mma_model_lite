@@ -1,6 +1,11 @@
 # Import functions from my scraper library
 import sys
-sys.path.append('E:/Repos/custom_tools')
+import os
+
+if os.name == "nt":
+    sys.path.append('E:/Repos/custom_tools')
+else:
+    sys.path.append('/home/andy/Repos/custom_tools')
 
 from model_tools.k_fold_id_by_runner import k_fold_id_by_runner
 
@@ -30,7 +35,6 @@ import mlflow
 # import mlflow.pyfunc
 from numba import njit
 import numpy as np
-import os
 from os import listdir, makedirs
 from os import path
 import pandas as pd
