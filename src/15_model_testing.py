@@ -18,8 +18,8 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the model location
-# model_path = './results/final_xgboost_forest.joblib'
-model_path = './models/xgb_forest_v3.0.10.joblib'
+model_path = './results/final_xgboost_forest.joblib'
+# model_path = './models/xgb_forest_v3.0.10.joblib'
 
 # # Set the version number to be used in outputs
 # new_version_number = ''
@@ -84,7 +84,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('OOT_testing_v2')
+mlflow.set_experiment('OOT_testing_v3')
 
 # Set this model's description for MLflow
 model_description = 'XGB forest v' + new_version_number + ', ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(rf_xgb_model[0]['features'])) + ' features ' + str(config['test_proportion']) + ' test size'
@@ -155,7 +155,7 @@ for backtesting_params in [
     with mlflow.start_run():
         
         # Get the model predictions
-        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test)
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test, model_hyper_params)
         
         # Log the SHAP values for the model
         log_shap_values_mlflow(rf_xgb_model, X_test)
@@ -185,7 +185,7 @@ for backtesting_params in [
         log_shap_values_mlflow(rf_xgb_model, X_oot)
         
         # Get the model predictions
-        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot, model_hyper_params)
         
         btest_model_and_log_mlflow(
             X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 

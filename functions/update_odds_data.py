@@ -11,7 +11,7 @@ def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odd
     # Scrape all the odds data for the fighters in the list
     new_odds_data, new_events_urls = parallel_scrape_odds_fast(
         new_fighter_list, 
-        num_threads = config['num_threads'], 
+        num_threads = 1, # config['num_threads'], TO ADDRESS ISSUE WITH BESTFIGHTODDS CAPTCHA
         firefox_location = config['firefox_location'], 
         gecko_driver = config['gecko_driver_location'],
         odds_urls_overide_df = fighter_odds_urls,
@@ -68,27 +68,27 @@ def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odd
     ### Update events data
     ###############################
     
-    if len(new_events_urls) > 0:
-        # Get a list of events that haven't already been parsed
-        new_events_to_scrape = new_events_urls[(~new_events_urls['event_url'].isin(existing_event_urls['event_url'].tolist())) | (new_events_urls['event_date'] >= date.today())]
+    # if len(new_events_urls) > 0:
+    #     # Get a list of events that haven't already been parsed
+    #     new_events_to_scrape = new_events_urls[(~new_events_urls['event_url'].isin(existing_event_urls['event_url'].tolist())) | (new_events_urls['event_date'] >= date.today())]
             
-        # Scrape the new event odds
-        new_events_odds = parallel_scrape_event_odds_fast(
-            new_events_to_scrape, 
-            num_threads = config['num_threads'], 
-            firefox_location = config['firefox_location'], 
-            gecko_driver = config['gecko_driver_location'],
-            fast = fast_scrape)
+    #     # Scrape the new event odds
+    #     new_events_odds = parallel_scrape_event_odds_fast(
+    #         new_events_to_scrape, 
+    #         num_threads = config['num_threads'], 
+    #         firefox_location = config['firefox_location'], 
+    #         gecko_driver = config['gecko_driver_location'],
+    #         fast = fast_scrape)
         
-        # Concat and replace duplicates
-        final_event_urls = pd.concat([new_events_to_scrape, existing_event_urls]).drop_duplicates()
-        final_event_odds = pd.concat([new_events_odds, existing_event_odds]).drop_duplicates(['date', 'fighter', 'opponent'], keep = 'first')
-        # Ensure format of final cols correct
-        final_event_odds.loc[:, odds_scrape_config['events_colnames']] = final_event_odds[odds_scrape_config['events_colnames']].apply(pd.to_numeric, errors = 'coerce')
+    #     # Concat and replace duplicates
+    #     final_event_urls = pd.concat([new_events_to_scrape, existing_event_urls]).drop_duplicates()
+    #     final_event_odds = pd.concat([new_events_odds, existing_event_odds]).drop_duplicates(['date', 'fighter', 'opponent'], keep = 'first')
+    #     # Ensure format of final cols correct
+    #     final_event_odds.loc[:, odds_scrape_config['events_colnames']] = final_event_odds[odds_scrape_config['events_colnames']].apply(pd.to_numeric, errors = 'coerce')
         
-    else:
+    # else:
         # The scrape was unsuccesful
-        final_event_urls = existing_event_urls
-        final_event_odds = existing_event_odds
+    final_event_urls = existing_event_urls
+    final_event_odds = existing_event_odds
         
     return new_odds_data, final_event_urls, final_event_odds

@@ -9,6 +9,7 @@ def test_aggregate_last_X_fight_data():
     
     # Creating a dataframe with multiple fighters and time series
     data = {
+        'event': range(1, 7),
         'fighter_id': ['fighter_1', 'fighter_1', 'fighter_1', 'fighter_2', 'fighter_2', 'fighter_2'],
         'date': pd.to_datetime(['2024-01-01', '2024-02-01', '2024-03-01', '2024-01-01', '2024-02-01', '2024-03-01']),
         'score': [10, np.nan, 20, 15, 5, np.nan],  # Contains NAs
@@ -18,7 +19,7 @@ def test_aggregate_last_X_fight_data():
     df = pd.DataFrame(data)
 
     # Define columns and parameters
-    ignore_cols = ['fighter_id', 'date', 'opponent']  # Columns to ignore in aggregation
+    ignore_cols = ['event', 'fighter_id', 'date', 'opponent']  # Columns to ignore in aggregation
     group_by = ['fighter_id']  # Group by fighter_id
     prefix = 'cumulative_'  # Prefix for new columns
 
@@ -71,7 +72,7 @@ def test_aggregate_last_X_fight_data():
 
     bayes_result = aggregate_last_X_fight_data(
         df, 
-        ignore_cols = ['event', 'bout', 'date', 'fighter', 'weightclass'], 
+        id_cols = ['event', 'bout', 'date', 'fighter', 'weightclass'], 
         group_by = ['fighter'], 
         prefix = 'test_', 
         X = 3, 

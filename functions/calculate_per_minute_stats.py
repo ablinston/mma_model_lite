@@ -4,7 +4,7 @@
 
 def calculate_per_minute_stats(fight_stats_hist, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'baye']):
 
-    stats_df = fight_stats_hist.copy()
+    stats_df = fight_stats_hist.copy().reset_index(drop = True)
     
     # pdb.set_trace()
     

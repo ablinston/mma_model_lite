@@ -12,8 +12,8 @@ def add_upcoming_to_fight_stats(fight_stats, upcoming_fight_details_df, events, 
     # Create empty stats rows for each fight
     upcoming_fight_details[['fighter1', 'fighter2']] = upcoming_fight_details['bout'].str.split('vs\\.', expand = True)
     upcoming_fight_stats = pd.concat([
-        upcoming_fight_details[['event', 'bout', 'fighter1']].rename(columns = {'fighter1': 'fighter'}),
-        upcoming_fight_details[['event', 'bout', 'fighter2']].rename(columns = {'fighter2': 'fighter'})
+        upcoming_fight_details[['event', 'bout', 'date', 'fighter1']].rename(columns = {'fighter1': 'fighter'}),
+        upcoming_fight_details[['event', 'bout', 'date', 'fighter2']].rename(columns = {'fighter2': 'fighter'})
         ])
     
     return pd.concat([upcoming_fight_stats, fight_stats])

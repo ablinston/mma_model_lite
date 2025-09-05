@@ -1,10 +1,11 @@
-def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute_calc = False, bayes_priors_df = None, bayes_alpha_plus_beta_rebase = None):
+def aggregate_last_X_fight_data(df, id_cols, group_by, prefix, X, per_minute_calc = False, bayes_priors_df = None, bayes_alpha_plus_beta_rebase = None):
     """
     Convert fight data into cumulative fight history for the last 3 entries (excluding the current entry).
+    THis version of the functions uses polars for the underlying calcs
 
     arguments:
     df: a data frame with one row for each fighter
-    ignore_cols: the columns not to be aggregated
+    id_cols: the columns not to be aggregated
     group_by: a list of columns to be aggregated by
     prefix: a str to be added to the start of stat columns
     X: the number of historic fights to include
@@ -18,61 +19,51 @@ def aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, X, per_minute
     # pdb.set_trace()
     
     # Get columns for grouping and stats
-    id_columns = list(set(ignore_cols + group_by))
+    id_columns = list(set(id_cols + group_by))
     stat_columns = [col for col in df.columns if col not in id_columns]
     
+    # Convert to polars
     # Sort DataFrame by group_by columns and date for ordered cumulative calculation
-    df_sorted = df.sort_values(by=group_by + ['date']).reset_index(drop=True)
+    pl_sorted = pl.from_pandas(df).sort(by=group_by + ['date'])
+    
+    # Set the join columns
+    join_cols = [col for col in id_cols if 'date' not in col]
+    
+    # Check that the join cols give unique rows
+    stop_if_not(len(pl_sorted) == len(pl_sorted.unique(subset = join_cols)), "Check that join cols identified in aggregate_last_X_fight_data inputs have a unique row for each occurance.")
     
     # pdb.set_trace()
     
     # Group by the group_by columns and calculate rolling sums for the last 3 entries
-    rolling_data = (
-        df_sorted.groupby(group_by)
-        .apply(lambda x: x[stat_columns].shift(1).rolling(window=X, min_periods=1).sum(), include_groups = False)
-        .reset_index(level=group_by, drop=True)
-    )
+    rolling_data = pl_sorted.with_columns([
+        pl.col(c).shift(1).rolling_sum(X, min_samples = 1).over(group_by)
+        for c in stat_columns
+    ])
+    
+    
+        
+    # Rename the adj columns to make it clear what they are
+    rolling_data = rolling_data.rename({col: col[:-4] + "_adjsum" if col.endswith("_adj") else col for col in rolling_data.columns})
+    
+    # Calculate rolling means for the adj statistics
+    rolling_mean_data = pl_sorted.with_columns([
+        pl.col(c).shift(1).rolling_mean(X, min_samples = 1).over(group_by)
+        for c in [col for col in stat_columns if '_adj' in col]
+    ]).select(id_cols + [col for col in stat_columns if '_adj' in col])
     
     # Rename the adj columns to make it clear what they are
-    rolling_data.rename(columns={col: col[:-4] + "_adjsum" if col.endswith("_adj") else col for col in df.columns}, inplace=True)
-    
-    rolling_mean_data = (
-        df_sorted.groupby(group_by)
-        .apply(lambda x: x[[stat for stat in stat_columns if '_adj' in stat]].shift(1).rolling(window=X, min_periods=1).mean(), include_groups = False)
-        .reset_index(level=group_by, drop=True)
-    )
-    
-    # Rename the adj columns to make it clear what they are
-    rolling_mean_data.rename(columns={col: col[:-4] + "_adjmean" if col.endswith("_adj") else col for col in df.columns}, inplace=True)
+    rolling_mean_data = rolling_mean_data.rename({col: col[:-4] + "_adjmean" if col.endswith("_adj") else col for col in rolling_mean_data.columns})
     
     # Combine the dataset
-    rolling_data = pd.concat([rolling_data, rolling_mean_data], axis = 1)
-    
-    # # Convert your pandas DataFrame to a Dask DataFrame
-    # ddf = dd.from_pandas(df_sorted, npartitions=4)  # Adjust the number of partitions as needed
-
-    # # Ensure the data is sorted by the group key to allow for proper rolling
-    # ddf = ddf.sort_values(by=group_by + ['date'])
-
-    # # Perform the shift and rolling sum
-    # def apply_rolling(group):
-    #     group[stat_columns] = group[stat_columns].shift(1)
-    #     return group[stat_columns].rolling(window=X, min_periods=1).sum()
-
-    # # Apply the rolling operation with a custom meta to avoid the warning
-    # rolling_data = (
-    #     ddf.groupby(group_by, group_keys=False)
-    #     .apply(apply_rolling, meta={col: 'f8' for col in stat_columns})  # Specify the meta here
-    #     .compute()  # Convert back to pandas
-    # )
-        
+    rolling_data = rolling_data.join(rolling_mean_data.drop('date'), on = join_cols, how = 'left')
+            
     # If fights column is in, replace NAs with 0
     if 'fights' in stat_columns:
-        rolling_data['fights'] = rolling_data['fights'].fillna(0)
+        rolling_data = rolling_data.with_columns([pl.col('fights').fill_null(0)])
     
     # Rename columns with prefix and concatenate with the id_columns
-    rolling_data = rolling_data.rename(columns=lambda x: prefix + x)
-    df_rolling = pd.concat([df_sorted[id_columns].reset_index(drop=True), rolling_data.reset_index(drop=True)], axis=1)
+    rolling_data = rolling_data.rename({x: prefix + x for x in rolling_data.columns if x not in id_columns})
+    df_rolling = pl_sorted[join_cols].join(rolling_data, on = join_cols, how = 'left').to_pandas()
 
     # Calculate per minute stats if needed
     if per_minute_calc:

@@ -35,7 +35,7 @@ def predict_future_events(
         the path where the outputs from the predictions will be saved. This is in addition to automatic outputs, which will be saved in ./results/
     
     """
-
+    
     # Set the odds to use as upcoming instead of as used in the regular data
     data_processing_config['odds_suffix_for_true_odds'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
     model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
@@ -47,8 +47,8 @@ def predict_future_events(
     if not skip_data_update:
         
         # Run these scripts to scrape then clean the raw data
-        scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
-        clean_all_raw_data_and_save(config)
+        # scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
+        # clean_all_raw_data_and_save(config)
         
         gc.collect();
         
@@ -72,7 +72,8 @@ def predict_future_events(
                     final_data_folder = config['final_data_path'],
                     average_odds_model_path = './results/average_odds_model.joblib',
                     config = config,
-                    data_processing_config = data_processing_config
+                    data_processing_config = data_processing_config,
+                    upcoming_only = True
                     )
         else:
             # Refresh the dataset

@@ -140,4 +140,5 @@ def derive_start_elos(elo_dt, fight_stats_dt, elo_constants):
 
 
     print("ELOs failed to compute after 500 rounds of iteration")
+    pdb.set_trace()
     return 1, 1

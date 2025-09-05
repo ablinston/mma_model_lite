@@ -17,6 +17,9 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
     # Recode the target. Don't need to distinguish between D and NC
     fight_results['outcome'] = np.where((fight_results['outcome'] == "D/D") | (fight_results['outcome'] == "NC/NC"), "OTH", fight_results['outcome'])
     
+    # Remove any results that are wins or losses by DQ. Just recode as OTH
+    fight_results['outcome'] = np.where((fight_results['method'] == "Other"), "OTH", fight_results['outcome'])
+    
     # Add the fighter columns needed to the data
     fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\\.', expand = True)
 
@@ -28,9 +31,9 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
         ]
     ).reset_index().drop(columns = ['index'])
 
-    # Remove any results that aren't wins or losses by DQ. Remove anything before start_date because of multiple fights per date.
-    # Keep np.nan because these are future events we want ELOs for
-    merged_data = merged_data[(merged_data['method'].isin(['Decision-Unanimous', 'KO/TKO', 'Submission', 'Decision-Split', np.nan])) & (merged_data['date'] >= start_date)]
+    # # Remove any results that aren't wins or losses by DQ. Remove anything before start_date because of multiple fights per date.
+    # # Keep np.nan because these are future events we want ELOs for
+    # merged_data = merged_data[(merged_data['method'].isin(['Decision-Unanimous', 'KO/TKO', 'Submission', 'Decision-Split', np.nan, None])) & (merged_data['date'] >= start_date)]
 
     # Cleanup
     del([fight_results, fight_stats])
@@ -56,7 +59,7 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
     start_elo = pd.concat([
         merged_data[['fighter1', 'date']].rename(columns = {'fighter1': 'fighter'}),
         merged_data[['fighter2', 'date']].rename(columns = {'fighter2': 'fighter'})
-        ]).sort_values(['fighter', 'date'])
+        ]).sort_values(['fighter', 'date']).reset_index(drop=True)
 
     # # Remove any remaining duplicates # Shouldn't be needed
     # start_elo = start_elo.drop_duplicates(['date', 'fighter'])
@@ -70,12 +73,12 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
 
     # Now merge these onto the merged fight data to being calculating the ELO at the end of the first fights
     merged_data = merged_data.merge(
-        start_elo[['fighter', 'date', 'start_elo']].rename(columns = {'start_elo': 'fighter1_start_elo'}),
+        start_elo[['fighter', 'date', 'start_elo', 'fight_number']].rename(columns = {'start_elo': 'fighter1_start_elo', 'fight_number': 'fighter1_fight_number'}),
         left_on = ['fighter1', 'date'], 
         right_on = ['fighter', 'date'],
         how = 'left'
     ).drop(columns='fighter').merge(
-        start_elo[['fighter', 'date', 'start_elo']].rename(columns = {'start_elo': 'fighter2_start_elo'}),
+        start_elo[['fighter', 'date', 'start_elo', 'fight_number']].rename(columns = {'start_elo': 'fighter2_start_elo', 'fight_number': 'fighter2_fight_number'}),
         left_on = ['fighter2', 'date'], 
         right_on = ['fighter', 'date'],
         how = 'left'
@@ -132,8 +135,8 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
     
     # Add the fight number for each fighter
     merged_data.sort_values('date', inplace = True)
-    merged_data['fighter1_fight_number'] = merged_data.groupby('fighter1').cumcount() + 1
-    merged_data['fighter2_fight_number'] = merged_data.groupby('fighter2').cumcount() + 1
+    # merged_data['fighter1_fight_number'] = merged_data.groupby('fighter1').cumcount() + 1
+    # merged_data['fighter2_fight_number'] = merged_data.groupby('fighter2').cumcount() + 1
     
     # Calculate the inverse of the fight length proportion (doing all as 25 minutes). Positive for a win, negative for loss
     merged_data['fight_end_in_round'] = np.ceil(merged_data['fighter1_allrounds_fight_minutes'] / 5)

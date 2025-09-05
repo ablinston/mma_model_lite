@@ -29,11 +29,13 @@ skip_save_data = False
 
 # # Load files
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('Model_Monitoring')
+mlflow.set_experiment('Model_Monitoring_v2')
 
 # Load all model versions
 rf_xgb_models = {}
-for i in range(1, 3):
+model_versions = [1, 2, '3.0.10']
+
+for i in model_versions:
     rf_xgb_models.update({str(i): joblib.load('./models/xgb_forest_v' + str(i) + '.joblib')})
 
 
@@ -143,19 +145,23 @@ backtesting_params = {
 
 
 # Loop through each model version and test
-for model_version in range(1, len(rf_xgb_models) + 1):
+for model_version in model_versions:
     
     with mlflow.start_run() as run:
         
         # Get the model predictions
-        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_models[str(model_version)], X_oot, [0] * len(X_oot))
+        prediction_probabilities, temp = predict_xgboost_ensemble(
+            rf_xgb_models[str(model_version)], 
+            X_oot, 
+            [0] * len(X_oot), 
+            model_hyper_params = model_hyper_params)
         
         btest_model_and_log_mlflow(
             X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
             prediction_probabilities, 
             breakdown_cols = breakdown_cols, 
             breakdown_metrics = breakdown_metrics, 
-            mlflow_description = 'Fixed KOs - XGB Forest v' + str(model_version), 
+            mlflow_description = 'XGB Forest v' + str(model_version), 
             target_column = target,
             backtesting_params = backtesting_params)
         

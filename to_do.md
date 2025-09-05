@@ -1,6 +1,7 @@
 # Feature ideas
 
 * Add odds accuracy history for that fighter
+* Add adjusted accuracy like with the bayes per minute adjusted stats
 
 # To do scripts
 

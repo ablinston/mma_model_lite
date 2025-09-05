@@ -35,6 +35,6 @@ def test_trim_column_list():
 
     # Test 7: Case with only the replaceable substrings
     column_list = ['_adjsum', '_adjmean', '_ratio', '_bayes']
-    expected_result = ['_adjsum']
+    expected_result = ['_adjsum', '_ratio']
     assert trim_column_list(column_list) == expected_result
     
