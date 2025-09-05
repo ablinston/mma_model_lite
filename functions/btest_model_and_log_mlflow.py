@@ -120,6 +120,27 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
     
     # Finally, get the backtesting results
     backtesting, backtesting_fight_output = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params)
+   
+    # Summarise the ROI for EV bands
+    roi_by_ev = summarise_bet_roi_by_ev(backtesting_fight_output)
+    
+    # Create chart and log in MLflow
+    fig = plot_roi_and_sample_size(roi_by_ev)
+    mlflow.log_figure(fig, "Backtesting results/ROI_by_EV.png")
+    
+    # Plot and log the calibration curve
+    fig = plot_calibration_curve(
+        np.where(actuals_data['outcome'] == 'W/L', 1, 0),
+        prediction_probabilities[:, 2] # Associated probabilities
+    )
+    mlflow.log_figure(fig, "Backtesting results/F1_Win_Calibration_Curve.png")
+    
+    # Plot and log the calibration curve
+    fig = plot_calibration_curve(
+        np.where(actuals_data['outcome'] == 'L/W', 1, 0),
+        prediction_probabilities[:, 0] # Associated probabilities
+    )
+    mlflow.log_figure(fig, "Backtesting results/F2_Win_Calibration_Curve.png")
     
     # Log the overall backtesting results
     backtesting.to_csv('results/temp/summary.csv', index = True)

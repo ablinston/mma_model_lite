@@ -6,6 +6,7 @@ def merge_and_process_all_clean_data(
         data_processing_config,
         odds_scrape_config,
         model_hyper_params,
+        test_fighter_list = [],
         skip_save_data = False # whether to skip the save data and just return merged data
         ):
     
@@ -660,12 +661,16 @@ def merge_and_process_all_clean_data(
     merged_data['fighter1_backtesting_odds'] = merged_data['fighter1_' + model_hyper_params['odds_to_use']].copy()
     merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper_params['odds_to_use']].copy()
 
+    # Add on odds to be used for base
+    merged_data['notformodel_wl_base_margin'] = merged_data['fighter1_' + data_processing_config['odds_suffix_for_base_margin']].copy()
+    merged_data['notformodel_lw_base_margin'] = merged_data['fighter2_' + data_processing_config['odds_suffix_for_base_margin']].copy()
+    
 
     ###########################################################################################
     # FLAG TRAIN/TEST/OOT
-
-    np.random.seed(seed = config['seed_all'] + 7156)
-    merged_data = flag_train_test_oot(merged_data, config)
+    # pdb.set_trace()
+    np.random.seed(seed = config['seed_all'] + 715)
+    merged_data = flag_train_test_oot(merged_data, config, test_fighter_list)
 
 
 

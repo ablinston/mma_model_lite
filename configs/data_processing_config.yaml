@@ -7,11 +7,15 @@ odds_suffix_for_true_odds: betfair_exch_odds
 # Set which odds should be used for the upcoming fights only # betfair_exch_odds or best_closing_odds
 upcoming_odds_suffix_for_true_odds: betfair_exch_odds
 
+# Set which odds to use for base margin in modelling (i.e. which odds to use when modelling a delta to odds rather than direct probs of winning)
+# Should generally just be whatever is used for backtesting. This will be calculated after the backtesting columns
+odds_suffix_for_base_margin: backtesting_odds
+
 # Set whether to impute odds where we have one fighter's odds but for some reason the odds scrape has missing for the other fighter
 impute_one_sided_missing_odds: True
 
 # Set whether to add the bayes versions of columns
-add_bayes_stats_columns: False
+add_bayes_stats_columns: True
 
 # Set how many past fights to use to calculate the bayesian priors. Not this will be per weightclass
 bayes_fightspan: 200
@@ -24,5 +28,5 @@ bayes_alpha_plus_beta_rebase_per_minute: 105
 bayesian_groupby: [] # ['weightclass']
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats)
-add_adj_bayes_columns: False
+add_adj_bayes_columns: True
 

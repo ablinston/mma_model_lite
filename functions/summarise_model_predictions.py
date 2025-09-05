@@ -70,9 +70,13 @@ def summarise_model_predictions(
     
     actuals_data['kelly_criterion'] = win_prob - (1 - win_prob) / (win_odds - 1)
     
-    # Perform a check that kelly is correct
-    stop_if_not((actuals_data['kelly_criterion'].max() <= 1) and (actuals_data['kelly_criterion'].min() >= 0),
-                'Kelly criterion check')
+    # Perform a check that kelly is correct if only +EV bets, it should always be positive.
+    if min_ev_to_bet >= 0:
+        stop_if_not((actuals_data['kelly_criterion'].max() <= 1) and (actuals_data['kelly_criterion'].min() >= 0),
+                    'Kelly criterion check')
+    else:
+        stop_if_not((actuals_data['kelly_criterion'].max() <= 1),
+                    'Kelly criterion check')
     
     # And use it to calculate how much to increase from the min
     actuals_data['bet_size'] = actuals_data['bets'] * (min_bet_size + (max_bet_size - min_bet_size) * actuals_data['kelly_criterion'])

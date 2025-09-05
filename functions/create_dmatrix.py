@@ -1,4 +1,5 @@
-def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False, split_dec_or_other_filter = False):
+def create_dmatrix(X_train, y_train, train_idx, test_idx, base_margin_cols, win_loss_only = False, split_dec_or_other_filter = False):
+    
     # pdb.set_trace()
     # Convert train_idx to a boolean mask
     mask = pd.Series(False, index=X_train.index)
@@ -31,21 +32,30 @@ def create_dmatrix(X_train, y_train, train_idx, test_idx, win_loss_only = False,
     test_fighter1_odds = X_train.iloc[test_idx]['fighter1_odds_for_loss']
     test_fighter2_odds = X_train.iloc[test_idx]['fighter2_odds_for_loss']
 
+    # Create test
+    X_test = X_train.copy().iloc[test_idx]
+
+    # Get base margin cols if needed
+    base_margin_train = get_base_margin(filtered_X_train, base_margin_cols)
+    base_margin_test = get_base_margin(X_test, base_margin_cols)
+
     # Remove odds used for loss from training and test X data
     cols_to_remove = [col for col in X_train.columns if 'for_loss' in col or 'backtesting' in col or 'notformodel' in col]
     filtered_X_train.drop(cols_to_remove, axis = 1, inplace = True)
-    X_test = X_train.copy().iloc[test_idx].drop(cols_to_remove, axis = 1)
+    X_test = X_test.drop(cols_to_remove, axis = 1)
 
     # Check if empty
     if len(filtered_X_train) == 0:
         pdb.set_trace()
 
+   
+
     # Create the DMatrix
     if split_dec_or_other_filter:
-        train_dmatrix = xgb.DMatrix(filtered_X_train, label=filtered_y_train)
-        test_dmatrix = xgb.DMatrix(X_test, label=y_train.iloc[test_idx])
+        train_dmatrix = xgb.DMatrix(filtered_X_train, label=filtered_y_train, base_margin = base_margin_train)
+        test_dmatrix = xgb.DMatrix(X_test, label=y_train.iloc[test_idx], base_margin = base_margin_test)
     else:
-        train_dmatrix = xgb.DMatrix(filtered_X_train, label=filtered_y_train)
-        test_dmatrix = xgb.DMatrix(X_test, label=y_train.iloc[test_idx])
+        train_dmatrix = xgb.DMatrix(filtered_X_train, label=filtered_y_train, base_margin = base_margin_train)
+        test_dmatrix = xgb.DMatrix(X_test, label=y_train.iloc[test_idx], base_margin = base_margin_test)
 
     return train_dmatrix, test_dmatrix, train_fighter1_odds, train_fighter2_odds, test_fighter1_odds, test_fighter2_odds

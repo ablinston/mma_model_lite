@@ -1,6 +1,6 @@
 # This function takes a data frame and flags the data with train/test/oot for a given config
 
-def flag_train_test_oot(df, config):
+def flag_train_test_oot(df, config, test_fighter_list = []):
     
     # pdb.set_trace()
     data = df.copy()
@@ -16,21 +16,26 @@ def flag_train_test_oot(df, config):
     data_without_oot = data[data['train_test_oot_flag'] == 'train'].copy()
         
     # Get a list of all fighters to select the test data
-    random.seed(config['seed_all'] + 45)
+    if len(test_fighter_list) == 0:
+        random.seed(config['seed_all'] + 45)
+        
+        ## Generate a random number for each fighter in a way that keeps them consistent when new ones are added
+        # First generate one for every fight, then drop duplicates to take the first random number allocated for each fighter. Need two sets so that fighter2 always starts at the same point too
+        
+        rand_set_1 = np.random.rand(len(data_without_oot))
+        
+        random.seed(config['seed_all'] + 97502)
+        rand_set_2 = np.random.rand(len(data_without_oot))
+        
+        rands = pd.DataFrame({'fighter': data_without_oot['fighter1'].tolist() + data_without_oot['fighter2'].tolist(),
+                             'rand': np.concatenate((rand_set_1, rand_set_2))}).drop_duplicates(subset = ['fighter'])
+        
+        # Set test fighters as those below a certain threshold, multiplied by a factor to get roughly the right proportion of fights
+        test_fighter_list = rands[rands['rand'] < config['test_proportion'] * 0.35]['fighter'].to_list()
     
-    ## Generate a random number for each fighter in a way that keeps them consistent when new ones are added
-    # First generate one for every fight, then drop duplicates to take the first random number allocated for each fighter. Need two sets so that fighter2 always starts at the same point too
-    
-    rand_set_1 = np.random.rand(len(data_without_oot))
-    
-    random.seed(config['seed_all'] + 97502)
-    rand_set_2 = np.random.rand(len(data_without_oot))
-    
-    rands = pd.DataFrame({'fighter': data_without_oot['fighter1'].tolist() + data_without_oot['fighter2'].tolist(),
-                         'rand': np.concatenate((rand_set_1, rand_set_2))}).drop_duplicates(subset = ['fighter'])
-    
-    # Set test fighters as those below a certain threshold, multiplied by a factor to get roughly the right proportion of fights
-    test_fighters = rands[rands['rand'] < config['test_proportion'] * 0.35]['fighter'].to_list()
+    # pdb.set_trace()
+    # with open("./configs/test_fighters.yaml", "w") as file:
+    #     dump(test_fighters, file, default_flow_style=False)
     
     # test_fighters = random.sample(
     #     list(set(data_without_oot['fighter1'].tolist() + data_without_oot['fighter2'].tolist())),
@@ -39,7 +44,7 @@ def flag_train_test_oot(df, config):
     
     # Set the test fighters to test
     data['train_test_oot_flag'] = np.where(
-        (data['train_test_oot_flag'] == 'train') & (data['fighter1'].isin(test_fighters) | data['fighter2'].isin(test_fighters)),
+        (data['train_test_oot_flag'] == 'train') & (data['fighter1'].isin(test_fighter_list) | data['fighter2'].isin(test_fighter_list)),
         'test',
         data['train_test_oot_flag']
     )

@@ -175,7 +175,7 @@ def backtest_model(
     actuals_data.sort_values('date', inplace = True)
     
     if 'y_pred_prob' in actuals_data.columns:
-        fight_output = actuals_data[['date', 'fighter1', 'Fighter1_win_prob', 'fighter1_backtesting_odds', 'fighter2', 'Fighter2_win_prob', 'fighter2_backtesting_odds', 'outcome', 'target', 'predictions', 'bets', 'bet_ev', 'profit_loss', 'bet_triggered_after_cutoff' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'total', 'fights', 'wins', 'y_pred_prob']]
+        fight_output = actuals_data[['date', 'fighter1', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter1_backtesting_odds', 'fighter2', 'Fighter2_win_prob', 'Fighter2_win_EV', 'fighter2_backtesting_odds', 'outcome', 'target', 'predictions', 'bets', 'bet_ev', 'profit_loss', 'bet_triggered_after_cutoff' ,'kelly_criterion', 'bet_size', 'max_bet_size', 'total', 'fights', 'wins', 'y_pred_prob']]
     else:
         fight_output = None
     

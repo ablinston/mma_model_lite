@@ -58,6 +58,7 @@ if not skip_data_update:
                 data_processing_config,
                 odds_scrape_config,
                 model_hyper_params,
+                test_fighter_list = test_fighters,
                 skip_save_data = skip_save_data # whether to skip the save data and just return merged data
                 )
         
@@ -154,7 +155,7 @@ for model_version in range(1, len(rf_xgb_models) + 1):
             prediction_probabilities, 
             breakdown_cols = breakdown_cols, 
             breakdown_metrics = breakdown_metrics, 
-            mlflow_description = 'XGB Forest v' + str(model_version), 
+            mlflow_description = 'Fixed KOs - XGB Forest v' + str(model_version), 
             target_column = target,
             backtesting_params = backtesting_params)
         

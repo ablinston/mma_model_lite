@@ -1,3 +1,11 @@
+# Import functions from my scraper library
+import sys
+sys.path.append('E:/Repos/custom_tools')
+
+from model_tools.k_fold_id_by_runner import k_fold_id_by_runner
+
+# from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
+
 import betfairlightweight
 from betfairlightweight import StreamListener
 from betfairlightweight.filters import market_filter, price_projection, streaming_market_filter, streaming_market_data_filter
@@ -20,6 +28,7 @@ import itertools
 import joblib
 import mlflow
 # import mlflow.pyfunc
+from numba import njit
 import numpy as np
 import os
 from os import listdir, makedirs
@@ -37,14 +46,16 @@ import random
 import re
 from re import sub
 import requests
+from scipy.special import logit
 from scipy.stats import hmean
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 import shutil
 # from sklearn.utils import resample
+from sklearn.calibration import calibration_curve
 from sklearn.metrics import log_loss, accuracy_score, f1_score, roc_auc_score
-from sklearn.preprocessing import LabelEncoder, label_binarize
+from sklearn.preprocessing import LabelEncoder, label_binarize, OrdinalEncoder
 import string
 # import sys
 import threading

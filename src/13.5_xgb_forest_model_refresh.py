@@ -25,7 +25,7 @@ exec(open('global.py').read())
 rf_xgb_model = joblib.load(bet_config['model_to_use'])
 
 # Set the new model version number
-new_version_number = "2.0.12"
+new_version_number = "2.0.13"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -68,17 +68,20 @@ all_features = []
 for i in range(0, len(rf_xgb_model)):
     all_features = all_features + rf_xgb_model[i]['features']
 
-all_features = list(set(all_features))
-
 # Add on manually any features we want in there
 all_features = all_features + ['fighter1_date_minus_dob', 'fighter2_date_minus_dob', 'diff_date_minus_dob']
+
+all_features = list(set(all_features))
+
+# Record how many features there are
+number_of_features = len(all_features)
 
 # Remove the rest from the data
 X_train_master = X_train_master[all_features + ['fighter1_backtesting_odds', 'fighter2_backtesting_odds', 'notformodel_split_dec_or_other', 'notformodel_fighter1', 'notformodel_fighter2']]
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('xgb_model_v' + new_version_number + '_refresh')
+mlflow.set_experiment('xgb_model_v2_refresh')
 
 
 
@@ -93,7 +96,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [135]),
+    'num_of_features': hp.choice('num_of_features', [number_of_features]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
     'hyperopt_early_stopping': 75
 }
@@ -154,7 +157,7 @@ params.update({
     # 'nthread': 3, # Only applies to CPU cores
     # 'learning_rate': 0.0225, # Learning rate
     # 'min_child_weight': 15,                 # The min observations that should be left in a leaf node
-    'split_dec_or_other': params['exclude_split_other_from_train'],
+    # 'split_dec_or_other': params['exclude_split_other_from_train'],
     # 'subsample': 0.85,
     # 'colsample_bytree': 0.95,
     # 'max_depth': 1,
@@ -177,7 +180,8 @@ params.update({
     # 'loss_function' : model_hyper_params['loss_function'],
     'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
     'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev'],
-    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging']
+    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging'],
+    'base_margin_cols': model_hyper_params['base_margin_cols'] 
 }
 )
 
@@ -196,7 +200,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training = all_features,
-    num_models = 50,
+    num_models = 150,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
@@ -208,7 +212,7 @@ xgboost_rf = train_ensemble_xgboost(
 mlflow.set_experiment('xgb_model_v' + new_version_number + '_refresh_trees')
 
 # for num_trees in [1]:
-for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 20)):
+for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 10)):
         
     if len(xgboost_rf) >= num_trees_i:
         
@@ -223,7 +227,7 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 2
             mlflow.set_tag('Sample', 'Train')
                         
             # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_train, y_train)
+            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_train, y_train)
             
             # Log the predictions just from the odds for info
             log_metrics_odds_mlflow(X_train, y_train)
@@ -239,14 +243,14 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 2
             mlflow.set_tag('Sample', 'Test')
                         
             # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_test, y_test)
+            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_test, y_test)
             
             # Log the predictions just from the odds for info
             log_metrics_odds_mlflow(X_test, y_test)
 
 
 # Set the final number of models
-final_forest_size = 21
+final_forest_size = 2
 
 
 # Save the model

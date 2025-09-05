@@ -17,6 +17,7 @@ if not os.name == "nt":
             data_processing_config = data_processing_config,
             model_hyper_params = model_hyper_params,
             betfair_login_config = betfair_login_config,
+            test_fighters = test_fighters,
             output_path = '/home/andy/to_gdrive'
             )
     
@@ -31,6 +32,7 @@ else:
             data_processing_config = data_processing_config,
             model_hyper_params = model_hyper_params,
             betfair_login_config = betfair_login_config,
+            test_fighters = test_fighters,
             output_path = None
             )
 

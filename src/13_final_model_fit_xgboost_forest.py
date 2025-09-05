@@ -18,6 +18,9 @@ import xgboost as xgb
 # Read in global objects and packages
 exec(open('global.py').read())
 
+# Set the new model version number
+new_version_number = "3.0.15"
+
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
@@ -52,7 +55,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v6')
+mlflow.set_experiment('gt2_fights_xgboost_forest_v' + new_version_number)
 
 
 
@@ -61,13 +64,13 @@ mlflow.set_experiment('2014+_gt2_fights_xgboost_forest_v6')
 ##########################################################################################
 
 params = {
-    'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.0225, # Learning rate
+    # 'nthread': 3, # Only applies to CPU cores
+    'learning_rate': 0.00827, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
-    'split_dec_or_other': False,
+    'split_dec_or_other': True, # whether to exclude them
     'subsample': 0.85,
-    'colsample_bytree': 0.95,
-    'max_depth': 1,
+    'colsample_bytree': 0.025,
+    'max_depth': 2,
     # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -82,12 +85,13 @@ params = {
     # 'reg_alpha': 0.3, # Lasso regularisation
     # 'reg_lambda': 0.02, # ridge regularisation
     # 'gamma': 1.13,
-    'win_loss_only': False,
+    'win_loss_only': True,
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function'],
     'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
     'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev'],
-    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging']
+    'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging'],
+    'base_margin_cols': model_hyper_params['base_margin_cols']
 }
 
 # Set hyperparameters for the forest
@@ -114,7 +118,7 @@ xgboost_rf = train_ensemble_xgboost(
 
 # Try different numbers of trees
 # for num_trees in [1]:
-for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 20)):
+for num_trees_i in list(range(1, 21, 2)) + list(range(25, 51, 5)) + list(range(60, len(xgboost_rf) + 1, 10)):
         
     if len(xgboost_rf) >= num_trees_i:
         
@@ -129,7 +133,7 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 2
             mlflow.set_tag('Sample', 'Train')
                         
             # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_train, y_train)
+            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_train, y_train)
             
             # Log the predictions just from the odds for info
             log_metrics_odds_mlflow(X_train, y_train)
@@ -145,14 +149,14 @@ for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 2
             mlflow.set_tag('Sample', 'Test')
                         
             # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i + 1)], X_test, y_test)
+            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_test, y_test)
             
             # Log the predictions just from the odds for info
             log_metrics_odds_mlflow(X_test, y_test)
 
 
 # Set the final number of models
-final_forest_size = 7
+final_forest_size = 70
 
 
 # Save the model

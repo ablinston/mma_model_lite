@@ -39,6 +39,12 @@ pip install --no-binary lightgbm --config-settings=cmake.define.CMAKE_C_COMPILER
 ```
 AB note: couldn't get GPU training with LightGBM working at all on Windows. Used conda and xgboost instead (for random forests too because it allows GPU training).
 
+```
+conda install -c conda-forge py-xgboost=*=cuda* --force-reinstall
+# or
+pip install --force-reinstall --no-deps xgboost==2.1.4
+```
+
 # Notes
 
 To undo stupid split in Spyder, use Alt + Shift + W
@@ -73,7 +79,10 @@ Or, I've succcessfully installed it with conda with less trouble.
 ```
 conda install dvc[s3]
 conda install dvc-s3
+# or 
+conda install -c conda-forge dvc-s3 --update-deps --force-reinstall
 ```
+Had a common issue with a '128m' error. If this happens go in the .git/config file and comment out the limits in the `[pack]` section.
 
 Then need to set up the remote. I have called it `storage`.
 

@@ -9,6 +9,7 @@ def predict_future_events(
         data_processing_config,
         model_hyper_params,
         betfair_login_config,
+        test_fighters,
         output_path = None,
         ):
     
@@ -81,6 +82,7 @@ def predict_future_events(
                     data_processing_config,
                     odds_scrape_config,
                     model_hyper_params,
+                    test_fighter_list = test_fighters,
                     skip_save_data = skip_save_data # whether to skip the save data and just return merged data
                     )
             
@@ -118,7 +120,7 @@ def predict_future_events(
 
     # Get the model predictions
     # prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
-    prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_upcoming, [0] * len(y_upcoming))
+    prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_upcoming, [0] * len(y_upcoming), model_hyper_params)
 
     # Add formatted fighters
     upcoming_fights_for_model = add_formatted_fighter_names(upcoming_fights_for_model, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)

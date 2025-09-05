@@ -59,6 +59,9 @@ def objective_xgboost_features_mlflow(
             # Ensure that both fighter1 and fighter2 versions of columns are in there
             column_names = column_names + pd.Series(column_names).replace('fighter2', 'fighterX').replace('fighter1', 'fighter2').replace('fighterX', 'fighter1').tolist()
             
+            # Add on any columns needed for functions
+            column_names = column_names + [col for col in X_train_master.columns if 'notformodel' in col]
+            
             # Create the train dataset based on the number of features
             global X_train
             X_train = X_train_master.copy()[list(set(column_names))]
@@ -67,7 +70,7 @@ def objective_xgboost_features_mlflow(
             X_train['fighter1_odds_for_loss'] = X_train_master['fighter1_backtesting_odds']
             X_train['fighter2_odds_for_loss'] = X_train_master['fighter2_backtesting_odds']
             
-            X_train = pd.concat([X_train, X_train_master[['notformodel_split_dec_or_other']]], axis = 1)
+            # X_train = pd.concat([X_train, X_train_master[['notformodel_split_dec_or_other']]], axis = 1)
             
             X_train.reset_index(drop = True, inplace = True)
             y_train.reset_index(drop = True, inplace = True)
