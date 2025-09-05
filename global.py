@@ -42,6 +42,7 @@ from pathlib import Path
 import pdb
 # from playwright.sync_api import sync_playwright
 # from playwright.async_api import async_playwright
+import polars as pl
 import pyarrow.parquet as pq
 # from pycaret.classification import *
 import queue
