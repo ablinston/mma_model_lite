@@ -72,7 +72,8 @@ def predict_future_events(
                     final_data_folder = config['final_data_path'],
                     average_odds_model_path = './results/average_odds_model.joblib',
                     config = config,
-                    data_processing_config = data_processing_config
+                    data_processing_config = data_processing_config,
+                    upcoming_only = True
                     )
         else:
             # Refresh the dataset

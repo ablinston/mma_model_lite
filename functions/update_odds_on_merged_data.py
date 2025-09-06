@@ -11,7 +11,8 @@ def update_odds_on_merged_data(
         final_data_folder: str,
         average_odds_model_path,
         config,
-        data_processing_config
+        data_processing_config,
+        upcoming_only = False
         ):
     
     # #########
@@ -28,11 +29,14 @@ def update_odds_on_merged_data(
     merged_data = fp.ParquetFile(final_data_folder).to_pandas() # pq.ParquetDataset(final_data_folder).read().to_pandas()
     average_odds_model = joblib.load(average_odds_model_path)
     
-    # Save original shape for later
-    original_shape = merged_data.shape
-    
     # pdb.set_trace()
     
+    if upcoming_only:
+        merged_data = merged_data[merged_data['outcome'].isna()].copy()
+    
+    # Save original shape for later
+    original_shape = merged_data.shape
+        
     # Assume that the event and bout have been added correctly as part of the data cleaning process.
     # But need to remove any with event or bout still missing
     fight_odds = fight_odds[(~fight_odds['event'].isna()) & (~fight_odds['bout'].isna())].copy()
@@ -54,7 +58,7 @@ def update_odds_on_merged_data(
 
     # Remove old columns
     merged_data.drop(columns = cols_to_remove, inplace = True)
-    pdb.set_trace()
+    
     # Merge on the new odds
     merged_data = merge_df_both_fighters(
         left_df =  merged_data,
