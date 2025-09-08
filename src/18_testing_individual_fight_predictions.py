@@ -243,11 +243,11 @@ before[['fighter1', 'fighter1_hist_opp_stance_round1_ctrl_minutes']]
 
 fighter_name = 'andreasgustafsson'
 
-cols_to_see = ['event', 'bout', 'date', 'fighter1', 'fighter2', 'fighter1_stance', 'fighter2_stance', 'fighter1_hist_opp_stance_round1_ctrl_minutes', 'fighter2_hist_opp_stance_round1_ctrl_minutes', 'fighter1_hist_round1_ctrl_minutes', 'fighter2_hist_round1_ctrl_minutes']
+cols_to_see = ['bout', 'date', 'fighter1', 'fighter2', 'fighter1_stance', 'fighter2_stance', 'fighter1_hist_opp_stance_round1_ctrl_minutes', 'fighter2_hist_opp_stance_round1_ctrl_minutes', 'fighter1_hist_round1_ctrl_minutes', 'fighter2_hist_round1_ctrl_minutes']
 
-brian_before = backtesting_data[(backtesting_data['fighter1'] == fighter_name) | ((backtesting_data['fighter2'] == fighter_name))].sort_values('date')[cols_to_see]
+brian_after = backtesting_data[(backtesting_data['fighter1'] == fighter_name) | ((backtesting_data['fighter2'] == fighter_name))].sort_values('date')[cols_to_see]
 
-brian_after = backtesting_data_before[(backtesting_data_before['fighter1'] == fighter_name) | ((backtesting_data_before['fighter2'] == fighter_name))].sort_values('date')[cols_to_see]
+brian_before = backtesting_data_before[(backtesting_data_before['fighter1'] == fighter_name) | ((backtesting_data_before['fighter2'] == fighter_name))].sort_values('date')[cols_to_see]
 
 
 
@@ -269,6 +269,21 @@ westin_after = backtesting_data_before[(backtesting_data_before['fighter1'] == '
 ##########################################################################################
 
 fight_stats_before = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+fighters_before = fp.ParquetFile('./data/' + config['fighter_tott_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+
+events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+upcoming_events = fp.ParquetFile('./data/' + config['upcoming_event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+
+# Add upcoming fights to fight stats
+fight_stats_before = add_upcoming_to_fight_stats(fight_stats_before, upcoming_fight_details, events, upcoming_events)
+
 
 # just get the fighter interested in
 fight_stats_before = fight_stats_before[(fight_stats_before['fighter'] == fighter_name)]
+fight_stats_before = add_opponent_column(fight_stats_before)
+
+
+hist_opp_stance_before = calculate_hist_opp_stance_stats(fight_stats_before, fighters_before, None, data_processing_config)
+fight_stats_before[['fighter', 'bout', 'date', 'round1_ctrl_minutes']]
+hist_opp_stance_before[['fighter', 'bout', 'hist_opp_stance_round1_ctrl_minutes']]
