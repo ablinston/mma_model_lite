@@ -97,7 +97,7 @@ def merge_and_process_all_clean_data(
 
     ###########################################################################################
     # Get the columns of stats
-
+    
     if data_processing_config['add_bayes_stats_columns']:
         
         # FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
@@ -115,7 +115,7 @@ def merge_and_process_all_clean_data(
     # Now aggrgate
     fight_stats_hist = aggregate_last_X_fight_data(
         fight_stats,
-        ignore_cols = ['date', 'event', 'bout', 'fighter'],
+        id_cols = ['date', 'event', 'bout', 'fighter'],
         group_by = ['fighter'],
         prefix = "hist_",
         X = 100,
@@ -138,7 +138,7 @@ def merge_and_process_all_clean_data(
 
     ###########################################################################################
     # ADJUSTED STATISTICS
-
+    
     if data_processing_config['add_bayes_stats_columns'] and data_processing_config['add_adj_bayes_columns']:
         fight_stats_bayes = calculate_per_minute_bayesian_stats(fight_stats, fight_stats_bayes_priors, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute'], bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute'])
         
@@ -147,11 +147,11 @@ def merge_and_process_all_clean_data(
         
         # Replace the fight stats with one with the adj but remove all the extra bayes info (will be added by aggregation later)
         fight_stats = fight_stats_plus_adj[[col for col in fight_stats_plus_adj if 'bayes' not in col or ('bayes' in col and 'adj' in col)]]
-        
+    
     # Reaggregate the data
     fight_stats_hist = aggregate_last_X_fight_data(
         fight_stats,
-        ignore_cols = ['date', 'event', 'bout', 'fighter'],
+        id_cols = ['date', 'event', 'bout', 'fighter'],
         group_by = ['fighter'],
         prefix = "hist_",
         X = 100,
@@ -172,7 +172,7 @@ def merge_and_process_all_clean_data(
     # Get the stats of the last 3 fights only
     fight_stats_hist_last_3 = aggregate_last_X_fight_data(
         fight_stats,
-        ignore_cols = ['date', 'event', 'bout', 'fighter'],
+        id_cols = ['date', 'event', 'bout', 'fighter'],
         group_by = ['fighter'],
         prefix = "hist_last_3_fights_",
         X = 3,
@@ -196,7 +196,7 @@ def merge_and_process_all_clean_data(
     ###########################################################################################
     # Get the fight stats of each fighter against only specific types of fighters
     
-    fight_stats = add_opponent_column(fight_stats)
+    fight_stats = add_opponent_column(fight_stats.copy())
     
     # Get the historic records of each fighter for each opponent stance
     fight_stats_hist_opponent_stance = calculate_hist_opp_stance_stats(fight_stats, fighters, fight_stats_bayes_priors, data_processing_config)
@@ -267,7 +267,7 @@ def merge_and_process_all_clean_data(
     fight_stats_hist['fighter_type'] = define_fighter_type(fight_stats_hist, fighter_results, config)
 
     # Add this fighter type to the stats data
-    fight_stats['fighter_type'] = fight_stats.merge(fight_stats_hist[['event', 'bout', 'fighter', 'fighter_type']], on = ['event', 'bout', 'fighter'], how = 'left')['fighter_type']
+    fight_stats = fight_stats.merge(fight_stats_hist[['event', 'bout', 'fighter', 'fighter_type']], on = ['event', 'bout', 'fighter'], how = 'left')
 
     # Now create a dataset with only opponents of that type
     types = fight_stats_hist['fighter_type'].str.replace(' ', '').unique().tolist()
@@ -283,14 +283,14 @@ def merge_and_process_all_clean_data(
     # Get the historic records of each fighter for each opponent type
     fight_stats_hist_opponent_type = aggregate_last_X_fight_data(
         fight_stats,
-        ignore_cols = ['date', 'event', 'bout', 'fighter', 'opponent', 'opponent_stance', 'fighter_type', 'opponent_type'],
+        id_cols = ['date', 'event', 'bout', 'fighter', 'opponent', 'fighter_type', 'opponent_type'],
         group_by = ['fighter', 'opponent_type'],
         prefix = 'hist_opp_type_',
         X = 100,
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-    ).drop(columns = ['date', 'opponent', 'opponent_stance', 'fighter_type', 'opponent_type'])
+    ).drop(columns = ['date', 'opponent', 'fighter_type', 'opponent_type'])
 
 
     # Check that we have the correct number of rows

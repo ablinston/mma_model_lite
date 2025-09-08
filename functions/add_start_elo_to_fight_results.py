@@ -4,7 +4,7 @@ def add_start_elo_to_fight_results(fight_results, fight_stats, config, elo_confi
     This function takes the fight results data and adds the start ELO to all the bouts
     
     """
-    pdb.set_trace()
+    # pdb.set_trace()
     
     # Get the starting data
     start_elo, elo_fight_data = prep_stats_for_elo_calc(fight_results, fight_stats, config, start_date = '2000-01-01', remove_nas = False)

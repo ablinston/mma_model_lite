@@ -24,8 +24,8 @@ def bayesian_priors(fight_stats_df, id_cols, group_by, fight_span, ignore_last_n
     
     # pdb.set_trace()
 
-    # Sort the data by weightclass and date
-    stats_df.sort_values(group_by + ['date'], inplace = True)
+    # Sort the data by weightclass and date, and add in sort by id_cols to ensure consistency in the ordering between different runs
+    stats_df.sort_values(group_by + ['date'] + id_cols, inplace = True)
 
     # Get a list of all the numeric columns
     numeric_columns = stats_df.select_dtypes(include = ['number', 'float']).columns.tolist()

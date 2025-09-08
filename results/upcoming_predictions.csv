@@ -1,15 +1,15 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-09-06,ufcfightnight:imavovvsborralho,2025-09-05 20:45:10.488,2025-09-05 20:45:10.488,Benoit Saint Denis,2.5,38.7,-0.03,Mauricio Ruffy,1.65,58.1,-0.04,None,0.0,,0.0,0.0,
-1,2025-09-06,ufcfightnight:imavovvsborralho,2025-09-05 20:45:10.488,2025-09-05 20:45:10.488,Modestas Bukauskas,1.32,75.7,-0.0,Paul Craig,3.95,22.0,-0.13,None,0.0,,0.0,0.0,
-2,2025-09-06,ufcfightnight:imavovvsborralho,2025-09-05 20:45:10.488,2025-09-05 20:45:10.488,Bolaji Oki,2.18,49.9,0.09,Mason Jones,1.82,46.8,-0.15,Bolaji Oki,2.18,2.0,165.0,194.7,
-3,2025-09-06,ufcfightnight:imavovvsborralho,2025-09-05 20:45:10.488,2025-09-05 20:45:10.488,Sam Patterson,1.55,56.1,-0.13,Trey Waters,2.76,41.3,0.14,None,0.0,,0.0,0.0,
-4,2025-09-06,ufcfightnight:imavovvsborralho,2025-09-05 20:45:10.488,2025-09-05 20:45:10.488,Oumar Sy,1.24,71.3,-0.12,Brendson Ribeiro,4.8,25.0,0.2,None,0.0,,0.0,0.0,
-5,2025-09-06,ufcfightnight:imavovvsborralho,2025-09-05 20:45:10.488,2025-09-05 20:45:10.488,Nassourdine Imavov,2.16,41.6,-0.1,Caio Borralho,1.84,54.6,0.0,Caio Borralho,1.84,1.83,165.0,138.6,
-3,2025-09-06,ufcfightnight:imavovvsborralho,,,,,,,Rhys McKee,,,,,,,,,Fights < 3
-4,2025-09-06,ufcfightnight:imavovvsborralho,,,Patricio Freire,,,,Losene Keita,,,,,,,,,Missing odds
-5,2025-09-06,ufcfightnight:imavovvsborralho,,,William Gomis,,,,Robert Ruchala,,,,,,,,,Fights < 3
-6,2025-09-06,ufcfightnight:imavovvsborralho,,,,,,,Kaue Fernandes,,,,,,,,,Fights < 3
-7,2025-09-06,ufcfightnight:imavovvsborralho,,,Marcin Tybura,,,,Ante Delija,,,,,,,,,Fights < 3
-9,2025-09-06,ufcfightnight:imavovvsborralho,,,Brad Tavares,,,,Robert Bryczek,,,,,,,,,Fights < 3
-10,2025-09-06,ufcfightnight:imavovvsborralho,,,Andreas Gustafsson,,,,Rinat Fakhretdinov,,,,,,,,,Fights < 3
-11,2025-09-06,ufcfightnight:imavovvsborralho,,,Shauna Bannon,,,,Sam Hughes,,,,,,,,,Womens
+0,2025-09-13,ufcfightnight:lopesvssilva,2025-09-09 15:16:03.991,2025-09-09 15:16:03.991,Rafa Garcia,3.0,42.8,0.28,Jared Gordon,1.04,54.6,-0.43,None,0.0,,0.0,0.0,
+1,2025-09-13,ufcfightnight:lopesvssilva,2025-09-09 15:16:03.991,2025-09-09 15:16:03.991,Kelvin Gastelum,1.41,65.9,-0.07,Dustin Stoltzfus,2.88,32.6,-0.06,None,0.0,,0.0,0.0,
+2,2025-09-13,ufcfightnight:lopesvssilva,2025-09-09 15:15:27.588911+00:00,2025-09-09 15:15:27.588911+00:00,Alexander Hernandez,1.79,42.6,-0.24,Diego Ferreira,2.1,55.1,0.16,Diego Ferreira,2.1,1.82,165.0,181.5,
+3,2025-09-13,ufcfightnight:lopesvssilva,2025-09-09 15:16:03.991,2025-09-09 15:16:03.991,Jose Daniel Medina,3.6,25.7,-0.08,Dusko Todorovic,1.35,72.0,-0.03,None,0.0,,0.0,0.0,
+4,2025-09-13,ufcfightnight:lopesvssilva,2025-09-09 15:16:03.991,2025-09-09 15:16:03.991,Zachary Reese,1.43,53.2,-0.24,Sedriques Dumas,2.74,44.2,0.21,None,0.0,,0.0,0.0,
+5,2025-09-13,ufcfightnight:lopesvssilva,2025-09-09 15:16:03.991,2025-09-09 15:16:03.991,Claudio Puelles,1.04,60.6,-0.37,Joaquim Silva,1.98,35.9,-0.29,None,0.0,,0.0,0.0,
+6,2025-09-13,ufcfightnight:lopesvssilva,2025-09-09 15:16:03.991,2025-09-09 15:16:03.991,Diego Lopes,3.1,28.6,-0.11,Jean Silva,1.43,66.9,-0.04,None,0.0,,0.0,0.0,
+0,2025-09-13,ufcfightnight:lopesvssilva,,,Rob Font,,,,David Martinez,,,,,,,,,Fights < 3
+4,2025-09-13,ufcfightnight:lopesvssilva,,,Santiago Luna,,,,Quang Le,,,,,,,,,Fights < 3
+6,2025-09-13,ufcfightnight:lopesvssilva,,,Jesus Aguilar,,,,Luis Gurule,,,,,,,,,Fights < 3
+7,2025-09-13,ufcfightnight:lopesvssilva,,,Tatiana Suarez,,,,Amanda Lemos,,,,,,,,,Womens
+9,2025-09-13,ufcfightnight:lopesvssilva,,,Alessandro Costa,,,,Alden Coria,,,,,,,,,Fights < 3
+10,2025-09-13,ufcfightnight:lopesvssilva,,,,,,,Alice Pereira,,,,,,,,,Womens
+11,2025-09-13,ufcfightnight:lopesvssilva,,,Rodrigo Sezinando,,,,Daniil Donchenko,,,,,,,,,Fights < 3
