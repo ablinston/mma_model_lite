@@ -35,7 +35,7 @@ def predict_future_events(
         the path where the outputs from the predictions will be saved. This is in addition to automatic outputs, which will be saved in ./results/
     
     """
-
+    pdb.set_trace()
     # Set the odds to use as upcoming instead of as used in the regular data
     data_processing_config['odds_suffix_for_true_odds'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
     model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
