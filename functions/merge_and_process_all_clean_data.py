@@ -195,43 +195,11 @@ def merge_and_process_all_clean_data(
 
     ###########################################################################################
     # Get the fight stats of each fighter against only specific types of fighters
-    stances = fighters['stance'].str.replace(' ', '').unique().tolist()
-    fight_stats[['fighter1', 'fighter2']] = fight_stats['bout'].str.split('vs\\.', expand = True)
-    fight_stats['opponent'] = np.where(fight_stats['fighter1'] == fight_stats['fighter'], fight_stats['fighter2'], fight_stats['fighter1'])
-    fight_stats.drop(columns = ['fighter1', 'fighter2'], inplace = True)
-
-    # Check no fighters are equal to opponents
-    if all(fight_stats['opponent'] != fight_stats['fighter']):
-        print('Opponent check PASSED')
-    else:
-        print('Opponent check FAILED')
-        raise SystemExit
-
-    # Merge on opponent stance
-    fight_stats['opponent_stance'] = fight_stats[['opponent']].merge(
-        fighters[['fighter', 'stance']], 
-        left_on = ['opponent'], 
-        right_on = ['fighter'], 
-        how = 'left')['stance']
-
+    
+    fight_stats = add_opponent_column(fight_stats)
+    
     # Get the historic records of each fighter for each opponent stance
-    fight_stats_hist_opponent_stance = aggregate_last_X_fight_data(
-        fight_stats,
-        ignore_cols = ['date', 'event', 'bout', 'fighter', 'opponent', 'opponent_stance'],
-        group_by = ['fighter', 'opponent_stance'],
-        prefix = 'hist_opp_stance_',
-        X = 100,
-        per_minute_calc = True, 
-        bayes_priors_df = fight_stats_bayes_priors,
-        bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-    ).drop(columns = ['date', 'opponent', 'opponent_stance'])
-
-    # Check the row numbers are correct
-    stop_if_not(len(fight_stats) == len(fight_stats_hist_opponent_stance), "Opponent data length check")
-
-
-
-
+    fight_stats_hist_opponent_stance = calculate_hist_opp_stance_stats(fight_stats, fighters, fight_stats_bayes_priors, data_processing_config)
 
 
     ###########################################################################################
