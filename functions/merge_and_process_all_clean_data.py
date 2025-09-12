@@ -192,6 +192,28 @@ def merge_and_process_all_clean_data(
         raise SystemExit
     del fight_stats_hist_last_3_check
 
+    fight_stats_hist_last_2 = aggregate_last_X_fight_data(
+        fight_stats,
+        id_cols = ['date', 'event', 'bout', 'fighter'],
+        group_by = ['fighter'],
+        prefix = "hist_last_2_fights_",
+        X = 2,
+        per_minute_calc = True, 
+        bayes_priors_df = fight_stats_bayes_priors,
+        bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
+    ).drop(columns = ['date'])
+    
+    fight_stats_hist_last_1 = aggregate_last_X_fight_data(
+        fight_stats,
+        id_cols = ['date', 'event', 'bout', 'fighter'],
+        group_by = ['fighter'],
+        prefix = "hist_last_1_fights_",
+        X = 1,
+        per_minute_calc = True, 
+        bayes_priors_df = fight_stats_bayes_priors,
+        bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
+    ).drop(columns = ['date'])
+    
 
     ###########################################################################################
     # Get the fight stats of each fighter against only specific types of fighters
@@ -405,6 +427,8 @@ def merge_and_process_all_clean_data(
             fight_stats[['event', 'bout', 'fighter', 'date_last_fight']],
             dates_knocked_out,
             fight_stats_hist,
+            fight_stats_hist_last_1,
+            fight_stats_hist_last_2,
             fight_stats_hist_last_3,
             fight_stats_hist_opponent_stance,
             fight_stats_hist_opponent_type,
