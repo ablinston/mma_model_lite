@@ -1,5 +1,7 @@
 # This script tests out methods of calculating decayed stats
 
+NOT ACTUALLY DONE ANYTHING WITH THIS SCRIPT YET
+
 
 import csv
 import gc

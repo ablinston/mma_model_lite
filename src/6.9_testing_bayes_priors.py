@@ -1,4 +1,5 @@
-# This script creates various columns on last X fights and sees which are the best predictors
+# This script test whether it's best to use bayes priors across all fighters or broken down
+# by weightclass
 
 
 import csv
@@ -85,102 +86,49 @@ del fight_stats_against
 fight_stats_bayes_priors = bayesian_priors(
     fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
     id_cols = ['event', 'bout', 'fighter'], 
-    group_by = data_processing_config['bayesian_groupby'], 
+    group_by = [], 
+    fight_span = data_processing_config['bayes_fightspan'],
+    ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
+)
+
+fight_stats_bayes_priors_weightclass = bayesian_priors(
+    fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
+    id_cols = ['event', 'bout', 'fighter'], 
+    group_by = ['weightclass'], 
     fight_span = data_processing_config['bayes_fightspan'],
     ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
 )
 
 
 # Now aggrgate
-fight_stats_hist_1 = aggregate_last_X_fight_data(
+fight_stats_hist_none = aggregate_last_X_fight_data(
     fight_stats,
     id_cols = ['date', 'event', 'bout', 'fighter'],
     group_by = ['fighter'],
-    prefix = "hist_X1_",
-    X = 1,
-    per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors,
-    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-).drop(columns = ['date'])
-
-fight_stats_hist_2 = aggregate_last_X_fight_data(
-    fight_stats,
-    id_cols = ['date', 'event', 'bout', 'fighter'],
-    group_by = ['fighter'],
-    prefix = "hist_X2_",
-    X = 2,
-    per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors,
-    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-).drop(columns = ['date'])
-
-fight_stats_hist_3 = aggregate_last_X_fight_data(
-    fight_stats,
-    id_cols = ['date', 'event', 'bout', 'fighter'],
-    group_by = ['fighter'],
-    prefix = "hist_X3_",
-    X = 3,
-    per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors,
-    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-).drop(columns = ['date'])
-
-fight_stats_hist_4 = aggregate_last_X_fight_data(
-    fight_stats,
-    id_cols = ['date', 'event', 'bout', 'fighter'],
-    group_by = ['fighter'],
-    prefix = "hist_X4_",
-    X = 4,
-    per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors,
-    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-).drop(columns = ['date'])
-
-fight_stats_hist_5 = aggregate_last_X_fight_data(
-    fight_stats,
-    id_cols = ['date', 'event', 'bout', 'fighter'],
-    group_by = ['fighter'],
-    prefix = "hist_X5_",
+    prefix = "hist_nogroup_",
     X = 5,
     per_minute_calc = True, 
     bayes_priors_df = fight_stats_bayes_priors,
     bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
 ).drop(columns = ['date'])
 
-fight_stats_hist_6 = aggregate_last_X_fight_data(
+fight_stats_hist_wc = aggregate_last_X_fight_data(
     fight_stats,
     id_cols = ['date', 'event', 'bout', 'fighter'],
     group_by = ['fighter'],
-    prefix = "hist_X6_",
-    X = 6,
+    prefix = "hist_weightclass_",
+    X = 5,
     per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors,
+    bayes_priors_df = fight_stats_bayes_priors_weightclass,
     bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
 ).drop(columns = ['date'])
-
-fight_stats_hist_7 = aggregate_last_X_fight_data(
-    fight_stats,
-    id_cols = ['date', 'event', 'bout', 'fighter'],
-    group_by = ['fighter'],
-    prefix = "hist_X7_",
-    X = 7,
-    per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors,
-    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-).drop(columns = ['date'])
-
 
 
 merged_data = merge_df_both_fighters(
     left_df =  fight_results[['event', 'bout', 'fighter1', 'fighter2', 'outcome', 'method']],
     df_list = [
-        fight_stats_hist_1,
-        fight_stats_hist_2,
-        fight_stats_hist_3,
-        fight_stats_hist_4,
-        fight_stats_hist_5,
-        fight_stats_hist_6,
-        fight_stats_hist_7
+        fight_stats_hist_none,
+        fight_stats_hist_wc
     ]
 ).reset_index(drop = True)
 
@@ -191,7 +139,7 @@ merged_data = merge_df_both_fighters(
 
 # Filter out missing
 merged_data = merged_data[~merged_data['outcome'].isna()]
-merged_data = merged_data[(merged_data['fighter1_hist_X7_fights'] > 2) & (merged_data['fighter2_hist_X7_fights'] > 2)]
+merged_data = merged_data[(merged_data['fighter1_hist_weightclass_fights'] > 2) & (merged_data['fighter2_hist_weightclass_fights'] > 2)]
 
 merged_data['train_test_oot_flag'] = 'oot'
 
@@ -208,7 +156,7 @@ params = {
     'booster': 'gbtree',
     'num_boost_round': 1, # to tell the package to train only 1 random forest
     'colsample_bynode': np.sqrt(len(X_train.columns)) / len(X_train.columns), # fraction of columns to select for each tree
-    'num_parallel_tree': 1500, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
+    'num_parallel_tree': 800, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
     'learning_rate': 1, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
@@ -235,7 +183,7 @@ importance = rf_model.get_score(importance_type='total_gain')
 sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
 
 # Save the variable importance plot to csv
-with open('results/random_forest_agg_X_test_variable_importance.csv', mode='w', newline='') as file:
+with open('results/random_forest_bayes_group_test_variable_importance.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(["Feature", "Importance"])  # Write the header
     writer.writerows(sorted_importance)
@@ -267,4 +215,4 @@ shap_importance_df = shap_importance_df.sort_values(by='Mean SHAP Value', ascend
 # Display or save the table
 print(shap_importance_df.head(10))  # Shows the top 10 most important features
 # Optionally, save to CSV
-shap_importance_df.to_csv('./results/rf_agg_X_test_shap_feature_importance.csv', index=False)
+shap_importance_df.to_csv('./results/rf_bayes_group_test_shap_feature_importance.csv', index=False)
