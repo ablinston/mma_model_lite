@@ -47,10 +47,10 @@ if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out 
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
 
-# # Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
-# var_importance = pd.read_csv('./results/shap_feature_importance_baseline.csv').sort_values('Mean SHAP Value', ascending = False)
+# Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
+var_importance = pd.read_csv('./results/shap_feature_importance_baseline.csv').sort_values('Mean SHAP Value', ascending = False)
 
-# X_train = X_train[[col for col in X_train.columns if col not in var_importance['Feature'][1000:len(var_importance)].tolist()]]
+X_train = X_train[[col for col in X_train.columns if col not in var_importance['Feature'][2000:len(var_importance)].tolist()]]
 
 # Now remove any columns that aren't wanted in a training dataset. At this point we don't remove non-true odds in order to see the rank in feature importance
 X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False, open_odds_only = False)
@@ -81,7 +81,7 @@ params = {
     'booster': 'gbtree',
     'num_boost_round': 1, # to tell the package to train only 1 random forest
     'colsample_bynode': np.sqrt(len(data.columns)) / len(data.columns), # fraction of columns to select for each tree
-    'num_parallel_tree': 1500, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
+    'num_parallel_tree': 2000, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
     'learning_rate': 1, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
@@ -94,7 +94,6 @@ params = {
     'predictor': 'gpu_predictor',   # Use GPU for prediction
     'verbosity': 1,
     'num_class': no_of_classes,
-    'n_folds': 5,                   # Number of folds for the cross-validation
     'random_state': config['seed_all'] + 38
 }
 
@@ -104,6 +103,9 @@ base_margin_train = get_base_margin(X_train, model_hyper_params['base_margin_col
 
 # Remove any objects not for modelling
 X_train = X_train[[col for col in X_train if 'notformodel' not in col]]
+
+# # Trim features if too many
+# X_train = X_train.iloc[:, 0:20000]
 
 # Prepare data
 train = xgb.DMatrix(X_train, label = y_train, base_margin = base_margin_train)
