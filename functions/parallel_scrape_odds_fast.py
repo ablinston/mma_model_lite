@@ -36,7 +36,7 @@ def parallel_scrape_odds_fast(
         
         # Get the cookies for the odds webpages using a Selenium call
         driver.get("https://www.bestfightodds.com/")
-    
+        pdb.set_trace()
         # Get cookies from Selenium
         selenium_cookies = driver.get_cookies()
         cookies_dict = {cookie['name']: cookie['value'] for cookie in selenium_cookies}
