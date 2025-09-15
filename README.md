@@ -63,6 +63,11 @@ Historic data has too many files so better to download online then extract the b
 
 MMA is lumped with everything else so the scripts scan the files and see which ones are fights. Each file is a `market` which is the market for a specific outcome e.g. Fight Result for Conor vs Khabib. The package creates `MarketBook`s which are the details of a market, and `RunnerBook`s which are betting on a specific outcome e.g. Conor to win.
 
+## Playwright
+
+To install, need to install the package then install the browsers with `python -m playwright install
+` 
+
 # DVC Setup
 
 Set up, using Backblaze (https://secure.backblaze.com/b2_buckets.htm) with S3 is a bit of a nightmare. FIrst need to install dvc that is compatable, then there are some recent updates that don't allow dvc to push properly so need older versions of packages.

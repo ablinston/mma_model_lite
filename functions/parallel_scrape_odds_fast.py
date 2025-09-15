@@ -22,24 +22,47 @@ def parallel_scrape_odds_fast(
             
     # If fast, we will use response.get. There is selenium code in here as well from old runs that still works
     if fast:
-        ###########
-        # Setup headless Firefox for getting odds information
-        options = Options()
-        options.headless = True
-        options.accept_insecure_certs = True
-        # Create a Service object with the path to Firefox driver
-        options.binary_location = firefox_location # firefox_binary
-        service = Service(gecko_driver)
-        # Create a WebDriver instance
-        driver = webdriver.Firefox(service=service, options=options)
-        ###########
+        # ###########
+        # # Setup headless Firefox for getting odds information
+        # options = Options()
+        # # options.headless = True
+        # options.accept_insecure_certs = True
+        # options.set_preference("general.useragent.override",
+        #                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        #                "AppleWebKit/537.36 (KHTML, like Gecko) "
+        #                "Chrome/121.0.0.0 Safari/537.36")
+        # # Create a Service object with the path to Firefox driver
+        # options.binary_location = firefox_location # firefox_binary
+        # service = Service(gecko_driver)
+        # options.set_preference("dom.webdriver.enabled", False)
+        # options.set_preference("useAutomationExtension", False)
+        # options.set_preference("dom.webnotifications.enabled", False)
+        # # Create a WebDriver instance
+        # driver = webdriver.Firefox(service=service, options=options)
+        # ###########
         
-        # Get the cookies for the odds webpages using a Selenium call
-        driver.get("https://www.bestfightodds.com/")
-        pdb.set_trace()
+        # # Get the cookies for the odds webpages using a Selenium call
+        # driver.get("https://www.bestfightodds.com/")
+        # pdb.set_trace()
         # Get cookies from Selenium
-        selenium_cookies = driver.get_cookies()
-        cookies_dict = {cookie['name']: cookie['value'] for cookie in selenium_cookies}
+        # selenium_cookies = driver.get_cookies()
+                
+        options = uc.ChromeOptions()
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--start-maximized")
+        
+        driver = uc.Chrome(options=options, headless=False)
+        
+        driver.get("https://www.bestfightodds.com/")
+        
+        # Give a delay to allow the checkbox to be manually done
+        time.sleep(20)
+        cookies = driver.get_cookies()
+        
+        cookies_dict = {cookie['name']: cookie['value'] for cookie in cookies}
         # Quit the browser
         driver.quit()
         
