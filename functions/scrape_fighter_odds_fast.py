@@ -14,7 +14,8 @@ def scrape_fighter_odds_fast(
         fast = True,
         playwright = False,
         firefox_binary = '', 
-        gecko_driver = ''):
+        gecko_driver = '',
+        driver = None):
 
     # pdb.set_trace()
     
@@ -40,9 +41,10 @@ def scrape_fighter_odds_fast(
             playwright_context = playwright_context,
             cookies = cookies_dict, # Only needed for fast
             firefox_binary = firefox_binary, # Only needed for NOT fast
-            gecko_driver = gecko_driver
+            gecko_driver = gecko_driver,
+            driver = driver
         )            
-
+        
         # skip if no possible matches found
         if soup.find('table') == None:
             print(f"Error scraping {fighter_name} with {headers['User-Agent']}")
@@ -62,10 +64,11 @@ def scrape_fighter_odds_fast(
                 url = link_url,
                 fast = fast,
                 playwright_context = playwright_context,
-                headers = headers, # Only needed for fast
+                # headers = headers, # Only needed for fast
                 cookies = cookies_dict, # Only needed for fast
                 firefox_binary = firefox_binary, # Only needed for NOT fast
-                gecko_driver = gecko_driver
+                gecko_driver = gecko_driver,
+                driver = driver
             )
 
         if playwright:
@@ -97,6 +100,6 @@ def scrape_fighter_odds_fast(
     
     except Exception as e:
         print(f"Error scraping {fighter_name}: {e}")
-        return pd.DataFrame()
+        return pd.DataFrame(), pd.DataFrame()
 
     return odds_df, events_df

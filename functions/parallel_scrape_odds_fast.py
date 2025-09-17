@@ -63,8 +63,9 @@ def parallel_scrape_odds_fast(
         cookies = driver.get_cookies()
         
         cookies_dict = {cookie['name']: cookie['value'] for cookie in cookies}
-        # Quit the browser
-        driver.quit()
+        # Quit the browser unless we are going through one at a time
+        if num_threads > 1:
+            driver.quit()
         
         scrape_func = partial(
             scrape_fighter_odds_fast,
@@ -77,26 +78,45 @@ def parallel_scrape_odds_fast(
             gecko_driver = gecko_driver
         )
         
-        with ThreadPoolExecutor(max_workers = num_threads) as executor:
-            future_to_url = {executor.submit(scrape_func, fighter): fighter for fighter in fighter_list}
-    
-            # Collect results as they complete
-            for future in as_completed(future_to_url):
-                try:
-                    odds_result, events_result = future.result()
-                    odds_scrape_results.append(odds_result)  # Collect the result (url, title)
-                    event_scrape_results.append(events_result)  # Collect the result (url, title)
+        # Check if we have more than 1 thread
+        if num_threads > 1:
+            with ThreadPoolExecutor(max_workers = num_threads) as executor:
+                future_to_url = {executor.submit(scrape_func, fighter): fighter for fighter in fighter_list}
+        
+                # Collect results as they complete
+                for future in as_completed(future_to_url):
+                    try:
+                        odds_result, events_result = future.result()
+                        odds_scrape_results.append(odds_result)  # Collect the result (url, title)
+                        event_scrape_results.append(events_result)  # Collect the result (url, title)
+                        
+                    except Exception as e:
+                        print(f"Error for fighter {future}: {e}")
+        
+                    # Increment the completed count
+                    completed_count += 1
+                    print(f"Completed {completed_count} out of {total_fighters} tasks")
                     
-                except Exception as e:
-                    print(f"Error for fighter {future}: {e}")
-    
-                # Increment the completed count
-                completed_count += 1
-                print(f"Completed {completed_count} out of {total_fighters} tasks")
+            # This ensures that all threads are done
+            executor.shutdown(wait=True)
+        
+        else:
+            for fighter in fighter_list:
                 
-        # This ensures that all threads are done
-        executor.shutdown(wait=True)
-    
+                odds_result, events_result = scrape_fighter_odds_fast(
+                    fighter,
+                    cookies_dict = cookies_dict,
+                    odds_urls_overide_df = odds_urls_overide_df,
+                    event_urls = event_urls,
+                    playwright = playwright,
+                    fast = fast,
+                    firefox_binary = firefox_location,
+                    gecko_driver = gecko_driver,
+                    driver = driver)
+                
+                odds_scrape_results.append(odds_result)  # Collect the result (url, title)
+                event_scrape_results.append(events_result)  # Collect the result (url, title)
+                    
     # Else it's not fast and we use playwright
     else:
         
@@ -140,6 +160,8 @@ def parallel_scrape_odds_fast(
         all_fighter_odds = pd.concat(odds_scrape_results)
     else:
         all_fighter_odds = pd.DataFrame()
+    
+    driver.quit()
     
     # Combine the results
     if event_urls:
