@@ -13,7 +13,7 @@ def test_derive_start_elos():
             "Alicevs.Bob"
         ],
         "outcome": ["W/L", "L/W", "W/L", np.nan],   # Alice beats Bob, Alice loses to Charlie, Bob beats Charlie
-        "method": ["KO/TKO", "DQ", "Submission", np.nan],
+        "method": ["KO/TKO", "Other", "Submission", np.nan],
         "weightclass": ["LW", "LW", "LW", "LW"],
         "date": ["2021-01-01", "2021-02-01", "2021-03-01", "2021-04-01"],
         "time format": ["3 Rnd (5-5-5)"] * 4,
@@ -69,5 +69,8 @@ def test_derive_start_elos():
     assert all(start_elo[start_elo['event'] == 'UFC4']['fighter1_start_elo'] > int(elo_config['starting_elo']))
     assert all(start_elo[start_elo['event'] == 'UFC4']['fighter2_start_elo'] > int(elo_config['starting_elo']))
     assert all(start_elo[start_elo['event'] == 'UFC3']['fighter2_start_elo'] == int(elo_config['starting_elo']))
+    
+    # Check that the 'Other' method of victory (usually DQ or something) doesn't affect ELO
+    assert start_elo[start_elo['event'] == 'UFC2']['fighter1_start_elo'].tolist() == start_elo[start_elo['event'] == 'UFC4']['fighter1_start_elo'].tolist()
 
 # fp.write('./tests/data/update_fighter_odds_data_data_correct3.parquet', result3, compression = 'ZSTD')

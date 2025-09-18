@@ -25,7 +25,7 @@ bayes_alpha_plus_beta_rebase_percent: 450
 bayes_alpha_plus_beta_rebase_per_minute: 105
 
 # Bayesian group by. This is what we group the Bayesian smooting of stats by
-bayesian_groupby: [] # ['weightclass']
+bayesian_groupby: [] # ['weightclass'] Tested using weightclass but features less predictive power after
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats)
 add_adj_bayes_columns: True

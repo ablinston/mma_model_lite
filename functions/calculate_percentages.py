@@ -2,6 +2,7 @@
 
 def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase):
 
+    # pdb.set_trace()
     merged_data = merged_data_df.copy()
     
     # Calculate percentages for those columns with attempts and lands
@@ -45,9 +46,9 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
         merged_data_bayes = merged_data.merge(fight_stats_bayes_priors, on = ['event', 'bout'], how = 'left')
         
         # Find what numerators and denominators are needed
-        bayes_numerators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_3_fights', '') for col in landed_columns]
+        bayes_numerators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in landed_columns]
         
-        bayes_denominators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_3_fights', '') for col in percent_columns]
+        bayes_denominators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in percent_columns]
         
         # Check these are in the bayes data
         stop_if_not(all(item in merged_data_bayes.columns for item in bayes_numerators + bayes_denominators), "Bayes priors check in data")

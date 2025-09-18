@@ -169,16 +169,18 @@ prediction_probabilities_oot
 
 
 
-
+##########################################################################################
 # TESTING PREDICTIONS ON ACTUAL DATA AND DATA FROM BEFORE EVENT
+##########################################################################################
 
 backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
 backtesting_data_before = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
+event = 'ufcfightnight:imavovvsborralho'
 
-actuals = backtesting_data[backtesting_data['event'] == 'ufcfightnight:walkervszhang']
-before = backtesting_data_before[backtesting_data_before['event'] == 'ufcfightnight:walkervszhang'].sort_values(by = ['fighter1']).reset_index(drop = True)
+actuals = backtesting_data[backtesting_data['event'] == event]
+before = backtesting_data_before[backtesting_data_before['event'] == event].sort_values(by = ['fighter1']).reset_index(drop = True)
 
 # Remove fights not in the before for whatever reason
 actuals = actuals[actuals['fighter1'].isin(before['fighter1'].to_list())].sort_values(by = ['fighter1']).reset_index(drop = True)
@@ -222,26 +224,116 @@ summary_data_before = betting_data_before[['date', 'event', 'fighter1', 'fighter
 actual_model = actuals.sort_values(by = ['fighter1']).reset_index(drop = True)[final_model_features]
 before_model = before.sort_values(by = ['fighter1']).reset_index(drop = True)[final_model_features]
 
+cols_to_check = [col for col in actuals.columns if 'opp_stance' not in col and 'odds' not in col]
+
 # Compare the data going into the model
-comparison = actuals.sort_values(by = ['fighter1']).reset_index(drop = True)[final_model_features].compare(before.sort_values(by = ['fighter1']).reset_index(drop = True)[final_model_features])
+comparison = actuals.sort_values(by = ['fighter1']).reset_index(drop = True)[cols_to_check].compare(before.sort_values(by = ['fighter1']).reset_index(drop = True)[cols_to_check])
 
-comparison.columns
+te = comparison.columns
 
+comparison['fighter1_hist_opp_stance_round1_ctrl_minutes']
+actuals[['fighter1', 'fighter1_hist_opp_stance_round1_ctrl_minutes']]
 
-actuals[['fighter2', 'fighter2_hist_times_knocked_out_round_1_per_fight']]
-
-before[['fighter2', 'fighter2_hist_times_knocked_out_round_1_per_fight']]
+before[['fighter1', 'fighter1_hist_opp_stance_round1_ctrl_minutes']]
 
 
 
 ###############
 # Do an ELO check on single fighter
 
-brian_before = backtesting_data[(backtesting_data['fighter1'] == 'brianortega') | ((backtesting_data['fighter2'] == 'brianortega'))].sort_values('date')[['fighter1', 'fighter2', 'outcome', 'fighter1_start_elo', 'fighter2_start_elo']]
+fighter_name = 'harryhardwick'
 
-brian_after = backtesting_data_before[(backtesting_data_before['fighter1'] == 'brianortega') | ((backtesting_data_before['fighter2'] == 'brianortega'))].sort_values('date')[['fighter1', 'fighter2', 'outcome', 'fighter1_start_elo', 'fighter2_start_elo']]
+cols_to_see = ['event', 'bout', 'date', 'fighter1', 'fighter2', 'fighter1_stance', 'fighter2_stance', 'fighter1_hist_opp_stance_round1_ctrl_minutes', 'fighter2_hist_opp_stance_round1_ctrl_minutes', 'fighter1_hist_round1_ctrl_minutes', 'fighter2_hist_round1_ctrl_minutes']
+
+brian_after = backtesting_data[(backtesting_data['fighter1'] == fighter_name) | ((backtesting_data['fighter2'] == fighter_name))].sort_values('date')[cols_to_see]
+
+brian_before = backtesting_data_before[(backtesting_data_before['fighter1'] == fighter_name) | ((backtesting_data_before['fighter2'] == fighter_name))].sort_values('date')[cols_to_see]
+
 
 
 westin_before = backtesting_data[(backtesting_data['fighter1'] == 'westinwilson') | ((backtesting_data['fighter2'] == 'westinwilson'))].sort_values('date')[['fighter1', 'fighter2', 'outcome', 'method', 'fighter1_hist_times_knocked_out_round_1', 'fighter2_hist_times_knocked_out_round_1']]
 
 westin_after = backtesting_data_before[(backtesting_data_before['fighter1'] == 'westinwilson') | ((backtesting_data_before['fighter2'] == 'westinwilson'))].sort_values('date')[['fighter1', 'fighter2', 'outcome', 'method', 'fighter1_hist_times_knocked_out_round_1', 'fighter2_hist_times_knocked_out_round_1']]
+
+
+
+
+
+
+
+
+
+
+##########################################################################################
+# TESTING FIGHT STATS AGGREGATION BEFORE
+##########################################################################################
+
+fight_stats_before = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+fighters_before = fp.ParquetFile('./data/' + config['fighter_tott_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+
+events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+upcoming_events = fp.ParquetFile('./data/' + config['upcoming_event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+
+# Add upcoming fights to fight stats
+fight_stats_before = add_upcoming_to_fight_stats(fight_stats_before, upcoming_fight_details, events, upcoming_events)
+
+
+# just get the fighter interested in
+fight_stats_before = fight_stats_before[(fight_stats_before['fighter'] == fighter_name)]
+fight_stats_before = add_opponent_column(fight_stats_before)
+
+
+hist_opp_stance_before = calculate_hist_opp_stance_stats(fight_stats_before, fighters)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##########################################################################################
+# TESTING BAYES PRIORS
+##########################################################################################
+
+inputs_before = fp.ParquetFile('../bayes_input_before.parquet').to_pandas()
+inputs_after = fp.ParquetFile('../bayes_input_after.parquet').to_pandas()
+
+# FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
+fight_stats_bayes_priors_before = bayesian_priors(
+    inputs_before, # Join on the weightclass for grouping
+    id_cols = ['event', 'bout', 'fighter'], 
+    group_by = data_processing_config['bayesian_groupby'], 
+    fight_span = data_processing_config['bayes_fightspan'],
+    ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
+)
+
+
+# FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
+fight_stats_bayes_priors = bayesian_priors(
+    inputs_after, # Join on the weightclass for grouping
+    id_cols = ['event', 'bout', 'fighter'], 
+    group_by = data_processing_config['bayesian_groupby'], 
+    fight_span = data_processing_config['bayes_fightspan'],
+    ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
+)
+
+# event = 'ufcfightnight:imavovvsborralho'
+event = 'ufc310:pantojavsasakura'
+
+event_priors_new = fight_stats_bayes_priors[fight_stats_bayes_priors['event'] == event].sort_values('bout').reset_index(drop = True)
+event_priors_old = fight_stats_bayes_priors_before[fight_stats_bayes_priors_before['event'] == event].sort_values('bout').reset_index(drop = True)
+
+kk = event_priors_old.compare(event_priors_new)

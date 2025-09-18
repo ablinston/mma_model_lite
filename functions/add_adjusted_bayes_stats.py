@@ -55,7 +55,7 @@ def add_adjusted_bayes_stats(
         , columns = [col + '_adj' for col in columns_to_adjust])
     
     # Final data
-    final_stats_df = pd.concat([stats_df, new_stats], axis = 1)
+    final_stats_df = pd.concat([stats_df.reset_index(drop = True), new_stats], axis = 1)
     
     # Check length
     stop_if_not(len(final_stats_df) == len(stats_df), "Dataset length")

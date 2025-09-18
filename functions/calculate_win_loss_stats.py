@@ -49,22 +49,33 @@ def calculate_win_loss_stats(fighter_results, finishes = ['KO/TKO', 'Submission'
             win_loss_stats['hist_wins_finishes'] += win_loss_stats['hist_wins_' + method]
             win_loss_stats['hist_losses_finishes'] += win_loss_stats['hist_losses_' + method]
 
-    # Now calculate the win rate for the last X fights
+    # Now calculate the win rate for the last X fights. Do in polars for speed
+    win_loss_stats_pl = pl.from_pandas(win_loss_stats)
     for x in range(1, (last_x_fights + 1)):
-        win_loss_stats[f'hist_win_percent_{x}_fights'] = (
-            win_loss_stats.groupby('fighter')['win']
-            .transform(lambda s: s.shift().rolling(x, min_periods=x).mean())
-        )
+        win_loss_stats_pl = win_loss_stats_pl.with_columns([
+            pl.col('win').shift(1).rolling_mean(x, min_samples = x).over('fighter').alias(f'hist_win_percent_{x}_fights'),
+            pl.col('win_finish').shift(1).rolling_mean(x, min_samples = x).over('fighter').alias(f'hist_win_finish_percent_{x}_fights'),
+            pl.col('loss_finish').shift(1).rolling_mean(x, min_samples = x).over('fighter').alias(f'hist_loss_finish_percent_{x}_fights')
+            ])
+    
+    # for x in range(1, (last_x_fights + 1)):
+    #     win_loss_stats[f'hist_win_percent_{x}_fights'] = (
+    #         win_loss_stats.groupby('fighter')['win']
+    #         .transform(lambda s: s.shift().rolling(x, min_periods=x).mean())
+    #     )
         
-        win_loss_stats[f'hist_win_finish_percent_{x}_fights'] = (
-            win_loss_stats.groupby('fighter')['win_finish']
-            .transform(lambda s: s.shift().rolling(x, min_periods=x).mean())
-        )
+    #     win_loss_stats[f'hist_win_finish_percent_{x}_fights'] = (
+    #         win_loss_stats.groupby('fighter')['win_finish']
+    #         .transform(lambda s: s.shift().rolling(x, min_periods=x).mean())
+    #     )
         
-        win_loss_stats[f'hist_loss_finish_percent_{x}_fights'] = (
-            win_loss_stats.groupby('fighter')['loss_finish']
-            .transform(lambda s: s.shift().rolling(x, min_periods=x).mean())
-        )
+    #     win_loss_stats[f'hist_loss_finish_percent_{x}_fights'] = (
+    #         win_loss_stats.groupby('fighter')['loss_finish']
+    #         .transform(lambda s: s.shift().rolling(x, min_periods=x).mean())
+    #     )
+
+    win_loss_stats = win_loss_stats_pl.to_pandas()
+    del(win_loss_stats_pl)
 
     # Add a flag to say whether a fighter has moved a weightclass since their last 2 fights (adding it into the win loss data because it has it in the format required already)
     win_loss_stats['weightclass_m1'] = win_loss_stats.groupby('fighter')['weightclass'].shift(1)

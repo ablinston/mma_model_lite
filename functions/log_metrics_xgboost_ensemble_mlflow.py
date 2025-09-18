@@ -1,11 +1,11 @@
 # This function takes a custom xgboost ensemble model and logs the metrics AUC and accuracy in MLflow
 
-def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df):
+def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df, model_hyper_params):
 
     # pdb.set_trace()
 
     # First get the predictions from the ensemble
-    y_pred_prob, y_pred = predict_xgboost_ensemble(models, X_test_df, y_test_df)
+    y_pred_prob, y_pred = predict_xgboost_ensemble(models, X_test_df, y_test_df, model_hyper_params)
 
     # Get the outcomes of the test data
     # Convert the predictions to object in case not already

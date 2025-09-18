@@ -8,6 +8,8 @@ else:
     sys.path.append('/home/andy/Repos/custom_tools')
 
 from model_tools.k_fold_id_by_runner import k_fold_id_by_runner
+from scraping_tools.get_website_soup import get_website_soup
+# from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
 
 # from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
 
@@ -42,6 +44,7 @@ from pathlib import Path
 import pdb
 # from playwright.sync_api import sync_playwright
 # from playwright.async_api import async_playwright
+import polars as pl
 import pyarrow.parquet as pq
 # from pycaret.classification import *
 import queue
@@ -64,6 +67,7 @@ import string
 # import sys
 import threading
 import time
+import undetected_chromedriver as uc
 import xgboost as xgb
 from yaml import safe_load, dump
 import warnings

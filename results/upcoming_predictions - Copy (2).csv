@@ -1,5 +1,0 @@
-,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win
-0,2025-06-21,ufcfightnight:hillvsrountreejr,2025-06-21 17:09:44.015934+00:00,2025-06-21 17:09:44.015934+00:00,Rafael Fiziev,2.22,43.1,-0.04,Ignacio Bahamondes,1.8,54.6,-0.02,None,0.0,,0.0,0.0
-1,2025-06-21,ufcfightnight:hillvsrountreejr,2025-06-21 17:09:44.015934+00:00,2025-06-21 17:09:44.015934+00:00,Nazim Sadykhov,1.24,70.0,-0.13,Nikolas Motta,4.6,27.9,0.28,None,0.0,,0.0,0.0
-2,2025-06-21,ufcfightnight:hillvsrountreejr,2025-06-21 17:09:44.015934+00:00,2025-06-21 17:09:44.015934+00:00,Muhammad Naimov,1.4,73.4,0.03,Bogdan Grad,3.1,24.5,-0.24,Muhammad Naimov,1.4,1.36,165.0,66.0
-3,2025-06-21,ufcfightnight:hillvsrountreejr,2025-06-21 17:09:44.015934+00:00,2025-06-21 17:09:44.015934+00:00,Ismail Naurdiev,2.52,40.8,0.03,JunYong Park,1.61,56.9,-0.09,None,0.0,,0.0,0.0
