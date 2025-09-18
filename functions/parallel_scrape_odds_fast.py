@@ -7,6 +7,7 @@ def parallel_scrape_odds_fast(
         num_threads = 1, 
         firefox_location = '', 
         gecko_driver = '',
+        chrome_driver = '',
         odds_urls_overide_df = None,
         event_urls = False,
         fast = True,
@@ -54,7 +55,10 @@ def parallel_scrape_odds_fast(
         options.add_argument("--disable-gpu")
         options.add_argument("--start-maximized")
         
-        driver = uc.Chrome(options=options, headless=False)
+        if chrome_driver == '':
+            driver = uc.Chrome(options=options, headless=False)
+        else:
+            driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver)
         
         driver.get("https://www.bestfightodds.com/")
         
@@ -112,6 +116,7 @@ def parallel_scrape_odds_fast(
                     fast = fast,
                     firefox_binary = firefox_location,
                     gecko_driver = gecko_driver,
+                    chrome_driver = chrome_driver,
                     driver = driver)
                 
                 odds_scrape_results.append(odds_result)  # Collect the result (url, title)
@@ -129,7 +134,8 @@ def parallel_scrape_odds_fast(
             fast = False,
             playwright = playwright,
             firefox_binary = firefox_location,
-            gecko_driver = gecko_driver
+            gecko_driver = gecko_driver,
+            chrome_driver = chrome_driver,
         )
 
         # with ThreadPoolExecutor(max_workers = num_threads) as executor:

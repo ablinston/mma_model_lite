@@ -107,4 +107,5 @@ pd.set_option('display.max_columns', None)
 if not os.name == "nt":
     config['firefox_location'] = config['firefox_location_pi']
     config['gecko_driver_location'] = config['gecko_driver_location_pi']
+    config['chrome_driver_location'] = config['chrome_driver_location_pi']
     config['num_threads'] = 2
