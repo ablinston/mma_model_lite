@@ -21,143 +21,104 @@ def parallel_scrape_odds_fast(
     odds_scrape_results = []
     event_scrape_results = []
             
-    # If fast, we will use response.get. There is selenium code in here as well from old runs that still works
-    if fast:
-        # ###########
-        # # Setup headless Firefox for getting odds information
-        # options = Options()
-        # # options.headless = True
-        # options.accept_insecure_certs = True
-        # options.set_preference("general.useragent.override",
-        #                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        #                "AppleWebKit/537.36 (KHTML, like Gecko) "
-        #                "Chrome/121.0.0.0 Safari/537.36")
-        # # Create a Service object with the path to Firefox driver
-        # options.binary_location = firefox_location # firefox_binary
-        # service = Service(gecko_driver)
-        # options.set_preference("dom.webdriver.enabled", False)
-        # options.set_preference("useAutomationExtension", False)
-        # options.set_preference("dom.webnotifications.enabled", False)
-        # # Create a WebDriver instance
-        # driver = webdriver.Firefox(service=service, options=options)
-        # ###########
-        
-        # # Get the cookies for the odds webpages using a Selenium call
-        # driver.get("https://www.bestfightodds.com/")
-        # pdb.set_trace()
-        # Get cookies from Selenium
-        # selenium_cookies = driver.get_cookies()
-                
-        options = uc.ChromeOptions()
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--start-maximized")
-        
-        if chrome_driver == '':
-            driver = uc.Chrome(options=options, headless=False)
-        else:
-            driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver)
-        
-        driver.get("https://www.bestfightodds.com/")
-        
-        # Give a delay to allow the checkbox to be manually done
-        time.sleep(20)
-        cookies = driver.get_cookies()
-        
-        cookies_dict = {cookie['name']: cookie['value'] for cookie in cookies}
-        # Quit the browser unless we are going through one at a time
-        if num_threads > 1:
-            driver.quit()
-        
-        scrape_func = partial(
-            scrape_fighter_odds_fast,
-            cookies_dict = cookies_dict,
-            odds_urls_overide_df = odds_urls_overide_df,
-            event_urls = event_urls,
-            playwright = playwright,
-            fast = fast,
-            firefox_binary = firefox_location,
-            gecko_driver = gecko_driver
-        )
-        
-        # Check if we have more than 1 thread
-        if num_threads > 1:
-            with ThreadPoolExecutor(max_workers = num_threads) as executor:
-                future_to_url = {executor.submit(scrape_func, fighter): fighter for fighter in fighter_list}
-        
-                # Collect results as they complete
-                for future in as_completed(future_to_url):
-                    try:
-                        odds_result, events_result = future.result()
-                        odds_scrape_results.append(odds_result)  # Collect the result (url, title)
-                        event_scrape_results.append(events_result)  # Collect the result (url, title)
-                        
-                    except Exception as e:
-                        print(f"Error for fighter {future}: {e}")
-        
-                    # Increment the completed count
-                    completed_count += 1
-                    print(f"Completed {completed_count} out of {total_fighters} tasks")
-                    
-            # This ensures that all threads are done
-            executor.shutdown(wait=True)
-        
-        else:
-            for fighter in fighter_list:
-                
-                odds_result, events_result = scrape_fighter_odds_fast(
-                    fighter,
-                    cookies_dict = cookies_dict,
-                    odds_urls_overide_df = odds_urls_overide_df,
-                    event_urls = event_urls,
-                    playwright = playwright,
-                    fast = fast,
-                    firefox_binary = firefox_location,
-                    gecko_driver = gecko_driver,
-                    chrome_driver = chrome_driver,
-                    driver = driver)
-                
-                odds_scrape_results.append(odds_result)  # Collect the result (url, title)
-                event_scrape_results.append(events_result)  # Collect the result (url, title)
-                    
-    # Else it's not fast and we use playwright
+    # ###########
+    # # Setup headless Firefox for getting odds information
+    # options = Options()
+    # # options.headless = True
+    # options.accept_insecure_certs = True
+    # options.set_preference("general.useragent.override",
+    #                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    #                "AppleWebKit/537.36 (KHTML, like Gecko) "
+    #                "Chrome/121.0.0.0 Safari/537.36")
+    # # Create a Service object with the path to Firefox driver
+    # options.binary_location = firefox_location # firefox_binary
+    # service = Service(gecko_driver)
+    # options.set_preference("dom.webdriver.enabled", False)
+    # options.set_preference("useAutomationExtension", False)
+    # options.set_preference("dom.webnotifications.enabled", False)
+    # # Create a WebDriver instance
+    # driver = webdriver.Firefox(service=service, options=options)
+    # ###########
+    
+    # # Get the cookies for the odds webpages using a Selenium call
+    # driver.get("https://www.bestfightodds.com/")
+    # pdb.set_trace()
+    # Get cookies from Selenium
+    # selenium_cookies = driver.get_cookies()
+            
+    options = uc.ChromeOptions()
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--start-maximized")
+    
+    if chrome_driver == '':
+        driver = uc.Chrome(options=options, headless=False)
     else:
-        
-        # Use partial to prefill arguments in the function. the map below only passes one argument.
-        scrape_func = partial(
-            scrape_fighter_odds_fast,
-            cookies_dict = {}, # only needed for fast run
-            odds_urls_overide_df = odds_urls_overide_df,
-            event_urls = event_urls,
-            fast = False,
-            playwright = playwright,
-            firefox_binary = firefox_location,
-            gecko_driver = gecko_driver,
-            chrome_driver = chrome_driver,
-        )
-
-        # with ThreadPoolExecutor(max_workers = num_threads) as executor:
-        #     scrape_results = list(executor.map(scrape_func, fighter_list))
-        
+        driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver)
+    
+    driver.get("https://www.bestfightodds.com/")
+    
+    # Give a delay to allow the checkbox to be manually done
+    time.sleep(20)
+    cookies = driver.get_cookies()
+    
+    cookies_dict = {cookie['name']: cookie['value'] for cookie in cookies}
+    # Quit the browser unless we are going through one at a time
+    if num_threads > 1:
+        driver.quit()
+    
+    scrape_func = partial(
+        scrape_fighter_odds_fast,
+        cookies_dict = cookies_dict,
+        odds_urls_overide_df = odds_urls_overide_df,
+        event_urls = event_urls,
+        playwright = playwright,
+        fast = fast,
+        firefox_binary = firefox_location,
+        gecko_driver = gecko_driver
+    )
+    
+    # Check if we have more than 1 thread
+    if num_threads > 1:
         with ThreadPoolExecutor(max_workers = num_threads) as executor:
-            futures = {executor.submit(scrape_func, fighter_name): fighter_name for fighter_name in fighter_list}
-
-            for future in as_completed(futures):
+            future_to_url = {executor.submit(scrape_func, fighter): fighter for fighter in fighter_list}
+    
+            # Collect results as they complete
+            for future in as_completed(future_to_url):
                 try:
                     odds_result, events_result = future.result()
                     odds_scrape_results.append(odds_result)  # Collect the result (url, title)
                     event_scrape_results.append(events_result)  # Collect the result (url, title)
-                except Exception as e:
-                    print(f"Error scraping {futures[future]}: {e}")  # Handle failures
                     
+                except Exception as e:
+                    print(f"Error for fighter {future}: {e}")
+    
                 # Increment the completed count
                 completed_count += 1
                 print(f"Completed {completed_count} out of {total_fighters} tasks")
-
+                
         # This ensures that all threads are done
         executor.shutdown(wait=True)
+    
+    else:
+        for fighter in fighter_list:
+            
+            odds_result, events_result = scrape_fighter_odds_fast(
+                fighter,
+                cookies_dict = cookies_dict,
+                odds_urls_overide_df = odds_urls_overide_df,
+                event_urls = event_urls,
+                playwright = playwright,
+                fast = fast,
+                firefox_binary = firefox_location,
+                gecko_driver = gecko_driver,
+                chrome_driver = chrome_driver,
+                driver = driver)
+            
+            odds_scrape_results.append(odds_result)  # Collect the result (url, title)
+            event_scrape_results.append(events_result)  # Collect the result (url, title)
         
     # pdb.set_trace()    
     
