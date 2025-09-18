@@ -35,7 +35,7 @@ def predict_future_events(
         the path where the outputs from the predictions will be saved. This is in addition to automatic outputs, which will be saved in ./results/
     
     """
-    
+    # pdb.set_trace()
     # Set the odds to use as upcoming instead of as used in the regular data
     data_processing_config['odds_suffix_for_true_odds'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
     model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
@@ -47,8 +47,8 @@ def predict_future_events(
     if not skip_data_update:
         
         # Run these scripts to scrape then clean the raw data
-        # scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
-        # clean_all_raw_data_and_save(config)
+        scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
+        clean_all_raw_data_and_save(config)
         
         gc.collect();
         
@@ -150,7 +150,7 @@ def predict_future_events(
     betting_data['bet_assumed_odds'] = betting_data['bets'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'], betting_data['fighter2_backtesting_odds'])
 
     # Round odds columns
-    for col in [cols for cols in betting_data.columns if 'odds' in cols]:
+    for col in [cols for cols in betting_data.columns if 'odds' in cols and 'datetime' not in cols]:
         betting_data.loc[:, col] = np.round(betting_data[col], 2)
 
     betting_data.rename(columns = {'fighter1_notformodel_true_odds_asat_datetime': 'f1_scrape_date', 'fighter2_notformodel_true_odds_asat_datetime': 'f2_scrape_date'}, inplace = True)

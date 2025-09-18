@@ -15,6 +15,7 @@ def scrape_fighter_odds_fast(
         playwright = False,
         firefox_binary = '', 
         gecko_driver = '',
+        chrome_driver = '',
         driver = None):
 
     # pdb.set_trace()
@@ -42,6 +43,7 @@ def scrape_fighter_odds_fast(
             cookies = cookies_dict, # Only needed for fast
             firefox_binary = firefox_binary, # Only needed for NOT fast
             gecko_driver = gecko_driver,
+            chrome_driver = chrome_driver,
             driver = driver
         )            
         
@@ -68,6 +70,7 @@ def scrape_fighter_odds_fast(
                 cookies = cookies_dict, # Only needed for fast
                 firefox_binary = firefox_binary, # Only needed for NOT fast
                 gecko_driver = gecko_driver,
+                chrome_driver = chrome_driver,
                 driver = driver
             )
 
