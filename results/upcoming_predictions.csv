@@ -1,11 +1,11 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:19:29.871,2025-09-18 11:19:29.871,Junior Tafa,1.03,56.9,-0.41,Ibo Aslan,1.56,40.2,-0.37,None,0.0,,0.0,0.0,
-1,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:19:29.871,2025-09-18 11:19:29.871,Jack Jenkins,1.35,35.0,-0.53,Ramon Taveras,1.03,61.4,-0.37,None,0.0,,0.0,0.0,
-2,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:19:29.871,2025-09-18 11:19:29.871,Jake Matthews,1.2,46.2,-0.45,Neil Magny,1.03,51.9,-0.47,None,0.0,,0.0,0.0,
-3,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:19:29.871,2025-09-18 11:19:29.871,Navajo Stirling,1.37,71.7,-0.02,Rodolfo Bellato,3.2,25.3,-0.19,None,0.0,,0.0,0.0,
-4,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:19:29.871,2025-09-18 11:19:29.871,Jamie Mullarkey,1.95,54.9,0.07,Rolando Bedoya,1.96,43.0,-0.16,Jamie Mullarkey,1.95,1.82,165.0,156.75,
+0,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:34:32.454,2025-09-18 11:34:32.454,Junior Tafa,1.03,56.9,-0.41,Ibo Aslan,1.57,40.2,-0.37,None,0.0,,0.0,0.0,
+1,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:34:32.454,2025-09-18 11:34:32.454,Jack Jenkins,1.35,35.0,-0.53,Ramon Taveras,1.03,61.4,-0.37,None,0.0,,0.0,0.0,
+2,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:34:32.454,2025-09-18 11:34:32.454,Jake Matthews,1.2,46.2,-0.45,Neil Magny,1.03,51.9,-0.47,None,0.0,,0.0,0.0,
+3,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:34:32.454,2025-09-18 11:34:32.454,Navajo Stirling,1.37,71.7,-0.02,Rodolfo Bellato,3.2,25.3,-0.19,None,0.0,,0.0,0.0,
+4,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:34:32.454,2025-09-18 11:34:32.454,Jamie Mullarkey,1.95,54.9,0.07,Rolando Bedoya,1.96,43.0,-0.16,Jamie Mullarkey,1.95,1.82,165.0,156.75,
 5,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:19:13.458082+00:00,2025-09-18 11:19:13.458082+00:00,Tom Nolan,1.64,56.0,-0.08,Charlie Campbell,2.4,41.2,-0.01,None,0.0,,0.0,0.0,
-6,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:19:29.871,2025-09-18 11:19:29.871,Carlos Ulberg,1.03,73.2,-0.25,Dominick Reyes,2.92,23.9,-0.3,None,0.0,,0.0,0.0,
+6,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-18 11:34:32.454,2025-09-18 11:34:32.454,Carlos Ulberg,1.03,73.2,-0.25,Dominick Reyes,2.92,23.9,-0.3,None,0.0,,0.0,0.0,
 2,2025-09-27,ufcfightnight:ulbergvsreyes,,,Jimmy Crute,,,,Ivan Erslan,,,,,,,,,Fights < 3
 4,2025-09-27,ufcfightnight:ulbergvsreyes,,,Justin Tafa,,,,Louie Sutherland,,,,,,,,,Fights < 3
 7,2025-09-27,ufcfightnight:ulbergvsreyes,,,Jonathan Micallef,,,,Oban Elliott,,,,,,,,,Fights < 3

@@ -173,7 +173,7 @@ def parallel_scrape_odds_fast(
     if event_urls:
         
         # Get rid of duplicate events and keep the most common date for the event
-        if len(event_scrape_results) > 0:
+        if len(all_fighter_odds) > 0:
             event_urls_odds_agg = pd.concat(event_scrape_results).groupby('event_url', as_index=False)['event_date'].apply(lambda x: x.mode().iloc[0])
         else:
             event_urls_odds_agg = pd.DataFrame()
