@@ -632,7 +632,7 @@ def merge_and_process_all_clean_data(
     # pd.DataFrame(merged_data.columns).to_csv("te.csv")
     ###########################################################################################
     # FIGHTER DIFFERENTIAL CALCULATIONS
-
+    
     merged_data = add_fighter_differentials(merged_data)
     
     gc.collect();
