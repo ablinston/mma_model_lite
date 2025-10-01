@@ -1,16 +1,15 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-25 13:19:58.322,2025-09-25 13:19:58.322,Jack Jenkins,1.37,52.8,-0.28,Ramon Taveras,3.5,43.3,0.51,None,0.0,,0.0,0.0,
-1,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-25 13:19:58.322,2025-09-25 13:19:58.322,Jake Matthews,1.25,66.0,-0.18,Neil Magny,4.7,32.3,0.52,None,0.0,,0.0,0.0,
-2,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-25 13:19:58.322,2025-09-25 13:19:58.322,Navajo Stirling,1.43,70.6,0.01,Rodolfo Bellato,3.15,26.3,-0.17,Navajo Stirling,1.43,1.42,165.0,70.95,
-3,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-25 13:19:58.322,2025-09-25 13:19:58.322,Jamie Mullarkey,1.92,55.8,0.07,Rolando Bedoya,2.04,42.0,-0.14,Jamie Mullarkey,1.92,1.79,165.0,151.8,
-4,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-25 13:19:58.322,2025-09-25 13:19:58.322,Tom Nolan,1.71,55.4,-0.05,Charlie Campbell,2.38,41.7,-0.01,None,0.0,,0.0,0.0,
-5,2025-09-27,ufcfightnight:ulbergvsreyes,2025-09-25 13:19:58.322,2025-09-25 13:19:58.322,Carlos Ulberg,1.42,70.1,-0.01,Dominick Reyes,3.3,27.0,-0.11,None,0.0,,0.0,0.0,
-0,2025-09-27,ufcfightnight:ulbergvsreyes,,,Junior Tafa,,,,Ibo Aslan,,,,,,,,,Missing odds
-2,2025-09-27,ufcfightnight:ulbergvsreyes,,,Jimmy Crute,,,,Ivan Erslan,,,,,,,,,Fights < 3
-4,2025-09-27,ufcfightnight:ulbergvsreyes,,,Justin Tafa,,,,Louie Sutherland,,,,,,,,,Fights < 3
-7,2025-09-27,ufcfightnight:ulbergvsreyes,,,Jonathan Micallef,,,,Oban Elliott,,,,,,,,,Fights < 3
-8,2025-09-27,ufcfightnight:ulbergvsreyes,,,Colby Thicknesse,,,,Josias Musasa,,,,,,,,,Fights < 3
-9,2025-09-27,ufcfightnight:ulbergvsreyes,,,Michelle Montague,,,,Luana Carolina,,,,,,,,,Womens
-10,2025-09-27,ufcfightnight:ulbergvsreyes,,,Brando Pericic,,,,Elisha Ellison,,,,,,,,,Fights < 3
-11,2025-09-27,ufcfightnight:ulbergvsreyes,,,Cam Rowston,,,,Andre Petroski,,,,,,,,,Missing odds
-13,2025-09-27,ufcfightnight:ulbergvsreyes,,,Loma Lookboonmee,,,,Alexia Thainara,,,,,,,,,Womens
+0,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Merab Dvalishvili,1.27,81.1,0.03,Cory Sandhagen,4.2,17.6,-0.26,Merab Dvalishvili,1.27,1.23,165.0,44.55,
+1,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Jiri Prochazka,1.6,74.9,0.2,Khalil Rountree Jr.,2.6,23.8,-0.38,Jiri Prochazka,1.6,1.34,165.0,99.0,
+2,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Josh Emmett,4.6,15.0,-0.31,Youssef Zalal,1.25,82.9,0.04,Youssef Zalal,1.25,1.21,165.0,41.25,
+3,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Abus Magomedov,3.1,40.2,0.24,Joe Pyfer,1.46,55.5,-0.19,None,0.0,,0.0,0.0,
+4,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Edmen Shahbazyan,1.38,60.4,-0.17,Andre Muniz,3.45,33.4,0.15,None,0.0,,0.0,0.0,
+5,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Chris Gutierrez,4.4,33.6,0.48,Farid Basharat,1.26,64.2,-0.19,None,0.0,,0.0,0.0,
+6,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Punahele Soriano,1.03,47.7,-0.51,Nikolay Veretennikov,1.03,50.1,-0.48,None,0.0,,0.0,0.0,
+7,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Magomed Ankalaev,1.44,71.2,0.03,Alex Pereira,3.2,26.1,-0.17,Magomed Ankalaev,1.44,1.4,165.0,72.6,
+6,2025-10-04,ufc320:ankalaevvspereira2,,,Patchy Mix,,,,Jakub Wiklacz,,,,,,,,,Fights < 3
+7,2025-10-04,ufc320:ankalaevvspereira2,,,Macy Chiasson,,,,Yana Santos,,,,,,,,,Womens
+9,2025-10-04,ufc320:ankalaevvspereira2,,,Ramiz Brahimaj,,,,Austin Vanderford,,,,,,,,,Fights < 3
+10,2025-10-04,ufc320:ankalaevvspereira2,,,Veronica Hardy,,,,Brogan Walker,,,,,,,,,Womens
+11,2025-10-04,ufc320:ankalaevvspereira2,,,Ateba Gautier,,,,Treston Vines,,,,,,,,,Missing odds
+12,2025-10-04,ufc320:ankalaevvspereira2,,,Daniel Santos,,,,JooSang Yoo,,,,,,,,,Fights < 3
