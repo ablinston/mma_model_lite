@@ -22,7 +22,6 @@ def test_switch_fighter1_fighter2():
     
     X = add_fighter_differentials(X)
     
-    
     # Create y with a different index order
     y = pd.Series(['2', '0', '1', '0', '2'], index=[20, 10, 30, 40, 50])
     
