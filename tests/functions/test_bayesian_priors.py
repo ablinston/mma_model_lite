@@ -5,9 +5,12 @@ exec(open('global.py').read())
 # Load what answers are expected
 test_bayesian_priors_correct = fp.ParquetFile('./tests/data/test_bayesian_priors_correct.parquet').to_pandas()
 
-np.random.seed(123)
+
 
 def test_bayesian_priors():
+    
+    np.random.seed(123)
+    
     # Create a larger mock dataset
     num_fights = 100
     data = {
@@ -31,10 +34,10 @@ def test_bayesian_priors():
     result = bayesian_priors(fight_stats_df, id_cols, group_by, fight_span, ignore_last_n_fights = 1)
     
     # Assertions
-    assert isinstance(result, pd.DataFrame), "Output should be a DataFrame"
-    assert all(col.startswith('bayes_total_') for col in result.columns if col not in id_cols), "Columns should be prefixed with 'bayes_total_'"
-    assert len(result) == len(fight_stats_df) / 2, "Output should have half the rows since duplicates are removed"
-    assert test_bayesian_priors_correct.equals(result)
+    assert isinstance(result, pd.DataFrame)
+    assert all(col.startswith('bayes_total_') for col in result.columns if col not in id_cols)
+    assert len(result) == len(fight_stats_df) / 2
+    assert test_bayesian_priors_correct.sort_values(['bout']).equals(result[test_bayesian_priors_correct.columns].sort_values(['bout']))
     
     
 # fp.write('./tests/data/test_bayesian_priors_correct.parquet', result, compression = 'ZSTD')

@@ -25,9 +25,9 @@ else:
     
     predict_future_events(
             skip_data_update = False,
-            skip_full_data_update = False,
-            skip_save_data = False,
-            skip_betfair_history = False,
+            skip_full_data_update = True,
+            skip_save_data = True,
+            skip_betfair_history = True,
             config = config,
             data_processing_config = data_processing_config,
             model_hyper_params = model_hyper_params,
