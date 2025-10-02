@@ -1,15 +1,15 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Merab Dvalishvili,1.27,81.1,0.03,Cory Sandhagen,4.2,17.6,-0.26,Merab Dvalishvili,1.27,1.23,165.0,44.55,
-1,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Jiri Prochazka,1.6,74.9,0.2,Khalil Rountree Jr.,2.6,23.8,-0.38,Jiri Prochazka,1.6,1.34,165.0,99.0,
-2,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Josh Emmett,4.6,15.0,-0.31,Youssef Zalal,1.25,82.9,0.04,Youssef Zalal,1.25,1.21,165.0,41.25,
-3,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Abus Magomedov,3.1,40.2,0.24,Joe Pyfer,1.46,55.5,-0.19,None,0.0,,0.0,0.0,
-4,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Edmen Shahbazyan,1.38,60.4,-0.17,Andre Muniz,3.45,33.4,0.15,None,0.0,,0.0,0.0,
-5,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Chris Gutierrez,4.4,33.6,0.48,Farid Basharat,1.26,64.2,-0.19,None,0.0,,0.0,0.0,
-6,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Punahele Soriano,1.03,47.7,-0.51,Nikolay Veretennikov,1.03,50.1,-0.48,None,0.0,,0.0,0.0,
-7,2025-10-04,ufc320:ankalaevvspereira2,2025-10-01 09:00:52.499,2025-10-01 09:00:52.499,Magomed Ankalaev,1.44,71.2,0.03,Alex Pereira,3.2,26.1,-0.17,Magomed Ankalaev,1.44,1.4,165.0,72.6,
-6,2025-10-04,ufc320:ankalaevvspereira2,,,Patchy Mix,,,,Jakub Wiklacz,,,,,,,,,Fights < 3
-7,2025-10-04,ufc320:ankalaevvspereira2,,,Macy Chiasson,,,,Yana Santos,,,,,,,,,Womens
-9,2025-10-04,ufc320:ankalaevvspereira2,,,Ramiz Brahimaj,,,,Austin Vanderford,,,,,,,,,Fights < 3
-10,2025-10-04,ufc320:ankalaevvspereira2,,,Veronica Hardy,,,,Brogan Walker,,,,,,,,,Womens
-11,2025-10-04,ufc320:ankalaevvspereira2,,,Ateba Gautier,,,,Treston Vines,,,,,,,,,Missing odds
-12,2025-10-04,ufc320:ankalaevvspereira2,,,Daniel Santos,,,,JooSang Yoo,,,,,,,,,Fights < 3
+0,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Merab Dvalishvili,1.26,82.1,0.03,Cory Sandhagen,4.7,16.7,-0.22,Merab Dvalishvili,1.26,1.22,165.0,42.9,
+1,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Jiri Prochazka,1.55,75.8,0.18,Khalil Rountree Jr.,2.76,22.9,-0.37,Jiri Prochazka,1.55,1.32,165.0,90.75,
+2,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Josh Emmett,4.8,14.9,-0.28,Youssef Zalal,1.24,83.0,0.03,Youssef Zalal,1.24,1.2,165.0,39.6,
+3,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Abus Magomedov,3.25,39.6,0.29,Joe Pyfer,1.42,56.0,-0.2,None,0.0,,0.0,0.0,
+4,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Edmen Shahbazyan,1.33,64.2,-0.15,Andre Muniz,3.8,29.6,0.13,None,0.0,,0.0,0.0,
+5,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Punahele Soriano,1.33,63.0,-0.16,Nikolay Veretennikov,3.4,34.9,0.19,None,0.0,,0.0,0.0,
+6,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Chris Gutierrez,5.1,33.1,0.69,Farid Basharat,1.23,64.7,-0.2,None,0.0,,0.0,0.0,
+7,2025-10-04,ufc320:ankalaevvspereira2,2025-10-02 08:05:54.318,2025-10-02 08:05:54.318,Magomed Ankalaev,1.4,71.4,-0.0,Alex Pereira,3.25,25.9,-0.16,None,0.0,,0.0,0.0,
+4,2025-10-04,ufc320:ankalaevvspereira2,,,Ateba Gautier,,,,Treston Vines,,,,,,,,,Missing odds
+6,2025-10-04,ufc320:ankalaevvspereira2,,,Macy Chiasson,,,,Yana Santos,,,,,,,,,Womens
+7,2025-10-04,ufc320:ankalaevvspereira2,,,Daniel Santos,,,,JooSang Yoo,,,,,,,,,Fights < 3
+8,2025-10-04,ufc320:ankalaevvspereira2,,,Patchy Mix,,,,Jakub Wiklacz,,,,,,,,,Fights < 3
+10,2025-10-04,ufc320:ankalaevvspereira2,,,Ramiz Brahimaj,,,,Austin Vanderford,,,,,,,,,Fights < 3
+11,2025-10-04,ufc320:ankalaevvspereira2,,,Veronica Hardy,,,,Brogan Walker,,,,,,,,,Womens

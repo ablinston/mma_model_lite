@@ -10,7 +10,7 @@ def merge_and_process_all_clean_data(
         skip_save_data = False # whether to skip the save data and just return merged data
         ):
     
-    # 00000000000000000set_trace()
+    # pdb.set_trace()
 
     # Read in the data
     events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
@@ -632,8 +632,6 @@ def merge_and_process_all_clean_data(
     # pd.DataFrame(merged_data.columns).to_csv("te.csv")
     ###########################################################################################
     # FIGHTER DIFFERENTIAL CALCULATIONS
-   
-    gc.collect();
     
     merged_data = add_fighter_differentials(merged_data)
     

@@ -27,9 +27,9 @@ def odds_to_probabilities(odds_fighter1, odds_fighter2, normalise = True):
 
     # Create a DataFrame to hold the results
     probabilities = pd.DataFrame({
-        'L/W': prob_fighter2,
-        'OTH': prob_draw,
-        'W/L': prob_fighter1
+        'L/W': np.round(prob_fighter2, 8),
+        'OTH': np.round(prob_draw, 8),
+        'W/L': np.round(prob_fighter1, 8)
     })
 
     return probabilities
