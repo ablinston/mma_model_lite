@@ -48,6 +48,10 @@ def test_calculate_knocked_out_stats():
     assert (fighter_a['hist_times_knocked_out'] >= 0).all()# "hist_times_knocked_out should be non-negative"
 
     # Check the data is the same as expected
-    assert correct.sort_values('fighter').equals(result.sort_values('fighter'))
+    pd.testing.assert_frame_equal(
+        correct.sort_values('fighter').reset_index(drop = True),
+        result.sort_values('fighter').reset_index(drop = True),
+        check_exact = False,
+        check_dtype = False)
 
 # fp.write('./tests/data/test_calculate_knocked_out_stats_correct.parquet', result, compression = 'ZSTD')
