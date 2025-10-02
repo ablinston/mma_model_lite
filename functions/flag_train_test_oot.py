@@ -1,9 +1,9 @@
 # This function takes a data frame and flags the data with train/test/oot for a given config
 
-def flag_train_test_oot(df, config, test_fighter_list = []):
+def flag_train_test_oot(data, config, test_fighter_list = []):
     
-    # pdb.set_trace()
-    data = df.copy()
+    # # pdb.set_trace()
+    # data = df.copy()
     
     # Flag the oot sample and set the rest to train
     data['train_test_oot_flag'] = np.where(
@@ -13,7 +13,7 @@ def flag_train_test_oot(df, config, test_fighter_list = []):
     )
     
     # Get a separate data frame with only non-oot fighters
-    data_without_oot = data[data['train_test_oot_flag'] == 'train'].copy()
+    data_without_oot = data[data['train_test_oot_flag'] == 'train'][['fighter1', 'fighter2']].copy()
         
     # Get a list of all fighters to select the test data
     if len(test_fighter_list) == 0:

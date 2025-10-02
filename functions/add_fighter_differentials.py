@@ -1,26 +1,20 @@
 # This function takes a data frame and calculates the differentials
 
-def add_fighter_differentials(df):
+def add_fighter_differentials(df, zero_over_zero_fill = 1):
 
     # pdb.set_trace()
     
-    merged_data = df.copy()
+    # Convert pandas DataFrame to Polars
+    df_pl = pl.from_pandas(df)
 
-    # merged_data.reset_index(drop = True, inplace = True)
-
-    # First, remove any existing diff columns
-    existing_diff_cols = [col for col in df.columns if 'diff' in col or 'offense_minus' in col]
+    # Remove existing diff columns
+    diff_cols = [c for c in df_pl.columns if 'diff' in c or 'offense_minus' in c]
+    if diff_cols:
+        df_pl = df_pl.select([c for c in df_pl.columns if c not in diff_cols])
     
-    if len(existing_diff_cols) > 0:
-        merged_data = merged_data[[col for col in df.columns if col not in existing_diff_cols]]
-
-    # Check there are no duplicates first
-    duplicate_columns = merged_data.columns[merged_data.columns.duplicated()]
-    stop_if_not(len(duplicate_columns) == 0)
-
-    # Get a sorted list of columns
-    sorted_columns = merged_data.columns.sort_values()  
-    
+    # Get sorted columns
+    sorted_columns = sorted(df_pl.columns)    
+       
     # Add direct differentials between fighter offence and defence
     fighter1_accuracy_off_cols = [col for col in sorted_columns if ('accuracy_percent' in col or 'ctrl_minutes_per_minute' in col) and 'diff' not in col and 'fighter1' in col and 'against' not in col]
     fighter2_accuracy_off_cols = [col for col in sorted_columns if ('accuracy_percent' in col or 'ctrl_minutes_per_minute' in col) and 'diff' not in col and 'fighter2' in col and 'against' not in col]
@@ -31,39 +25,39 @@ def add_fighter_differentials(df):
     stop_if_not(check_identical_excl_string(fighter1_accuracy_off_cols, [col.replace('_against', '') for col in fighter2_accuracy_def_cols], 'fighter1', 'fighter2'))
     stop_if_not(check_identical_excl_string(fighter2_accuracy_off_cols, [col.replace('_against', '') for col in fighter1_accuracy_def_cols], 'fighter2', 'fighter1'))
     
-    # Calculate the differentials. Fill NAs with 0 for the purposes of this calc
-    fighter1_off_fighter2_def = pd.DataFrame(merged_data[fighter1_accuracy_off_cols].copy().fillna(0).to_numpy() - (1 - merged_data[fighter2_accuracy_def_cols].copy().fillna(0).to_numpy()),
-                                             columns = [col.replace('fighter1', 'fighter1_offense_minus_fighter2_defense') for col in fighter1_accuracy_off_cols],
-                                             index = merged_data.index)
-    fighter1_def_fighter2_off = pd.DataFrame(merged_data[fighter2_accuracy_off_cols].copy().fillna(0).to_numpy() - (1 -  merged_data[fighter1_accuracy_def_cols].copy().fillna(0).to_numpy()),
-                                             columns = [col.replace('fighter2', 'fighter2_offense_minus_fighter1_defense') for col in fighter2_accuracy_off_cols],
-                                             index = merged_data.index)
-    
-    # Combined with the data
-    merged_data = pd.concat([merged_data, fighter1_off_fighter2_def, fighter1_def_fighter2_off], axis = 1)
+    first_exprs = []
+
+    # Fighter1 offense minus Fighter2 defense
+    first_exprs.extend([
+        (pl.col(f1).fill_null(0) - (1 - pl.col(f2).fill_null(0)))
+        .alias(f1.replace("fighter1", "fighter1_offense_minus_fighter2_defense"))
+        for f1, f2 in zip(fighter1_accuracy_off_cols, fighter2_accuracy_def_cols)
+    ])
+
+    # Fighter2 offense minus Fighter1 defense
+    first_exprs.extend([
+        (pl.col(f2).fill_null(0) - (1 - pl.col(f1).fill_null(0)))
+        .alias(f2.replace("fighter2", "fighter2_offense_minus_fighter1_defense"))
+        for f2, f1 in zip(fighter2_accuracy_off_cols, fighter1_accuracy_def_cols)
+    ])
+
+    df_pl = df_pl.with_columns(first_exprs)
+
 
     #######################
     # Add in some combination of differentials for an overall fight
     # Get the fighter columns
-    fighter1_cols = [col for col in merged_data.columns if col.startswith('fighter1_') and 'notformodel' not in col and 'backtesting' not in col]
-    fighter2_cols = [col for col in merged_data.columns if col.startswith('fighter2_') and 'notformodel' not in col and 'backtesting' not in col]
+    fighter1_cols = [c for c in df_pl.columns if c.startswith('fighter1_') and 'notformodel' not in c and 'backtesting' not in c]
+    fighter2_cols = [c for c in df_pl.columns if c.startswith('fighter2_') and 'notformodel' not in c and 'backtesting' not in c]
 
     # Remove string columns
     # Identify string columns
-    string_columns = merged_data.select_dtypes(include=['object']).columns
-    fighter1_cols = [col for col in fighter1_cols if col not in string_columns]
-    fighter2_cols = [col for col in fighter2_cols if col not in string_columns]
+    string_cols = [c for c, dt in df_pl.schema.items() if dt in (pl.Utf8, pl.Categorical)]
+    fighter1_cols = [c for c in fighter1_cols if c not in string_cols]
+    fighter2_cols = [c for c in fighter2_cols if c not in string_cols]
 
     fighter1_cols.sort()
     fighter2_cols.sort()
-
-    # Separate out the dates
-    date_columns = merged_data.select_dtypes(include=['datetime64']).columns
-
-    fighter1_cols_no_dates = [col for col in fighter1_cols if col not in date_columns]
-    fighter2_cols_no_dates = [col for col in fighter2_cols if col not in date_columns]
-    fighter1_cols_dates = [col for col in fighter1_cols if col in date_columns]
-    fighter2_cols_dates = [col for col in fighter2_cols if col in date_columns]
 
     # Check that the columns correspond to one another
     if check_identical_excl_string(fighter1_cols, fighter2_cols, 'fighter1_', 'fighter2_', check_both = True):
@@ -71,41 +65,58 @@ def add_fighter_differentials(df):
     else:
         print("Column correspondence check FAILED")
         raise SystemExit
+ 
+    # Split off datetime columns
+    date_cols = [c for c, dt in df_pl.schema.items() if dt == pl.Datetime]
+    f1_no_dates = [c for c in fighter1_cols if c not in date_cols]
+    f2_no_dates = [c for c in fighter2_cols if c not in date_cols]
+    f1_dates = [c for c in fighter1_cols if c in date_cols]
+    f2_dates = [c for c in fighter2_cols if c in date_cols]
+    
+    stop_if_not(check_identical_excl_string(f1_no_dates, f2_no_dates, 'fighter1_', 'fighter2_', check_both = True))
 
-    stop_if_not(check_identical_excl_string(fighter1_cols_no_dates, fighter2_cols_no_dates, 'fighter1_', 'fighter2_', check_both = True))
+    # --- Differences ---
+    # Build a set of all boolean columns
+    bool_cols = {c for c, dt in df_pl.schema.items() if dt == pl.Boolean}
+    
+    # f1_exprs and f2_exprs for arithmetic
+    f1_exprs = [pl.col(c).cast(pl.Float64) if c in bool_cols else pl.col(c) for c in f1_no_dates]
+    f2_exprs = [pl.col(c).cast(pl.Float64) if c in bool_cols else pl.col(c) for c in f2_no_dates]
 
-    # Create differential columns
-    diff_columns = pd.DataFrame(np.subtract(merged_data[fighter1_cols_no_dates].to_numpy(), merged_data[fighter2_cols_no_dates].to_numpy()),
-                                columns = [col.replace('fighter1_', 'diff_').replace('fighter2_', '') for col in fighter1_cols_no_dates],
-                                index = merged_data.index)
+    df_pl = df_pl.with_columns([
+        (f1 - f2).alias(c.replace("fighter1_", "diff_").replace("fighter2_", ""))
+        for f1, f2, c in zip(f1_exprs, f2_exprs, f1_no_dates)
+    ])
 
-    # Create differential columns but as ratios rather than differences
-    diff_ratio_columns = pd.DataFrame(safe_divide_np(merged_data[fighter1_cols_no_dates].to_numpy(), merged_data[fighter2_cols_no_dates].to_numpy()),
-                                columns = [col.replace('fighter1_', 'diff_ratio_').replace('fighter2_', '') for col in fighter1_cols_no_dates],
-                                index = merged_data.index)
+    # --- Ratios ---
+    df_pl = df_pl.with_columns([
+        (
+            pl.when((f1 == 0) & (f2 == 0))           # both numerator & denominator zero
+              .then(zero_over_zero_fill)
+            .when(f2 == 0)                           # denominator zero
+              .then(np.inf)
+            .otherwise(f1 / f2)                      # normal division
+        ).alias(c.replace("fighter1_", "diff_ratio_").replace("fighter2_", ""))
+        for f1, f2, c in zip(f1_exprs, f2_exprs, f1_no_dates)
+    ])
 
-    # Perform element-wise division and replace NaN (from division by zero) with np.inf    
-    diff_date_columns = pd.DataFrame((merged_data[fighter1_cols_dates].to_numpy(dtype='datetime64') - merged_data[fighter2_cols_dates].to_numpy(dtype='datetime64')) / np.timedelta64(1, 'D'),
-                                columns = [col.replace('fighter1_', 'diff_').replace('fighter2_', '') for col in fighter1_cols_dates],
-                                index = merged_data.index)
+    # --- Date differences in days ---
+    df_pl = df_pl.with_columns([
+        ((pl.col(f1).cast(pl.Int64) - pl.col(f2).cast(pl.Int64)) / 86_400_000_000_000)
+        .alias(f1.replace("fighter1_", "diff_").replace("fighter2_", ""))
+        for f1, f2 in zip(f1_dates, f2_dates)
+    ])
 
-    # Remove differential columns that might not be correct or not needed
-    diff_columns = diff_columns[[col for col in diff_columns.columns if col not in ['diff_weight', 'diff_open_odds', 'diff_best_closing_odds', 'diff_mean_closing_odds']]]
-    try:
-        diff_ratio_columns.drop(columns = ['diff_ratio_weight'], inplace = True)
-    except:
-        pass
-
-    # Combine the columns onto the master dataset
-    merged_data = pd.concat([merged_data, diff_columns, diff_ratio_columns, diff_date_columns], axis = 1)
-    del([diff_columns, diff_date_columns, diff_ratio_columns])
-
+    # Remove unwanted columns (same as original)
+    for c in ['diff_weight', 'diff_open_odds', 'diff_best_closing_odds', 'diff_mean_closing_odds', 'diff_ratio_weight']:
+        if c in df_pl.columns:
+            df_pl = df_pl.drop(c)
 
     # Check rows is consistent
-    if (len(merged_data) == len(df)):
+    if (len(df_pl) == len(df)):
         print("Row number check PASSED")
     else:
         print("Row number check FAILED")
         raise SystemExit
     
-    return merged_data
+    return df_pl.to_pandas()
