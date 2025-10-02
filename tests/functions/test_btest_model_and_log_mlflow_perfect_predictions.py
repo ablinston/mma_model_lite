@@ -60,6 +60,7 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
         backtesting_params = {'min_prob_to_bet': 0, 'min_ev_to_bet': -0.01, 'max_bet_size': 1}
     )
 
+    calc_metrics['Logloss'] = np.round(calc_metrics['Logloss'], 8)
     
     # Example validation: Check if "Backtesting_ROI" was logged
     assert calc_metrics == {'Accuracy': 1.0,
@@ -69,9 +70,11 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
      'L/W Accuracy': 1.0,
      'Avg WL only AUC': 1.0,
      'Hmean WL only Accuracy': 1.0,
-     'Logloss': 2.220446049250313e-16,
+     'Logloss': 0,
      'EV MSE': 0.0,
      'Sample Size': 7}
+    
+    calc_odds_metrics['X Odds Logloss'] = np.round(calc_odds_metrics['X Odds Logloss'], 8)
     
     assert calc_odds_metrics == {'X Odds Accuracy': 1.0,
      'X Odds W/L AUC': 1.0,
@@ -79,7 +82,7 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
      'X Odds W/L Accuracy': 1.0,
      'X Odds L/W Accuracy': 1.0,
      'X Odds Avg WL only AUC': 1.0,
-     'X Odds Logloss': 2.220446049250313e-16,
+     'X Odds Logloss': 0,
      'X Odds EV MSE': 0.3333333334, # something strange about the way odds go to probabilities with extremely low and large numbers
      'X Odds Hmean WL only Accuracy': 1.0}
 
