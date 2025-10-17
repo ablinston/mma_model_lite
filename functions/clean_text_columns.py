@@ -20,5 +20,6 @@ def clean_text_columns(df):
         # Clean any names that are equivalent
         if col in ['fighter', 'FIGHTER']:
             df.loc[:, col] = df[col].str.replace('montserendon', 'montserratrendon')
+            df.loc[:, col] = df[col].str.replace('michaelaswell', 'michaelaswelljr')
         
     return df

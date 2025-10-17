@@ -16,7 +16,7 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     
     # Create a flag to say whether checks passed
     all_checks_passed = True
-    # pdb.set_trace()
+    pdb.set_trace()
     # Make copies so we don't overwrite any of the original data frames
     event_details = event_details_df.copy()
     fight_details = fight_details_df.copy()
