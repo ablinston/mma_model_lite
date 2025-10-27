@@ -2,7 +2,7 @@
 model_to_use: './models/xgb_forest_v3.0.10.joblib'
 
 # Set the minimum values to trigger a bet when predicting upcoming events. Works as strictly greater than
-min_prob_to_bet: 0.49
+min_prob_to_bet: 0.485
 min_ev_to_bet: 0.0
 
 # Set either constant bets or proportion bets
