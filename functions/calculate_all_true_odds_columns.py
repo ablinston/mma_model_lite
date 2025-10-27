@@ -24,7 +24,12 @@ def calculate_all_true_odds_columns(merged_data, impute_missing_betfair, odds_su
     """
     
     # pdb.set_trace()
-    
+        
+    # Fill in missing columns if Betfair has nothing
+    if 'fighter1_notformodel_betfair_odds_datetime' not in merged_data.columns:
+        merged_data['fighter1_notformodel_betfair_odds_datetime'] = np.nan
+        merged_data['fighter2_notformodel_betfair_odds_datetime'] = np.nan
+        
     # Impute missing odds if they are missing for one fighter but not the other
     if impute_one_sided_missing_odds:
         for odds in ['betfair_exch_odds', 'best_closing_odds', 'open_odds']:
