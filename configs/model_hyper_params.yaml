@@ -43,4 +43,4 @@ xgb_forest_bagging: True
 # To asign a flat % probability, input a dictionary such as {'flat_prob': 0.01}. 
 # To not use any, input Null.
 # e.g.s Null or ['notformodel_lw_base_margin', {'flat_prob': 0.0183}, 'notformodel_wl_base_margin'] 
-base_margin_cols: Null # ['notformodel_lw_base_margin', {'flat_prob': 0.02}, 'notformodel_wl_base_margin'] 
+base_margin_cols: Null #['notformodel_lw_base_margin', {'flat_prob': 0.05}, 'notformodel_wl_base_margin'] 

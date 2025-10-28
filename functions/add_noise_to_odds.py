@@ -11,7 +11,7 @@ def add_noise_to_odds(df, norm_mean = 1, norm_sd = 0.1, include_backtesting_odds
         odds_cols = [col for col in df.columns if 'odds' in col and 'backtesting' not in col]
     
     # Create data with just the odds
-    odds_df = df[odds_cols].copy()
+    odds_df = df[['event', 'bout'] + odds_cols].copy()
     
     # Add randomness to the odds. Loop through so we can check each column
     for col in ['open_odds', 'mean_closing_odds', 'best_closing_odds']:
@@ -43,10 +43,7 @@ def add_noise_to_odds(df, norm_mean = 1, norm_sd = 0.1, include_backtesting_odds
     odds_df = add_fighter_differentials(odds_df) 
     
     # Now merge the new odds with the old data
-    new_df = pd.concat([
-        df.drop(columns = odds_cols),
-        odds_df[odds_cols]
-    ], axis = 1)
+    new_df = df.drop(columns = odds_cols).merge(odds_df[['event', 'bout'] + odds_cols], on = ['event', 'bout'], how = 'left')
     
     # check the data is the right shape
     stop_if_not(new_df.shape == df.shape, "Add noise - shape check")

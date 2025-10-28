@@ -17,7 +17,8 @@ exec(open('global.py').read())
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
 # Set the model location
-model_path = './models/xgb_forest_v2.joblib'
+model_path = './models/xgb_forest_v3.0.10.joblib'
+new_version_number = '3.0.10'
 
 # Read in the data for training
 backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -74,10 +75,10 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Set up experiment training
-mlflow.set_experiment('rand_odds_testing_v1')
+mlflow.set_experiment('rand_odds_testing_v3.0.10')
 
 # Set this model's description for MLflow
-model_description = 'XGB forest v2 - ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(final_model_features)) + ' features'
+model_description = 'XGB forest v' + new_version_number + ', ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(rf_xgb_model[0]['features'])) + ' features ' + str(config['test_proportion']) + ' test size'
 
 ##########################################################################################
 ### Calculating metrics ###
@@ -104,11 +105,11 @@ for i in range(0, 10):
     X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data_rand_odds)
 
     backtesting_params = {
-        'min_prob_to_bet': 0.49,
+        'min_prob_to_bet': 0.485,
         'min_ev_to_bet': 0.0,
-        'max_bet_size': 0.05,
-        'min_bet_size': 0.05,
-        'constant_bets': False
+        'max_bet_size': 100,
+        'min_bet_size': 100,
+        'constant_bets': True
     }
     
     # Run the metrics on the training data
@@ -118,7 +119,7 @@ for i in range(0, 10):
         mlflow.log_params(backtesting_params)
         
         # Get the model predictions
-        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train)
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train, model_hyper_params)
         
         btest_model_and_log_mlflow(
             X_train[['id']].merge(backtesting_data_rand_odds, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
@@ -142,7 +143,7 @@ for i in range(0, 10):
         mlflow.log_params(backtesting_params)
         
         # Get the model predictions
-        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test)
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test, model_hyper_params)
         
         btest_model_and_log_mlflow(
             X_test[['id']].merge(backtesting_data_rand_odds, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
@@ -169,7 +170,7 @@ for i in range(0, 10):
             oot_testing = True)
         
         # Get the model predictions
-        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot)
+        prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot, model_hyper_params)
         
         btest_model_and_log_mlflow(
             X_oot[['id']].merge(backtesting_data_rand_odds, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
