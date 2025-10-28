@@ -1,5 +1,5 @@
 outs:
-- md5: 487429ea808137b023abd887724babbb
-  size: 562695
+- md5: 0ee4ba4f6845c86f98ce38237cf7942d
+  size: 564393
   hash: md5
   path: fight_odds_data.parquet
