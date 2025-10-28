@@ -97,8 +97,8 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
     
     # Keep the diff in dates from the original data and use the diffs from the rest of the data
     diff_df = pd.concat([
-        diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]], 
-        final_df[[col for col in final_cols if ('date' in col or 'dob' in col) or col not in diff_df.columns]]
+        diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]].reset_index(drop = True), 
+        final_df[[col for col in final_cols if ('date' in col or 'dob' in col) or col not in diff_df.columns]].reset_index(drop = True)
         ], axis = 1)
     
     final_df = diff_df.loc[:, final_cols].copy()
