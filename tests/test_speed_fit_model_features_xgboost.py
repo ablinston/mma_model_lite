@@ -1,8 +1,6 @@
 # This script fits XGBoost models to the final data
 
 import gc
-import h2o
-from h2o.automl import H2OAutoML
 from hyperopt import hp, STATUS_OK, tpe, fmin, rand, Trials # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
 from hyperopt.early_stop import no_progress_loss
