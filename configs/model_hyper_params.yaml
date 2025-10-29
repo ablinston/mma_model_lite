@@ -34,7 +34,7 @@ open_odds_only: False
 odds_to_use: betfair_exch_odds
 
 # Set whether to trim model features to try to remove duplicated similar but slightly different features. Just keep the highest importance version
-trim_model_features: False
+# trim_model_features: False # Is a hyperparameter now
 
 # Set whether to use bootstrapping and bagging on the training data, or just use the training dataset. If enabled, the model will take the subsample and increase the sample size back to the original dataset through bootstrapping
 xgb_forest_bagging: True

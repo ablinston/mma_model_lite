@@ -93,6 +93,7 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         
     # pdb.set_trace()
     # Recalculate diff columns because Infs etc might have been cleaned before. Only keep the columns needed
+    save_index = final_df.index.copy()
     diff_df = add_fighter_differentials(final_df)
     
     # Keep the diff in dates from the original data and use the diffs from the rest of the data
@@ -100,6 +101,9 @@ def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None
         diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]].reset_index(drop = True), 
         final_df[[col for col in final_cols if ('date' in col or 'dob' in col) or col not in diff_df.columns]].reset_index(drop = True)
         ], axis = 1)
+    
+    # Set index back to what it was
+    diff_df.index = save_index
     
     final_df = diff_df.loc[:, final_cols].copy()
     

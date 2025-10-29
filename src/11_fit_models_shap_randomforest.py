@@ -81,7 +81,7 @@ params = {
     'booster': 'gbtree',
     'num_boost_round': 1, # to tell the package to train only 1 random forest
     'colsample_bynode': np.sqrt(len(data.columns)) / len(data.columns), # fraction of columns to select for each tree
-    'num_parallel_tree': 2000, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
+    'num_parallel_tree': 1500, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
     'learning_rate': 1, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
     'subsample': 0.85,
