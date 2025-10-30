@@ -19,7 +19,7 @@ results/final_xgboost_forest.joblib
 
 /configs/betfair_login_config.yaml
 /data/raw_betfair/**
-
+/AutogluonModels/**
 
 # Distribution / packaging
 .Python
