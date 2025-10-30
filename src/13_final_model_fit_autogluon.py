@@ -3,14 +3,16 @@
 # import os
 # os.environ["PYTHON_EXECUTABLE"] = r"E:\Programs\Miniconda_envs\mma_model\python.exe"
 
+import numpy
+print(numpy.__version__)
 
 # Read in global objects and packages
 exec(open('global.py').read())
 
-from autogluon.tabular import TabularDataset, TabularPredictor
+from autogluon.tabular import TabularPredictor
 
 # Set the new model version number
-new_version_number = "3.2.1"
+new_version_number = "4.0.1"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
