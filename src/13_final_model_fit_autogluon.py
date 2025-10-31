@@ -2,9 +2,19 @@
 
 # import os
 # os.environ["PYTHON_EXECUTABLE"] = r"E:\Programs\Miniconda_envs\mma_model\python.exe"
+import os
 
-import numpy
-print(numpy.__version__)
+# Use a simple ASCII path for temp files
+os.environ["LIGHTGBM_CACHE_DIR"] = r"E:\Temp\lightgbm_cache"
+os.environ["TMP"] = r"E:\Temp"
+os.environ["TEMP"] = r"E:\Temp"
+
+# Make sure the folder exists
+os.makedirs(r"E:\Temp\lightgbm_cache", exist_ok=True)
+
+import torch
+print(torch.cuda.is_available())  # Should be True
+print(torch.cuda.device_count())  # Should be > 0
 
 # Read in global objects and packages
 exec(open('global.py').read())
@@ -63,6 +73,8 @@ columns_in_order = trim_column_list(columns_in_order)
 ### Data prep for model ###
 ##########################################################################################
 
+data['id'] = data.index.copy()
+
 # Prep the data ready for model training
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, split_or_other_flag = True)
 
@@ -71,7 +83,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 train_df = pd.concat([
     pd.DataFrame(y_train),
-    X_train[columns_in_order[0:100]]],
+    X_train[columns_in_order[0:1000]]],
     axis = 1)
 
 # Set up experiment training
@@ -85,15 +97,42 @@ mlflow.set_experiment('gt2_fights_xgboost_forest_v' + new_version_number)
 ### Model training
 ##########################################################################################
 
+hyperparameters = {
+    'RF': {},       # Random Forest
+    'XT': {},       # Extra Trees
+    'NN_TORCH': {},       # Neural Network
+    'FASTAI': {},
+    'KNN': {},
+    'LR': {},
+    'XGB': {},      # XGBoost
+    'CAT': {}       # CatBoost (make sure catboost is installed)
+}
+
 # Train the models
 predictor = TabularPredictor(label='outcome',  eval_metric='log_loss').fit(
     train_data = train_df,
     num_gpus = 1,
     ag_args_fit={'num_cpus': 2},  # limit parallelism
     presets = 'best_quality',
+    hyperparameters=hyperparameters,
     time_limit = 3600  # 5 minutes
 )
 
+# Set this model's description for MLflow
+model_description = 'Autogluon'
+
+probs = predictor.predict_proba(X_test[columns_in_order[0:1000]])
+
+with mlflow.start_run():
+    
+    btest_model_and_log_mlflow(
+        X_test[['id']].merge(data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+        probs.to_numpy(), 
+        breakdown_cols = breakdown_cols, 
+        breakdown_metrics = breakdown_metrics, 
+        mlflow_description = model_description + '  - Test data', 
+        target_column = target,
+        backtesting_params = backtesting_params)
 
 # Try different numbers of trees
 # for num_trees in [1]:
