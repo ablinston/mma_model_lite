@@ -66,6 +66,10 @@ def merge_and_process_all_clean_data(
 
     # Calculate the historical stats of each fighter at the fight date
     fight_stats = fight_stats.sort_values(by=['fighter', 'date'], axis = 0)
+    
+    # Create subs attempted and landed versions
+    fight_stats.do()
+    ## FINISH THIS TO ADD SUB LANDED AND ATTEMPTED WITH SAME NAMING CONVENTION FOR PERCENTAGES
 
     # Copy the fight stats but for against a fighter, then merge onto stats
     fight_stats_against = fight_stats.copy()
