@@ -9,6 +9,26 @@ The full data scrape code is found in the `src` folder. Scripts 1, 2 and 3 will 
 
 Once this has been done, script 4 can be run to add new events and fighter stats to the existing data. **To update, only script 4 needs to be run.**
 
+# Bayesian Beta Binomial: The Zero Division Solution
+
+When calculating success rates (like submission accuracy or strike accuracy), we use Bayesian Beta Binomial analysis to provide meaningful priors that smoothly handle edge cases.
+
+The approach works like this: Instead of naive division that breaks on zeros, we model each ratio as a Beta distribution where:
+
+```
+α (alpha) represents successful attempts plus prior successes
+β (beta) represents failed attempts plus prior failures
+The posterior mean (α / (α + β)) gives us our smoothed estimate
+```
+
+For example, with submission accuracy:
+
+`submission_accuracy = (submissions + α) / (submission_attempts + α + β)`
+
+α is the total submissions from the last n fights and α + β is the total attempts at submissions. In my functions, these are scaled by a factor called `bayes_alpha_plus_beta_rebase` for both per minute stats and percentage stats. This is to stop them dominating the formula. They will be rebased to a number of total attempts or minutes depending on what's being calculated.
+
+For example, if there are 100 submission attempts across 1000 minutes in the history, this could be rebased to give α = 1, α + β = 10.
+
 ## Unit testing
 
 There are some unit test scripts saved within `./tests/functions/`. To run this, open an anaconda prompt, activate the `mma_model` environment and then change directory to `./tests/functions/`. Then use command `pytest`.
@@ -40,6 +60,7 @@ pip install --no-binary lightgbm --config-settings=cmake.define.CMAKE_C_COMPILER
 AB note: couldn't get GPU training with LightGBM working at all on Windows. Used conda and xgboost instead (for random forests too because it allows GPU training).
 
 ```
+conda install -c nvidia cuda-toolkit # HAVE TO GET THE RIGHT VERSION 
 conda install -c conda-forge py-xgboost=*=cuda* --force-reinstall
 # or
 pip install --force-reinstall --no-deps xgboost==2.1.4

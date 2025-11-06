@@ -2,7 +2,7 @@
 
 def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
 
-    # pdb.set_trace()    
+    # pdb.set_trace()
 
     # First get the predictions from the ensemble
     y_pred_prob = odds_to_probabilities(X_test['fighter1_backtesting_odds'], X_test['fighter2_backtesting_odds'])

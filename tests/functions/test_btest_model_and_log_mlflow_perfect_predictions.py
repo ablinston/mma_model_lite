@@ -83,7 +83,7 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
      'X Odds L/W Accuracy': 1.0,
      'X Odds Avg WL only AUC': 1.0,
      'X Odds Logloss': 0,
-     'X Odds EV MSE': 0.3333333334, # something strange about the way odds go to probabilities with extremely low and large numbers
+     'X Odds EV MSE': 0.0,
      'X Odds Hmean WL only Accuracy': 1.0}
 
     assert test_results['win_percent'][0] == 100.0

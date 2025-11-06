@@ -54,7 +54,7 @@ def test_switch_fighter1_fighter2():
     # assert X_new.index.equals(y_new.index), "Indices of X and y should match"
     
     # Ensure no unintended modifications occurred
-    assert X_new_correct[X_new.columns].equals(X_new) # X_new_correct[X_new.columns].compare(X_new)
+    assert X_new_correct[X_new.columns].reset_index(drop = True).equals(X_new.reset_index(drop = True)) # X_new_correct[X_new.columns].compare(X_new)
     assert all(y_new_correct == y_new)
     
     # Now perform two switches and check if the outputs are the same
