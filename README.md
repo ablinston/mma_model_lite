@@ -60,7 +60,7 @@ pip install --no-binary lightgbm --config-settings=cmake.define.CMAKE_C_COMPILER
 AB note: couldn't get GPU training with LightGBM working at all on Windows. Used conda and xgboost instead (for random forests too because it allows GPU training).
 
 ```
-conda install -c nvidia cuda-toolkit # HAVE TO GET THE RIGHT VERSION 
+conda install -c nvidia cuda-toolkit==11.8 # HAVE TO GET THE RIGHT VERSION THAT's STABLE WITH GTX 1060 
 conda install -c conda-forge py-xgboost=*=cuda* --force-reinstall
 # or
 pip install --force-reinstall --no-deps xgboost==2.1.4
