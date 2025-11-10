@@ -1,5 +1,5 @@
 @echo off
-set "MLFLOW_DIR=E:\Google Drive\MLflow"
+set "MLFLOW_DIR=X:\Google Drive\MLflow"
 
 echo Cleaning up MLflow garbage...
 

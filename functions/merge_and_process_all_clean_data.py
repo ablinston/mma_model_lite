@@ -68,8 +68,10 @@ def merge_and_process_all_clean_data(
     fight_stats = fight_stats.sort_values(by=['fighter', 'date'], axis = 0)
     
     # Create subs attempted and landed versions
-    fight_stats.do()
-    ## FINISH THIS TO ADD SUB LANDED AND ATTEMPTED WITH SAME NAMING CONVENTION FOR PERCENTAGES
+    fight_stats.columns = fight_stats.columns.str.replace('_sub.att', '_sub_attempt')
+    
+    # Get submission success
+    fight_stats = add_submissions_landed(fight_stats, fight_results)
 
     # Copy the fight stats but for against a fighter, then merge onto stats
     fight_stats_against = fight_stats.copy()
@@ -77,7 +79,6 @@ def merge_and_process_all_clean_data(
     fight_stats_against.rename(columns = lambda x: x + "_against" if "landed" in x else x, inplace = True)
     fight_stats_against.rename(columns = lambda x: x + "_against" if "ctrl_minutes" in x else x, inplace = True)
     fight_stats_against.rename(columns = lambda x: x + "_against" if "kd" in x else x, inplace = True)
-    fight_stats_against.rename(columns = lambda x: x + "_against" if "sub.att" in x else x, inplace = True)
 
     # Split the bout into fighters
     # Set the opponent to the fighter for merging
@@ -603,17 +604,17 @@ def merge_and_process_all_clean_data(
         # Strikes per TD attempt
         merged_data[fighter + '_sig.str._per_td_attempt'] = merged_data[fighter + '_hist_allrounds_sig.str._attempt'] / merged_data[fighter + '_hist_allrounds_td_attempt']
         # Strikes per sub attempt
-        merged_data[fighter + '_sig.str.per_sub.att'] = merged_data[fighter + '_hist_allrounds_sig.str._attempt'] / merged_data[fighter + '_hist_allrounds_sub.att']
+        merged_data[fighter + '_sig.str.per_sub_attempt'] = merged_data[fighter + '_hist_allrounds_sig.str._attempt'] / merged_data[fighter + '_hist_allrounds_sub_attempt']
         # Knockdowns per strike landed
         merged_data[fighter + '_kd_per_sig.str._landed'] = merged_data[fighter + '_hist_allrounds_kd'] / merged_data[fighter + '_hist_allrounds_sig.str._landed']
         # Sub attempt per td
-        merged_data[fighter + '_sub.att.per_td_landed'] = merged_data[fighter + '_hist_allrounds_sub.att'] / merged_data[fighter + '_hist_allrounds_td_landed']
+        merged_data[fighter + '_sub_attempt.per_td_landed'] = merged_data[fighter + '_hist_allrounds_sub_attempt'] / merged_data[fighter + '_hist_allrounds_td_landed']
             
         # Subs per attempt
-        merged_data[fighter + '_subs_per_attempt'] = merged_data[fighter + '_hist_wins_Submission'] / merged_data[fighter + '_hist_allrounds_sub.att']
+        merged_data[fighter + '_subs_per_attempt'] = merged_data[fighter + '_hist_wins_Submission'] / merged_data[fighter + '_hist_allrounds_sub_attempt']
         
         # Recode Infs as missing, because could give misleading results
-        new_columns = [fighter + '_sig.str._per_td_attempt', fighter + '_sig.str.per_sub.att', fighter + '_kd_per_sig.str._landed', fighter + '_sub.att.per_td_landed', fighter + '_subs_per_attempt']
+        new_columns = [fighter + '_sig.str._per_td_attempt', fighter + '_sig.str.per_sub_attempt', fighter + '_kd_per_sig.str._landed', fighter + '_sub_attempt.per_td_landed', fighter + '_subs_per_attempt']
         
         merged_data[new_columns] = merged_data[new_columns].fillna(-np.inf)
         # merged_data[new_columns] = merged_data[new_columns].replace([-np.inf, np.inf], np.nans)

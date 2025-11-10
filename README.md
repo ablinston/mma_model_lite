@@ -61,10 +61,12 @@ AB note: couldn't get GPU training with LightGBM working at all on Windows. Used
 
 ```
 conda install -c nvidia cuda-toolkit==11.8 # HAVE TO GET THE RIGHT VERSION THAT's STABLE WITH GTX 1060 
-conda install -c conda-forge py-xgboost=*=cuda* --force-reinstall
+conda install -c conda-forge libxgboost=*=cuda* py-xgboost=*=cuda* --force-reinstall
 # or
 pip install --force-reinstall --no-deps xgboost==2.1.4
 ```
+
+If run into errors and cuda version of xgboost is installed, list `conda list xgboost` and check the lib-xgboost version. I may be different and cpu only.
 
 # Notes
 

@@ -34,8 +34,6 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
     # Combine with data
     merged_data = pd.concat([merged_data, new_data], axis = 1)
 
-    pdb.set_trace()
-
     ##########################################
     # Now calculate the bayes percentages
     

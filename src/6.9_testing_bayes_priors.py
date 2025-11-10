@@ -61,7 +61,7 @@ fight_stats_against.rename(columns = lambda x: x + "_against" if "attempt" in x 
 fight_stats_against.rename(columns = lambda x: x + "_against" if "landed" in x else x, inplace = True)
 fight_stats_against.rename(columns = lambda x: x + "_against" if "ctrl_minutes" in x else x, inplace = True)
 fight_stats_against.rename(columns = lambda x: x + "_against" if "kd" in x else x, inplace = True)
-fight_stats_against.rename(columns = lambda x: x + "_against" if "sub.att" in x else x, inplace = True)
+# fight_stats_against.rename(columns = lambda x: x + "_against" if "sub.att" in x else x, inplace = True)
 
 # Split the bout into fighters
 # Set the opponent to the fighter for merging

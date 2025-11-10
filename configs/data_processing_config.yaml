@@ -17,13 +17,13 @@ impute_one_sided_missing_odds: True
 # Set whether to add the bayes versions of columns
 add_bayes_stats_columns: True
 
-## Bayes figures set by trial and error optimisation
+## Bayes figures
 # Set how many past fights to use to calculate the bayesian priors. Not this will be per weightclass if chosen
-bayes_fightspan: 100
+bayes_fightspan: 200
 
 # Set the number of observations to equalise the priors to in bayes stats calcs. Effectively how many minutes/attemps the priors count for compared to the fighter's own stats. alpha plus beta in the formula will then always be set to this and alpha recalculated with this as a base
-bayes_alpha_plus_beta_rebase_percent: 250
-bayes_alpha_plus_beta_rebase_per_minute: 5
+bayes_alpha_plus_beta_rebase_percent: 450
+bayes_alpha_plus_beta_rebase_per_minute: 105
 
 # Bayesian group by. This is what we group the Bayesian smooting of stats by
 bayesian_groupby: [] # ['weightclass'] Tested using weightclass but features less predictive power after

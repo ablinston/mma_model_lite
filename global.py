@@ -3,7 +3,7 @@ import sys
 import os
 
 if os.name == "nt":
-    sys.path.append('E:/Repos/custom_tools')
+    sys.path.append('X:/Repos/custom_tools')
 else:
     sys.path.append('/home/andy/Repos/custom_tools')
 
