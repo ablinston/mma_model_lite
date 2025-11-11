@@ -9,6 +9,7 @@ import itertools
 # import lightgbm as lgb
 import mlflow
 import pickle
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.utils import resample
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
@@ -19,7 +20,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the new model version number
-new_version_number = "4.0.4"
+new_version_number = "4.0.5"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -91,7 +92,8 @@ params = {
     'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
     'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev'],
     'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging'],
-    'base_margin_cols': model_hyper_params['base_margin_cols']
+    'base_margin_cols': model_hyper_params['base_margin_cols'],
+    'calibrate_models': True
 }
 
 # Set hyperparameters for the forest
@@ -108,7 +110,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training = final_model_features,
-    num_models = 50,
+    num_models = 5,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
@@ -156,7 +158,7 @@ for num_trees_i in list(range(1, 21, 2)) + list(range(25, 51, 5)) + list(range(6
 
 
 # Set the final number of models
-final_forest_size = 15
+final_forest_size = 5
 
 
 # Save the model

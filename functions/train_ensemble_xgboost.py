@@ -129,7 +129,31 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         dmatrix_val = xgb.DMatrix(X_val[X_train_df.columns], label=y_val, base_margin = base_margin_val)
         
         # Train the model
-        if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
+        if params['calibrate_models']: # Calibration doesn't work with EV loss function at the moment. Not built.
+            
+            # Add a dummy 1 value in case it's missing (that causes the fit to fail)
+            X_dummy = np.zeros((1, X_train_df.shape[1]))  # or any constant
+            y_dummy = np.array([1])  # the missing class
+            
+            X_train_aug = np.vstack([X_train_df, X_dummy])
+            y_train_aug = np.concatenate([y_train_df, y_dummy])
+        
+            # Train the model in a way compatible with SKLearn
+            raw_model = xgb.XGBClassifier(params)
+            raw_model.fit(X_train_aug, y_train_aug)                
+            
+            # Create a calibration model
+            model_cal = CalibratedClassifierCV(estimator = raw_model, 
+                                               method = 'sigmoid', # This is a Platt calibration
+                                               cv = 'prefit') # the model has already been trained
+            
+            # Now fit to the validation data
+            model_cal.fit(X_val[X_train_df.columns], y_val)
+            
+            model['xgb_model'] = raw_model
+            model['model'] = model_cal
+        
+        elif model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
             # Pass the odds to the loss function
             custom_loss = create_custom_loss(train_fighter1_odds, train_fighter2_odds)
             custom_loss_test = ev_loss_function_test(test_fighter1_odds, test_fighter2_odds)
@@ -165,6 +189,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
         
         # Save the parameters used
         model['params'] = params
+        model['calibrated'] = params['calibrate_models']
         
         # Add model to the list
         models.append(model)
