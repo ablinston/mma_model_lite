@@ -19,10 +19,10 @@ exec(open('global.py').read())
 
 # Set the model location
 model_path = './results/final_xgboost_forest.joblib'
-# model_path = './models/xgb_forest_v3.0.10.joblib'
 
+model_path = './models/xgb_forest_v3.0.4.joblib'
 # # Set the version number to be used in outputs
-# new_version_number = ''
+new_version_number = '3.0.4'
 
 # Read in the data for training
 backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -78,6 +78,10 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 ### Data prep for model ###
 ##########################################################################################
+
+# Rename columns if needed
+if 'v3' in model_path:
+    backtesting_data.columns = backtesting_data.columns.str.replace('_sub_attempt', '_sub.att')
 
 # Prep the data ready for model training as it was done in the overall model training
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data)
