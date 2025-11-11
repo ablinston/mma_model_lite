@@ -19,7 +19,7 @@ exec(open('global.py').read())
 
 # Set the model location
 model_path = './results/final_xgboost_forest.joblib'
-model_path = './models/xgb_forest_v3.0.10.joblib'
+# model_path = './models/xgb_forest_v3.0.10.joblib'
 
 # # Set the version number to be used in outputs
 # new_version_number = ''
