@@ -21,9 +21,9 @@ exec(open('global.py').read())
 # Set the model location
 model_path = './results/final_xgboost_forest.joblib'
 
-# model_path = './models/xgb_forest_v3.0.4.joblib'
+# model_path = './models/xgb_forest_v3.0.10.joblib'
 # # Set the version number to be used in outputs
-# new_version_number = '3.0.4'
+# new_version_number = '3.0.10'
 
 # Read in the data for training
 backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()

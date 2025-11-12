@@ -135,12 +135,18 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
             X_dummy = np.zeros((1, X_train_df.shape[1]))  # or any constant
             y_dummy = np.array([1])  # the missing class
             
-            X_train_aug = np.vstack([X_train_df, X_dummy])
-            y_train_aug = np.concatenate([y_train_df, y_dummy])
-        
+            # Convert to Data Frames
+            X_dummy = pd.DataFrame(X_dummy, columns = X_train_df.columns)
+            
+            X_train_aug = pd.concat([X_train_df, X_dummy], axis = 0)
+            y_train_aug = pd.concat([y_train_df, pd.Series(y_dummy)], axis = 0)
+            
             # Train the model in a way compatible with SKLearn
             raw_model = xgb.XGBClassifier(params)
-            raw_model.fit(X_train_aug, y_train_aug)                
+            raw_model.fit(X_train_aug, y_train_aug,
+                          eval_set = [(X_val[X_train_df.columns], y_val)],
+                          early_stopping_rounds = early_stopping_rounds,
+                          verbose = verbose_eval)                
             
             # Create a calibration model
             model_cal = CalibratedClassifierCV(estimator = raw_model, 
