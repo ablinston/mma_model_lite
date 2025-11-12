@@ -20,7 +20,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the new model version number
-new_version_number = "4.0.5"
+new_version_number = "4.0.6"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -66,13 +66,13 @@ mlflow.set_experiment('gt2_fights_xgboost_forest_v' + new_version_number)
 
 params = {
     # 'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.00537, # Learning rate
+    'learning_rate': 0.0105, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
     'split_dec_or_other': True, # whether to exclude them
     'subsample': 0.85,
-    'colsample_bytree': 0.17,
+    'colsample_bytree': 0.1,
     'max_depth': 8,
-    # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
+    'max_bin': 500, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
     'tree_method': 'hist',      # Use GPU accelerated algorithm
@@ -85,15 +85,15 @@ params = {
     'early_stopping_rounds': 30,
     # 'reg_alpha': 0.3, # Lasso regularisation
     # 'reg_lambda': 0.02, # ridge regularisation
-    'gamma': 2.677,
-    'win_loss_only': False,
+    # 'gamma': 2.677,
+    'win_loss_only': True,
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function'],
     'add_noise_to_odds': model_hyper_params['add_noise_to_odds'],
     'odds_noise_standard_dev': model_hyper_params['odds_noise_standard_dev'],
     'xgb_forest_bagging': model_hyper_params['xgb_forest_bagging'],
     'base_margin_cols': model_hyper_params['base_margin_cols'],
-    'calibrate_models': True
+    'calibrate_models': model_hyper_params['calibrate_models']
 }
 
 # Set hyperparameters for the forest
@@ -110,7 +110,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training = final_model_features,
-    num_models = 5,
+    num_models = 50,
     num_boost_round = 5000,
     colsample_bynode = colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample = subsample,
@@ -158,7 +158,7 @@ for num_trees_i in list(range(1, 21, 2)) + list(range(25, 51, 5)) + list(range(6
 
 
 # Set the final number of models
-final_forest_size = 5
+final_forest_size = 9
 
 
 # Save the model

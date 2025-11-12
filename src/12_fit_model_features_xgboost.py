@@ -125,9 +125,9 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [i for i in range(50, 350, 5)]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [i for i in range(200, 750, 5)]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
-    'hyperopt_early_stopping': 35
+    'hyperopt_early_stopping': 10
 }
 
 # Set the hyperopt parameters for the inner optimisation
@@ -148,7 +148,7 @@ params_inner = {
      'num_class': no_of_classes,
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
-     'early_stopping_rounds': 30,
+     'early_stopping_rounds': 35,
      # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
      # 'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
      # 'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
@@ -171,7 +171,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:220]
+column_names = X_train_master.columns.tolist()[0:330]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

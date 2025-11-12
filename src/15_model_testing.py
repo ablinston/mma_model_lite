@@ -118,7 +118,7 @@ for backtesting_params in [
         # # ,
         {
             'min_prob_to_bet': 0.485,
-            'min_ev_to_bet': 0.0,
+            'min_ev_to_bet': 0.01,
             'max_bet_size': 100,
             'min_bet_size': 100,
             'constant_bets': True,
