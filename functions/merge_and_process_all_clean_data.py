@@ -108,11 +108,24 @@ def merge_and_process_all_clean_data(
         # FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
         fight_stats_bayes_priors = bayesian_priors(
             fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
-            id_cols = ['event', 'bout', 'fighter'], 
+            id_cols = ['event', 'bout', 'fighter', 'date'], 
             group_by = data_processing_config['bayesian_groupby'], 
             fight_span = data_processing_config['bayes_fightspan'],
             ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
         )
+        
+        # Use constant Bayesian priors if required
+        if data_processing_config['constant_bayes_priors'] == True:
+            
+            # Get the single row for constant bayes using the max date
+            max_date = fight_stats_bayes_priors[fight_stats_bayes_priors['date'] < pd.to_datetime(data_processing_config['constant_bayes_priors_date'])]['date'].max()
+            constant_bayes = fight_stats_bayes_priors[fight_stats_bayes_priors['date'] == max_date].head(1)
+            
+            # Now set these as the bayes stats for everyone
+            fight_stats_bayes_priors = fight_stats_bayes_priors[['event', 'bout']].merge(
+                constant_bayes.drop(columns = ['event', 'bout', 'date']), how = 'cross')
+        else:
+            fight_stats_bayes_priors.drop(columns = ['date'], inplace = True)
         
     else:
         fight_stats_bayes_priors = None

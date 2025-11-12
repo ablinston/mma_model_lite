@@ -15,11 +15,16 @@ odds_suffix_for_base_margin: backtesting_odds
 impute_one_sided_missing_odds: True
 
 # Set whether to add the bayes versions of columns
-add_bayes_stats_columns: False
+add_bayes_stats_columns: True
 
 ## Bayes figures
-# Set how many past fights to use to calculate the bayesian priors. Not this will be per weightclass if chosen
-bayes_fightspan: 200
+
+# Set whether to use fixed Bayesian priors across all fights ever. If True, this will choose the Bayesian priors from a single date (and ignore groupby) and just apply those to every fight
+constant_bayes_priors: True
+constant_bayes_priors_date: 2018-01-01
+
+# Set how many past fights to use to calculate the bayesian priors. Not this will be per group if chosen to groupby. For reference, in 2016, there were 490 fights
+bayes_fightspan: 1000
 
 # Set the number of observations to equalise the priors to in bayes stats calcs. Effectively how many minutes/attemps the priors count for compared to the fighter's own stats. alpha plus beta in the formula will then always be set to this and alpha recalculated with this as a base
 bayes_alpha_plus_beta_rebase_percent: 450
@@ -29,5 +34,5 @@ bayes_alpha_plus_beta_rebase_per_minute: 105
 bayesian_groupby: [] # ['weightclass'] Tested using weightclass but features less predictive power after
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats)
-add_adj_bayes_columns: False
+add_adj_bayes_columns: True
 
