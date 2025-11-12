@@ -36,12 +36,26 @@ def add_submissions_landed(fight_stats, fight_results):
     
     # Check there are no NAs after 2010. Settled for 10 because some tiny misalignments are too cumbersome to fix
     stop_if_not(new_stats[new_stats['date'] > '2010-01-01']['submission'].isna().sum() < 10)
-    
+        
     # Create round columns
     for round in range(1, 6):
         new_stats['round' + str(round) + '_sub_landed'] = np.where(new_stats['submission'] == round, 1, 0)
+        
+        # CHeck that landed isn't > attempts and if it is, replace it. (This only happens in a handful of cases, so not a systemic issue)
+        new_stats['round' + str(round) + '_sub_attempt'] = np.where(
+            new_stats['round' + str(round) + '_sub_landed'] > new_stats['round' + str(round) + '_sub_attempt'],
+            new_stats['round' + str(round) + '_sub_landed'],
+            new_stats['round' + str(round) + '_sub_attempt']
+        )
     
     new_stats['allrounds_sub_landed'] = new_stats[[col for col in new_stats.columns if 'sub_landed' in col]].sum(axis = 1)
+    
+    # CHeck that landed isn't > attempts and if it is, replace it
+    new_stats['allrounds_sub_attempt'] = np.where(
+        new_stats['allrounds_sub_landed'] > new_stats['allrounds_sub_attempt'],
+        new_stats['allrounds_sub_landed'],
+        new_stats['allrounds_sub_attempt']
+    )
     del([fighter1_submissions, fighter2_submissions])
     
     # Cleanup

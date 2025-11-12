@@ -19,7 +19,8 @@ add_bayes_stats_columns: True
 
 ## Bayes figures
 
-# Set whether to use fixed Bayesian priors across all fights ever. If True, this will choose the Bayesian priors from a single date (and ignore groupby) and just apply those to every fight
+# Set whether to use fixed Bayesian priors across all fights ever. If True, this will choose the Bayesian priors from a single date (and ignore groupby) and just apply those to every fight both
+# past and present.
 constant_bayes_priors: True
 constant_bayes_priors_date: 2018-01-01
 
