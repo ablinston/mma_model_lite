@@ -24,7 +24,7 @@ def test_aggregate_last_X_fight_data():
     prefix = 'cumulative_'  # Prefix for new columns
 
     # Apply the function
-    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000, per_minute_calc = True)
+    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000, per_minute_bayes = False, per_minute_calc = True)
 
     # Ensure that 'fighter_id' and 'date' columns are preserved and not included in the aggregation
     assert 'fighter_id' in result.columns
@@ -76,6 +76,7 @@ def test_aggregate_last_X_fight_data():
         group_by = ['fighter'], 
         prefix = 'test_', 
         X = 3, 
+        per_minute_bayes = True,
         per_minute_calc = True, 
         bayes_priors_df = bayesian_priors(
             df,

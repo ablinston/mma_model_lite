@@ -104,8 +104,8 @@ base_margin_train = get_base_margin(X_train, model_hyper_params['base_margin_col
 # Remove any objects not for modelling
 X_train = X_train[[col for col in X_train if 'notformodel' not in col]]
 
-# # Trim features if too many
-# X_train = X_train.iloc[:, 0:20000]
+# Trim features if too many
+X_train = X_train.iloc[:, 0:25000]
 
 # Prepare data
 train = xgb.DMatrix(X_train, label = y_train, base_margin = base_margin_train)
