@@ -4,7 +4,7 @@ exec(open('global.py').read())
 # # Load what answers are expected
 test_add_adjusted_bayes_stats_correct = fp.ParquetFile('./tests/data/test_add_adjusted_bayes_stats_correct.parquet').to_pandas()
 
-def test_add_adjusted_bayes_stats():
+def test_add_adjusted_stats():
     # --- Build stats_df with 10 bouts (20 rows) ---
     fighters = ["AlwaysWins", "AlwaysLoses", "MixedA", "MixedB", "Random1", "Random2"]
     rows = []
@@ -50,7 +50,7 @@ def test_add_adjusted_bayes_stats():
     hist_df = pd.DataFrame(hist_rows)
 
     # --- Run function ---
-    result = add_adjusted_bayes_stats(stats_df, hist_df, columns_with=["bayes_strikes"]).sort_values(['event', 'fighter'])
+    result = add_adjusted_stats(stats_df, hist_df, columns_with=["bayes_strikes"]).sort_values(['event', 'fighter'])
 
     # --- Assertions ---
     # Shape preserved

@@ -5,7 +5,7 @@
 
 def calculate_adjusted_percentages(
         fight_stats, 
-        fight_stats_hist, 
+        fight_stats_hist, # This must contain both against and normal versions of stats
         fight_stats_bayes_priors,
         data_processing_config):
 

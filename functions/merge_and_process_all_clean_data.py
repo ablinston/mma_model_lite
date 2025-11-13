@@ -180,8 +180,10 @@ def merge_and_process_all_clean_data(
             fight_stats_hist, 
             fight_stats_bayes_priors,
             data_processing_config)
-
-    pdb.set_trace()
+    
+    # Only keep the adj percentage columns. We don't want to aggregate the rest, just calc later from agg counts
+    fight_stats = fight_stats[[col for col in fight_stats.columns if not ('accuracy_percent' in col and '_adj' not in col)]]
+    
     ###########################################################################################
     # Reaggregate the data
     fight_stats_hist = aggregate_last_X_fight_data(
@@ -537,8 +539,8 @@ def merge_and_process_all_clean_data(
     odds_qa_df.to_csv('./data/qa_merged_betfair_odds_out_of_sync.csv')   
                 
     ###########################################################################################
-    # PERCENTAGE CALCULATIONS
-    pdb.set_trace()
+    # PERCENTAGE CALCULATIONS - MOVED TO BEFORE MERGE
+    
     if data_processing_config['add_bayes_percentage_columns']:
         merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_percent'])
         

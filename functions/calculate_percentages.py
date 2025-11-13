@@ -44,9 +44,9 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
         merged_data_bayes = merged_data.merge(fight_stats_bayes_priors, on = ['event', 'bout'], how = 'left')
         
         # Find what numerators and denominators are needed
-        bayes_numerators = ['bayes_total_' + col.replace('fighter1_', '').replace('fighter2_', '').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in landed_columns]
+        bayes_numerators = ['bayes_total_' + (col.replace('fighter1_', '').replace('fighter2_', '').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('last_1_fights_', '').replace('last_2_fights_', '').replace('last_3_fights_', '')) for col in landed_columns]
         
-        bayes_denominators = ['bayes_total_' + col.replace('fighter1_', '').replace('fighter2_', '').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in percent_columns]
+        bayes_denominators = ['bayes_total_' + (col.replace('fighter1_', '').replace('fighter2_', '').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('last_1_fights_', '').replace('last_2_fights_', '').replace('last_3_fights_', '')) for col in percent_columns]
         
         # Check these are in the bayes data
         stop_if_not(all(item in merged_data_bayes.columns for item in bayes_numerators + bayes_denominators), "Bayes priors check in data")
