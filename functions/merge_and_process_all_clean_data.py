@@ -103,7 +103,7 @@ def merge_and_process_all_clean_data(
     ###########################################################################################
     # Get the columns of stats
     
-    if data_processing_config['add_bayes_stats_columns']:
+    if data_processing_config['add_bayes_percentage_columns'] or data_processing_config['add_bayes_per_minute_columns']:
         
         # FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
         fight_stats_bayes_priors = bayesian_priors(
@@ -137,6 +137,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter'],
         prefix = "hist_",
         X = 100,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -157,15 +158,31 @@ def merge_and_process_all_clean_data(
     ###########################################################################################
     # ADJUSTED STATISTICS
     
-    if data_processing_config['add_bayes_stats_columns'] and data_processing_config['add_adj_bayes_columns']:
+    if data_processing_config['add_bayes_per_minute_columns'] and data_processing_config['add_adj_per_minute_bayes_columns']:
+        
         fight_stats_bayes = calculate_per_minute_bayesian_stats(fight_stats, fight_stats_bayes_priors, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute'], bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute'])
         
         # Adding on adjusted stats to the fight stats
-        fight_stats_plus_adj = add_adjusted_bayes_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'])
+        fight_stats_plus_adj = add_adjusted_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'])
         
         # Replace the fight stats with one with the adj but remove all the extra bayes info (will be added by aggregation later)
         fight_stats = fight_stats_plus_adj[[col for col in fight_stats_plus_adj if 'bayes' not in col or ('bayes' in col and 'adj' in col)]]
     
+    if data_processing_config['add_adj_per_minute_columns']:
+        fight_stats = add_adjusted_stats(fight_stats, fight_stats_hist, columns_with = ['per_minute'], exclude_columns_with = ['bayes'])
+    
+    
+    ###########################################################################################
+    # Calculate accuracy percentages
+    
+    fight_stats = calculate_adjusted_percentages(
+            fight_stats, 
+            fight_stats_hist, 
+            fight_stats_bayes_priors,
+            data_processing_config)
+
+    pdb.set_trace()
+    ###########################################################################################
     # Reaggregate the data
     fight_stats_hist = aggregate_last_X_fight_data(
         fight_stats,
@@ -173,6 +190,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter'],
         prefix = "hist_",
         X = 100,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -194,6 +212,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter'],
         prefix = "hist_last_3_fights_",
         X = 3,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -216,6 +235,7 @@ def merge_and_process_all_clean_data(
     #     group_by = ['fighter'],
     #     prefix = "hist_last_2_fights_",
     #     X = 2,
+    # per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
     #     per_minute_calc = True, 
     #     bayes_priors_df = fight_stats_bayes_priors,
     #     bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -227,6 +247,7 @@ def merge_and_process_all_clean_data(
     #     group_by = ['fighter'],
     #     prefix = "hist_last_1_fights_",
     #     X = 1,
+    # per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
     #     per_minute_calc = True, 
     #     bayes_priors_df = fight_stats_bayes_priors,
     #     bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -249,6 +270,8 @@ def merge_and_process_all_clean_data(
     stop_if_not(
         len(fight_stats) == len(fight_stats_hist_opponent_stance) == len(fight_stats_hist_last_3),
         "All hist stats data length check")
+
+    
 
 
     ###########################################################################################
@@ -327,6 +350,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter', 'opponent_type'],
         prefix = 'hist_opp_type_',
         X = 100,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -514,9 +538,15 @@ def merge_and_process_all_clean_data(
                 
     ###########################################################################################
     # PERCENTAGE CALCULATIONS
-
-    merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_percent'])
-
+    pdb.set_trace()
+    if data_processing_config['add_bayes_percentage_columns']:
+        merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_percent'])
+        
+        # # Calculate bayes adj accuracy if required
+        # if data_processing_config['add_adj_percentage_bayes_columns']:
+        #     merged_data = add_()
+    else:
+        merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors = None, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_percent'])
 
     ###########################################################################################
     # RATIO CALCULATIONS

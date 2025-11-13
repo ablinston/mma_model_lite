@@ -1,4 +1,4 @@
-# This function takes the merged data and calculates percentages
+# This function takes the merged data or fight stats data and calculates percentages
 
 def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase):
 
@@ -44,9 +44,9 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
         merged_data_bayes = merged_data.merge(fight_stats_bayes_priors, on = ['event', 'bout'], how = 'left')
         
         # Find what numerators and denominators are needed
-        bayes_numerators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in landed_columns]
+        bayes_numerators = ['bayes_total_' + col.replace('fighter1_', '').replace('fighter2_', '').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in landed_columns]
         
-        bayes_denominators = [col.replace('fighter1_', 'bayes_total_').replace('fighter2_', 'bayes_total_').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in percent_columns]
+        bayes_denominators = ['bayes_total_' + col.replace('fighter1_', '').replace('fighter2_', '').replace('hist_', '').replace('opp_type_', '').replace('opp_stance_', '').replace('_against', '').replace('_last_1_fights', '').replace('_last_2_fights', '').replace('_last_3_fights', '') for col in percent_columns]
         
         # Check these are in the bayes data
         stop_if_not(all(item in merged_data_bayes.columns for item in bayes_numerators + bayes_denominators), "Bayes priors check in data")
@@ -75,6 +75,10 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
     
     # Check we have the correct number of rows
     stop_if_not(len(merged_data_df) == len(merged_data), "Dataset length")
+    
+    # Percent check
+    stop_if_not(merged_data[new_percent_cols].max().max() <= 1.0, "Percentage calculations 100 max")
+    stop_if_not(merged_data[new_percent_cols].min().min() >= 0.0, "Percentage calculations 100 max")
     
     del([new_data, percent_columns, landed_columns, new_percent_cols])
     

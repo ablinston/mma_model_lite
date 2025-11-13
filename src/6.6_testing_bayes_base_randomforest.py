@@ -17,8 +17,8 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('bayes_base_testing_rf_v3')
 
 # Choose a new base for the bayes variables
-for bayes_base_per_minute in [0, 1, 50]: # :range(25, 175, 25):
-    for bayes_base_percent in [0, 10, 50, 100, 200, 500]: #range(50, 300, 50):
+for bayes_base_per_minute in [0, 1, 2, 50]: # :range(25, 175, 25):
+    for bayes_base_percent in [0.001, 10, 50, 100, 200, 500]: #range(50, 300, 50):
         # for bayes_fightspan in [50, 150]:
         
         # Overwrite the base

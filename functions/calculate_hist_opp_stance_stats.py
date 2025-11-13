@@ -24,6 +24,7 @@ def calculate_hist_opp_stance_stats(fight_stats, fighters, fight_stats_bayes_pri
         group_by = ['fighter', 'opponent_stance'],
         prefix = 'hist_opp_stance_',
         X = 100,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
