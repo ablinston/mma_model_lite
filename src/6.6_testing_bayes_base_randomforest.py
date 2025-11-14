@@ -11,7 +11,7 @@ import xgboost as xgb
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('bayes_base_testing_rf_v3')
+mlflow.set_experiment('bayes_base_testing_rf_v4')
 
 # Choose a new base for the bayes variables
 for bayes_base_per_minute in [0, 1, 2, 50]: # :range(25, 175, 25):
