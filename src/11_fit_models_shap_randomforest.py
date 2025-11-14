@@ -7,6 +7,7 @@ from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisat
 from hyperopt.atpe import suggest as atpe_suggest
 import itertools
 # import lightgbm as lgb
+import math
 import matplotlib.pyplot as plt
 import mlflow
 import pickle
@@ -44,16 +45,10 @@ target = 'outcome'
     
     # data = pd.concat([data, data2, data3], ignore_index = True)
 
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
-
-
-# # Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
-# var_importance = pd.read_csv('./results/shap_feature_importance_baseline.csv').sort_values('Mean SHAP Value', ascending = False)
-
-# X_train = X_train[[col for col in X_train.columns if col not in var_importance['Feature'][2000:len(var_importance)].tolist()]]
+X_train_master, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(data, config)
 
 # Now remove any columns that aren't wanted in a training dataset. At this point we don't remove non-true odds in order to see the rank in feature importance
-X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False, open_odds_only = False)
+X_train_master = standard_feature_removal(X_train_master, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = False, open_odds_only = False)
 
 # Check data types
 data.dtypes.value_counts()
@@ -92,87 +87,180 @@ params = {
     'tree_method': 'hist',      # Use GPU accelerated algorithm
     'device': 'cuda',           # Use CUDA / GPU
     'predictor': 'gpu_predictor',   # Use GPU for prediction
-    'verbosity': 1,
+    'verbosity': 2,
     'num_class': no_of_classes,
     'random_state': config['seed_all'] + 38
 }
 
 
 # Get base margin cols if needed
-base_margin_train = get_base_margin(X_train, model_hyper_params['base_margin_cols'])
+base_margin_train = get_base_margin(X_train_master, model_hyper_params['base_margin_cols'])
 
 # Remove any objects not for modelling
-X_train = X_train[[col for col in X_train if 'notformodel' not in col]]
+X_train_master = X_train_master[[col for col in X_train_master if 'notformodel' not in col]]
 
-# Trim features if too many
-X_train = X_train.iloc[:, 0:25000]
+# Count the number of runs it's going to take
+runs_required = math.ceil(len(X_train_master.columns) / 10000)
 
-# Prepare data
-train = xgb.DMatrix(X_train, label = y_train, base_margin = base_margin_train)
-
-
-# Add the odds in case we're using custom loss
-# train.set_info(fighter1_backtesting_odds=X_train['fighter1_backtesting_odds'].values,
-#                fighter2_backtesting_odds=X_train['fighter2_backtesting_odds'].values)
-
-
-with mlflow.start_run():
-
-    # Log the params
-    mlflow.log_params(params)
-    mlflow.log_param('model', "RandomForest")
-
-    # Train the model
-    if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
+for i in range(0, runs_required):
     
-        # Pass the odds to the loss function
-        custom_loss = create_custom_loss(X_train['fighter1_backtesting_odds'].values, X_train['fighter2_backtesting_odds'].values)
+    # Trim features if too many
+    X_train = X_train_master.iloc[:, (10000 * i):np.min([10000 * (i + 1), len(X_train_master.columns) + 1])]
+
+    # Prepare data
+    train = xgb.DMatrix(X_train, label = y_train, base_margin = base_margin_train)
+    
+    print("Training RF " + str(i) + "...")
+    # Add the odds in case we're using custom loss
+    # train.set_info(fighter1_backtesting_odds=X_train['fighter1_backtesting_odds'].values,
+    #                fighter2_backtesting_odds=X_train['fighter2_backtesting_odds'].values)
+
+
+    with mlflow.start_run():
+    
+        # Log the params
+        mlflow.log_params(params)
+        mlflow.log_param('model', "RandomForest partial iteration" + str(i))
+        mlflow.log_param('features', len(X_train.columns))
+    
         # Train the model
-        rf_model = xgb.train(params, train, obj = custom_loss)
+        if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
         
-    else:
-        rf_model = xgb.train(params, train)
+            # Pass the odds to the loss function
+            custom_loss = create_custom_loss(X_train['fighter1_backtesting_odds'].values, X_train['fighter2_backtesting_odds'].values)
+            # Train the model
+            rf_model = xgb.train(params, train, obj = custom_loss)
+            
+        else:
+            rf_model = xgb.train(params, train)
+            
+        # Get feature importance scores
+        importance = rf_model.get_score(importance_type='total_gain')
+    
+        # Sort features by importance
+        sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
+        
+        # Save the variable importance plot to csv
+        with open('results/random_forest_variable_importance_' + str(i) + '.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Feature", "Importance"])  # Write the header
+            writer.writerows(sorted_importance)
+    
+        # TreeSHAP calculation
+        explainer = shap.TreeExplainer(rf_model)
+        shap_values = explainer.shap_values(X_train)
+        
+        # # Plot SHAP feature importance
+        # shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
+        # plt.title("SHAP Feature Importance (TreeSHAP)")
+        # plt.savefig('results/treeshap_feature_importance.png')
+        # plt.show()
+        
+        # Combine SHAP values with feature names into a DataFrame for each target class
+        # If you have a single-target classification, shap_values will be a single array
+        # For multi-class, it will be a list of arrays, one for each class
+        
+        # Assuming `shap_values` has the shape (6792, 18000, 3)
+        # Take the mean absolute SHAP values across all samples and classes
+        mean_shap_values = np.mean(np.abs(shap_values), axis=(0, 2))
+        
+        # Create a DataFrame for better readability
+        shap_importance_df = pd.DataFrame({'Feature': X_train.columns, 'Mean SHAP Value': mean_shap_values})
+        
+        # Sort features by importance
+        shap_importance_df = shap_importance_df.sort_values(by='Mean SHAP Value', ascending=False).reset_index(drop=True)
+        
+        # Display or save the table
+        print(shap_importance_df.head(10))  # Shows the top 10 most important features
+        # Optionally, save to CSV
+        shap_importance_df.to_csv('./results/shap_feature_importance_' + str(i) + '.csv', index=False)
 
-    # Save the model in case we want to use it later
-    rf_model.save_model("results/7.5_random_forest_model.xgb")
-    
-    # Get feature importance scores
-    importance = rf_model.get_score(importance_type='total_gain')
 
-    # Sort features by importance
-    sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
+if runs_required > 1:
     
-    # Save the variable importance plot to csv
-    with open('results/random_forest_variable_importance.csv', mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Feature", "Importance"])  # Write the header
-        writer.writerows(sorted_importance)
-
-    # TreeSHAP calculation
-    explainer = shap.TreeExplainer(rf_model)
-    shap_values = explainer.shap_values(X_train)
-
-    # # Plot SHAP feature importance
-    # shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
-    # plt.title("SHAP Feature Importance (TreeSHAP)")
-    # plt.savefig('results/treeshap_feature_importance.png')
-    # plt.show()
+    # Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
+    for i in range(0, runs_required):
+        
+        if i == 1:
+            var_importance = pd.read_csv('./results/shap_feature_importance_' + str(i) + '.csv').sort_values('Mean SHAP Value', ascending = False)
+            # Take top 2000
+            var_importance = var_importance[0:2000]
+        else:
+            temp_importance = pd.read_csv('./results/shap_feature_importance_' + str(i) + '.csv').sort_values('Mean SHAP Value', ascending = False)
+            # Take top 2000
+            temp_importance = temp_importance[0:2000]
+            
+            # Combine with other SHAPs
+            var_importance = pd.concat([var_importance, temp_importance], axis = 0)
+   
+    # Select only the top columns
+    X_train = X_train_master[[col for col in X_train_master.columns if col in var_importance['Feature'].to_list()]]
     
-    # Combine SHAP values with feature names into a DataFrame for each target class
-    # If you have a single-target classification, shap_values will be a single array
-    # For multi-class, it will be a list of arrays, one for each class
+    # Prepare data
+    train = xgb.DMatrix(X_train, label = y_train, base_margin = base_margin_train)
     
-    # Assuming `shap_values` has the shape (6792, 18000, 3)
-    # Take the mean absolute SHAP values across all samples and classes
-    mean_shap_values = np.mean(np.abs(shap_values), axis=(0, 2))
+    # Train the final random forest
+    with mlflow.start_run():
     
-    # Create a DataFrame for better readability
-    shap_importance_df = pd.DataFrame({'Feature': X_train.columns, 'Mean SHAP Value': mean_shap_values})
+        # Log the params
+        mlflow.log_params(params)
+        mlflow.log_param('model', "RandomForest")
+        mlflow.log_param('features', len(X_train.columns))
     
-    # Sort features by importance
-    shap_importance_df = shap_importance_df.sort_values(by='Mean SHAP Value', ascending=False).reset_index(drop=True)
+        # Train the model
+        if model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
+        
+            # Pass the odds to the loss function
+            custom_loss = create_custom_loss(X_train['fighter1_backtesting_odds'].values, X_train['fighter2_backtesting_odds'].values)
+            # Train the model
+            rf_model = xgb.train(params, train, obj = custom_loss)
+            
+        else:
+            rf_model = xgb.train(params, train)
     
-    # Display or save the table
-    print(shap_importance_df.head(10))  # Shows the top 10 most important features
-    # Optionally, save to CSV
-    shap_importance_df.to_csv('./results/shap_feature_importance.csv', index=False)
+        # Save the model in case we want to use it later
+        rf_model.save_model("results/7.5_random_forest_model.xgb")
+        
+        # Get feature importance scores
+        importance = rf_model.get_score(importance_type='total_gain')
+    
+        # Sort features by importance
+        sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
+        
+        # Save the variable importance plot to csv
+        with open('results/random_forest_variable_importance.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Feature", "Importance"])  # Write the header
+            writer.writerows(sorted_importance)
+    
+        # TreeSHAP calculation
+        explainer = shap.TreeExplainer(rf_model)
+        shap_values = explainer.shap_values(X_train)
+    
+        # # If the above doesn't work
+        # shap_values = rf_model.predict(train, pred_contribs=True)    
+    
+        # # Plot SHAP feature importance
+        # shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
+        # plt.title("SHAP Feature Importance (TreeSHAP)")
+        # plt.savefig('results/treeshap_feature_importance.png')
+        # plt.show()
+        
+        # Combine SHAP values with feature names into a DataFrame for each target class
+        # If you have a single-target classification, shap_values will be a single array
+        # For multi-class, it will be a list of arrays, one for each class
+        
+        # Assuming `shap_values` has the shape (6792, 18000, 3)
+        # Take the mean absolute SHAP values across all samples and classes
+        mean_shap_values = np.mean(np.abs(shap_values), axis=(0, 2))
+        
+        # Create a DataFrame for better readability
+        shap_importance_df = pd.DataFrame({'Feature': X_train.columns, 'Mean SHAP Value': mean_shap_values})
+        
+        # Sort features by importance
+        shap_importance_df = shap_importance_df.sort_values(by='Mean SHAP Value', ascending=False).reset_index(drop=True)
+        
+        # Display or save the table
+        print(shap_importance_df.head(10))  # Shows the top 10 most important features
+        # Optionally, save to CSV
+        shap_importance_df.to_csv('./results/shap_feature_importance.csv', index=False)
