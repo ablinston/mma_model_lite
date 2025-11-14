@@ -2,7 +2,7 @@
 
 # Can set some excluded strings to not include columns containing those phrases
 
-def calculate_per_minute_stats(fight_stats_hist, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'baye']):
+def calculate_per_minute_stats(fight_stats_hist, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'baye', 'per_minute']):
 
     stats_df = fight_stats_hist.copy().reset_index(drop = True)
     

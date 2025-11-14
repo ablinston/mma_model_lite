@@ -30,7 +30,7 @@ def add_adjusted_stats(
     
     # Add per minute stats on
     if 'per_minute' in columns_with:
-        new_stats_df = calculate_per_minute_stats(new_stats_df, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'opponent', 'bayes'] + exclude_columns_with)
+        new_stats_df = calculate_per_minute_stats(new_stats_df, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'opponent', 'bayes', 'per_minute'] + exclude_columns_with)
     
     # Find the columns to adjust
     columns_to_adjust = []

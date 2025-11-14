@@ -14,8 +14,8 @@ mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 mlflow.set_experiment('bayes_base_testing_rf_v4')
 
 # Choose a new base for the bayes variables
-for bayes_base_per_minute in [0, 1, 2, 50]: # :range(25, 175, 25):
-    for bayes_base_percent in [0, 10, 50, 100, 200, 500]: #range(50, 300, 50):
+for bayes_base_per_minute in [0, 25, 50]: # :range(25, 175, 25):
+    for bayes_base_percent in [0, 10, 25, 50, 75, 100]: #range(50, 300, 50):
         # for bayes_fightspan in [50, 150]:
         
         # Read in global objects and packages
@@ -82,7 +82,7 @@ for bayes_base_per_minute in [0, 1, 2, 50]: # :range(25, 175, 25):
             feature_list = feature_list.str.replace('bayes_accuracy_percent', 'accuracy_percent')
         
         # Get unique values
-        feature_list = feature_list.unique().to_list()
+        feature_list = list(feature_list.unique())
 
         X_train = X_train[[col for col in X_train.columns if col in feature_list[0:1000]]]
         
@@ -90,7 +90,7 @@ for bayes_base_per_minute in [0, 1, 2, 50]: # :range(25, 175, 25):
         X_train = standard_feature_removal(X_train, differentials_only = model_hyper_params['differential_features_only'], true_odds_only = True, open_odds_only = False)
         
         # Remove all but a subgroup of features
-        X_train = X_train[[col for col in X_train.columns if 'baye' in col]].copy()
+        X_train = X_train[[col for col in X_train.columns if 'odds' not in col]].copy()
         
         # Check data types
         data.dtypes.value_counts()
