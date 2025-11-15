@@ -101,6 +101,9 @@ columns_in_order += ['fighter1_backtesting_odds', 'fighter2_backtesting_odds']
 # Remove any duplicates
 columns_in_order = pd.Series(columns_in_order).drop_duplicates().tolist()
 
+# Remove any columns not in the data
+columns_in_order = [col for col in columns_in_order if col in X_train_master.columns]
+
 # Select only the needed columns without duplicates
 X_train_master = X_train_master.loc[:, ~X_train_master.columns.duplicated()].copy()[columns_in_order]
 
@@ -113,7 +116,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v7')
+mlflow.set_experiment('fights_gt2_post_data_fix_v8')
 
 
 ##########################################################################################
@@ -125,9 +128,9 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [i for i in range(200, 750, 5)]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [286]), # [i for i in range(50, 750, 5)]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
-    'hyperopt_early_stopping': 10
+    'hyperopt_early_stopping': 30
 }
 
 # Set the hyperopt parameters for the inner optimisation
@@ -137,7 +140,7 @@ params_inner = {
      'min_child_weight': 15, # hp.quniform('min_child_weight', 8, 21, 1), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'colsample_bytree': hp.quniform('colsample_bytree', 0.01, 0.4, 0.01),
-     'max_depth': hp.quniform('max_depth', 1, 4, 1),
+     'max_depth': hp.quniform('max_depth', 1, 5, 1),
      'max_bin': 180, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
      'eval_metric': 'mlogloss',       # Evaluation metric
@@ -151,7 +154,7 @@ params_inner = {
      'early_stopping_rounds': 35,
      # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
      # 'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
-     # 'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
+     'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
      'exclude_split_other_from_train': True, # hp.choice('exclude_split_other_from_train', [True, False]),  # Almost all best trials end up with this as True
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': True, # hp.choice('win_loss_only', [True, False]), # Almost all best trials end up with this as True
@@ -163,7 +166,7 @@ params_inner = {
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = atpe_suggest,
-            max_evals = 50,
+            max_evals = 100,
             trials = trials)
 
 
@@ -171,7 +174,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:330]
+column_names = X_train_master.columns.tolist()[0:300]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

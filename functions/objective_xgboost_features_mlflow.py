@@ -100,13 +100,13 @@ def objective_xgboost_features_mlflow(
                     print('Error encountered')
                     error_count += 1
                     # pdb.set_trace()
-                    
+            
             while error_count < 5:
                 try:
                     best = fmin(fn = objective_cv_xgboost,
                                 space = params_inner,
                                 algo = atpe_suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
-                                max_evals = (params['max_evals'] - 50),
+                                max_evals = params['max_evals'],
                                 trials = trials_inner,
                                 early_stop_fn = no_progress_loss(params['hyperopt_early_stopping']))
                     break # exit loop if successful
