@@ -116,7 +116,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v9')
+mlflow.set_experiment('fights_gt2_post_data_fix_v10')
 
 
 ##########################################################################################

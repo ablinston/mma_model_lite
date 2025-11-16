@@ -7,7 +7,7 @@ switch_fighters_with_odds: False
 
 # This sets whether the fighters should be randomly switched before models are fit
 # Note that if this is true it effectively undoes the switch with odds
-switch_fighters_randomly: True
+switch_fighters_randomly: False
 
 # Set whether to exclude split decisions and other from training data (this won't be applied to test data)
 # split_or_other_exclude: False # Now a variable hyperparameter in hyperopt
