@@ -205,7 +205,6 @@ for backtesting_params in [
         
     mlflow.end_run()
 
-
 # # If the model is good, then log it in the registery
 # if model_approved:
 #     run_id = 'aa217e4b1bf442729c4f86abfba56f98'
