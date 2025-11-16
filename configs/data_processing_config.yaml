@@ -36,7 +36,7 @@ bayes_alpha_plus_beta_rebase_per_minute: 105
 bayesian_groupby: [] # ['weightclass'] Tested using weightclass but features less predictive power after
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats for the bayes adj columns)
-add_adj_per_minute_columns: True
-add_adj_percentage_columns: True
+add_adj_per_minute_columns: False
+add_adj_percentage_columns: False
 add_adj_per_minute_bayes_columns: False
-add_adj_percentage_bayes_columns: True
+add_adj_percentage_bayes_columns: False

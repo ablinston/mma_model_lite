@@ -116,7 +116,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v8')
+mlflow.set_experiment('fights_gt2_post_data_fix_v9')
 
 
 ##########################################################################################
@@ -128,7 +128,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [286]), # [i for i in range(50, 750, 5)]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [i for i in range(321, 322, 1)]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
     'hyperopt_early_stopping': 30
 }
@@ -174,7 +174,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:300]
+column_names = X_train_master.columns.tolist()[0:320]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

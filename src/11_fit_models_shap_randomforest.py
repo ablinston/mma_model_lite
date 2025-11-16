@@ -181,7 +181,7 @@ if runs_required > 1:
     # Read in the baseline run and remove any columns with very low accuracy historically to speed up the RF
     for i in range(0, runs_required):
         
-        if i == 1:
+        if i == 0:
             var_importance = pd.read_csv('./results/shap_feature_importance_' + str(i) + '.csv').sort_values('Mean SHAP Value', ascending = False)
             # Take top 2000
             var_importance = var_importance[0:2000]
