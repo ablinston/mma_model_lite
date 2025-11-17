@@ -37,6 +37,6 @@ bayesian_groupby: [] # ['weightclass'] Tested using weightclass but features les
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats for the bayes adj columns)
 add_adj_per_minute_columns: False
-add_adj_percentage_columns: False
+add_adj_percentage_columns: True
 add_adj_per_minute_bayes_columns: False
 add_adj_percentage_bayes_columns: False

@@ -16,6 +16,11 @@ def predict_xgboost_ensemble(models, X_test_df, y_test_df = None, model_hyper_pa
     
     # Collect predictions from each model
     model_predictions = []
+    
+    # Check if columns need to be renamed
+    if any('_sub.att' in feature for feature in models[0]['features']):
+        X_test_df.columns = X_test_df.columns.str.replace('_sub_attempt', '_sub.att')
+    
     for model in models:
         
         # Clean the test features
