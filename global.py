@@ -8,6 +8,7 @@ else:
     sys.path.append('/home/andy/Repos/custom_tools')
 
 from model_tools.k_fold_id_by_runner import k_fold_id_by_runner
+from model_tools.TemperatureScaler import TemperatureScaler
 from scraping_tools.get_website_soup import get_website_soup
 # from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
 

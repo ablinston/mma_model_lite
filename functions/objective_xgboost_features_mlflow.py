@@ -92,9 +92,9 @@ def objective_xgboost_features_mlflow(
                     best = fmin(fn = objective_cv_xgboost,
                                 space = params_inner,
                                 algo = rand.suggest, # tpe is the most commonly used algorithm in hyperopt by atpe_suggest is more thorough. Might take 500-1000 iterations
-                                max_evals = 50,
+                                max_evals = 100,
                                 trials = trials_inner,
-                                early_stop_fn = no_progress_loss(51))
+                                early_stop_fn = no_progress_loss(101))
                     break # exit loop if successful
                 except:
                     print('Error encountered')

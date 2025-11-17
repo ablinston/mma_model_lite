@@ -46,4 +46,4 @@ xgb_forest_bagging: True
 base_margin_cols: Null # ['notformodel_lw_base_margin', {'flat_prob': 0.05}, 'notformodel_wl_base_margin'] 
 
 # Set whether each individual XGBoost model in the forest should have Platt calibration applied based on the validation sample (not the test or OOT sample)
-calibrate_models: False
+calibrate_models: True

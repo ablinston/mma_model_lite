@@ -149,9 +149,10 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
                           verbose = verbose_eval)                
             
             # Create a calibration model
-            model_cal = CalibratedClassifierCV(estimator = raw_model, 
-                                               method = 'sigmoid', # This is a Platt calibration
-                                               cv = 'prefit') # the model has already been trained
+            model_cal = TemperatureScaler(raw_model)
+            # model_cal = CalibratedClassifierCV(estimator = raw_model, 
+            #                                    method = 'sigmoid', # This is a Platt calibration
+            #                                    cv = 'prefit') # the model has already been trained
             
             # Now fit to the validation data
             model_cal.fit(X_val[X_train_df.columns], y_val)

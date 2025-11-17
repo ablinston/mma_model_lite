@@ -127,7 +127,7 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 100,
+    'max_evals': 150,
     'num_of_features': hp.choice('num_of_features', [i for i in range(30, 700, 10)]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
     'hyperopt_early_stopping': 10
