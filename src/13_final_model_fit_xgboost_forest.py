@@ -20,7 +20,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the new model version number
-new_version_number = "4.0.15"
+new_version_number = "4.0.17"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -66,11 +66,11 @@ mlflow.set_experiment('gt2_fights_xgboost_forest_v' + new_version_number)
 
 params = {
     # 'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.0157, # Learning rate
+    'learning_rate': 0.0126, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
     'split_dec_or_other': True, # whether to exclude them
     'subsample': 0.85,
-    'colsample_bytree': 0.28,
+    'colsample_bytree': 0.29,
     'max_depth': 5,
     'max_bin': 500, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
@@ -85,7 +85,7 @@ params = {
     'early_stopping_rounds': 30,
     # 'reg_alpha': 0.3, # Lasso regularisation
     # 'reg_lambda': 0.02, # ridge regularisation
-    'gamma': 1.212,
+    'gamma': 0.402,
     'win_loss_only': True,
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function'],
@@ -119,8 +119,8 @@ xgboost_rf = train_ensemble_xgboost(
     )
 
 # Try different numbers of trees
-# for num_trees in [1]:
-for num_trees_i in list(range(1, 21, 2)) + list(range(25, 51, 5)) + list(range(60, len(xgboost_rf) + 1, 10)):
+# for num_trees_i in [4, 6]:
+for num_trees_i in list(range(1, 7, 1)) + list(range(7, 21, 2)) + list(range(25, 51, 5)) + list(range(60, len(xgboost_rf) + 1, 10)):
         
     if len(xgboost_rf) >= num_trees_i:
         
@@ -158,7 +158,7 @@ for num_trees_i in list(range(1, 21, 2)) + list(range(25, 51, 5)) + list(range(6
 
 
 # Set the final number of models
-final_forest_size = 11
+final_forest_size = 4
 
 
 # Save the model
