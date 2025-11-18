@@ -75,6 +75,8 @@ columns_in_order = var_importance['Feature'].tolist()
 # Get rid of the last X results
 columns_in_order = [col for col in columns_in_order if not ('_last_' in col and '_results' in col)]
 
+# columns_in_order = [col for col in columns_in_order if '_adjsum' not in col]
+
 # Add on other columns needed
 columns_in_order = columns_in_order + [col for col in X_train_master.columns if 'notformodel' in col and col not in columns_in_order]
     
@@ -116,7 +118,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v11')
+mlflow.set_experiment('fights_gt2_post_data_fix_v12')
 
 
 ##########################################################################################
