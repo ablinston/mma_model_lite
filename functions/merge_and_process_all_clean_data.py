@@ -163,13 +163,13 @@ def merge_and_process_all_clean_data(
         fight_stats_bayes = calculate_per_minute_bayesian_stats(fight_stats, fight_stats_bayes_priors, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute'], bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute'])
         
         # Adding on adjusted stats to the fight stats
-        fight_stats_plus_adj = add_adjusted_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'])
+        fight_stats_plus_adj = add_adjusted_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'], exclude_columns_with = ['_minus_'])
         
         # Replace the fight stats with one with the adj but remove all the extra bayes info (will be added by aggregation later)
         fight_stats = fight_stats_plus_adj[[col for col in fight_stats_plus_adj if 'bayes' not in col or ('bayes' in col and 'adj' in col)]]
     
     if data_processing_config['add_adj_per_minute_columns']:
-        fight_stats = add_adjusted_stats(fight_stats, fight_stats_hist, columns_with = ['per_minute'], exclude_columns_with = ['bayes'])
+        fight_stats = add_adjusted_stats(fight_stats, fight_stats_hist, columns_with = ['per_minute'], exclude_columns_with = ['bayes', '_minus_'])
     
     
     ###########################################################################################

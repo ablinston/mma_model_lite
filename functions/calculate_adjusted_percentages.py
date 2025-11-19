@@ -32,7 +32,7 @@ def calculate_adjusted_percentages(
             stats_df = fight_stats_percentages, 
             hist_df = fight_stats_hist_percentages,
             columns_with = ['accuracy_percent'],
-            exclude_columns_with = ['bayes']
+            exclude_columns_with = ['bayes', '_minus_']
             )
     
     # Add on adjusted bayes percentages if required
@@ -42,7 +42,7 @@ def calculate_adjusted_percentages(
             stats_df = fight_stats_percentages, 
             hist_df = fight_stats_hist_percentages,
             columns_with = ['bayes_accuracy_percent'],
-            exclude_columns_with = ['_adj']
+            exclude_columns_with = ['_adj', '_minus_']
             )
         
     # Check all the row numbers are correct
