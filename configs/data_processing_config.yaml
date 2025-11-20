@@ -30,13 +30,13 @@ bayes_fightspan: 1000
 
 # Set the number of observations to equalise the priors to in bayes stats calcs. Effectively how many minutes/attemps the priors count for compared to the fighter's own stats. alpha plus beta in the formula will then always be set to this and alpha recalculated with this as a base
 bayes_alpha_plus_beta_rebase_percent: 75
-bayes_alpha_plus_beta_rebase_per_minute: 105
+bayes_alpha_plus_beta_rebase_per_minute: 5
 
 # Bayesian group by. This is what we group the Bayesian smooting of stats by
 bayesian_groupby: [] # ['weightclass'] Tested using weightclass but features less predictive power after
 
 # Set whether to add adjusted stats as well as raw (requires bayes stats for the bayes adj columns)
-add_adj_per_minute_columns: False
+add_adj_per_minute_columns: True
 add_adj_percentage_columns: False
 add_adj_per_minute_bayes_columns: False
-add_adj_percentage_bayes_columns: True
+add_adj_percentage_bayes_columns: False
