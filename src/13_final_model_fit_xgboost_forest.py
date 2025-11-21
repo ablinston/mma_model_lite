@@ -20,7 +20,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the new model version number
-new_version_number = "4.0.25"
+new_version_number = "4.0.30"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -66,12 +66,12 @@ mlflow.set_experiment('gt2_fights_xgboost_forest_v' + new_version_number)
 
 params = {
     # 'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.0249, # Learning rate
+    'learning_rate': 0.0508, # Learning rate
     'min_child_weight': 15,                 # The min observations that should be left in a leaf node
     'split_dec_or_other': True, # whether to exclude them
     'subsample': 0.85,
-    'colsample_bytree': 0.11,
-    'max_depth': 4,
+    'colsample_bytree': 0.15,
+    'max_depth': 8,
     'max_bin': 500, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -84,8 +84,8 @@ params = {
     'num_iterations': 5000,
     'early_stopping_rounds': 30,
     # 'reg_alpha': 0.3, # Lasso regularisation
-    # 'reg_lambda': 0.02, # ridge regularisation
-    'gamma': 0.924,
+    'reg_lambda': 0.496, # ridge regularisation
+    'gamma': 0.601,
     'win_loss_only': True,
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function'],
@@ -125,20 +125,21 @@ for num_trees_i in list(range(1, 7, 1)) + list(range(7, 21, 2)) + list(range(25,
     if len(xgboost_rf) >= num_trees_i:
         
         # Start a new model run in MLflow
-        with mlflow.start_run():
-            
-            # Log the initial metrics
-            mlflow.log_params(params)
-            mlflow.log_param('num_trees', num_trees_i)
-            mlflow.log_param('Forest col proportion', colsample_bynode)
-            mlflow.log_param('Forest subsample', subsample)
-            mlflow.set_tag('Sample', 'Train')
-                        
-            # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_train, y_train, model_hyper_params)
-            
-            # Log the predictions just from the odds for info
-            log_metrics_odds_mlflow(X_train, y_train)
+        if num_trees_i == 1:
+            with mlflow.start_run():
+                
+                # Log the initial metrics
+                mlflow.log_params(params)
+                mlflow.log_param('num_trees', num_trees_i)
+                mlflow.log_param('Forest col proportion', colsample_bynode)
+                mlflow.log_param('Forest subsample', subsample)
+                mlflow.set_tag('Sample', 'Train')
+                            
+                # Log the metrics of the forest with that many trees in MLflow
+                log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_train, y_train, model_hyper_params)
+                
+                # Log the predictions just from the odds for info
+                log_metrics_odds_mlflow(X_train, y_train)
             
         # Start a new model run in MLflow
         with mlflow.start_run():
@@ -158,7 +159,7 @@ for num_trees_i in list(range(1, 7, 1)) + list(range(7, 21, 2)) + list(range(25,
 
 
 # Set the final number of models
-final_forest_size = 4
+final_forest_size = 11
 
 
 # Save the model

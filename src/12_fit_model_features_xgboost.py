@@ -119,7 +119,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v18')
+mlflow.set_experiment('fights_gt2_post_data_fix_v19')
 
 
 ##########################################################################################
@@ -133,7 +133,7 @@ space = {
     'max_evals': 150,
     'num_of_features': hp.choice('num_of_features', [i for i in range(30, 700, 10)]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
-    'hyperopt_early_stopping': 10
+    'hyperopt_early_stopping': 15
 }
 
 # Set the hyperopt parameters for the inner optimisation
@@ -155,8 +155,8 @@ params_inner = {
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
      'early_stopping_rounds': 10,
-     # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
-     # 'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
+     # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # L1 regularisation
+     'reg_lambda': hp.uniform('reg_lambda', 0, 5), # L2 regularisation
      'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
      'exclude_split_other_from_train': True, # hp.choice('exclude_split_other_from_train', [True, False]),  # Almost all best trials end up with this as True
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
@@ -194,7 +194,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:160]
+column_names = X_train_master.columns.tolist()[0:190]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)
