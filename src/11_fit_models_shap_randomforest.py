@@ -34,14 +34,14 @@ data = standard_data_filter(data)
 # Set target
 target = 'outcome'
 
-# # Switch fighers if necessary
-# if model_hyper_params['switch_fighters_with_odds'] == True:
-#     data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
-# if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
-#     np.random.seed(seed = config['seed_all'] + 9845)
-#     # Switch twice then concat to try to get some variance
-#     data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
-#     # data2 = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+# Switch fighers if necessary
+if model_hyper_params['switch_fighters_with_odds'] == True:
+    data = switch_fighter1_fighter2(data, data['fighter1_backtesting_odds'] > data['fighter2_backtesting_odds'])
+if model_hyper_params['switch_fighters_randomly'] == True: # Commented this out because I don't think we want random for the RF
+    np.random.seed(seed = config['seed_all'] + 9845)
+    # Switch twice then concat to try to get some variance
+    data = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
+    # data2 = switch_fighter1_fighter2(data, np.random.choice([True, False], size = len(data)))
     
     # data = pd.concat([data, data2, data3], ignore_index = True)
 

@@ -119,7 +119,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v17')
+mlflow.set_experiment('fights_gt2_post_data_fix_v18')
 
 
 ##########################################################################################
@@ -143,7 +143,7 @@ params_inner = {
      'min_child_weight': 15, # hp.quniform('min_child_weight', 8, 21, 1), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'colsample_bytree': hp.quniform('colsample_bytree', 0.01, 0.4, 0.01),
-     'max_depth': hp.quniform('max_depth', 1, 5, 1),
+     'max_depth': hp.quniform('max_depth', 1, 8, 1),
      'max_bin': 180, # used in the hist method to speed up, this says how many bins the vars should be split into
      'objective': 'multi:softprob', # Multi classification objective
      'eval_metric': 'mlogloss',       # Evaluation metric
@@ -180,7 +180,7 @@ trials = Trials()
 space = {
     # Set the feature objective params
     'max_evals': 1000,
-    'num_of_features': hp.choice('num_of_features', [201]), # , 1000, 2000, len(X_train_master)]),
+    'num_of_features': hp.choice('num_of_features', [170]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
     'hyperopt_early_stopping': 50
 }
@@ -194,7 +194,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:350]
+column_names = X_train_master.columns.tolist()[0:160]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)

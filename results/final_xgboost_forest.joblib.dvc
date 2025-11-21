@@ -1,5 +1,5 @@
 outs:
-- md5: b2642372c22d96fc2798a95fdb81c893
-  size: 250785
+- md5: 340cc917f14a667a625431e3d5fc7368
+  size: 1279962
   hash: md5
   path: final_xgboost_forest.joblib
