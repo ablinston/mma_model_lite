@@ -20,7 +20,7 @@ import xgboost as xgb
 exec(open('global.py').read())
 
 # Set the new model version number
-new_version_number = "4.0.30"
+new_version_number = "4.0.31"
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -66,12 +66,12 @@ mlflow.set_experiment('gt2_fights_xgboost_forest_v' + new_version_number)
 
 params = {
     # 'nthread': 3, # Only applies to CPU cores
-    'learning_rate': 0.0508, # Learning rate
-    'min_child_weight': 15,                 # The min observations that should be left in a leaf node
+    'learning_rate': 0.0143, # Learning rate
+    'min_child_weight': 17,                 # The min observations that should be left in a leaf node
     'split_dec_or_other': True, # whether to exclude them
     'subsample': 0.85,
-    'colsample_bytree': 0.15,
-    'max_depth': 8,
+    'colsample_bytree': 0.16,
+    'max_depth': 6,
     'max_bin': 500, # used in the hist method to speed up, this says how many bins the vars should be split into
     'objective': 'multi:softprob', # Multi classification objective
     'eval_metric': 'mlogloss',       # Evaluation metric
@@ -84,8 +84,8 @@ params = {
     'num_iterations': 5000,
     'early_stopping_rounds': 30,
     # 'reg_alpha': 0.3, # Lasso regularisation
-    'reg_lambda': 0.496, # ridge regularisation
-    'gamma': 0.601,
+    # 'reg_lambda': 0.496, # ridge regularisation
+    'gamma': 1.306,
     'win_loss_only': True,
     'switch_fighters_randomly': False if model_hyper_params['switch_all_fighters_and_stack'] else model_hyper_params['switch_fighters_randomly'], # Set whether each tree should have randomised fighters
     'loss_function' : model_hyper_params['loss_function'],

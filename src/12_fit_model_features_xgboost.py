@@ -119,7 +119,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v19')
+mlflow.set_experiment('fights_gt2_post_data_fix_v20')
 
 
 ##########################################################################################
@@ -140,7 +140,7 @@ space = {
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
      'learning_rate': hp.uniform('learning_rate', 0.002, 0.2), # Learning rate #  0.01-0.2 is considered low-moderate learning rates
-     'min_child_weight': 15, # hp.quniform('min_child_weight', 8, 21, 1), # The min observations that should be left in a leaf node    
+     'min_child_weight': hp.quniform('min_child_weight', 8, 21, 1), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'colsample_bytree': hp.quniform('colsample_bytree', 0.01, 0.4, 0.01),
      'max_depth': hp.quniform('max_depth', 1, 8, 1),
@@ -156,13 +156,13 @@ params_inner = {
      'num_iterations': 5000,
      'early_stopping_rounds': 10,
      # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # L1 regularisation
-     'reg_lambda': hp.uniform('reg_lambda', 0, 5), # L2 regularisation
+     # 'reg_lambda': hp.uniform('reg_lambda', 0, 5), # L2 regularisation
      'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
      'exclude_split_other_from_train': True, # hp.choice('exclude_split_other_from_train', [True, False]),  # Almost all best trials end up with this as True
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
      'win_loss_only': True, # hp.choice('win_loss_only', [True, False]), # Almost all best trials end up with this as True
      'loss_function' : model_hyper_params['loss_function'],
-     'trim_model_features': hp.choice('trim_model_features', [True, False]),
+     'trim_model_features': True, # hp.choice('trim_model_features', [True, False]),
      'base_margin_cols': model_hyper_params['base_margin_cols'] 
 }
 
@@ -194,7 +194,7 @@ best = fmin(fn = objective_xgboost_features_mlflow,
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:190]
+column_names = X_train_master.columns.tolist()[0:160]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)
