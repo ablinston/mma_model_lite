@@ -1,15 +1,15 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Belal Muhammad,3.5,24.4,-0.15,Ian Machado Garry,1.39,72.5,0.01,None,0.0,,0.0,0.0,
-1,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Volkan Oezdemir,1.46,71.5,0.04,Alonzo Menifield,3.05,25.8,-0.21,None,0.0,,0.0,0.0,
-2,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Jack Hermansson,2.84,37.1,0.05,Myktybek Orolbai,1.53,59.8,-0.08,None,0.0,,0.0,0.0,
-3,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Waldo Cortes-Acosta,1.69,72.3,0.22,Shamil Gaziev,2.26,24.9,-0.44,Waldo Cortes-Acosta,1.69,1.38,165.0,113.85,
-4,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Tagir Ulanbekov,1.49,76.0,0.13,Kyoji Horiguchi,2.98,21.4,-0.36,Tagir Ulanbekov,1.49,1.32,165.0,80.85,
-5,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Alex Perez,2.84,34.2,-0.03,Asu Almabayev,1.52,62.6,-0.05,None,0.0,,0.0,0.0,
-6,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Arman Tsarukyan,1.17,88.3,0.03,Dan Hooker,6.4,9.6,-0.39,None,0.0,,0.0,0.0,
-5,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Bogdan Grad,,,,Luke Riley,,,,,,,,,Fights < 3
-6,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Abdul-Rakhman Yakhyaev,,,,,,,,,,,,,Fights < 3
-8,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Bekzat Almakhan,,,,Aleksandre Topuria,,,,,,,,,Fights < 3
-9,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Ismail Naurdiev,,,,Ryan Loder,,,,,,,,,Fights < 3
-10,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Nurullo Aliev,,,,,,,,,,,,,Fights < 3
-11,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Marek Bujlo,,,,Denzel Freeman,,,,,,,,,Fights < 3
-12,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Nicolas Dalby,,,,Saygid Izagakhmaev,,,,,,,,,Fights < 3
+0,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Alexandre Pantoja,1.46,75.3,0.1,Joshua Van,2.96,21.8,-0.35,None,0.0,,0.0,0.0,
+1,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Brandon Moreno,2.06,49.3,0.02,Tatsuro Taira,1.75,47.4,-0.17,None,0.0,,0.0,0.0,
+2,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Henry Cejudo,3.2,26.6,-0.15,Payton Talbott,1.37,70.4,-0.04,None,0.0,,0.0,0.0,
+3,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Jan Blachowicz,1.03,75.5,-0.22,Bogdan Guskov,2.08,21.8,-0.55,None,0.0,,0.0,0.0,
+4,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Grant Dawson,1.48,60.1,-0.11,Manuel Torres,2.52,36.7,-0.07,None,0.0,,0.0,0.0,
+5,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Terrance McKinney,2.36,48.5,0.15,Chris Duncan,1.63,48.2,-0.21,Terrance McKinney,2.36,2.06,165.0,224.4,
+6,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Marvin Vettori,2.0,55.2,0.1,Brunno Ferreira,1.83,41.6,-0.24,Marvin Vettori,2.0,1.81,165.0,165.0,
+7,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Nazim Sadykhov,2.3,35.5,-0.18,Fares Ziam,1.63,61.5,0.0,None,0.0,,0.0,0.0,
+8,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Edson Barboza,3.0,19.4,-0.42,Jalin Turner,1.03,77.9,-0.2,None,0.0,,0.0,0.0,
+9,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:34.402023+00:00,2025-11-24 10:56:34.402023+00:00,Mansur Abdul-Malik,1.1,87.3,-0.04,Antonio Trocoli,7.5,10.6,-0.21,None,0.0,,0.0,0.0,
+10,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Muhammad Naimov,1.03,44.9,-0.54,Mairon Santos,1.03,52.1,-0.46,None,0.0,,0.0,0.0,
+11,2025-12-06,ufc323:dvalishvilivsyan2,2025-11-24 10:56:50.568,2025-11-24 10:56:50.568,Merab Dvalishvili,1.21,75.6,-0.09,Petr Yan,5.0,21.7,0.08,None,0.0,,0.0,0.0,
+9,2025-12-06,ufc323:dvalishvilivsyan2,,,Iwo Baraniewski,,,,Ibo Aslan,,,,,,,,,Fights < 3
+12,2025-12-06,ufc323:dvalishvilivsyan2,,,Maycee Barber,,,,Karine Silva,,,,,,,,,Womens
