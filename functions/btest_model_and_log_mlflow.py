@@ -116,7 +116,12 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
         if 'EV MSE' in breakdown_metrics and 'X Odds EV MSE' in breakdown_metrics:
             fig, ax = metric_chart(x = summary_df['group'], y_model = summary_df['EV MSE'], y_odds = summary_df['X Odds EV MSE'], x_label = 'Group', y_label = 'EV MSE')
             mlflow.log_figure(fig, col +  " metrics/ev_mse_chart.png")
-
+            
+        if 'Hmean WL only Accuracy' in breakdown_metrics and 'X Odds Hmean WL only Accuracy' in breakdown_metrics:
+            fig, ax = metric_chart(x = summary_df['group'], y_model = summary_df['Hmean WL only Accuracy'], y_odds = summary_df['X Odds Hmean WL only Accuracy'], x_label = 'Group', y_label = 'Hmean WL only Accuracy')
+            mlflow.log_figure(fig, col +  " metrics/accuracy_chart.png")
+            
+        # pdb.set_trace()
     
     # Finally, get the backtesting results
     backtesting, backtesting_fight_output = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params)
