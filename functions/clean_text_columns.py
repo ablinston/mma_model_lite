@@ -22,5 +22,6 @@ def clean_text_columns(df):
             df.loc[:, col] = df[col].str.replace('montserendon', 'montserratrendon')
             df.loc[:, col] = df[col].str.replace('michaelaswell', 'michaelaswelljr').str.replace('jrjr', 'jr')
             df.loc[:, col] = df[col].str.replace('zachreese', 'zacharyreese')
+            df.loc[:, col] = df[col].str.replace('shaquemerock', 'shemrock')
             
     return df

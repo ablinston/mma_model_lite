@@ -148,7 +148,7 @@ def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fi
     
     # if (len(missing_fighter_details) > 0):
     #     print(f"Error: Missing fighters from fighter_details data: {missing_fighter_details}")
-    
+    # pdb.set_trace()
     # Find which fighters are missing from tott data
     missing_fighter_tott = all_fighters[~all_fighters.isin(fighter_tott['fighter'].to_list())].to_list()
     if (len(missing_fighter_tott) > 0):
