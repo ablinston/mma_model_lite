@@ -1,8 +1,8 @@
 # This script fits XGBoost models to the future events data after refreshing data scrape
 
 import gc
-import h2o
-from h2o.automl import H2OAutoML
+# import h2o
+# from h2o.automl import H2OAutoML
 from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
 import itertools
@@ -24,7 +24,7 @@ if not os.name == "nt":
     config['firefox_location'] = config['firefox_location_pi']
 
 # Use this to skip update of data if it's already been done recently
-skip_data_update = False
+skip_data_update = False # Needs to be run again because bayes settings different
 skip_save_data = False
 
 # # Load files
@@ -47,7 +47,7 @@ if not skip_data_update:
     
     # Run these scripts to scrape then clean the raw data
     # Run these scripts to scrape then clean the raw data
-    scrape_all_unparsed_data(False, config, betfair_login_config)
+    scrape_all_unparsed_data(True, config, betfair_login_config)
     clean_all_raw_data_and_save(config)
     
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
@@ -77,6 +77,9 @@ else:
 
 # Apply standard filters
 backtesting_data = standard_data_filter(backtesting_data)
+
+# # For v1-3 need to rename columns
+# backtesting_data.columns = backtesting_data.columns.str.replace("_sub_attempt", "_sub.att")
 
 # Create an ID column to easily filter the data
 backtesting_data['id'] = backtesting_data.index
