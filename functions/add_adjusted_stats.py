@@ -1,10 +1,11 @@
 # This function takes a data frame with stats columns, another dataframe with every fighter's historic stats and calculates adjusted
 # statistics on the stats data. By default, this function adjusts with the opponents Bayes smoothed stats
 
-def add_adjusted_bayes_stats(
+def add_adjusted_stats(
         stats_df, # The cleaned stats df with a bit of processing
         hist_df, # The aggregated historic stats from the aggregate_last_X_fights() function
-        columns_with = ['per_minute_bayes']): # A string to select a subset of columns to cal stats for with this string
+        columns_with = ['per_minute_bayes'], # A string to select a subset of columns to cal stats for with this string
+        exclude_columns_with = []): # A string to exclude a subset of columns to cal stats for with this string
     
     """
     Take a set of predictions and actuals and calculates a series of metrics
@@ -13,6 +14,7 @@ def add_adjusted_bayes_stats(
         y_pred_prob (array): an array of probabilities for the predictions
         y_test_df: a series of actuals to test against
         classes (array): the classes of the predicted variable
+        exclude_columns_with (list): a list of column strings to be excluded
         
     Returns:
         A dictionary of metrics
@@ -28,7 +30,7 @@ def add_adjusted_bayes_stats(
     
     # Add per minute stats on
     if 'per_minute' in columns_with:
-        new_stats_df = calculate_per_minute_stats(new_stats_df, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'opponent', 'bayes'])
+        new_stats_df = calculate_per_minute_stats(new_stats_df, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'opponent', 'bayes', 'per_minute'] + exclude_columns_with)
     
     # Find the columns to adjust
     columns_to_adjust = []
@@ -36,12 +38,23 @@ def add_adjusted_bayes_stats(
     for item in columns_with:
         columns_to_adjust += [col for col in new_stats_df.columns if item in col and 'against' not in col]
         # Now find corresponding historic columns for the columns to adjust
-        adjustment_cols += ['hist_' + col.replace('_per', '_against_per') for col in columns_to_adjust]
+        adjustment_cols += ['hist_' + col.replace('_per_minute', '_against_per_minute').replace('_accuracy_percent', '_accuracy_percent_against') for col in columns_to_adjust]
         # Now add on the opposing stats for defense
         adjustment_cols += ['hist_' + col for col in columns_to_adjust]
         # Now add on the against stats
         columns_to_adjust += [col for col in new_stats_df.columns if item in col and 'against' in col]
         
+    # Remove any excluded strings
+    for item in exclude_columns_with:
+        columns_to_adjust = [col for col in columns_to_adjust if item not in col]
+        adjustment_cols = [col for col in adjustment_cols if item not in col]
+        
+    # Check column correspondence
+    stop_if_not((
+        pd.Series(columns_to_adjust).str.replace('_against', '') == pd.Series(
+            adjustment_cols).str.replace('_against', '')).sum() == 0,
+        'adjusted stats column correspondence check')
+    
     # Now merge on each opponents historic stats
     new_stats_df = new_stats_df.merge(hist_df, left_on = ['event', 'bout', 'opponent'], right_on = ['event', 'bout', 'fighter'], how = 'left')
     

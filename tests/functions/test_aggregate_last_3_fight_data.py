@@ -26,7 +26,7 @@ def test_aggregate_last_3_fight_data():
     prefix = 'last_3_'
 
     # Call the function
-    result_df = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 3)
+    result_df = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 3, per_minute_bayes = False)
     
     assert result_df[['fighter_id', 'date', 'last_3_stat1', 'last_3_stat2']].equals(aggregate_last_3_fight_data_correct) == True
     

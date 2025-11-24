@@ -7,7 +7,7 @@ switch_fighters_with_odds: False
 
 # This sets whether the fighters should be randomly switched before models are fit
 # Note that if this is true it effectively undoes the switch with odds
-switch_fighters_randomly: True
+switch_fighters_randomly: False
 
 # Set whether to exclude split decisions and other from training data (this won't be applied to test data)
 # split_or_other_exclude: False # Now a variable hyperparameter in hyperopt
@@ -34,7 +34,7 @@ open_odds_only: False
 odds_to_use: betfair_exch_odds
 
 # Set whether to trim model features to try to remove duplicated similar but slightly different features. Just keep the highest importance version
-trim_model_features: False
+# trim_model_features: False # Is a hyperparameter now
 
 # Set whether to use bootstrapping and bagging on the training data, or just use the training dataset. If enabled, the model will take the subsample and increase the sample size back to the original dataset through bootstrapping
 xgb_forest_bagging: True
@@ -43,4 +43,7 @@ xgb_forest_bagging: True
 # To asign a flat % probability, input a dictionary such as {'flat_prob': 0.01}. 
 # To not use any, input Null.
 # e.g.s Null or ['notformodel_lw_base_margin', {'flat_prob': 0.0183}, 'notformodel_wl_base_margin'] 
-base_margin_cols: Null # ['notformodel_lw_base_margin', {'flat_prob': 0.02}, 'notformodel_wl_base_margin'] 
+base_margin_cols: Null # ['notformodel_lw_base_margin', {'flat_prob': 0.05}, 'notformodel_wl_base_margin'] 
+
+# Set whether each individual XGBoost model in the forest should have Platt calibration applied based on the validation sample (not the test or OOT sample)
+calibrate_models: False

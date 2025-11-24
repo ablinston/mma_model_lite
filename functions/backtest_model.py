@@ -55,7 +55,7 @@ def backtest_model(
     
     # pdb.set_trace()
     
-    breakdown_cols = ['bet_ev_band', 'Predict_to_win'] + breakdown_columns.copy()
+    breakdown_cols = ['bet_ev_band', 'Predict_to_win', 'Fighter_to_win'] + breakdown_columns.copy()
     
     # Use the new function to summarise the model predictions and bet triggers
     actuals_data, wl_trigger, lw_trigger = summarise_model_predictions(actuals_data, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size, max_bet_size, return_triggers = True, point_in_time_only_odds = point_in_time_only_odds, target_ev_after_cutoff = target_ev_after_cutoff)

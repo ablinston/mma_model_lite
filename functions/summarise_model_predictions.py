@@ -58,8 +58,8 @@ def summarise_model_predictions(
     # col_min = np.round(np.floor(actuals_data['bet_ev'].min() / bucket_width) * bucket_width, 2)
     # col_max = np.round(np.ceil(actuals_data['bet_ev'].max() / bucket_width) * bucket_width, 2)
     actuals_data['bet_ev_band'] = pd.cut(actuals_data['bet_ev'],
-                                    bins=[0, 0.1, 0.2, np.inf],
-                                    labels=['0 - 0.1', '0.1 - 0.2', '0.2+'])
+                                    bins=[0, 0.05, 0.1, 0.2, np.inf],
+                                    labels=['0 - 0.05', '0.05 - 0.1', '0.1 - 0.2', '0.2+'])
     
     
     ## Determine the bet size. Begin with the minimum, then add on the confidence of the bet
@@ -118,6 +118,7 @@ def summarise_model_predictions(
                                              np.where((actuals_data['Fighter2_win_prob'] > actuals_data['Fighter1_win_prob']) & (actuals_data['fighter2_backtesting_odds'] > actuals_data['fighter1_backtesting_odds']),
                                              'Underdog to win',
                                              'Favourite to win'))
+    actuals_data['Fighter_to_win'] = np.where(actuals_data['Fighter1_win_prob'] > actuals_data['Fighter2_win_prob'], "Fighter 1 to win", "Fighter 2 to win")
     actuals_data['fighter1_target_exchange_odds'] = wl_target_odds_inc_commission
     actuals_data['fighter2_target_exchange_odds'] = lw_target_odds_inc_commission
     

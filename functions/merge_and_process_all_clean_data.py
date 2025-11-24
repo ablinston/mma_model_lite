@@ -66,6 +66,12 @@ def merge_and_process_all_clean_data(
 
     # Calculate the historical stats of each fighter at the fight date
     fight_stats = fight_stats.sort_values(by=['fighter', 'date'], axis = 0)
+    
+    # Create subs attempted and landed versions
+    fight_stats.columns = fight_stats.columns.str.replace('_sub.att', '_sub_attempt')
+    
+    # Get submission success
+    fight_stats = add_submissions_landed(fight_stats, fight_results)
 
     # Copy the fight stats but for against a fighter, then merge onto stats
     fight_stats_against = fight_stats.copy()
@@ -73,7 +79,6 @@ def merge_and_process_all_clean_data(
     fight_stats_against.rename(columns = lambda x: x + "_against" if "landed" in x else x, inplace = True)
     fight_stats_against.rename(columns = lambda x: x + "_against" if "ctrl_minutes" in x else x, inplace = True)
     fight_stats_against.rename(columns = lambda x: x + "_against" if "kd" in x else x, inplace = True)
-    fight_stats_against.rename(columns = lambda x: x + "_against" if "sub.att" in x else x, inplace = True)
 
     # Split the bout into fighters
     # Set the opponent to the fighter for merging
@@ -98,16 +103,29 @@ def merge_and_process_all_clean_data(
     ###########################################################################################
     # Get the columns of stats
     
-    if data_processing_config['add_bayes_stats_columns']:
+    if data_processing_config['add_bayes_percentage_columns'] or data_processing_config['add_bayes_per_minute_columns']:
         
         # FIrst calculate the Bayesian priors that will be used for Bayesian smoothing
         fight_stats_bayes_priors = bayesian_priors(
             fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
-            id_cols = ['event', 'bout', 'fighter'], 
+            id_cols = ['event', 'bout', 'fighter', 'date'], 
             group_by = data_processing_config['bayesian_groupby'], 
             fight_span = data_processing_config['bayes_fightspan'],
             ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
         )
+        
+        # Use constant Bayesian priors if required
+        if data_processing_config['constant_bayes_priors'] == True:
+            
+            # Get the single row for constant bayes using the max date
+            max_date = fight_stats_bayes_priors[fight_stats_bayes_priors['date'] < pd.to_datetime(data_processing_config['constant_bayes_priors_date'])]['date'].max()
+            constant_bayes = fight_stats_bayes_priors[fight_stats_bayes_priors['date'] == max_date].head(1)
+            
+            # Now set these as the bayes stats for everyone
+            fight_stats_bayes_priors = fight_stats_bayes_priors[['event', 'bout']].merge(
+                constant_bayes.drop(columns = ['event', 'bout', 'date']), how = 'cross')
+        else:
+            fight_stats_bayes_priors.drop(columns = ['date'], inplace = True)
         
     else:
         fight_stats_bayes_priors = None
@@ -119,6 +137,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter'],
         prefix = "hist_",
         X = 100,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -139,15 +158,33 @@ def merge_and_process_all_clean_data(
     ###########################################################################################
     # ADJUSTED STATISTICS
     
-    if data_processing_config['add_bayes_stats_columns'] and data_processing_config['add_adj_bayes_columns']:
+    if data_processing_config['add_bayes_per_minute_columns'] and data_processing_config['add_adj_per_minute_bayes_columns']:
+        
         fight_stats_bayes = calculate_per_minute_bayesian_stats(fight_stats, fight_stats_bayes_priors, excluded_strings = ['percent', 'fight_length', 'fight_minute', 'ratio', 'per_minute'], bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute'])
         
         # Adding on adjusted stats to the fight stats
-        fight_stats_plus_adj = add_adjusted_bayes_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'])
+        fight_stats_plus_adj = add_adjusted_stats(fight_stats_bayes, fight_stats_hist, columns_with = ['per_minute_bayes'], exclude_columns_with = [])
         
         # Replace the fight stats with one with the adj but remove all the extra bayes info (will be added by aggregation later)
         fight_stats = fight_stats_plus_adj[[col for col in fight_stats_plus_adj if 'bayes' not in col or ('bayes' in col and 'adj' in col)]]
     
+    if data_processing_config['add_adj_per_minute_columns']:
+        fight_stats = add_adjusted_stats(fight_stats, fight_stats_hist, columns_with = ['per_minute'], exclude_columns_with = ['bayes'])
+    
+    
+    ###########################################################################################
+    # Calculate accuracy percentages
+    
+    fight_stats = calculate_adjusted_percentages(
+            fight_stats, 
+            fight_stats_hist, 
+            fight_stats_bayes_priors,
+            data_processing_config)
+    
+    # Only keep the adj percentage columns. We don't want to aggregate the rest, just calc later from agg counts
+    fight_stats = fight_stats[[col for col in fight_stats.columns if not ('accuracy_percent' in col and '_adj' not in col)]]
+    
+    ###########################################################################################
     # Reaggregate the data
     fight_stats_hist = aggregate_last_X_fight_data(
         fight_stats,
@@ -155,6 +192,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter'],
         prefix = "hist_",
         X = 100,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -176,6 +214,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter'],
         prefix = "hist_last_3_fights_",
         X = 3,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -198,6 +237,7 @@ def merge_and_process_all_clean_data(
     #     group_by = ['fighter'],
     #     prefix = "hist_last_2_fights_",
     #     X = 2,
+    # per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
     #     per_minute_calc = True, 
     #     bayes_priors_df = fight_stats_bayes_priors,
     #     bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -209,6 +249,7 @@ def merge_and_process_all_clean_data(
     #     group_by = ['fighter'],
     #     prefix = "hist_last_1_fights_",
     #     X = 1,
+    # per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
     #     per_minute_calc = True, 
     #     bayes_priors_df = fight_stats_bayes_priors,
     #     bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -231,6 +272,8 @@ def merge_and_process_all_clean_data(
     stop_if_not(
         len(fight_stats) == len(fight_stats_hist_opponent_stance) == len(fight_stats_hist_last_3),
         "All hist stats data length check")
+
+    
 
 
     ###########################################################################################
@@ -309,6 +352,7 @@ def merge_and_process_all_clean_data(
         group_by = ['fighter', 'opponent_type'],
         prefix = 'hist_opp_type_',
         X = 100,
+        per_minute_bayes = data_processing_config['add_bayes_per_minute_columns'],
         per_minute_calc = True, 
         bayes_priors_df = fight_stats_bayes_priors,
         bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
@@ -495,10 +539,16 @@ def merge_and_process_all_clean_data(
     odds_qa_df.to_csv('./data/qa_merged_betfair_odds_out_of_sync.csv')   
                 
     ###########################################################################################
-    # PERCENTAGE CALCULATIONS
-
-    merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_percent'])
-
+    # PERCENTAGE CALCULATIONS - MOVED TO BEFORE MERGE
+    
+    if data_processing_config['add_bayes_percentage_columns']:
+        merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_percent'])
+        
+        # # Calculate bayes adj accuracy if required
+        # if data_processing_config['add_adj_percentage_bayes_columns']:
+        #     merged_data = add_()
+    else:
+        merged_data = calculate_percentages(merged_data, fight_stats_bayes_priors = None, bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_percent'])
 
     ###########################################################################################
     # RATIO CALCULATIONS
@@ -599,17 +649,17 @@ def merge_and_process_all_clean_data(
         # Strikes per TD attempt
         merged_data[fighter + '_sig.str._per_td_attempt'] = merged_data[fighter + '_hist_allrounds_sig.str._attempt'] / merged_data[fighter + '_hist_allrounds_td_attempt']
         # Strikes per sub attempt
-        merged_data[fighter + '_sig.str.per_sub.att'] = merged_data[fighter + '_hist_allrounds_sig.str._attempt'] / merged_data[fighter + '_hist_allrounds_sub.att']
+        merged_data[fighter + '_sig.str.per_sub_attempt'] = merged_data[fighter + '_hist_allrounds_sig.str._attempt'] / merged_data[fighter + '_hist_allrounds_sub_attempt']
         # Knockdowns per strike landed
         merged_data[fighter + '_kd_per_sig.str._landed'] = merged_data[fighter + '_hist_allrounds_kd'] / merged_data[fighter + '_hist_allrounds_sig.str._landed']
         # Sub attempt per td
-        merged_data[fighter + '_sub.att.per_td_landed'] = merged_data[fighter + '_hist_allrounds_sub.att'] / merged_data[fighter + '_hist_allrounds_td_landed']
+        merged_data[fighter + '_sub_attempt.per_td_landed'] = merged_data[fighter + '_hist_allrounds_sub_attempt'] / merged_data[fighter + '_hist_allrounds_td_landed']
             
         # Subs per attempt
-        merged_data[fighter + '_subs_per_attempt'] = merged_data[fighter + '_hist_wins_Submission'] / merged_data[fighter + '_hist_allrounds_sub.att']
+        merged_data[fighter + '_subs_per_attempt'] = merged_data[fighter + '_hist_wins_Submission'] / merged_data[fighter + '_hist_allrounds_sub_attempt']
         
         # Recode Infs as missing, because could give misleading results
-        new_columns = [fighter + '_sig.str._per_td_attempt', fighter + '_sig.str.per_sub.att', fighter + '_kd_per_sig.str._landed', fighter + '_sub.att.per_td_landed', fighter + '_subs_per_attempt']
+        new_columns = [fighter + '_sig.str._per_td_attempt', fighter + '_sig.str.per_sub_attempt', fighter + '_kd_per_sig.str._landed', fighter + '_sub_attempt.per_td_landed', fighter + '_subs_per_attempt']
         
         merged_data[new_columns] = merged_data[new_columns].fillna(-np.inf)
         # merged_data[new_columns] = merged_data[new_columns].replace([-np.inf, np.inf], np.nans)

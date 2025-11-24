@@ -1,8 +1,8 @@
 # This script fits XGBoost models to the final data
 
 import gc
-import h2o
-from h2o.automl import H2OAutoML
+# import h2o
+# from h2o.automl import H2OAutoML
 from hyperopt import hp, STATUS_OK, tpe, fmin, rand, Trials # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
 from hyperopt.early_stop import no_progress_loss
@@ -75,6 +75,9 @@ columns_in_order = var_importance['Feature'].tolist()
 # Get rid of the last X results
 columns_in_order = [col for col in columns_in_order if not ('_last_' in col and '_results' in col)]
 
+# Remove adjsum columns that don't make as much sense
+columns_in_order = [col for col in columns_in_order if not (('_adjsum' in col))] # or ('_adj' in col and '_minus' in col))]
+
 # Add on other columns needed
 columns_in_order = columns_in_order + [col for col in X_train_master.columns if 'notformodel' in col and col not in columns_in_order]
     
@@ -101,6 +104,9 @@ columns_in_order += ['fighter1_backtesting_odds', 'fighter2_backtesting_odds']
 # Remove any duplicates
 columns_in_order = pd.Series(columns_in_order).drop_duplicates().tolist()
 
+# Remove any columns not in the data
+columns_in_order = [col for col in columns_in_order if col in X_train_master.columns]
+
 # Select only the needed columns without duplicates
 X_train_master = X_train_master.loc[:, ~X_train_master.columns.duplicated()].copy()[columns_in_order]
 
@@ -113,7 +119,7 @@ X_train = None
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('fights_gt2_post_data_fix_v3')
+mlflow.set_experiment('fights_gt2_post_data_fix_v20')
 
 
 ##########################################################################################
@@ -124,17 +130,17 @@ trials = Trials()
 
 space = {
     # Set the feature objective params
-    'max_evals': 500,
-    'num_of_features': hp.choice('num_of_features', [i for i in range(250, 350, 10)]), # , 1000, 2000, len(X_train_master)]),
+    'max_evals': 150,
+    'num_of_features': hp.choice('num_of_features', [i for i in range(30, 700, 10)]), # , 1000, 2000, len(X_train_master)]),
     'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
-    'hyperopt_early_stopping': 35
+    'hyperopt_early_stopping': 15
 }
 
 # Set the hyperopt parameters for the inner optimisation
 params_inner = {
      'nthread': 3, # Only applies to CPU cores
      'learning_rate': hp.uniform('learning_rate', 0.002, 0.2), # Learning rate #  0.01-0.2 is considered low-moderate learning rates
-     'min_child_weight': 15, # hp.quniform('min_child_weight', 8, 21, 1), # The min observations that should be left in a leaf node    
+     'min_child_weight': hp.quniform('min_child_weight', 8, 21, 1), # The min observations that should be left in a leaf node    
      'subsample': 0.85,
      'colsample_bytree': hp.quniform('colsample_bytree', 0.01, 0.4, 0.01),
      'max_depth': hp.quniform('max_depth', 1, 8, 1),
@@ -148,13 +154,13 @@ params_inner = {
      'num_class': no_of_classes,
      'random_state': config['seed_all'] + 39,
      'num_iterations': 5000,
-     'early_stopping_rounds': 30,
-     # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # Lasso regularisation
-     # 'reg_lambda': hp.uniform('reg_lambda', 0, 3), # ridge regularisation
+     'early_stopping_rounds': 10,
+     # 'reg_alpha': hp.uniform('reg_alpha', 0, 1), # L1 regularisation
+     # 'reg_lambda': hp.uniform('reg_lambda', 0, 5), # L2 regularisation
      'gamma': hp.uniform('gamma', 0, 10), # controls when the nodes have a sufficient enough split
      'exclude_split_other_from_train': True, # hp.choice('exclude_split_other_from_train', [True, False]),  # Almost all best trials end up with this as True
      'switch_all_fighters_and_stack': model_hyper_params['switch_all_fighters_and_stack'],
-     'win_loss_only': False, # hp.choice('win_loss_only', [True, False]), # Almost all best trials end up with this as True
+     'win_loss_only': True, # hp.choice('win_loss_only', [True, False]), # Almost all best trials end up with this as True
      'loss_function' : model_hyper_params['loss_function'],
      'trim_model_features': True, # hp.choice('trim_model_features', [True, False]),
      'base_margin_cols': model_hyper_params['base_margin_cols'] 
@@ -163,15 +169,32 @@ params_inner = {
 best = fmin(fn = objective_xgboost_features_mlflow,
             space = space,
             algo = atpe_suggest,
-            max_evals = 20,
+            max_evals = 100,
             trials = trials)
 
 
 
+# Find more accurate parameters
+trials = Trials()
+
+space = {
+    # Set the feature objective params
+    'max_evals': 1000,
+    'num_of_features': hp.choice('num_of_features', [171]), # , 1000, 2000, len(X_train_master)]),
+    'split_dec_or_other': False, # model_hyper_params['split_or_other_exclude'], # Want it to be in the test data for cross validation regardless
+    'hyperopt_early_stopping': 50
+}
+
+best = fmin(fn = objective_xgboost_features_mlflow,
+            space = space,
+            algo = atpe_suggest,
+            max_evals = 1,
+            trials = trials)
+
 # # Output the feature set if we want to use it for the model
 # X_train.columns.to_series().to_csv('./results/2014+_feature_set_6.csv', index = False)
 # Convert column names to a list
-column_names = X_train_master.columns.tolist()[0:340]
+column_names = X_train_master.columns.tolist()[0:170]
 
 # Ensure that both fighter1 and fighter2 versions of columns are in there
 column_names = column_names + list_swap_fighter1_fighter2(column_names)
@@ -181,4 +204,4 @@ if trim_model_features:
 
 # Save to a YAML file
 with open('./configs/final_model_features.yaml', 'w') as file:
-    dump(list(set(column_names)), file, default_flow_style=False)
+    dump(pd.Series(column_names).unique().tolist(), file, default_flow_style=False)

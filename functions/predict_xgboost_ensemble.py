@@ -16,6 +16,11 @@ def predict_xgboost_ensemble(models, X_test_df, y_test_df = None, model_hyper_pa
     
     # Collect predictions from each model
     model_predictions = []
+    
+    # Check if columns need to be renamed
+    if any('_sub.att' in feature for feature in models[0]['features']):
+        X_test_df.columns = X_test_df.columns.str.replace('_sub_attempt', '_sub.att')
+    
     for model in models:
         
         # Clean the test features
@@ -24,10 +29,21 @@ def predict_xgboost_ensemble(models, X_test_df, y_test_df = None, model_hyper_pa
         # Get base margin
         base_margin_test = get_base_margin(X_test_df, model_hyper_params['base_margin_cols'])
         
-        # Create the DMatrix for predictions
-        dmatrix_test = xgb.DMatrix(X_test_df[model['model'].feature_names], label = y_test_df, base_margin = base_margin_test)
+        # Check if this is a calibration model
+       
+        if 'calibrated' not in model.keys():
+            model['calibrated'] = False
         
-        preds = model['model'].predict(dmatrix_test)
+        # Get model predictions depending if a calibrated model or not
+        if model['calibrated'] == True:
+            preds = model['model'].predict_proba(X_test_df[model['features']])
+        
+        else:
+            # Create the DMatrix for predictions
+            dmatrix_test = xgb.DMatrix(X_test_df[model['model'].feature_names], label = y_test_df, base_margin = base_margin_test)
+            
+            preds = model['model'].predict(dmatrix_test)
+            
         model_predictions.append(preds)
         
     # pdb.set_trace()

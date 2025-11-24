@@ -54,7 +54,8 @@ def test_calculate_hist_opp_stance_stats():
     # Priors (not used in mock, but passed through)
     fight_stats_bayes_priors = bayesian_priors(fight_stats, id_cols, group_by, fight_span, ignore_last_n_fights = 1)
 
-    data_processing_config = {"bayes_alpha_plus_beta_rebase_per_minute": 10}
+    data_processing_config = {"bayes_alpha_plus_beta_rebase_per_minute": 10,
+                              "add_bayes_per_minute_columns": True}
 
     # Run function
     result = calculate_hist_opp_stance_stats(

@@ -13,16 +13,25 @@ def log_shap_values_mlflow(xgb_forest, data):
 
     for model in xgb_forest:
         
+        if 'calibrated' not in model.keys():
+            model['calibrated'] = False
+            
+        # Get the booster from the model
+        if model['calibrated'] == True:
+            xgb_model = model['xgb_model'].get_booster()
+        else:
+            xgb_model = model['model']
+            
         # Create the DMatrix for predictions
-        dmatrix_test = xgb.DMatrix(X_test_df[model['model'].feature_names], label = [0] * len(X_test_df))
+        dmatrix_test = xgb.DMatrix(X_test_df[model['features']], label = [0] * len(X_test_df))
         
         # Calculate shap values and add them to list
-        shap_values = model['model'].predict(dmatrix_test, pred_contribs=True)
+        shap_values = xgb_model.predict(dmatrix_test, pred_contribs=True)
         
         # Create a df from it
         shap_df = pd.DataFrame(
             shap_values[:, 0, :],
-            columns=list(model['model'].feature_names) + ["bias"]
+            columns=list(model['features']) + ["bias"]
         )
         
         shap_values_list.append(shap_df)

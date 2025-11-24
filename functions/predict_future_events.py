@@ -11,6 +11,7 @@ def predict_future_events(
         betfair_login_config,
         test_fighters,
         output_path = None,
+        skip_data_scrape = False
         ):
     
     """
@@ -46,11 +47,12 @@ def predict_future_events(
 
     if not skip_data_update:
         
-        # Run these scripts to scrape then clean the raw data
-        scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
-        clean_all_raw_data_and_save(config)
+        if not skip_data_scrape:
+            # Run these scripts to scrape then clean the raw data
+            scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
+            clean_all_raw_data_and_save(config)
         
-        gc.collect();
+            gc.collect();
         
         # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
         if skip_full_data_update:

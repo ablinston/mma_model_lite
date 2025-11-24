@@ -3,11 +3,12 @@ import sys
 import os
 
 if os.name == "nt":
-    sys.path.append('E:/Repos/custom_tools')
+    sys.path.append('X:/Repos/custom_tools')
 else:
     sys.path.append('/home/andy/Repos/custom_tools')
 
 from model_tools.k_fold_id_by_runner import k_fold_id_by_runner
+from model_tools.TemperatureScaler import TemperatureScaler
 from scraping_tools.get_website_soup import get_website_soup
 # from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
 
@@ -35,7 +36,7 @@ import itertools
 import joblib
 import mlflow
 # import mlflow.pyfunc
-from numba import njit
+# from numba import njit
 import numpy as np
 from os import listdir, makedirs
 from os import path
@@ -60,7 +61,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 import shutil
 # from sklearn.utils import resample
-from sklearn.calibration import calibration_curve
+from sklearn.calibration import calibration_curve, CalibratedClassifierCV
 from sklearn.metrics import log_loss, accuracy_score, f1_score, roc_auc_score
 from sklearn.preprocessing import LabelEncoder, label_binarize, OrdinalEncoder
 import string

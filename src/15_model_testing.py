@@ -1,15 +1,16 @@
 # This script fits XGBoost models to the final data
 
 import gc
-import h2o
-from h2o.automl import H2OAutoML
+# import h2o
+# from h2o.automl import H2OAutoML
 from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
 import itertools
-import lightgbm as lgb
+# import lightgbm as lgb
 import matplotlib.pyplot as plt
 import mlflow
 import pickle
+import shap
 from sklearn.model_selection import train_test_split, KFold
 import seaborn as sns
 import xgboost as xgb
@@ -19,10 +20,10 @@ exec(open('global.py').read())
 
 # Set the model location
 model_path = './results/final_xgboost_forest.joblib'
-# model_path = './models/xgb_forest_v3.0.10.joblib'
 
+# model_path = './models/xgb_forest_v4.0.14.joblib'
 # # Set the version number to be used in outputs
-# new_version_number = ''
+# new_version_number = '4.0.14'
 
 # Read in the data for training
 backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -79,12 +80,16 @@ backtesting_data['favourite'] = np.where(
 ### Data prep for model ###
 ##########################################################################################
 
+# Rename columns if needed
+if 'v3' in model_path:
+    backtesting_data.columns = backtesting_data.columns.str.replace('_sub_attempt', '_sub.att')
+
 # Prep the data ready for model training as it was done in the overall model training
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data)
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('OOT_testing_v3')
+mlflow.set_experiment('OOT_testing_v5')
 
 # Set this model's description for MLflow
 model_description = 'XGB forest v' + new_version_number + ', ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(rf_xgb_model[0]['features'])) + ' features ' + str(config['test_proportion']) + ' test size'
@@ -112,8 +117,8 @@ for backtesting_params in [
         # }
         # # ,
         {
-            'min_prob_to_bet': 0.49,
-            'min_ev_to_bet': 0.0,
+            'min_prob_to_bet': 0.485,
+            'min_ev_to_bet': 0.01,
             'max_bet_size': 100,
             'min_bet_size': 100,
             'constant_bets': True,
@@ -141,8 +146,8 @@ for backtesting_params in [
             backtesting_params = backtesting_params)
         
         # Log the model as an artifact so we have a record of it
-        # mlflow.log_artifact(model_path, 'Model_object')
-        mlflow.pyfunc.log_model(artifact_path="Model", python_model = custom_xgboost_model(), artifacts={"model": model_path})
+        mlflow.log_artifact(model_path, 'Model_object')
+        # mlflow.pyfunc.log_model(name = "Model", python_model = custom_xgboost_model(), artifacts={"model": model_path})
         
         # Save the run id for if we want to register the model
         run_id = run.info.run_id
@@ -199,7 +204,6 @@ for backtesting_params in [
         mlflow.set_tag('Sample', 'OOT')
         
     mlflow.end_run()
-
 
 # # If the model is good, then log it in the registery
 # if model_approved:

@@ -1,12 +1,12 @@
 # This script fits XGBoost models to the future events data after refreshing data scrape
 
 import gc
-import h2o
-from h2o.automl import H2OAutoML
+# import h2o
+# from h2o.automl import H2OAutoML
 from hyperopt import hp, STATUS_OK, tpe, fmin, Trials # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
 import itertools
-import lightgbm as lgb
+# import lightgbm as lgb
 import matplotlib.pyplot as plt
 import mlflow
 import pickle
