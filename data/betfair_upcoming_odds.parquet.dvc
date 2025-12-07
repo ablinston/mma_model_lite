@@ -1,5 +1,5 @@
 outs:
-- md5: eed2736c548ed76720519b5d54a47f65
-  size: 2826
+- md5: ea4471aa63c0958807438bbef5853e1e
+  size: 2359
   hash: md5
   path: betfair_upcoming_odds.parquet
