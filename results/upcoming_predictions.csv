@@ -1,13 +1,13 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-12-13,ufcfightnight:royvalvskape,2025-12-07 14:01:10.108079+00:00,2025-12-07 14:01:10.108079+00:00,Giga Chikadze,2.9,28.5,-0.17,Kevin Vallejos,1.44,68.5,-0.01,None,0.0,,0.0,0.0,
-1,2025-12-13,ufcfightnight:royvalvskape,2025-12-07 14:01:10.108079+00:00,2025-12-07 14:01:10.108079+00:00,Melquizael Costa,1.83,66.0,0.21,Morgan Charriere,2.1,31.0,-0.35,Melquizael Costa,1.83,1.52,165.0,137.5,
-2,2025-12-13,ufcfightnight:royvalvskape,2025-12-07 14:01:10.108079+00:00,2025-12-07 14:01:10.108079+00:00,Joanderson Brito,1.5,64.1,-0.04,Melsik Baghdasaryan,2.75,32.8,-0.1,None,0.0,,0.0,0.0,
-3,2025-12-13,ufcfightnight:royvalvskape,2025-12-07 14:01:10.108079+00:00,2025-12-07 14:01:10.108079+00:00,Brandon Royval,3.05,32.7,-0.0,Manel Kape,1.42,64.3,-0.09,None,0.0,,0.0,0.0,
+0,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Giga Chikadze,3.75,21.8,-0.18,Kevin Vallejos,1.35,75.4,0.02,None,0.0,,0.0,0.0,
+1,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Melquizael Costa,1.8,66.8,0.2,Morgan Charriere,2.22,30.2,-0.33,Melquizael Costa,1.8,1.5,165.0,132.0,
+2,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Amanda Lemos,2.78,31.1,-0.14,Gillian Robertson,1.55,65.8,0.02,None,0.0,,0.0,0.0,
+3,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Brandon Royval,3.45,30.3,0.04,Manel Kape,1.4,66.7,-0.07,None,0.0,,0.0,0.0,
 1,2025-12-13,ufcfightnight:royvalvskape,,,Cesar Almeida,,,,Cezary Oleksiejczuk,,,,,,,,,Fights < 3
 3,2025-12-13,ufcfightnight:royvalvskape,,,Kennedy Nzechukwu,,,,Marcus Buchecha,,,,,,,,,Fights < 3
-4,2025-12-13,ufcfightnight:royvalvskape,,,Amanda Lemos,,,,Gillian Robertson,,,,,,,,,Womens
-5,2025-12-13,ufcfightnight:royvalvskape,,,Sean Sharaf,,,,Steven Asplund,,,,,,,,,Fights < 3
-6,2025-12-13,ufcfightnight:royvalvskape,,,Neil Magny,,,,Yaroslav Amosov,,,,,,,,,Fights < 3
-7,2025-12-13,ufcfightnight:royvalvskape,,,Melissa Croden,,,,Luana Santos,,,,,,,,,Womens
-8,2025-12-13,ufcfightnight:royvalvskape,,,Allen Frye Jr.,,,,Guilherme Pat,,,,,,,,,Missing odds
-9,2025-12-13,ufcfightnight:royvalvskape,,,Jamey-Lyn Horth,,,,Tereza Bleda,,,,,,,,,Womens
+4,2025-12-13,ufcfightnight:royvalvskape,,,King Green,,,,,,,,,,,,,Womens
+5,2025-12-13,ufcfightnight:royvalvskape,,,Sean Sharaf,,,,Steven Asplund,,,,,,,,,Womens
+6,2025-12-13,ufcfightnight:royvalvskape,,,Joanderson Brito,,,,,,,,,,,,,Fights < 3
+7,2025-12-13,ufcfightnight:royvalvskape,,,Neil Magny,,,,Yaroslav Amosov,,,,,,,,,Fights < 3
+8,2025-12-13,ufcfightnight:royvalvskape,,,Melissa Croden,,,,Luana Santos,,,,,,,,,Fights < 3
+9,2025-12-13,ufcfightnight:royvalvskape,,,Allen Frye Jr.,,,,Guilherme Pat,,,,,,,,,Womens
