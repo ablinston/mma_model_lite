@@ -1,13 +1,14 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Giga Chikadze,3.75,21.8,-0.18,Kevin Vallejos,1.35,75.4,0.02,None,0.0,,0.0,0.0,
-1,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Melquizael Costa,1.8,66.8,0.2,Morgan Charriere,2.22,30.2,-0.33,Melquizael Costa,1.8,1.5,165.0,132.0,
-2,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Amanda Lemos,2.78,31.1,-0.14,Gillian Robertson,1.55,65.8,0.02,None,0.0,,0.0,0.0,
-3,2025-12-13,ufcfightnight:royvalvskape,2025-12-13 14:01:03.424,2025-12-13 14:01:03.424,Brandon Royval,3.45,30.3,0.04,Manel Kape,1.4,66.7,-0.07,None,0.0,,0.0,0.0,
-1,2025-12-13,ufcfightnight:royvalvskape,,,Cesar Almeida,,,,Cezary Oleksiejczuk,,,,,,,,,Fights < 3
-3,2025-12-13,ufcfightnight:royvalvskape,,,Kennedy Nzechukwu,,,,Marcus Buchecha,,,,,,,,,Fights < 3
-4,2025-12-13,ufcfightnight:royvalvskape,,,King Green,,,,,,,,,,,,,Womens
-5,2025-12-13,ufcfightnight:royvalvskape,,,Sean Sharaf,,,,Steven Asplund,,,,,,,,,Womens
-6,2025-12-13,ufcfightnight:royvalvskape,,,Joanderson Brito,,,,,,,,,,,,,Fights < 3
-7,2025-12-13,ufcfightnight:royvalvskape,,,Neil Magny,,,,Yaroslav Amosov,,,,,,,,,Fights < 3
-8,2025-12-13,ufcfightnight:royvalvskape,,,Melissa Croden,,,,Luana Santos,,,,,,,,,Fights < 3
-9,2025-12-13,ufcfightnight:royvalvskape,,,Allen Frye Jr.,,,,Guilherme Pat,,,,,,,,,Womens
+0,2026-01-24,ufc324:gaethjevspimblett,None,2025-12-14 14:01:07.590300+00:00,Sean O'Malley,1.66,62.1,0.03,Song Yadong,2.52,34.8,-0.12,None,0.0,,0.0,0.0,
+1,2026-01-24,ufc324:gaethjevspimblett,2025-12-14 14:01:07.590300+00:00,2025-12-14 14:01:07.590300+00:00,Waldo Cortes-Acosta,1.43,82.9,0.19,Derrick Lewis,3.35,14.8,-0.51,Waldo Cortes-Acosta,1.43,1.21,165.0,71.74,
+2,2026-01-24,ufc324:gaethjevspimblett,2025-12-14 14:01:07.590300+00:00,2025-12-14 14:01:07.590300+00:00,Arnold Allen,2.85,28.4,-0.19,Jean Silva,1.51,68.5,0.04,None,0.0,,0.0,0.0,
+3,2026-01-24,ufc324:gaethjevspimblett,2025-12-14 14:01:23.449,2025-12-14 14:01:23.449,Justin Gaethje,2.42,37.7,-0.09,Paddy Pimblett,1.5,59.2,-0.11,None,0.0,,0.0,0.0,
+0,2026-01-24,ufc324:gaethjevspimblett,,,Kayla Harrison,,,,Amanda Nunes,,,,,,,,,Womens
+4,2026-01-24,ufc324:gaethjevspimblett,,,Natalia Silva,,,,Rose Namajunas,,,,,,,,,Womens
+5,2026-01-24,ufc324:gaethjevspimblett,,,Michael Johnson,,,,Alexander Hernandez,,,,,,,,,Missing odds
+6,2026-01-24,ufc324:gaethjevspimblett,,,Ateba Gautier,,,,Andrey Pulyaev,,,,,,,,,Missing odds
+7,2026-01-24,ufc324:gaethjevspimblett,,,Nikita Krylov,,,,Modestas Bukauskas,,,,,,,,,Missing odds
+8,2026-01-24,ufc324:gaethjevspimblett,,,Alex Perez,,,,Charles Johnson,,,,,,,,,Missing odds
+9,2026-01-24,ufc324:gaethjevspimblett,,,Josh Hokit,,,,Denzel Freeman,,,,,,,,,Missing odds
+10,2026-01-24,ufc324:gaethjevspimblett,,,Ricky Turcios,,,,Cameron Smotherman,,,,,,,,,Missing odds
+11,2026-01-24,ufc324:gaethjevspimblett,,,Umar Nurmagomedov,,,,Deiveson Figueiredo,,,,,,,,,Missing odds
