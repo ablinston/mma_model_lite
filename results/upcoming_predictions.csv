@@ -1,15 +1,14 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_breakeven_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Belal Muhammad,3.5,24.4,-0.15,Ian Machado Garry,1.39,72.5,0.01,None,0.0,,0.0,0.0,
-1,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Volkan Oezdemir,1.46,71.5,0.04,Alonzo Menifield,3.05,25.8,-0.21,None,0.0,,0.0,0.0,
-2,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Jack Hermansson,2.84,37.1,0.05,Myktybek Orolbai,1.53,59.8,-0.08,None,0.0,,0.0,0.0,
-3,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Waldo Cortes-Acosta,1.69,72.3,0.22,Shamil Gaziev,2.26,24.9,-0.44,Waldo Cortes-Acosta,1.69,1.38,165.0,113.85,
-4,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Tagir Ulanbekov,1.49,76.0,0.13,Kyoji Horiguchi,2.98,21.4,-0.36,Tagir Ulanbekov,1.49,1.32,165.0,80.85,
-5,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Alex Perez,2.84,34.2,-0.03,Asu Almabayev,1.52,62.6,-0.05,None,0.0,,0.0,0.0,
-6,2025-11-22,ufcfightnight:tsarukyanvshooker,2025-11-22 11:06:59.106,2025-11-22 11:06:59.106,Arman Tsarukyan,1.17,88.3,0.03,Dan Hooker,6.4,9.6,-0.39,None,0.0,,0.0,0.0,
-5,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Bogdan Grad,,,,Luke Riley,,,,,,,,,Fights < 3
-6,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Abdul-Rakhman Yakhyaev,,,,,,,,,,,,,Fights < 3
-8,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Bekzat Almakhan,,,,Aleksandre Topuria,,,,,,,,,Fights < 3
-9,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Ismail Naurdiev,,,,Ryan Loder,,,,,,,,,Fights < 3
-10,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Nurullo Aliev,,,,,,,,,,,,,Fights < 3
-11,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Marek Bujlo,,,,Denzel Freeman,,,,,,,,,Fights < 3
-12,2025-11-22,ufcfightnight:tsarukyanvshooker,,,Nicolas Dalby,,,,Saygid Izagakhmaev,,,,,,,,,Fights < 3
+0,2026-01-24,ufc324:gaethjevspimblett,None,2025-12-14 14:01:07.590300+00:00,Sean O'Malley,1.66,62.1,0.03,Song Yadong,2.52,34.8,-0.12,None,0.0,,0.0,0.0,
+1,2026-01-24,ufc324:gaethjevspimblett,2025-12-14 14:01:07.590300+00:00,2025-12-14 14:01:07.590300+00:00,Waldo Cortes-Acosta,1.43,82.9,0.19,Derrick Lewis,3.35,14.8,-0.51,Waldo Cortes-Acosta,1.43,1.21,165.0,71.74,
+2,2026-01-24,ufc324:gaethjevspimblett,2025-12-14 14:01:07.590300+00:00,2025-12-14 14:01:07.590300+00:00,Arnold Allen,2.85,28.4,-0.19,Jean Silva,1.51,68.5,0.04,None,0.0,,0.0,0.0,
+3,2026-01-24,ufc324:gaethjevspimblett,2025-12-14 14:01:23.449,2025-12-14 14:01:23.449,Justin Gaethje,2.42,37.7,-0.09,Paddy Pimblett,1.5,59.2,-0.11,None,0.0,,0.0,0.0,
+0,2026-01-24,ufc324:gaethjevspimblett,,,Kayla Harrison,,,,Amanda Nunes,,,,,,,,,Womens
+4,2026-01-24,ufc324:gaethjevspimblett,,,Natalia Silva,,,,Rose Namajunas,,,,,,,,,Womens
+5,2026-01-24,ufc324:gaethjevspimblett,,,Michael Johnson,,,,Alexander Hernandez,,,,,,,,,Missing odds
+6,2026-01-24,ufc324:gaethjevspimblett,,,Ateba Gautier,,,,Andrey Pulyaev,,,,,,,,,Missing odds
+7,2026-01-24,ufc324:gaethjevspimblett,,,Nikita Krylov,,,,Modestas Bukauskas,,,,,,,,,Missing odds
+8,2026-01-24,ufc324:gaethjevspimblett,,,Alex Perez,,,,Charles Johnson,,,,,,,,,Missing odds
+9,2026-01-24,ufc324:gaethjevspimblett,,,Josh Hokit,,,,Denzel Freeman,,,,,,,,,Missing odds
+10,2026-01-24,ufc324:gaethjevspimblett,,,Ricky Turcios,,,,Cameron Smotherman,,,,,,,,,Missing odds
+11,2026-01-24,ufc324:gaethjevspimblett,,,Umar Nurmagomedov,,,,Deiveson Figueiredo,,,,,,,,,Missing odds
