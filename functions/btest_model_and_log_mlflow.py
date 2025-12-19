@@ -116,7 +116,12 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
         if 'EV MSE' in breakdown_metrics and 'X Odds EV MSE' in breakdown_metrics:
             fig, ax = metric_chart(x = summary_df['group'], y_model = summary_df['EV MSE'], y_odds = summary_df['X Odds EV MSE'], x_label = 'Group', y_label = 'EV MSE')
             mlflow.log_figure(fig, col +  " metrics/ev_mse_chart.png")
-
+            
+        if 'Hmean WL only Accuracy' in breakdown_metrics and 'X Odds Hmean WL only Accuracy' in breakdown_metrics:
+            fig, ax = metric_chart(x = summary_df['group'], y_model = summary_df['Hmean WL only Accuracy'], y_odds = summary_df['X Odds Hmean WL only Accuracy'], x_label = 'Group', y_label = 'Hmean WL only Accuracy')
+            mlflow.log_figure(fig, col +  " metrics/accuracy_chart.png")
+            
+        # pdb.set_trace()
     
     # Finally, get the backtesting results
     backtesting, backtesting_fight_output = backtest_model(actuals_data, prediction_probabilities, breakdown_cols, **backtesting_params)
@@ -147,7 +152,17 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
     mlflow.log_artifact('results/temp/summary.csv', 'Backtesting results')
     backtesting_fight_output.to_csv('results/temp/fight_backtesting.csv', index = True)
     mlflow.log_artifact('results/temp/fight_backtesting.csv', 'Backtesting results')
- 
+    
+    # Chart profit and loss
+    cumulative_profit_loss = backtesting_fight_output[backtesting_fight_output['bets'] == 1]['profit_loss'].cumsum()
+    
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(pd.to_datetime(backtesting_fight_output[backtesting_fight_output['bets'] == 1]['date']).dt.date, cumulative_profit_loss)
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Cumulative Profit")
+    plt.xticks(rotation=90)
+    mlflow.log_figure(fig, "Backtesting results/Running_Cumulative_Profit_Loss.png")
+    
     # Log the total metrics in MLflow
     mlflow.log_params(backtesting_params)
     

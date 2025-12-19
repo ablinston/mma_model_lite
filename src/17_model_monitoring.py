@@ -33,7 +33,7 @@ mlflow.set_experiment('Model_Monitoring_v2')
 
 # Load all model versions
 rf_xgb_models = {}
-model_versions = [1, 2, '3.0.10']
+model_versions = ['4.0.14']
 
 for i in model_versions:
     rf_xgb_models.update({str(i): joblib.load('./models/xgb_forest_v' + str(i) + '.joblib')})
