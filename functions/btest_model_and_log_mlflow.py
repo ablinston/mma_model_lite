@@ -148,6 +148,16 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
     backtesting_fight_output.to_csv('results/temp/fight_backtesting.csv', index = True)
     mlflow.log_artifact('results/temp/fight_backtesting.csv', 'Backtesting results')
  
+    # Chart profit and loss
+    cumulative_profit_loss = backtesting_fight_output[backtesting_fight_output['bets'] == 1]['profit_loss'].cumsum()
+    
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(pd.to_datetime(backtesting_fight_output[backtesting_fight_output['bets'] == 1]['date']).dt.date, cumulative_profit_loss)
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Cumulative Profit")
+    plt.xticks(rotation=90)
+    mlflow.log_figure(fig, "Backtesting results/Running_Cumulative_Profit_Loss.png")   
+ 
     # Log the total metrics in MLflow
     mlflow.log_params(backtesting_params)
     
