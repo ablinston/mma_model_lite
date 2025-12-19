@@ -45,10 +45,10 @@ for i in model_versions:
 
 if not skip_data_update:
     
-    # Run these scripts to scrape then clean the raw data
-    # Run these scripts to scrape then clean the raw data
-    scrape_all_unparsed_data(True, config, betfair_login_config)
-    clean_all_raw_data_and_save(config)
+    # # Run these scripts to scrape then clean the raw data
+    # # Run these scripts to scrape then clean the raw data
+    # scrape_all_unparsed_data(True, config, betfair_login_config)
+    # clean_all_raw_data_and_save(config)
     
     # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
     if True: # unparsed_events: Hard coded this to always run because fights can change if fighters drop out and otherwise they wont have the hist stats
