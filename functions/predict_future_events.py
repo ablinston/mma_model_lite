@@ -130,7 +130,7 @@ def predict_future_events(
     upcoming_fights = add_formatted_fighter_names(upcoming_fights, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)
 
     gc.collect();
-
+    # pdb.set_trace()
     # Summarise the model predictions and betting decisions using the config
     betting_data = summarise_model_predictions(
         actuals_data_df = upcoming_fights_for_model, 
@@ -139,7 +139,8 @@ def predict_future_events(
         min_ev_to_bet = bet_config['min_ev_to_bet'], 
         min_bet_size = bet_config['min_bet_size'], 
         max_bet_size = bet_config['max_bet_size'],
-        exchange_commission = bet_config['exchange_commission'])
+        exchange_commission = bet_config['exchange_commission'],
+        target_ev_after_cutoff = bet_config['min_ev_to_bet'])
 
     # Add the final bet size based on balance
     if bet_config['constant_bets'] == False:
@@ -155,12 +156,14 @@ def predict_future_events(
     for col in [cols for cols in betting_data.columns if 'odds' in cols and 'datetime' not in cols]:
         betting_data.loc[:, col] = np.round(betting_data[col], 2)
 
-    betting_data.rename(columns = {'fighter1_notformodel_true_odds_asat_datetime': 'f1_scrape_date', 'fighter2_notformodel_true_odds_asat_datetime': 'f2_scrape_date'}, inplace = True)
+    betting_data.rename(columns = {'fighter1_notformodel_true_odds_asat_datetime': 'f1_scrape_date', 
+                                   'fighter2_notformodel_true_odds_asat_datetime': 'f2_scrape_date',
+                                   'Bet_target_exchange_odds': 'Bet_min_exchange_odds'}, inplace = True)
 
     # Flag whether odds Betfair imputed
     
 
-    summary_data = betting_data[['date', 'event', 'f1_scrape_date', 'f2_scrape_date', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_breakeven_odds', 'Final_bet', 'Potential_win']]
+    summary_data = betting_data[['date', 'event', 'f1_scrape_date', 'f2_scrape_date', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_min_exchange_odds', 'Final_bet', 'Potential_win']]
 
     # Add the fights that haven't been modelled along with exclusion reason for info
     summary_data = pd.concat([
@@ -186,7 +189,7 @@ def predict_future_events(
         print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}")
         print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
         print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
-        print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}")
+        print(f"Min bet exchange odds: {bets_to_place.iloc[i]['Bet_min_exchange_odds']:.2f}")
         print(f"Breakeven exchange odds: {bets_to_place.iloc[i]['Bet_breakeven_exchange_odds']:.2f}")
 
     # Output the results
