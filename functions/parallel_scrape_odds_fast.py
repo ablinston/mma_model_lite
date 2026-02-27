@@ -53,9 +53,11 @@ def parallel_scrape_odds_fast(
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--start-maximized")
+    options.add_argument('--no-first-run')
     
     if chrome_driver == '':
-        driver = uc.Chrome(options=options, headless=False)
+        options.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
+        driver = uc.Chrome(options=options, headless=False, browser_executable_path=options.binary_location)
     else:
         driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver)
     
