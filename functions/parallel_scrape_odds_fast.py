@@ -59,7 +59,7 @@ def parallel_scrape_odds_fast(
         options.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
         driver = uc.Chrome(options=options, headless=False, browser_executable_path=options.binary_location)
     else:
-        driver = uc.Chrome(options=options, headless=False)
+        driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver)
     
     driver.get("https://www.bestfightodds.com/")
     
