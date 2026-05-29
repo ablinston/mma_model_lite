@@ -21,7 +21,7 @@ def test_scrape_fighter_odds():
     if os.name != "nt":
         driver = uc.Chrome(options = options, headless = False, driver_executable_path = config['chrome_driver_location_pi'])
     else:
-        driver = uc.Chrome(options = options, headless = False)
+        driver = uc.Chrome(options = options, headless = False, browser_executable_path = 'C:\Program Files\Google\Chrome Beta\Application\chrome.exe')
 
     driver.get("https://www.bestfightodds.com")
     

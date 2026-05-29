@@ -12,10 +12,14 @@ def get_soup(url):
     soup = BeautifulSoup(page.content, 'html.parser')
     
     # If we didn't get a good result
-    if soup.find(string = 'Checking your browser…') == 'Checking your browser…':
-        if not os.name == 'nt':
-            soup = get_website_soup(url, fast = False, time_delay = True)
+    for attempt in range(0, 6):
+        
+        if soup.find(string = 'Checking your browser…') != 'Checking your browser…':
+            break
         else:
-            soup = get_website_soup(url, fast = False, chrome_binary = 'C:\Program Files\Google\Chrome Beta\Application\chrome.exe', time_delay = True)
+            if not os.name == 'nt':
+                soup = get_website_soup(url, fast = False, chrome_driver = './data/chrome_drivers/chromedriver_64ARM' ,time_delay = True)
+            else:
+                soup = get_website_soup(url, fast = False, time_delay = True)
         
     return soup
