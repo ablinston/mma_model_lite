@@ -9,8 +9,9 @@ def parse_fight_details_url(url, config):
     returns:
     a df of fight details
     """
+    
     if not os.name == 'nt':
-        soup = get_website_soup(url, fast = False, time_delay = True)
+        soup = get_website_soup(url, fast = False, chrome_driver = config['chrome_driver_location_pi'], time_delay = True)
     else:
         soup = get_website_soup(url, fast = False, chrome_binary = config['chrome_binary_location'], time_delay = True)
     
