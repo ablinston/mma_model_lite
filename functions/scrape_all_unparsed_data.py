@@ -328,7 +328,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
             parsed_fight_stats_df, 
             new_parsed_odds_df,
             all_fighter_details_df,
-            parsed_fighter_tott_df,
+            new_parsed_fighter_tott_df,
             new_parsed_event_odds_df,
             new_parsed_betfair_odds_df,
             upcoming_events_df,
