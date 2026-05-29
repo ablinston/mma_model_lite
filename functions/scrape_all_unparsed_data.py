@@ -19,7 +19,11 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
     list_of_parsed_events = list(parsed_event_details_df['EVENT'])
 
     # get soup
-    soup = get_soup(config['completed_events_all_url'])
+    if not os.name == 'nt':
+        soup = get_soup(config['completed_events_all_url'])
+    else:
+        soup = get_website_soup(config['completed_events_all_url'], fast = False, chrome_binary = config['chrome_binary_location'], time_delay = True)
+        
     # parse event details
     new_event_details_df = parse_event_details(soup)
     # get list of all event names
@@ -35,7 +39,14 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
     ###############################################################################
 
     # Get a list of upcoming events
-    upcoming_events_df = parse_event_details(get_soup(config['upcoming_events_url']), upcoming = True)
+    if not os.name == 'nt':
+        upcoming_events_df = parse_event_details(
+            get_website_soup(config['upcoming_events_url'], fast = False, time_delay = True),
+            upcoming = True)
+    else:
+        upcoming_events_df = parse_event_details(
+            get_website_soup(config['upcoming_events_url'], fast = False, chrome_binary = config['chrome_binary_location'], time_delay = True),
+            upcoming = True)
 
     # # If missed the event start time because it is today, move it to the upcoming data
     if pd.to_datetime(new_event_details_df.iloc[0]['DATE']) == pd.to_datetime(datetime.today().strftime('%Y-%m-%d')):
@@ -206,14 +217,14 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
         parse_function = parse_fighter_details,
         num_threads = config['num_threads'],
         fighter_details_column_names = config['fighter_details_column_names'])
-
+    
     # Clean out any 'www' to ensure we find all the required URLs
     all_fighter_details_df['URL'] = all_fighter_details_df['URL'].str.replace('www,', '')
     parsed_fighter_tott_df['URL'] = parsed_fighter_tott_df['URL'].str.replace('www,', '')
 
     # Find the unparsed urls
     unparsed_fighter_urls = all_fighter_details_df['URL'][~all_fighter_details_df['URL'].isin(parsed_fighter_tott_df['URL'].to_list())].to_list()
-
+    
     # Now parse the unparsed URLs
     if len(unparsed_fighter_urls) > 0:
         

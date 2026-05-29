@@ -8,7 +8,7 @@ def update_fight_details_data(existing_fights_data, new_events_url_list, config,
 
     # Run a parallel scrape of the new fights data
     with ThreadPoolExecutor(max_workers = num_threads) as executor:
-        future_to_url = {executor.submit(parse_fight_details_url, url): url for url in new_events_url_list}
+        future_to_url = {executor.submit(parse_fight_details_url, url, config): url for url in new_events_url_list}
 
         # Now iterate through the functions
         for future in as_completed(future_to_url):

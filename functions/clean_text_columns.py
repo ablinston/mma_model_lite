@@ -17,7 +17,8 @@ def clean_text_columns(df):
             df.loc[:, col] = df[col].str.replace('vs##', 'vs.')
         df.loc[:, col] = df[col].str.replace('saint', 'st')
         
-        # Clean any names that are equivalent
+        # Clean any names that are equivalent.
+        # This is to get alignment between the fighter names on UFCstats/fighters and bout stats
         if col in ['fighter', 'FIGHTER']:
             df.loc[:, col] = df[col].str.replace('montserendon', 'montserratrendon')
             df.loc[:, col] = df[col].str.replace('michaelaswell', 'michaelaswelljr').str.replace('jrjr', 'jr')
