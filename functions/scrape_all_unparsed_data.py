@@ -210,7 +210,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
     # Scrape the full list of fighters from the UFC site again
     # generate list of urls for fighter details
     list_of_alphabetical_urls = generate_alphabetical_urls()
-
+    
     # Go through list of alphabetical urls
     all_fighter_details_df = parallel_scrape(
         url_list = list_of_alphabetical_urls,
@@ -221,10 +221,10 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
     # Clean out any 'www' to ensure we find all the required URLs
     all_fighter_details_df['URL'] = all_fighter_details_df['URL'].str.replace('www,', '')
     parsed_fighter_tott_df['URL'] = parsed_fighter_tott_df['URL'].str.replace('www,', '')
-
+    
     # Find the unparsed urls
     unparsed_fighter_urls = all_fighter_details_df['URL'][~all_fighter_details_df['URL'].isin(parsed_fighter_tott_df['URL'].to_list())].to_list()
-    
+    # pdb.set_trace()
     # Now parse the unparsed URLs
     if len(unparsed_fighter_urls) > 0:
         

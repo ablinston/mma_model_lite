@@ -18,6 +18,7 @@ def parse_organise_fight_results_and_stats(soup, url,
     returns:
     two dfs for fight results and stats
     """
+    # pdb.set_trace()
     fight_results = parse_fight_results(soup)
     fight_results.append('URL:' + url)
     fight_results_df = organise_fight_results(fight_results,
