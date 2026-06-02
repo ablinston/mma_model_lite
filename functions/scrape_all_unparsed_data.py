@@ -43,7 +43,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     # Get a list of upcoming events
     if not os.name == 'nt':
         upcoming_events_df = parse_event_details(
-            get_website_soup(config['upcoming_events_url'], fast = False, time_delay = True),
+            get_website_soup(config['upcoming_events_url'], fast = False, chrome_driver = './data/chrome_drivers/chromedriver_64ARM', time_delay = True),
             upcoming = True)
     else:
         upcoming_events_df = parse_event_details(
