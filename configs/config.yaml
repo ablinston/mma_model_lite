@@ -18,7 +18,7 @@ chrome_driver_location_pi: './data/chrome_drivers/chromedriver_64ARM'
 chrome_binary_location: 'C:\Program Files\Google\Chrome Beta\Application\chrome.exe'
 
 # Numer of CPU threads to use for concurrent processes
-num_threads: 3
+num_threads: 1
 num_threads_odds_scrape: 1 # Doing separately because of cloudfare issues
 
 # Set the seed for all random components e.g. train test split etc
