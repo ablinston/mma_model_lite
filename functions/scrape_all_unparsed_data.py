@@ -1,11 +1,13 @@
 # This function scrapes event details from UFCStats.com given a list of urls to events
 
-def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config):
+def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config, skip_fighter_tott_update = False):
     """
     Scrapes all raw data from online given the config, saving the results
 
     Args:
         skip_betfair_history (bool): Whether to skip downloading and updating the betfair historic odds
+        skip_fighter_tott_update (bool): Whether to skip re-scraping the full fighter details and tott data.
+            When True, the existing saved parquets are used as-is, saving significant runtime.
 
     Returns:
         Only a success message. Data is saved according to the config
@@ -204,43 +206,52 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
     ##### Parse new fighter data #####
     ###############################################################################
 
+    # Load the saved fighter details and tott datasets from disk — always needed downstream
     parsed_fighter_details_df = fp.ParquetFile('./data/' + config['fighter_details_file_name']).to_pandas()
     parsed_fighter_tott_df = fp.ParquetFile('./data/' + config['fighter_tott_file_name']).to_pandas()
 
-    # Scrape the full list of fighters from the UFC site again
-    # generate list of urls for fighter details
-    list_of_alphabetical_urls = generate_alphabetical_urls()
-    
-    # Go through list of alphabetical urls
-    all_fighter_details_df = parallel_scrape(
-        url_list = list_of_alphabetical_urls,
-        parse_function = parse_fighter_details,
-        num_threads = config['num_threads'],
-        fighter_details_column_names = config['fighter_details_column_names'])
-    
-    # Clean out any 'www' to ensure we find all the required URLs
-    all_fighter_details_df['URL'] = all_fighter_details_df['URL'].str.replace('www,', '')
-    parsed_fighter_tott_df['URL'] = parsed_fighter_tott_df['URL'].str.replace('www,', '')
-    
-    # Find the unparsed urls
-    unparsed_fighter_urls = all_fighter_details_df['URL'][~all_fighter_details_df['URL'].isin(parsed_fighter_tott_df['URL'].to_list())].to_list()
-    # pdb.set_trace()
-    # Now parse the unparsed URLs
-    if len(unparsed_fighter_urls) > 0:
-        
-        # Concatenate the old and new scraped data
-        new_parsed_fighter_tott_df = pd.concat([
-            parallel_scrape(
-                url_list = unparsed_fighter_urls,
-                # url_list = all_fighter_details_df['URL'].tolist(),
-                parse_function = get_fighter_data,
-                num_threads = config['num_threads'],
-                fighter_tott_column_names = config['fighter_tott_column_names']),
-            parsed_fighter_tott_df
-        ])
+    if skip_fighter_tott_update:
+
+        # Skip the full re-scrape and use the saved datasets as-is
+        all_fighter_details_df = parsed_fighter_details_df
+        new_parsed_fighter_tott_df = parsed_fighter_tott_df
 
     else:
-        new_parsed_fighter_tott_df = parsed_fighter_tott_df
+
+        # Scrape the full list of fighters from the UFC site again
+        # generate list of urls for fighter details
+        list_of_alphabetical_urls = generate_alphabetical_urls()
+        
+        # Go through list of alphabetical urls
+        all_fighter_details_df = parallel_scrape(
+            url_list = list_of_alphabetical_urls,
+            parse_function = parse_fighter_details,
+            num_threads = config['num_threads'],
+            fighter_details_column_names = config['fighter_details_column_names'])
+        
+        # Clean out any 'www' to ensure we find all the required URLs
+        all_fighter_details_df['URL'] = all_fighter_details_df['URL'].str.replace('www,', '')
+        parsed_fighter_tott_df['URL'] = parsed_fighter_tott_df['URL'].str.replace('www,', '')
+        
+        # Find the unparsed urls
+        unparsed_fighter_urls = all_fighter_details_df['URL'][~all_fighter_details_df['URL'].isin(parsed_fighter_tott_df['URL'].to_list())].to_list()
+        # pdb.set_trace()
+        # Now parse the unparsed URLs
+        if len(unparsed_fighter_urls) > 0:
+            
+            # Concatenate the old and new scraped data
+            new_parsed_fighter_tott_df = pd.concat([
+                parallel_scrape(
+                    url_list = unparsed_fighter_urls,
+                    # url_list = all_fighter_details_df['URL'].tolist(),
+                    parse_function = get_fighter_data,
+                    num_threads = config['num_threads'],
+                    fighter_tott_column_names = config['fighter_tott_column_names']),
+                parsed_fighter_tott_df
+            ])
+
+        else:
+            new_parsed_fighter_tott_df = parsed_fighter_tott_df
         
 
     ###############################################################################

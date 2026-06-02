@@ -48,8 +48,15 @@ def predict_future_events(
     if not skip_data_update:
         
         if not skip_data_scrape:
-            # Run these scripts to scrape then clean the raw data
-            scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config)
+            # Run these scripts to scrape then clean the raw data.
+            # Pass skip_fighter_tott_update so the slow full-fighter re-scrape is
+            # skipped whenever we are also skipping the full dataset rebuild.
+            scrape_all_unparsed_data(
+                skip_betfair_history,
+                config,
+                betfair_login_config,
+                skip_fighter_tott_update = skip_full_data_update
+            )
             clean_all_raw_data_and_save(config)
         
             gc.collect();

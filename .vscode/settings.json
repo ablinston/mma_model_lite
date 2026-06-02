@@ -1,4 +1,8 @@
 {
+    "python.defaultInterpreterPath": "X:/Programs/Miniconda_envs/mma_model_dev/python.exe",
+    "python.condaPath": "X:/Programs/miniconda3/Scripts/conda.exe",
+    "python.locator": "js",
+    "python.terminal.activateEnvironment": true,
     "python.REPL.enableREPLSmartSend": false,
     "python.analysis.extraPaths": ["${workspaceFolder}"],
     "[python]": {

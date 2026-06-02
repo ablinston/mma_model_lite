@@ -5,6 +5,13 @@ alwaysApply: true
 
 # mma_model_lite conventions
 
+## Python environment (Cursor)
+
+- Use the Conda environment **`mma_model_dev`** for this repo (on this machine it lives under `Miniconda_envs/mma_model_dev/` next to the Miniconda **base** install).
+- Workspace `.vscode/settings.json` pins `python.defaultInterpreterPath` and `python.condaPath` so the Python extension can resolve and activate the env; if you clone on another PC, update both paths to match `conda env list` / your base Miniconda `Scripts/conda.exe`.
+- If the interpreter still does not attach: install the **Python** and **Pylance** extensions (see `.vscode/extensions.json`), then **Python: Select Interpreter** → `mma_model_dev`.
+- If **Python: Select Interpreter** errors with **“Cannot read properties of undefined”** (common with Conda + the new native locator): run **Python: Clear Cache and Reload Window**; this workspace sets `"python.locator": "js"` as a workaround. If it still fails, disable the **Python Environments** extension (`ms-python.vscode-python-envs`) in Cursor and reload—several upstream issues show that extension’s Conda discovery throws that error until disabled or updated.
+
 ## Where code and config live
 
 - **Library / reusable functions**: `functions/` at repo root. Add or edit modules here, not ad hoc copies under `src/`.
