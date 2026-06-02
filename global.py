@@ -68,7 +68,9 @@ import string
 # import sys
 import threading
 import time
+import logging
 import undetected_chromedriver as uc
+logging.getLogger('undetected_chromedriver').setLevel(logging.ERROR)
 import xgboost as xgb
 from yaml import safe_load, dump
 import warnings
