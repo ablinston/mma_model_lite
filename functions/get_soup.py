@@ -14,7 +14,7 @@ def get_soup(url):
     # If we didn't get a good result
     for attempt in range(0, 6):
         
-        if soup.find(string = 'Checking your browser…') != 'Checking your browser…':
+        if soup.find(string = re.compile('Checking your browser')) is None:
             break
         else:
             if not os.name == 'nt':
