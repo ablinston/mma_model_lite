@@ -57,8 +57,8 @@ def test_update_odds_on_merged_data():
     new_data.drop(columns = cols_to_drop, inplace = True)
     
     # Reset indexes
-    new_data = new_data.sort_values('fighter1').reset_index(drop = True)
-    pre_event_data = pre_event_data.sort_values('fighter1').reset_index(drop = True)
+    new_data = new_data.sort_values(['event', 'fighter1', 'fighter2']).reset_index(drop = True)
+    pre_event_data = pre_event_data.sort_values(['event', 'fighter1', 'fighter2']).reset_index(drop = True)
     
     assert pre_event_data.equals(new_data)
     

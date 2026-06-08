@@ -13,10 +13,10 @@ def test_add_event_and_bout_to_odds_data():
     new_odds = add_event_and_bout_to_odds_data(
         test_add_event_and_bout_to_odds_data_input_odds,
         test_add_event_and_bout_to_odds_data_input_events,
-        test_add_event_and_bout_to_odds_data_input_stats).sort_values(['fighter', 'date']).reset_index(drop = True)
+        test_add_event_and_bout_to_odds_data_input_stats).sort_values(['fighter', 'date', 'opponent']).reset_index(drop = True)
         
     assert new_odds.shape == test_add_event_and_bout_to_odds_data_correct.shape
-    assert (new_odds[test_add_event_and_bout_to_odds_data_correct.columns].equals(test_add_event_and_bout_to_odds_data_correct.sort_values(['fighter', 'date']).reset_index(drop = True))) == True
+    assert (new_odds[test_add_event_and_bout_to_odds_data_correct.columns].equals(test_add_event_and_bout_to_odds_data_correct.sort_values(['fighter', 'date', 'opponent']).reset_index(drop = True))) == True
     
 
 # fp.write('./tests/data/test_add_event_and_bout_to_odds_data_correct.parquet', new_odds, compression = 'ZSTD')
