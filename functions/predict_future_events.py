@@ -196,8 +196,7 @@ def predict_future_events(
         print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}")
         print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
         print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
-        print(f"Min bet exchange odds: {bets_to_place.iloc[i]['Bet_min_exchange_odds']:.2f}")
-        print(f"Breakeven exchange odds: {bets_to_place.iloc[i]['Bet_breakeven_exchange_odds']:.2f}")
+        print(f"Min exchange odds (EV >= {bet_config['min_ev_to_bet']:.2f}): {bets_to_place.iloc[i]['Bet_min_exchange_odds']:.2f}")
 
     # Output the results
     summary_data.to_csv('./results/upcoming_predictions.csv')
@@ -216,7 +215,6 @@ def predict_future_events(
                 print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}", file = file)
                 print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%", file = file)
                 print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds", file = file)
-                print(f"Breakeven odds: {bets_to_place.iloc[i]['Bet_breakeven_odds']:.2f}", file = file)
-                print(f"Breakeven exchange odds: {bets_to_place.iloc[i]['Bet_breakeven_exchange_odds']:.2f}", file = file)
+                print(f"Min exchange odds (EV >= {bet_config['min_ev_to_bet']:.2f}): {bets_to_place.iloc[i]['Bet_min_exchange_odds']:.2f}", file = file)
 
     return summary_data
