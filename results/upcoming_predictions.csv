@@ -1,12 +1,15 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_min_exchange_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,NaT,Brendan Allen,1.46,76.9,0.12,Edmen Shahbazyan,3.17,20.4,-0.35,Brendan Allen,1.46,1.44,165.0,75.9,
-1,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Fares Ziam,1.36,76.9,0.05,Tom Nolan,3.55,20.4,-0.28,None,0.0,,0.0,0.0,
-2,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Matt Schnell,5.7,23.5,0.34,Alessandro Costa,1.14,73.5,-0.16,None,0.0,,0.0,0.0,
-3,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Priscila Cachoeira,1.95,31.7,-0.38,Chelsea Chandler,1.03,65.1,-0.33,None,0.0,,0.0,0.0,
-4,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Belal Muhammad,1.7,45.6,-0.22,Gabriel Bonfim,2.1,51.2,0.08,None,0.0,,0.0,0.0,
-2,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Bryce Mitchell,,,,Santiago Luna,,,,,,,,,Fights < 3
-3,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Iwo Baraniewski,,,,Junior Tafa,,,,,,,,,Fights < 3
-6,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Bruno Silva,,,,Edgar Chairez,,,,,,,,,Womens
-7,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Jordan Leavitt,,,,Joanderson Brito,,,,,,,,,Womens
-8,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Jeisla Chaves,,,,Yuneisy Duben,,,,,,,,,Womens
-9,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Marcus McGhee,,,,John Yannis,,,,,,,,,Fights < 3
+0,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Benoit Saint Denis,1.69,45.0,-0.24,Paddy Pimblett,2.2,51.8,0.14,Paddy Pimblett,2.2,2.15,165.0,198.0,
+1,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Cory Sandhagen,1.68,46.1,-0.23,Mario Bautista,2.34,50.7,0.19,Mario Bautista,2.34,2.19,165.0,221.1,
+2,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Brandon Royval,2.82,26.7,-0.25,Lone'er Kavanagh,1.51,70.4,0.06,None,0.0,,0.0,0.0,
+3,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,King Green,2.5,46.0,0.15,Terrance McKinney,1.6,50.6,-0.19,None,0.0,,0.0,0.0,
+4,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Nikita Krylov,2.42,46.8,0.13,Robert Whittaker,1.58,50.1,-0.21,None,0.0,,0.0,0.0,
+5,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Alessandro Costa,1.03,78.6,-0.19,Cody Durden,3.15,18.9,-0.41,None,0.0,,0.0,0.0,
+6,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Cody Garbrandt,4.2,25.4,0.07,Adrian Yanez,1.22,71.6,-0.13,None,0.0,,0.0,0.0,
+7,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Conor McGregor,3.05,32.2,-0.02,Max Holloway,1.47,64.8,-0.05,None,0.0,,0.0,0.0,
+5,2026-07-11,ufc329:mcgregorvsholloway2,,,Gable Steveson,,,,Elisha Ellison,,,,,,,,,Fights < 3
+6,2026-07-11,ufc329:mcgregorvsholloway2,,,Tracy Cortez,,,,Wang Cong,,,,,,,,,Womens
+7,2026-07-11,ufc329:mcgregorvsholloway2,,,Luke Riley,,,,,,,,,,,,,Fights < 3
+8,2026-07-11,ufc329:mcgregorvsholloway2,,,Damian Pinas,,,,Cesar Almeida,,,,,,,,,Fights < 3
+9,2026-07-11,ufc329:mcgregorvsholloway2,,,Farid Basharat,,,,Ethyn Ewing,,,,,,,,,Fights < 3
+10,2026-07-11,ufc329:mcgregorvsholloway2,,,Ryan Gandra,,,,,,,,,,,,,Fights < 3
