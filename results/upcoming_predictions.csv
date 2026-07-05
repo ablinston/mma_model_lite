@@ -1,12 +1,12 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_min_exchange_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Benoit Saint Denis,1.69,45.0,-0.24,Paddy Pimblett,2.2,51.8,0.14,Paddy Pimblett,2.2,2.15,165.0,198.0,
-1,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Cory Sandhagen,1.68,46.1,-0.23,Mario Bautista,2.34,50.7,0.19,Mario Bautista,2.34,2.19,165.0,221.1,
-2,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Brandon Royval,2.82,26.7,-0.25,Lone'er Kavanagh,1.51,70.4,0.06,None,0.0,,0.0,0.0,
-3,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,King Green,2.5,46.0,0.15,Terrance McKinney,1.6,50.6,-0.19,None,0.0,,0.0,0.0,
-4,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Nikita Krylov,2.42,46.8,0.13,Robert Whittaker,1.58,50.1,-0.21,None,0.0,,0.0,0.0,
-5,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Alessandro Costa,1.03,78.6,-0.19,Cody Durden,3.15,18.9,-0.41,None,0.0,,0.0,0.0,
-6,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Cody Garbrandt,4.2,25.4,0.07,Adrian Yanez,1.22,71.6,-0.13,None,0.0,,0.0,0.0,
-7,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-04 13:01:23.698,2026-07-04 13:01:23.698,Conor McGregor,3.05,32.2,-0.02,Max Holloway,1.47,64.8,-0.05,None,0.0,,0.0,0.0,
+0,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Benoit Saint Denis,1.78,44.8,-0.2,Paddy Pimblett,2.22,52.0,0.15,Paddy Pimblett,2.22,2.14,165.0,201.3,
+1,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Cory Sandhagen,1.71,45.3,-0.23,Mario Bautista,2.34,51.5,0.21,Mario Bautista,2.34,2.16,165.0,221.1,
+2,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Brandon Royval,2.92,26.1,-0.24,Lone'er Kavanagh,1.5,71.0,0.06,None,0.0,,0.0,0.0,
+3,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,King Green,2.24,49.3,0.1,Terrance McKinney,1.64,47.3,-0.22,King Green,2.24,2.26,165.0,204.6,
+4,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Nikita Krylov,2.24,49.4,0.11,Robert Whittaker,1.66,47.4,-0.21,Nikita Krylov,2.24,2.25,165.0,204.6,
+5,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:12.522529+00:00,2026-07-05 13:01:12.522529+00:00,Alessandro Costa,1.4,73.5,0.03,Cody Durden,3.15,23.8,-0.25,None,0.0,,0.0,0.0,
+6,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:12.522529+00:00,2026-07-05 13:01:12.522529+00:00,Cody Garbrandt,4.5,25.4,0.14,Adrian Yanez,1.25,71.5,-0.11,None,0.0,,0.0,0.0,
+7,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Conor McGregor,3.0,32.0,-0.04,Max Holloway,1.48,65.0,-0.04,None,0.0,,0.0,0.0,
 5,2026-07-11,ufc329:mcgregorvsholloway2,,,Gable Steveson,,,,Elisha Ellison,,,,,,,,,Fights < 3
 6,2026-07-11,ufc329:mcgregorvsholloway2,,,Tracy Cortez,,,,Wang Cong,,,,,,,,,Womens
 7,2026-07-11,ufc329:mcgregorvsholloway2,,,Luke Riley,,,,,,,,,,,,,Fights < 3
