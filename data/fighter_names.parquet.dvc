@@ -1,5 +1,5 @@
 outs:
-- md5: 40863d7a35d601df61a214f4c6274596
-  size: 66661
+- md5: c700c71316c0b16a70e8a4fc0a2bf208
+  size: 67004
   hash: md5
   path: fighter_names.parquet
