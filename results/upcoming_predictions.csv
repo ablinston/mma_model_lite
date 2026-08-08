@@ -1,15 +1,13 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_min_exchange_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Benoit Saint Denis,1.78,44.8,-0.2,Paddy Pimblett,2.22,52.0,0.15,Paddy Pimblett,2.22,2.14,165.0,201.3,
-1,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Cory Sandhagen,1.71,45.3,-0.23,Mario Bautista,2.34,51.5,0.21,Mario Bautista,2.34,2.16,165.0,221.1,
-2,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Brandon Royval,2.92,26.1,-0.24,Lone'er Kavanagh,1.5,71.0,0.06,None,0.0,,0.0,0.0,
-3,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,King Green,2.24,49.3,0.1,Terrance McKinney,1.64,47.3,-0.22,King Green,2.24,2.26,165.0,204.6,
-4,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Nikita Krylov,2.24,49.4,0.11,Robert Whittaker,1.66,47.4,-0.21,Nikita Krylov,2.24,2.25,165.0,204.6,
-5,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:12.522529+00:00,2026-07-05 13:01:12.522529+00:00,Alessandro Costa,1.4,73.5,0.03,Cody Durden,3.15,23.8,-0.25,None,0.0,,0.0,0.0,
-6,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:12.522529+00:00,2026-07-05 13:01:12.522529+00:00,Cody Garbrandt,4.5,25.4,0.14,Adrian Yanez,1.25,71.5,-0.11,None,0.0,,0.0,0.0,
-7,2026-07-11,ufc329:mcgregorvsholloway2,2026-07-05 13:01:28.310,2026-07-05 13:01:28.310,Conor McGregor,3.0,32.0,-0.04,Max Holloway,1.48,65.0,-0.04,None,0.0,,0.0,0.0,
-5,2026-07-11,ufc329:mcgregorvsholloway2,,,Gable Steveson,,,,Elisha Ellison,,,,,,,,,Fights < 3
-6,2026-07-11,ufc329:mcgregorvsholloway2,,,Tracy Cortez,,,,Wang Cong,,,,,,,,,Womens
-7,2026-07-11,ufc329:mcgregorvsholloway2,,,Luke Riley,,,,,,,,,,,,,Fights < 3
-8,2026-07-11,ufc329:mcgregorvsholloway2,,,Damian Pinas,,,,Cesar Almeida,,,,,,,,,Fights < 3
-9,2026-07-11,ufc329:mcgregorvsholloway2,,,Farid Basharat,,,,Ethyn Ewing,,,,,,,,,Fights < 3
-10,2026-07-11,ufc329:mcgregorvsholloway2,,,Ryan Gandra,,,,,,,,,,,,,Fights < 3
+0,2026-08-08,ufcfightnight:gamrotvssalkilld,2026-08-08 18:06:25.224,2026-08-08 18:06:25.224,Diego Ferreira,1.59,57.4,-0.09,Billy Quarantillo,2.62,39.5,0.03,None,0.0,,0.0,0.0,
+1,2026-08-08,ufcfightnight:gamrotvssalkilld,2026-08-08 18:06:25.224,2026-08-08 18:06:25.224,Darren Elkins,7.4,26.4,0.96,Yadier del Valle,1.13,70.4,-0.2,None,0.0,,0.0,0.0,
+2,2026-08-08,ufcfightnight:gamrotvssalkilld,2026-08-08 18:06:25.224,2026-08-08 18:06:25.224,Diyar Nurgozhay,1.63,64.7,0.05,Bruno Lopes,2.5,32.4,-0.19,None,0.0,,0.0,0.0,
+3,2026-08-08,ufcfightnight:gamrotvssalkilld,2026-08-08 18:06:25.224,2026-08-08 18:06:25.224,Mateusz Gamrot,2.24,45.1,0.01,Quillan Salkilld,1.79,51.8,-0.07,None,0.0,,0.0,0.0,
+2,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Amanda Lemos,,,,Alexia Thainara,,,,,,,,,Womens
+3,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Billy Ray Goff,,,,Ty Miller,,,,,,,,,Fights < 3
+4,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Steven Asplund,,,,Guilherme Pat,,,,,,,,,Fights < 3
+5,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Manoel Sousa,,,,Richie Miranda,,,,,,,,,Fights < 3
+6,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Louie Sutherland,,,,Jose Montanha,,,,,,,,,Fights < 3
+7,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Miles Johns,,,,Gianni Vazquez,,,,,,,,,Fights < 3
+8,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Juliana Miller,,,,Ravena Oliveira,,,,,,,,,Womens
+9,2026-08-08,ufcfightnight:gamrotvssalkilld,,,Gigi Canuto,,,,Carol Foro,,,,,,,,,Womens

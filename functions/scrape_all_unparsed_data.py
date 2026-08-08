@@ -14,7 +14,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     """
 
     ### check if there are any unparsed events ###
-    # pdb.set_trace()
+    pdb.set_trace()
     # read existing event details
     parsed_event_details_df = fp.ParquetFile('./data/' + config['event_details_file_name']).to_pandas()
     # get list of parsed event names
