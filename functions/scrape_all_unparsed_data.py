@@ -64,7 +64,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
         existing_fights_data = pd.DataFrame(),
         new_events_url_list = upcoming_events_df['URL'].to_list(),
         config = config,
-        num_threads = 3)
+        num_threads = config['num_threads'])
 
 
 
@@ -112,7 +112,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
             existing_fights_data = parsed_fight_details_df,
             new_events_url_list = list_of_unparsed_events_urls,
             config = config,
-            num_threads = 3)
+            num_threads = config['num_threads'])
 
         ##### Parse fight results and fight stats #####
         
