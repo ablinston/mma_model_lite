@@ -14,7 +14,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     """
 
     ### check if there are any unparsed events ###
-    pdb.set_trace()
+    # pdb.set_trace()
     # read existing event details
     parsed_event_details_df = fp.ParquetFile('./data/' + config['event_details_file_name']).to_pandas()
     # get list of parsed event names
@@ -95,7 +95,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     parsed_event_odds_urls = fp.ParquetFile('./data/event_odds_urls.parquet').to_pandas()
     parsed_event_odds_df = fp.ParquetFile('./data/' + config['event_odds_file_name']).to_pandas()
     parsed_betfair_odds_df = fp.ParquetFile('./data/' + config['betfair_odds_file_name']).to_pandas()
-
+    
     if unparsed_events == True:
         
         ##### Add new events to events data #####
@@ -257,7 +257,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     ###############################################################################
     ##### Data consistency checks #####
     ###############################################################################
-
+    
     if unparsed_events:
         
         ## Run checks to ensure each of the datasets are consistent and cover the same events

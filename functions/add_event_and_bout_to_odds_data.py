@@ -60,7 +60,7 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_ch
     
     # # Replace events and bouts with those from the opponents data #  Removed this because it caused issues with duplicates
     # new_odds_df = replace_event_and_bout_odds(odds_df = new_odds_df, stats_df = opponents_df, join_on = ['fighter', 'opponent'], day_shift = 0, odds_event_priority = False)
-    pdb.set_trace()
+    
     # Now, working from 2 days down to one, fill the missing events
     new_odds_df = replace_event_and_bout_odds(odds_df = new_odds_df, stats_df = new_stats_df, join_on = ['fighter', 'date', 'opponent'], day_shift = 2, odds_event_priority = False)
     new_odds_df = replace_event_and_bout_odds(odds_df = new_odds_df, stats_df = new_stats_df, join_on = ['fighter', 'date', 'opponent'], day_shift = -2, odds_event_priority = False)
