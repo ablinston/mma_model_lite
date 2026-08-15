@@ -1,13 +1,12 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_min_exchange_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Charles Johnson,4.2,20.6,-0.13,Jose Ochoa,1.24,76.5,-0.05,None,0.0,,0.0,0.0,
-1,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Mansur Abdul-Malik,1.18,82.9,-0.02,Dustin Stoltzfus,5.3,14.6,-0.23,None,0.0,,0.0,0.0,
-2,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Edson Barboza,5.4,17.8,-0.04,Esteban Ribovics,1.2,79.5,-0.05,None,0.0,,0.0,0.0,
-3,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Chidi Njokuani,3.1,31.3,-0.03,Joel Alvarez,1.4,65.6,-0.08,None,0.0,,0.0,0.0,
-4,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Vicente Luque,2.14,31.5,-0.33,Tresean Gore,1.8,65.5,0.18,Tresean Gore,1.8,1.69,165.0,132.0,
-5,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Neil Magny,2.18,48.5,0.06,Ramiz Brahimaj,1.77,48.3,-0.15,None,0.0,,0.0,0.0,
-6,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Jeremiah Wells,7.6,29.2,1.22,Myktybek Orolbai,1.12,67.6,-0.24,None,0.0,,0.0,0.0,
-7,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Jalin Turner,1.66,58.8,-0.02,Kaue Fernandes,2.4,38.2,-0.08,None,0.0,,0.0,0.0,
-8,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-11 14:01:16.830,2026-08-11 14:01:16.830,Islam Makhachev,1.33,76.2,0.01,Ian Machado Garry,4.0,21.0,-0.16,None,0.0,,0.0,0.0,
+0,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Jalin Turner,1.9,53.2,0.01,Kaue Fernandes,2.06,43.6,-0.1,None,0.0,,0.0,0.0,
+1,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Mansur Abdul-Malik,1.16,83.6,-0.03,Dustin Stoltzfus,6.2,14.0,-0.13,None,0.0,,0.0,0.0,
+2,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Edson Barboza,6.2,17.9,0.11,Esteban Ribovics,1.17,79.5,-0.07,None,0.0,,0.0,0.0,
+3,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Chidi Njokuani,3.7,29.1,0.08,Joel Alvarez,1.36,67.8,-0.08,None,0.0,,0.0,0.0,
+4,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Vicente Luque,2.0,36.6,-0.27,Tresean Gore,1.98,60.3,0.19,Tresean Gore,1.98,1.84,165.0,161.7,
+5,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Neil Magny,2.36,44.1,0.04,Ramiz Brahimaj,1.71,52.6,-0.1,None,0.0,,0.0,0.0,
+6,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Islam Makhachev,1.33,76.2,0.01,Ian Machado Garry,4.0,21.0,-0.16,None,0.0,,0.0,0.0,
 0,2026-08-15,ufc330:makhachevvsmachadogarry,,,Mackenzie Dern,,,,Gillian Robertson,,,,,,,,,Womens
 6,2026-08-15,ufc330:makhachevvsmachadogarry,,,Donte Johnson,,,,Eric McConico,,,,,,,,,Fights < 3
 7,2026-08-15,ufc330:makhachevvsmachadogarry,,,Rafael Tobias,,,,Lucas Fernando,,,,,,,,,Fights < 3
+9,2026-08-15,ufc330:makhachevvsmachadogarry,,,Charles Johnson,,,,Eduardo Chapolin,,,,,,,,,Missing odds
