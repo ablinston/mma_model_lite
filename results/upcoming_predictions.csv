@@ -1,12 +1,14 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_min_exchange_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Jalin Turner,1.9,53.2,0.01,Kaue Fernandes,2.06,43.6,-0.1,None,0.0,,0.0,0.0,
-1,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Mansur Abdul-Malik,1.16,83.6,-0.03,Dustin Stoltzfus,6.2,14.0,-0.13,None,0.0,,0.0,0.0,
-2,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Edson Barboza,6.2,17.9,0.11,Esteban Ribovics,1.17,79.5,-0.07,None,0.0,,0.0,0.0,
-3,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Chidi Njokuani,3.7,29.1,0.08,Joel Alvarez,1.36,67.8,-0.08,None,0.0,,0.0,0.0,
-4,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Vicente Luque,2.0,36.6,-0.27,Tresean Gore,1.98,60.3,0.19,Tresean Gore,1.98,1.84,165.0,161.7,
-5,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Neil Magny,2.36,44.1,0.04,Ramiz Brahimaj,1.71,52.6,-0.1,None,0.0,,0.0,0.0,
-6,2026-08-15,ufc330:makhachevvsmachadogarry,2026-08-15 11:30:37.537,2026-08-15 11:30:37.537,Islam Makhachev,1.33,76.2,0.01,Ian Machado Garry,4.0,21.0,-0.16,None,0.0,,0.0,0.0,
-0,2026-08-15,ufc330:makhachevvsmachadogarry,,,Mackenzie Dern,,,,Gillian Robertson,,,,,,,,,Womens
-6,2026-08-15,ufc330:makhachevvsmachadogarry,,,Donte Johnson,,,,Eric McConico,,,,,,,,,Fights < 3
-7,2026-08-15,ufc330:makhachevvsmachadogarry,,,Rafael Tobias,,,,Lucas Fernando,,,,,,,,,Fights < 3
-9,2026-08-15,ufc330:makhachevvsmachadogarry,,,Charles Johnson,,,,Eduardo Chapolin,,,,,,,,,Missing odds
+0,2026-08-22,ufcfightnight:hernandezvsrodrigues,2026-08-19 08:48:39.901,2026-08-19 08:48:39.901,Serghei Spivac,2.2,37.7,-0.17,Vitor Petrino,1.71,59.4,0.02,None,0.0,,0.0,0.0,
+1,2026-08-22,ufcfightnight:hernandezvsrodrigues,2026-08-19 08:48:39.901,2026-08-19 08:48:39.901,Reinier de Ridder,1.26,81.4,0.03,Roman Dolidze,4.1,16.0,-0.34,None,0.0,,0.0,0.0,
+2,2026-08-22,ufcfightnight:hernandezvsrodrigues,2026-08-19 08:48:39.901,2026-08-19 08:48:39.901,MarQuel Mederos,3.5,23.4,-0.18,Mason Jones,1.33,73.5,-0.02,None,0.0,,0.0,0.0,
+3,2026-08-22,ufcfightnight:hernandezvsrodrigues,2026-08-19 08:48:39.901,2026-08-19 08:48:39.901,Chris Padilla,1.99,57.9,0.15,Nasrat Haqparast,1.84,39.0,-0.28,Chris Padilla,1.99,1.92,165.0,163.35,
+4,2026-08-22,ufcfightnight:hernandezvsrodrigues,2026-08-19 08:48:39.901,2026-08-19 08:48:39.901,Kennedy Nzechukwu,2.14,51.1,0.09,Shamil Gaziev,1.67,45.6,-0.24,None,0.0,,0.0,0.0,
+5,2026-08-22,ufcfightnight:hernandezvsrodrigues,2026-08-19 08:48:39.901,2026-08-19 08:48:39.901,Wes Schultz,2.68,38.2,0.03,Jackson McVey,1.48,58.6,-0.13,None,0.0,,0.0,0.0,
+6,2026-08-22,ufcfightnight:hernandezvsrodrigues,2026-08-19 08:48:39.901,2026-08-19 08:48:39.901,Anthony Hernandez,1.64,58.1,-0.05,Gregory Rodrigues,2.44,38.8,-0.05,None,0.0,,0.0,0.0,
+3,2026-08-22,ufcfightnight:hernandezvsrodrigues,,,Carli Judice,,,,Jeisla Chaves,,,,,,,,,Womens
+4,2026-08-22,ufcfightnight:hernandezvsrodrigues,,,Anthony Wint,,,,Terrance Chatman,,,,,,,,,Fights < 3
+7,2026-08-22,ufcfightnight:hernandezvsrodrigues,,,Marcio Barbosa,,,,,,,,,,,,,Fights < 3
+8,2026-08-22,ufcfightnight:hernandezvsrodrigues,,,Gauge Young,,,,,,,,,,,,,Fights < 3
+10,2026-08-22,ufcfightnight:hernandezvsrodrigues,,,Shanelle Dyer,,,,Elise Reed,,,,,,,,,Womens
+11,2026-08-22,ufcfightnight:hernandezvsrodrigues,,,Jamall Emmers,,,,Lerryan Douglas,,,,,,,,,Fights < 3
