@@ -1,5 +1,5 @@
 outs:
-- md5: 7273e951f2de47b521b0b9711560c5ab
+- md5: 705d47b579fe6054c529cceff8bf2fb5
   size: 74696
   hash: md5
   path: ufc_fighter_tott_clean.parquet
