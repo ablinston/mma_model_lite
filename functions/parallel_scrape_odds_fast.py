@@ -55,11 +55,19 @@ def parallel_scrape_odds_fast(
     options.add_argument("--start-maximized")
     options.add_argument('--no-first-run')
     
+    # Look up the true global config (this function is defined via exec() into the
+    # caller's namespace, so globals() here is that namespace, not the local
+    # 'config' parameter above, which defaults to [] and is otherwise unused)
+    _global_config = globals().get('config')
+    version_main = _global_config.get('chrome_version_main') if isinstance(_global_config, dict) else None
+    chrome_binary_location = _global_config.get('chrome_binary_location') if isinstance(_global_config, dict) else None
+
     if chrome_driver == '':
-        options.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
-        driver = uc.Chrome(options=options, headless=False, browser_executable_path=options.binary_location)
+        if chrome_binary_location:
+            options.binary_location = chrome_binary_location
+        driver = uc.Chrome(options=options, headless=False, browser_executable_path=chrome_binary_location, version_main=version_main)
     else:
-        driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver)
+        driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver, version_main=version_main)
     
     driver.get("https://www.bestfightodds.com/")
     
