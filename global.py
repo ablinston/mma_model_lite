@@ -60,6 +60,7 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 import shutil
+import subprocess
 # from sklearn.utils import resample
 from sklearn.calibration import calibration_curve, CalibratedClassifierCV
 from sklearn.metrics import log_loss, accuracy_score, f1_score, roc_auc_score
@@ -112,3 +113,44 @@ if not os.name == "nt":
     config['gecko_driver_location'] = config['gecko_driver_location_pi']
     config['chrome_driver_location'] = config['chrome_driver_location_pi']
     config['num_threads'] = 2
+
+# Auto-detect the installed Chrome/Chromium version so undetected_chromedriver
+# can be told exactly which chromedriver build to fetch, instead of relying on
+# its own detection (which mismatches when running Chrome Beta, since it
+# updates ahead of published stable drivers)
+def _detect_chrome_version(binary_path):
+    try:
+        if os.name == "nt":
+            # On Windows, running chrome.exe with --version can attach to (or
+            # launch) a full browser window instead of printing and exiting, so
+            # read the version straight off the file instead of executing it
+            ps_command = f"(Get-Item -LiteralPath '{binary_path}').VersionInfo.ProductVersion"
+            version_output = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command", ps_command],
+                stderr=subprocess.STDOUT, timeout=15
+            ).decode('utf-8', errors='ignore')
+        else:
+            # On Linux/Chromium (e.g. the Raspberry Pi), --version is safe: it
+            # prints to stdout and exits rather than opening a window
+            version_output = subprocess.check_output(
+                [binary_path, '--version'], stderr=subprocess.STDOUT, timeout=15
+            ).decode('utf-8', errors='ignore')
+
+        version_match = re.search(r'(\d+)\.\d+\.\d+\.\d+', version_output)
+        if version_match:
+            return int(version_match.group(1))
+    except Exception as e:
+        logging.warning(f"Could not auto-detect Chrome version from {binary_path}: {e}")
+    return None
+
+if os.name == "nt":
+    config['chrome_version_main'] = _detect_chrome_version(config['chrome_binary_location'])
+    uc_cache_path = os.path.join(os.path.expanduser('~'), 'appdata', 'roaming', 'undetected_chromedriver')
+else:
+    config['chrome_version_main'] = _detect_chrome_version(config.get('chrome_binary_location_pi', '/usr/bin/chromium-browser'))
+    uc_cache_path = os.path.join(os.path.expanduser('~'), '.local', 'share', 'undetected_chromedriver')
+
+# Clear any cached chromedriver binary so a stale driver left over from a
+# previous Chrome/Chromium install or update is never reused
+if os.path.isdir(uc_cache_path):
+    shutil.rmtree(uc_cache_path, ignore_errors=True)
