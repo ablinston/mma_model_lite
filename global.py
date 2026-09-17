@@ -2,17 +2,12 @@
 import sys
 import os
 
-if os.name == "nt":
-    sys.path.append('X:/Repos/custom_tools')
-else:
-    sys.path.append('/home/andy/Repos/custom_tools')
+from ablinston_ml.validation import k_fold_id_by_runner
+from ablinston_ml.experiments import TemperatureScaler
+from ablinston_ml.scraping import get_website_soup
+# from ablinston_ml.scraping import parallel_scrape_and_process_urls
 
-from model_tools.k_fold_id_by_runner import k_fold_id_by_runner
-from model_tools.TemperatureScaler import TemperatureScaler
-from scraping_tools.get_website_soup import get_website_soup
-# from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
-
-# from scraping_tools.parallel_scrape_and_process_urls import parallel_scrape_and_process_urls
+# from ablinston_ml.scraping import parallel_scrape_and_process_urls
 
 import betfairlightweight
 from betfairlightweight import StreamListener
