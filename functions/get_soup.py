@@ -17,9 +17,6 @@ def get_soup(url):
         if soup.find(string = re.compile('Checking your browser')) is None:
             break
         else:
-            if not os.name == 'nt':
-                soup = get_website_soup(url, fast = False, chrome_driver = './data/chrome_drivers/chromedriver_64ARM' ,time_delay = True)
-            else:
-                soup = get_website_soup(url, fast = False, time_delay = True)
+            soup = get_website_soup(url, fast = False, time_delay = True)
         
     return soup

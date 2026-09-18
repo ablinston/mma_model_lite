@@ -13,10 +13,9 @@ def scrape_fighter_odds_fast(
         event_urls = False,
         fast = True,
         playwright = False,
-        firefox_binary = '', 
+        firefox_binary = '',
         gecko_driver = '',
-        chrome_driver = '',
-        driver = None):
+        browser = None):
 
     # pdb.set_trace()
     
@@ -29,8 +28,8 @@ def scrape_fighter_odds_fast(
         if playwright == True:
             # Use parallel scraping within playwright
             with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                playwright_context = browser.new_context()
+                playwright_browser = p.chromium.launch(headless=True)
+                playwright_context = playwright_browser.new_context()
         else:
             playwright_context = None
             
@@ -43,9 +42,8 @@ def scrape_fighter_odds_fast(
             cookies = cookies_dict, # Only needed for fast
             firefox_binary = firefox_binary, # Only needed for NOT fast
             gecko_driver = gecko_driver,
-            chrome_driver = chrome_driver,
-            driver = driver
-        )            
+            browser = browser
+        )
         
         # skip if no possible matches found
         if soup.find('table') == None:
@@ -70,13 +68,12 @@ def scrape_fighter_odds_fast(
                 cookies = cookies_dict, # Only needed for fast
                 firefox_binary = firefox_binary, # Only needed for NOT fast
                 gecko_driver = gecko_driver,
-                chrome_driver = chrome_driver,
-                driver = driver
+                browser = browser
             )
 
         if playwright:
             # Close the browser
-            browser.close()
+            playwright_browser.close()
             
         # pdb.set_trace()
                     

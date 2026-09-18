@@ -14,7 +14,6 @@ def update_odds_data(existing_odds_data, existing_event_urls, existing_event_odd
         num_threads = config['num_threads_odds_scrape'], # TO ADDRESS ISSUE WITH BESTFIGHTODDS CAPTCHA
         firefox_location = config['firefox_location'], 
         gecko_driver = config['gecko_driver_location'],
-        chrome_driver = config['chrome_driver_location'],
         odds_urls_overide_df = fighter_odds_urls,
         event_urls = True,
         fast = fast_scrape)
