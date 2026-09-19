@@ -13,8 +13,6 @@ def scrape_fighter_odds_fast(
         event_urls = False,
         fast = True,
         playwright = False,
-        firefox_binary = '',
-        gecko_driver = '',
         browser = None):
 
     # pdb.set_trace()
@@ -40,11 +38,10 @@ def scrape_fighter_odds_fast(
             fast = fast,
             playwright_context = playwright_context,
             cookies = cookies_dict, # Only needed for fast
-            firefox_binary = firefox_binary, # Only needed for NOT fast
-            gecko_driver = gecko_driver,
+            chrome_binary = config['chrome_binary_location'], # Only needed for NOT fast
             browser = browser
         )
-        
+
         # skip if no possible matches found
         if soup.find('table') == None:
             print(f"Error scraping {fighter_name} with {headers['User-Agent']}")
@@ -66,8 +63,7 @@ def scrape_fighter_odds_fast(
                 playwright_context = playwright_context,
                 # headers = headers, # Only needed for fast
                 cookies = cookies_dict, # Only needed for fast
-                firefox_binary = firefox_binary, # Only needed for NOT fast
-                gecko_driver = gecko_driver,
+                chrome_binary = config['chrome_binary_location'], # Only needed for NOT fast
                 browser = browser
             )
 

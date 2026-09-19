@@ -19,8 +19,6 @@ def test_parallel_scrape_odds_fast():
         fighter_list,
         config = config,
         num_threads = config['num_threads_odds_scrape'], 
-        firefox_location = config['firefox_location'],
-        gecko_driver = config['gecko_driver_location'],
         odds_urls_overide_df = fighter_odds_urls)
     
 

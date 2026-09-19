@@ -23,8 +23,6 @@ def test_scrape_fighter_odds():
         'Georges St-Pierre',
         cookies_dict = {},
         odds_urls_overide_df = pd.DataFrame({'fighter':[]}),
-        firefox_binary = config['firefox_location'],
-        gecko_driver = config['gecko_driver_location'],
         fast = False,
         browser = browser)
 

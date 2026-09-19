@@ -28,8 +28,6 @@ fighter_odds_urls = pd.read_csv(config['fighter_odds_urls'])
 fighter_odds, event_urls_odds_agg = parallel_scrape_odds_fast(
     fighter_list, 
     num_threads = config['num_threads'], 
-    firefox_location = config['firefox_location'], 
-    gecko_driver = config['gecko_driver_location'],
     odds_urls_overide_df = fighter_odds_urls,
     event_urls = True)
 

@@ -5,8 +5,6 @@ def parallel_scrape_odds_fast(
         output_df = pd.DataFrame(), 
         config = [],
         num_threads = 1, 
-        firefox_location = '',
-        gecko_driver = '',
         odds_urls_overide_df = None,
         event_urls = False,
         fast = True,
@@ -74,8 +72,6 @@ def parallel_scrape_odds_fast(
         event_urls = event_urls,
         playwright = playwright,
         fast = fast,
-        firefox_binary = firefox_location,
-        gecko_driver = gecko_driver
     )
     
     # Check if we have more than 1 thread
@@ -110,8 +106,6 @@ def parallel_scrape_odds_fast(
                 event_urls = event_urls,
                 playwright = playwright,
                 fast = fast,
-                firefox_binary = firefox_location,
-                gecko_driver = gecko_driver,
                 browser = browser)
             
             odds_scrape_results.append(odds_result)  # Collect the result (url, title)

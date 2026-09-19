@@ -9,9 +9,7 @@
 def scrape_event_odds_fast(
         event_details, # A tuple with the event url and date together
         cookies_dict,
-        fast = True,
-        firefox_binary = '',
-        gecko_driver = ''):
+        fast = True):
 
     # pdb.set_trace()
 
@@ -20,7 +18,7 @@ def scrape_event_odds_fast(
         # Arrive from another page on the site rather than cold, to look like normal browsing
         referer = f'https://www.bestfightodds.com/events/ufc-{random.randint(3500, 3700)}'
 
-        soup = get_website_soup('https://www.bestfightodds.com' + event_details[1]['event_url'], fast = fast, referer = referer, cookies = cookies_dict, firefox_binary = firefox_binary, gecko_driver = gecko_driver)
+        soup = get_website_soup('https://www.bestfightodds.com' + event_details[1]['event_url'], fast = fast, referer = referer, cookies = cookies_dict, chrome_binary = config['chrome_binary_location'])
         # # Navigate to the website
         # response = requests.get('https://www.bestfightodds.com' + event_details[1]['event_url'], headers=headers, cookies=cookies_dict)
         
