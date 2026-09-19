@@ -21,7 +21,7 @@ exec(open('global.py').read())
 
 # Replace the firefox location if we're not on windows
 if not os.name == "nt":
-    config['firefox_location'] = config['firefox_location_pi']
+    config['firefox_location'] = config['firefox_location_linux']
 
 # Use this to skip update of data if it's already been done recently
 skip_data_update = False

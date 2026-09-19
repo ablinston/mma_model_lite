@@ -8,15 +8,6 @@ def get_soup(url):
     returns:
     soup
     """
-    page = requests.get(url)
-    soup = BeautifulSoup(page.content, 'html.parser')
-    
-    # If we didn't get a good result
-    for attempt in range(0, 6):
-        
-        if soup.find(string = re.compile('Checking your browser')) is None:
-            break
-        else:
-            soup = get_website_soup(url, fast = False, time_delay = True)
-        
-    return soup
+    # get_website_soup drops to a browser itself if the fast fetch gets blocked
+    return get_website_soup(url, fast = True, time_delay = True,
+                            chrome_binary = config['chrome_binary_location'])

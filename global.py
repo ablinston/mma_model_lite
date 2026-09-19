@@ -3,7 +3,7 @@ import sys
 import os
 
 from ablinston_ml.validation import k_fold_id_by_runner
-from ablinston_ml.experiments import TemperatureScaler
+# from ablinston_ml.experiments import TemperatureScaler
 from ablinston_ml.scraping import clear_captcha, get_website_soup, start_browser
 # from ablinston_ml.scraping import parallel_scrape_and_process_urls
 
@@ -99,10 +99,10 @@ for file in listdir('./functions/'):
 # Settings so that data frames always display in full in terminal
 pd.set_option('display.max_columns', None)
 
-# Change configs for Raspberry Pi
+# Change configs for Linux, which covers both the Pi and the container
 if not os.name == "nt":
-    config['firefox_location'] = config['firefox_location_pi']
-    config['gecko_driver_location'] = config['gecko_driver_location_pi']
-    config['chrome_binary_location'] = config['chrome_binary_location_pi']
+    config['firefox_location'] = config['firefox_location_linux']
+    config['gecko_driver_location'] = config['gecko_driver_location_linux']
+    config['chrome_binary_location'] = config['chrome_binary_location_linux']
     config['num_threads'] = 2
 

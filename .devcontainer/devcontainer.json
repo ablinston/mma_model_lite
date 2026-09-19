@@ -1,0 +1,37 @@
+{
+  "name": "mma_model_lite (CPU)",
+
+  // Built from the non-CUDA Dockerfile. Context is the project folder because
+  // the Dockerfile copies requirements.txt out of it.
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // ablinston-ml is a sibling folder on the host, kept out of /workspace so it
+  // does not show up in the project tree
+  "mounts": [
+    "source=${localWorkspaceFolder}/../ablinston-ml,target=/opt/ablinston-ml,type=bind,consistency=cached",
+    "source=${localWorkspaceFolder}/../.claude,target=/root/.claude,type=bind"
+  ],
+  "remoteUser": "root",
+
+  // Editable, so edits to ablinston-ml show up here without reinstalling
+  "postCreateCommand": "pip install -e /opt/ablinston-ml",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python"
+      }
+    }
+  }
+}
