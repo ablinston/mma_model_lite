@@ -1,3 +1,4 @@
+
 # Import functions from my scraper library
 import sys
 import os
@@ -17,8 +18,8 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 import copy
-import datatable as dt
-from datatable import f
+# import datatable as dt
+# from datatable import f
 from datetime import datetime, date, timedelta, timezone
 # from fake_useragent import UserAgent
 import fastparquet as fp

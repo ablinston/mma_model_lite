@@ -1,10 +1,8 @@
-FROM debian:bookworm-slim
+FROM python:3.11-slim-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11-venv \
-    python3.11-dev \
     build-essential \
     git \
     ca-certificates \
@@ -19,14 +17,14 @@ RUN printf '%b' '[include]\n\tpath = /root/.gitconfig-host\n' \
 
 WORKDIR /workspace
 
-RUN python3.11 -m venv /opt/venv
+RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt \
-    && apt-get purge -y build-essential python3.11-dev \
+    && apt-get purge -y build-essential \
     && apt-get autoremove -y
 
 
