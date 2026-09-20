@@ -135,7 +135,8 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     del([new_stats, prefix])
     
     # Fill the NAs in the fight stats with 0 for landed and attempts
-    fight_stats_agg.fillna(0, inplace = True)
+    stats_cols = [col for col in fight_stats_agg.columns.to_list() if col not in id_cols]
+    fight_stats_agg.loc[:, stats_cols] = fight_stats_agg.loc[:, stats_cols].fillna(0)
     
     # Calculate the total for all rounds then merge onto data
     fight_stats_all_round = fight_stats.groupby(id_cols)[agg_cols].sum().reset_index().rename(columns = dict(zip(agg_cols, ['allrounds_' + col for col in agg_cols])))
