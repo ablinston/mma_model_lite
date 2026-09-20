@@ -1,12 +1,13 @@
 ,date,event,f1_scrape_date,f2_scrape_date,fighter1,fighter1_backtesting_odds,Fighter1_win_prob,Fighter1_win_EV,fighter2,fighter2_backtesting_odds,Fighter2_win_prob,Fighter2_win_EV,Bet_trigger,bet_assumed_odds,Bet_min_exchange_odds,Final_bet,Potential_win,notformodel_exclusion_reason
-0,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,NaT,Brendan Allen,1.46,76.9,0.12,Edmen Shahbazyan,3.17,20.4,-0.35,Brendan Allen,1.46,1.44,165.0,75.9,
-1,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Fares Ziam,1.36,76.9,0.05,Tom Nolan,3.55,20.4,-0.28,None,0.0,,0.0,0.0,
-2,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Matt Schnell,5.7,23.5,0.34,Alessandro Costa,1.14,73.5,-0.16,None,0.0,,0.0,0.0,
-3,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Priscila Cachoeira,1.95,31.7,-0.38,Chelsea Chandler,1.03,65.1,-0.33,None,0.0,,0.0,0.0,
-4,2026-06-06,ufcfightnight:muhammadvsbonfim,2026-06-02 19:35:25.780,2026-06-02 19:35:25.780,Belal Muhammad,1.7,45.6,-0.22,Gabriel Bonfim,2.1,51.2,0.08,None,0.0,,0.0,0.0,
-2,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Bryce Mitchell,,,,Santiago Luna,,,,,,,,,Fights < 3
-3,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Iwo Baraniewski,,,,Junior Tafa,,,,,,,,,Fights < 3
-6,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Bruno Silva,,,,Edgar Chairez,,,,,,,,,Womens
-7,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Jordan Leavitt,,,,Joanderson Brito,,,,,,,,,Womens
-8,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Jeisla Chaves,,,,Yuneisy Duben,,,,,,,,,Womens
-9,2026-06-06,ufcfightnight:muhammadvsbonfim,,,Marcus McGhee,,,,John Yannis,,,,,,,,,Fights < 3
+0,2026-09-19,ufc331:vanvspantoja2,2026-09-20 20:16:33.154212+00:00,2026-09-20 20:16:33.154212+00:00,Arman Tsarukyan,1.36,75.4,0.03,Mauricio Ruffy,3.5,21.8,-0.24,None,0.0,,0.0,0.0,
+1,2026-09-19,ufc331:vanvspantoja2,2026-09-20 20:16:33.154212+00:00,2026-09-20 20:16:33.154212+00:00,Alonzo Menifield,3.75,27.8,0.04,Iwo Baraniewski,1.4,69.0,-0.03,None,0.0,,0.0,0.0,
+2,2026-09-19,ufc331:vanvspantoja2,2026-09-20 20:16:33.154212+00:00,2026-09-20 20:16:33.154212+00:00,Marlon Vera,2.75,20.5,-0.44,Charles Jourdain,1.54,76.9,0.19,Charles Jourdain,1.54,1.44,165.0,89.19,
+3,2026-09-19,ufc331:vanvspantoja2,2026-09-20 20:16:33.154212+00:00,2026-09-20 20:16:33.154212+00:00,Edmen Shahbazyan,1.57,64.1,0.01,Brunno Ferreira,2.55,32.9,-0.16,None,0.0,,0.0,0.0,
+4,2026-09-19,ufc331:vanvspantoja2,2026-09-20 20:16:33.154212+00:00,2026-09-20 20:16:33.154212+00:00,Giga Chikadze,5.8,37.5,1.18,Joanderson Brito,1.25,59.0,-0.26,None,0.0,,0.0,0.0,
+5,2026-09-19,ufc331:vanvspantoja2,2026-09-20 20:16:33.154212+00:00,2026-09-20 20:16:33.154212+00:00,Tai Tuivasa,4.5,45.7,1.06,Robelis Despaigne,1.25,50.8,-0.37,None,0.0,,0.0,0.0,
+6,2026-09-19,ufc331:vanvspantoja2,2026-09-20 20:16:33.154212+00:00,2026-09-20 20:16:33.154212+00:00,Joshua Van,1.69,69.8,0.18,Alexandre Pantoja,2.38,27.3,-0.35,Joshua Van,1.69,1.59,165.0,113.79,
+1,2026-09-19,ufc331:vanvspantoja2,,,Patricio Pitbull,,,,Dooho Choi,,,,,,,,,Missing odds
+2,2026-09-19,ufc331:vanvspantoja2,,,Gable Steveson,,,,Sean Sharaf,,,,,,,,,Fights < 3
+5,2026-09-19,ufc331:vanvspantoja2,,,Ryan Gandra,,,,Ozzy Diaz,,,,,,,,,Fights < 3
+6,2026-09-19,ufc331:vanvspantoja2,,,Michael Aswell,,,,JooSang Yoo,,,,,,,,,Missing odds
+8,2026-09-19,ufc331:vanvspantoja2,,,Casey O'Neill,,,,Eduarda Moura,,,,,,,,,Womens
