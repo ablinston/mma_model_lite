@@ -9,6 +9,7 @@ __pycache__/
 data/raw_betfair/*
 mlruns/
 *xgb
+mlflow.db
 
 # Specific files
 results/7.5_random_forest_model.xgb
