@@ -106,7 +106,8 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     fight_results['fight_minutes'] = time_to_minutes_decimal(fight_results['time'])
     fight_stats = to_numeric(fight_stats, ['round', 'sub.att'])
     fight_results = to_numeric(fight_results, ['round'])
-    fight_stats = fight_stats.merge(fight_results[['bout', 'round', 'fight_minutes']], on = ['bout', 'round'], how = 'left')
+    # Event is needed in the join, otherwise a rematch picks up the first fight's round time
+    fight_stats = fight_stats.merge(fight_results[['event', 'bout', 'round', 'fight_minutes']], on = ['event', 'bout', 'round'], how = 'left')
     # Set fight time (5 minute round assumed)
     fight_stats['fight_minutes'] = fight_stats['fight_minutes'].fillna(config['round_time_default'])
     

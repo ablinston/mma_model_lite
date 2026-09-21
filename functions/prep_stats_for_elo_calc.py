@@ -52,7 +52,7 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
 
     # Remove any duplicates of fighters on dates
     # Sort so we keep records with results first
-    merged_data = merged_data.sort_values(['outcome'])
+    merged_data = merged_data.sort_values(['outcome'], kind = 'stable')
     merged_data = remove_duplicate_fighter_pairs(merged_data)
 
     # Now create a data frame that contains only the fighters and the dates they fought. This will be used to track the existing ELO of a fighter on that date

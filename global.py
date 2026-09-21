@@ -4,7 +4,7 @@ import sys
 import os
 
 from ablinston_ml import stop_if_not
-from ablinston_ml.validation import k_fold_id_by_runner
+from ablinston_ml.validation import k_fold_id_by_runner, equals_to_dp
 # from ablinston_ml.experiments import TemperatureScaler
 from ablinston_ml.scraping import clear_captcha, get_website_soup, start_browser
 # from ablinston_ml.scraping import parallel_scrape_and_process_urls

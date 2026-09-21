@@ -178,6 +178,7 @@ sbvirtualdisplay==1.4.0
 scikit-learn==1.9.1
 scipy==1.17.1
 scmrepo==3.6.2
+seaborn==0.13.2
 selenium==4.49.0
 seleniumbase==4.54.10
 semver==3.1.0
