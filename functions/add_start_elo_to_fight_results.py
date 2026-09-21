@@ -13,8 +13,8 @@ def add_start_elo_to_fight_results(fight_results, fight_stats, config, elo_confi
     elo_data, elo_fight_data_welo = derive_start_elos(start_elo, elo_fight_data, elo_config)
 
     # Create two versions to be added onto the results data
-    fighter1_elo = elo_data.copy().to_pandas().drop(['fight_number'], axis = 1).rename(columns = {'fighter': 'fighter1', 'start_elo': 'fighter1_start_elo'}).sort_values(['date']).reset_index(drop=True)
-    fighter2_elo = elo_data.copy().to_pandas().drop(['fight_number'], axis = 1).rename(columns = {'fighter': 'fighter2', 'start_elo': 'fighter2_start_elo'}).sort_values(['date']).reset_index(drop=True)
+    fighter1_elo = elo_data.to_pandas().drop(['fight_number'], axis = 1).rename(columns = {'fighter': 'fighter1', 'start_elo': 'fighter1_start_elo'}).sort_values(['date']).reset_index(drop=True)
+    fighter2_elo = elo_data.to_pandas().drop(['fight_number'], axis = 1).rename(columns = {'fighter': 'fighter2', 'start_elo': 'fighter2_start_elo'}).sort_values(['date']).reset_index(drop=True)
 
     # Merge this onto the fight results data, because this is a merge to the nearest date before or on the fight date. Can't merged elo_fight_data because draws etc were filtered out.
 

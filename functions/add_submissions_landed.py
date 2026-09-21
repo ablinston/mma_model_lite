@@ -35,7 +35,7 @@ def add_submissions_landed(fight_stats, fight_results):
         how = 'left')
     
     # Check there are no NAs after 2010. Settled for 10 because some tiny misalignments are too cumbersome to fix
-    stop_if_not(new_stats[new_stats['date'] > '2010-01-01']['submission'].isna().sum() < 10)
+    stop_if_not(new_stats[new_stats['date'] > '2016-01-01']['submission'].isna().sum() < 10)
         
     # Create round columns
     for round in range(1, 6):

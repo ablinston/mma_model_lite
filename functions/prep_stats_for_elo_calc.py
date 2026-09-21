@@ -1,9 +1,9 @@
 # This function prepares a stats dataset for the elo calcs. It takes in pandas data frames,
 # the cleaned fight results and fights stats data,
-# then outputs two datatables because that will be used for the ELO calc.
+# then outputs two polars frames because that will be used for the ELO calc.
 
-# The first output is a data table with each fighter and the ELO for each fight ready to be populated
-# The second output is a data table with each fight and the results/stats
+# The first output is a frame with each fighter and the ELO for each fight ready to be populated
+# The second output is a frame with each fight and the results/stats
 
 # remove_nas is a setting on whether to remove NA stats from the dataset. Some fights have no stats. If they are not remove, NAs will be filled by 0 so a basic version of ELO will apply.
 
@@ -152,9 +152,9 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
         for col in [colu  for colu in merged_data.columns if colu not in ['fighter1_start_elo', 'fighter2_start_elo']]
     })
     
-    # Convert to data table for speed
-    merged_data = dt.Frame(merged_data)
-    start_elo = dt.Frame(start_elo)
-    start_elo.key = ['date', 'fighter']
-    
+    # Convert to polars for speed. start_elo goes in date then fighter order because the
+    # ELO calc relies on each fighter's rows being in date order
+    merged_data = pl.from_pandas(merged_data)
+    start_elo = pl.from_pandas(start_elo).select(['date', 'fighter', 'fight_number', 'start_elo']).sort(['date', 'fighter'])
+
     return start_elo, merged_data
