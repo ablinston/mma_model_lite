@@ -12,6 +12,10 @@ RUN apt-get update && apt-get install -y \
     git \
     openssh-client \
     curl \
+    xvfb \
+    xauth \
+    # deadsnakes keeps tkinter separate, and pyautogui dies without it
+    python3.11-tk \
     # Get chromium for the scrapers
     && curl -fsSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/chrome.deb \
     && apt-get install -y /tmp/chrome.deb \
