@@ -1,3 +1,14 @@
+from ablinston_ml import stop_if_not
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from scipy.stats import hmean
+from sklearn.calibration import calibration_curve
+from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
+from sklearn.preprocessing import label_binarize
+
+from mma_functions import modelling, odds
+
 def calculate_metrics(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, classes = np.array([0, 1, 2])):
     
     """
@@ -45,7 +56,7 @@ def calculate_metrics(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, clas
     # **Calculate LogLoss**
     log_loss_result = log_loss(y_test_df, y_pred_prob, labels = classes)
 
-    ev_mse = ev_loss_function(
+    ev_mse = modelling.ev_loss_function(
         y_pred_prob,
         y_test_df,
         fighter1_odds, 
@@ -74,7 +85,7 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     # pdb.set_trace()
 
     # First get the predictions from the ensemble
-    y_pred_prob = odds_to_probabilities(X_test['fighter1_backtesting_odds'], X_test['fighter2_backtesting_odds'])
+    y_pred_prob = odds.odds_to_probabilities(X_test['fighter1_backtesting_odds'], X_test['fighter2_backtesting_odds'])
 
     # # Fill in nas
     # y_pred_prob['L/W'] = y_pred_prob['L/W'].fillna(0.499)
@@ -116,7 +127,7 @@ def calculate_metrics_odds(X_test, y_test, classes = np.array([0, 1, 2])):
     log_loss_result = log_loss(y_test, y_pred_prob, labels = classes)    
 
     # Calculate the MSE of the Expected value
-    ev_mse = ev_loss_function(
+    ev_mse = modelling.ev_loss_function(
         y_pred_prob,
         y_test,
         X_test['fighter1_backtesting_odds'], 
@@ -380,12 +391,12 @@ def summarise_model_predictions(
     
     #######################################
     # Now calculate the target odds, for everyone, but especially those with no bets
-    wl_target_odds_inc_commission = calculate_target_odds(prediction_probabilities[:, 2], target_ev_after_cutoff, exchange_commission)
-    lw_target_odds_inc_commission = calculate_target_odds(prediction_probabilities[:, 0], target_ev_after_cutoff, exchange_commission)
+    wl_target_odds_inc_commission = odds.calculate_target_odds(prediction_probabilities[:, 2], target_ev_after_cutoff, exchange_commission)
+    lw_target_odds_inc_commission = odds.calculate_target_odds(prediction_probabilities[:, 0], target_ev_after_cutoff, exchange_commission)
     
     # And do the same for lay odds
-    wl_target_lay_odds_inc_commission = calculate_target_lay_odds(prediction_probabilities[:, 2], target_ev_after_cutoff, exchange_commission)
-    lw_target_lay_odds_inc_commission = calculate_target_lay_odds(prediction_probabilities[:, 0], target_ev_after_cutoff, exchange_commission) 
+    wl_target_lay_odds_inc_commission = odds.calculate_target_lay_odds(prediction_probabilities[:, 2], target_ev_after_cutoff, exchange_commission)
+    lw_target_lay_odds_inc_commission = odds.calculate_target_lay_odds(prediction_probabilities[:, 0], target_ev_after_cutoff, exchange_commission) 
     
     # Calculate target betsizes
     actuals_data['fighter1_target_bet_size'] = (min_bet_size + (max_bet_size - min_bet_size) * (

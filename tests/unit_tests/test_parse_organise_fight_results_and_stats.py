@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+
+from mma_functions.parsing import parse_organise_fight_results_and_stats
+from mma_functions.scraping import get_soup
+from mma_functions.config import config
 
 # Load what answers are expected
 parse_organise_fight_results_correct = fp.ParquetFile('./tests/data/parse_organise_fight_results_correct.parquet').to_pandas()
@@ -20,4 +24,3 @@ def test_parse_organise_fight_results_and_stats():
     
     assert (fight_results.equals(parse_organise_fight_results_correct)) & (fight_stats.equals(parse_organise_fight_stats_correct)) == True
     
-

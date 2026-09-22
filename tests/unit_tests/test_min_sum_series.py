@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import pandas as pd
+
+from mma_functions.utils import minimum_sum_series
 
 # Get an example series
 test_series = pd.Series([1, -1, 0, 1, -1, -1, -1, 1, -1, 1, -1, -1])

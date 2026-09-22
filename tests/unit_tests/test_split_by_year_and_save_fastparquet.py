@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import os
+import pandas as pd
+
+from mma_functions.utils import concat_parquets_fastparquet, split_by_year_and_save_fastparquet
 
 import shutil
 

@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+
+from mma_functions.features import calculate_knocked_out_stats
 
 
 correct = fp.ParquetFile('./tests/data/test_calculate_knocked_out_stats_correct.parquet').to_pandas()

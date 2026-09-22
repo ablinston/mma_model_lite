@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import pandas as pd
+
+from mma_functions.dataset import remove_duplicate_fighter_pairs
 
 # This test looks whether the function effectively removes the duplicate rows
 def test_remove_duplicate_fighter_pairs():

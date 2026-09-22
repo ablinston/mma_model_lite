@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+from datetime import datetime, timedelta
+import numpy as np
+import pandas as pd
+
+from mma_functions.features import calculate_win_loss_stats
 
 def test_calculate_win_loss_statts():
     
@@ -123,4 +127,3 @@ def test_calculate_win_loss_statts():
 
     # Fighter C: second fight should still be NaN for rolling 3-fight win%
     assert pd.isna(C["hist_win_percent_3_fights"].iloc[1])
-

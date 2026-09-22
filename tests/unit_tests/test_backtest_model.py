@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.pipelines import backtest_model
 
 def test_backtest_model():
     # Create dummy actuals data

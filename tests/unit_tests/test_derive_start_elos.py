@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.elo import add_start_elo_to_fight_results
+from mma_functions.config import config, elo_config
 
 # This test looks at a specific URL for an historic event and checks that the results match what is expected
 def test_derive_start_elos():

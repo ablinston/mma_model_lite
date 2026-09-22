@@ -1,5 +1,5 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+from mma_functions.dataset import trim_column_list
 
 # Test cases for the trim_column_list function
 def test_trim_column_list():

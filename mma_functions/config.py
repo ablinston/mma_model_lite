@@ -28,3 +28,9 @@ def load_configs(configs_path = CONFIG_DIR):
 
 # Load the configs into global space
 globals().update(load_configs())
+
+# Change configs for Linux, which covers both the Pi and the container
+if not os.name == "nt":
+    config['firefox_location'] = config['firefox_location_linux']
+    config['gecko_driver_location'] = config['gecko_driver_location_linux']
+    config['chrome_binary_location'] = config['chrome_binary_location_linux']

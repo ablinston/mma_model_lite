@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+from datetime import datetime
+import numpy as np
+import pandas as pd
+
+from mma_functions.betfair import betfair_bout_get_chosen_odds
 
 # Test cases for the trim_column_list function
 def test_betfair_bout_get_chosen_odds():

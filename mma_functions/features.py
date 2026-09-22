@@ -1,3 +1,12 @@
+from ablinston_ml import stop_if_not
+import numpy as np
+import pandas as pd
+import pdb
+import polars as pl
+
+from mma_functions import cleaning, dataset, utils
+from mma_functions.config import config
+
 import requests
 
 # This function takes a data frame with stats columns, another dataframe with every fighter's historic stats and calculates adjusted
@@ -28,7 +37,7 @@ def add_adjusted_stats(
 
     # We want to merge the historic stats of opponents onto the data
     # FIrst get opponent column
-    new_stats_df = add_opponent_column(stats_df.copy())
+    new_stats_df = dataset.add_opponent_column(stats_df.copy())
     
     # Add per minute stats on
     if 'per_minute' in columns_with:
@@ -101,8 +110,8 @@ def add_fighter_differentials(df, zero_over_zero_fill = 1):
     fighter2_accuracy_def_cols = [col for col in sorted_columns if ('accuracy_percent' in col or 'ctrl_minutes_against_per_minute' in col) and 'diff' not in col and 'fighter2' in col and 'against' in col]
     
     # Check the columns line up
-    stop_if_not(check_identical_excl_string(fighter1_accuracy_off_cols, [col.replace('_against', '') for col in fighter2_accuracy_def_cols], 'fighter1', 'fighter2'))
-    stop_if_not(check_identical_excl_string(fighter2_accuracy_off_cols, [col.replace('_against', '') for col in fighter1_accuracy_def_cols], 'fighter2', 'fighter1'))
+    stop_if_not(utils.check_identical_excl_string(fighter1_accuracy_off_cols, [col.replace('_against', '') for col in fighter2_accuracy_def_cols], 'fighter1', 'fighter2'))
+    stop_if_not(utils.check_identical_excl_string(fighter2_accuracy_off_cols, [col.replace('_against', '') for col in fighter1_accuracy_def_cols], 'fighter2', 'fighter1'))
     
     first_exprs = []
 
@@ -139,7 +148,7 @@ def add_fighter_differentials(df, zero_over_zero_fill = 1):
     fighter2_cols.sort()
 
     # Check that the columns correspond to one another
-    if check_identical_excl_string(fighter1_cols, fighter2_cols, 'fighter1_', 'fighter2_', check_both = True):
+    if utils.check_identical_excl_string(fighter1_cols, fighter2_cols, 'fighter1_', 'fighter2_', check_both = True):
         print("Column correspondence check PASSED")
     else:
         print("Column correspondence check FAILED")
@@ -152,7 +161,7 @@ def add_fighter_differentials(df, zero_over_zero_fill = 1):
     f1_dates = [c for c in fighter1_cols if c in date_cols]
     f2_dates = [c for c in fighter2_cols if c in date_cols]
     
-    stop_if_not(check_identical_excl_string(f1_no_dates, f2_no_dates, 'fighter1_', 'fighter2_', check_both = True))
+    stop_if_not(utils.check_identical_excl_string(f1_no_dates, f2_no_dates, 'fighter1_', 'fighter2_', check_both = True))
 
     # --- Differences ---
     # Build a set of all boolean columns
@@ -909,7 +918,7 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
     merged_data[landed_columns].index = merged_data[percent_columns].index
     
     # Shapes where strange so had to use numpy
-    new_data = pd.DataFrame(safe_divide_np(merged_data[landed_columns].to_numpy(), merged_data[percent_columns].to_numpy(), zero_zero_fill = np.nan), columns = new_percent_cols)
+    new_data = pd.DataFrame(utils.safe_divide_np(merged_data[landed_columns].to_numpy(), merged_data[percent_columns].to_numpy(), zero_zero_fill = np.nan), columns = new_percent_cols)
     
     # Remove percentages for sample sizes below minimum thresholds, excluding takedowns
     percent_columns_no_td = [col for col in percent_columns if "_td_" not in col]
@@ -944,7 +953,7 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
         bayes_alphas = merged_data_bayes[bayes_numerators] * bayes_alpha_plus_beta_rebase / merged_data_bayes[bayes_denominators].to_numpy()
         
         # Calculate the bayes percentages
-        new_data = pd.DataFrame(safe_divide_np(
+        new_data = pd.DataFrame(utils.safe_divide_np(
             merged_data_bayes[landed_columns].fillna(0).to_numpy() + bayes_alphas.to_numpy(), 
             merged_data_bayes[percent_columns].fillna(0).to_numpy() + bayes_alpha_plus_beta_rebase, 
             zero_zero_fill = np.nan
@@ -1209,3 +1218,144 @@ def longest_streak(series, target_value):
 
     # Return the longest streak length
     return streak_lengths.max() or 0
+
+# This function switches who is fighter1 and fighter2 on the merged final dataset
+
+def switch_fighter1_fighter2(df_original = None, filter_boolean = None, X = None, y = None, for_model = True):
+    """
+    # This functions takes a dataframe and a filter of same length and switches fighter1 and fighter2 in the rows labelled 'True'
+    
+    It can either take a data frame as a whole, or take data in the form of X y, i.e. predictors split into a data frame X and y is the observed outcomes
+    
+    """
+    # pdb.set_trace()
+    
+    # First, check the type of y. It will be forced to int
+    if y is not None:
+        if y.dtype != 'int32':
+            print('Warning: y vector passed into switch_fighter1_fighter2() is not an int32 type. Output will be forced to int32')
+
+    # Make the filter an array from a list to avoid index issues
+    filter_boolean = np.array(list(filter_boolean))
+
+    # Define the data to be switched
+    if X is None:
+        df = df_original.copy()
+        df = df[filter_boolean].copy()
+    else:
+        df = X.copy()
+        df = df[filter_boolean].copy()
+        y_new = y.copy()
+        y_new = y_new[filter_boolean].copy()
+
+    final_cols = df.columns.tolist()
+        
+    # Undo any cleaning that's been done on the data
+    df = cleaning.undo_clean_inf(df)
+
+    # Swap column names
+    swap_dict = {'fighter1': 'fighter2', 'fighter2': 'fighter1'}
+    df.columns = df.columns.str.replace(r'fighter1|fighter2', lambda x: swap_dict.get(x.group(0), x.group(0)), regex=True)
+
+    # # First rename fighter1 columns
+    # df.columns = df.columns.str.replace('fighter1', 'fighterX')
+
+    # # Now rename fighter2
+    # df.columns = df.columns.str.replace('fighter2', 'fighter1')
+
+    # # Now create the final name for fighter1
+    # df.columns = df.columns.str.replace('fighterX', 'fighter2')
+
+    # Now reverse and diff columns
+    diff_columns = [col for col in df.columns if 'diff' in col and 'diff_ratio' not in col]
+    df[diff_columns] = -df[diff_columns]
+
+    diff_ratio_columns = [col for col in df.columns if 'diff_ratio' in col]
+    df[diff_ratio_columns] = 1 / df[diff_ratio_columns]
+
+    ## Now change individual columns
+
+    # Reverse the matchup. Have only done this when the matchup column is as a whole, dummies wont be properly adjusted! But they never seem to be high in importance so assumed not included in final models
+    if 'matchup' in df.columns:
+        fighter_types = df['matchup'].str.split('-vs-', expand = True)
+        df['matchup'] = fighter_types[1] + "-vs-" + fighter_types[0]
+
+    # Change the outcomes
+    if 'outcome' in df.columns:
+        df['outcome'] = np.where(df['outcome'] == 'W/L', 'L/W', np.where(df['outcome'] == 'L/W', 'W/L', df['outcome']))
+        
+    # Now combine this data with the rows not switched
+    if X is None:
+        final_df = pd.concat([df, df_original.copy().reset_index(drop = True)[~filter_boolean]])
+    else:
+        # # Create the filtered original data for those records not adjusted
+        # X_filtered = X.copy()[~filter_boolean]
+        
+        # # Now re-align the columns of the new data
+        # df = df.reindex(columns=X_filtered.columns)
+        
+        # final_df = pd.DataFrame(index=range(len(df) + len(X_filtered)), columns=df.columns)
+        # final_df.loc[: len(df) - 1] = df.values
+        # final_df.loc[len(df) :] = X_filtered.values
+        
+        # # Set column types to match the original df
+        # final_df = final_df.astype(df.dtypes.to_dict())
+
+        final_df = pd.concat([df.copy(), X.copy()[~filter_boolean]])
+    
+    # Handle cases where we have X, y input instead of a single data frame
+    if y is not None: # Check this works with W/L and isn't 0, 1, 2
+        y_new = y_new.astype('int32')
+        y_df = pd.DataFrame(y_new)
+        y_df.iloc[:, 0] = np.where(y_df.iloc[:, 0] == 2, 0, np.where(y_df.iloc[:, 0] == 0, 2, y_df.iloc[:, 0]))
+        
+        # Now combine this data with the rows not switched
+        y_new = pd.concat([y_df.iloc[:, 0], y[~filter_boolean]])
+        
+    # pdb.set_trace()
+    # Recalculate diff columns because Infs etc might have been cleaned before. Only keep the columns needed
+    save_index = final_df.index.copy()
+    diff_df = add_fighter_differentials(final_df)
+    
+    # Keep the diff in dates from the original data and use the diffs from the rest of the data
+    diff_df = pd.concat([
+        diff_df[[col for col in diff_df.columns if 'date' not in col and 'dob' not in col]].reset_index(drop = True), 
+        final_df[[col for col in final_cols if ('date' in col or 'dob' in col) or col not in diff_df.columns]].reset_index(drop = True)
+        ], axis = 1)
+    
+    # Set index back to what it was
+    diff_df.index = save_index
+    
+    final_df = diff_df.loc[:, final_cols].copy()
+    
+    # Clean columns of infs if necessary
+    if for_model:
+        final_df = cleaning.clean_inf_and_large(final_df)
+        final_df = dataset.format_cols_for_model(final_df)
+        
+    # Make sure the data types of the columns are as before
+    if X is None:
+        final_df = final_df.astype(df_original.dtypes.to_dict())
+    else:
+        final_df = final_df.astype(X.dtypes.to_dict())
+        y_new = y_new.astype('int32')
+    
+    # Check we have the correct number of rows and columns
+    if X is None:
+        stop_if_not(final_df.shape == df_original.shape, 'Dataset length check')
+    else:
+        stop_if_not(final_df.shape == X.shape, 'Dataset length check')
+
+    # # Ensure the old index is preserved
+    # ## CAN'T GET IT TO WORK
+    # if X is None:
+    #     final_df = final_df.loc[df_original.index]
+    # else:
+    #     final_df2 = final_df.loc[X.index]
+    #     y_new2 = y_new.loc[y.index.values]
+    
+
+    if y is None:
+        return final_df.copy()
+    else:
+        return final_df.copy(), y_new.copy()

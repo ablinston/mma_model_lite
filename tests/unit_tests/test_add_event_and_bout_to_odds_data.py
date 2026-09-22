@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+
+from mma_functions.odds import add_event_and_bout_to_odds_data
 
 # Load what answers are expected
 test_add_event_and_bout_to_odds_data_correct = fp.ParquetFile('./tests/data/test_add_event_and_bout_to_odds_data_correct.parquet').to_pandas()

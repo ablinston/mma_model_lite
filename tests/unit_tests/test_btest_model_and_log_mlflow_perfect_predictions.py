@@ -1,5 +1,10 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.cleaning import clean_target_column
+from mma_functions.evaluation import calculate_metrics, calculate_metrics_odds
+from mma_functions.pipelines import btest_model_and_log_mlflow
 
 import mlflow
 from unittest.mock import patch
@@ -57,7 +62,8 @@ def test_btest_model_and_log_mlflow_perfect_predictions(mock_log_artifact, mock_
         breakdown_cols=breakdown_cols,
         breakdown_metrics=breakdown_metrics,
         mlflow_description=mlflow_description,
-        backtesting_params = {'min_prob_to_bet': 0, 'min_ev_to_bet': -0.01, 'max_bet_size': 1}
+        backtesting_params = {'min_prob_to_bet': 0, 'min_ev_to_bet': -0.01, 'max_bet_size': 1},
+        log_mlflow = False
     )
 
     calc_metrics['Logloss'] = np.round(calc_metrics['Logloss'], 8)

@@ -1,3 +1,21 @@
+from ablinston_ml import stop_if_not
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import gc
+import itertools
+import joblib
+import mlflow
+import numpy as np
+import pandas as pd
+import pdb
+from scipy.stats import hmean
+from sklearn.metrics import accuracy_score, auc, log_loss, roc_auc_score
+from sklearn.model_selection import KFold
+from sklearn.preprocessing import label_binarize
+import xgboost as xgb
+
+from mma_functions import cleaning, dataset, tracking
+from mma_functions.config import config, model_hyper_params
+
 def create_dmatrix(X_train, y_train, train_idx, test_idx, base_margin_cols, win_loss_only = False, split_dec_or_other_filter = False):
     
     # pdb.set_trace()
@@ -571,7 +589,7 @@ def objective_cv_xgboost(
         
         # Trim the model features for similar columns if set to
         if params['trim_model_features']:
-            X_train_trim = X_train[trim_column_list(X_train.columns)].copy()
+            X_train_trim = X_train[dataset.trim_column_list(X_train.columns)].copy()
         else:
             X_train_trim = X_train.copy()
             
@@ -848,15 +866,15 @@ def objective_xgboost_features_mlflow(
     # pdb.set_trace()
     
     # Check for duplicates
-    if is_duplicate_run(params, parameter_to_check = 'num_of_features'):
+    if tracking.is_duplicate_run(params, parameter_to_check = 'num_of_features'):
         
         # pdb.set_trace()
         
         # If the run existing, find what the loss was and return it without logging in mlflow
         if model_hyper_params['loss_function'] == 'ev_loss_function':
-            existing_metric, all_params = get_existing_metric_and_params({'num_of_features': params['num_of_features']}, 'EV MSE')
+            existing_metric, all_params = tracking.get_existing_metric_and_params({'num_of_features': params['num_of_features']}, 'EV MSE')
         else:
-            existing_metric, all_params = get_existing_metric_and_params({'num_of_features': params['num_of_features']}, 'Logloss')
+            existing_metric, all_params = tracking.get_existing_metric_and_params({'num_of_features': params['num_of_features']}, 'Logloss')
         
         print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
         return {'loss': existing_metric, 'params': all_params, 'status': STATUS_OK}
@@ -976,227 +994,6 @@ def objective_xgboost_features_mlflow(
         # Return whatever metric we wish to optimise for the LightGBM. Do 1 - because it tries to minimise the value.
         return {'loss': trials_inner.best_trial['result']['metrics']['Logloss'], 'params': params, 'status': STATUS_OK}
 
-# This function predicts future UFC events
-
-def predict_future_events(
-        skip_data_update,
-        skip_full_data_update,
-        skip_save_data,
-        skip_betfair_history,
-        config,
-        data_processing_config,
-        model_hyper_params,
-        betfair_login_config,
-        test_fighters,
-        output_path = None,
-        skip_data_scrape = False
-        ):
-    
-    """
-    This function predicts all the future UFC events. It first scrapes the latest data, then if required, reprocesses
-    the data to get the latest forecasting dataset, and then forecasts the upcoming fights based on the standard data filters
-    
-    Parameters
-    ----------
-    skip_data_update: bool
-        whether to skip updating the data and go straight to predictions
-    
-    skip_full_data_update: bool
-        whether to skip re-running the processing script on cleaned data. If set to False, only the odds will be updated
-        
-    skip_save_data: bool
-        set whether the saving of processed data should be skipped i.e. only used for the predictions
-        
-    skip_betfair_history: bool
-        set whether to skip downloading the latest betfair odds history data
-    
-    output_path: str
-        the path where the outputs from the predictions will be saved. This is in addition to automatic outputs, which will be saved in ./results/
-    
-    """
-    # pdb.set_trace()
-    # Set the odds to use as upcoming instead of as used in the regular data
-    data_processing_config['odds_suffix_for_true_odds'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
-    model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
-
-    ##########################################################################################
-    ### Update the upcoming event and odds data ###
-    ##########################################################################################
-
-    if not skip_data_update:
-        
-        if not skip_data_scrape:
-            # Run these scripts to scrape then clean the raw data.
-            # Pass skip_fighter_tott_update so the slow full-fighter re-scrape is
-            # skipped whenever we are also skipping the full dataset rebuild.
-            scrape_all_unparsed_data(
-                skip_betfair_history,
-                config,
-                betfair_login_config,
-                skip_fighter_tott_update = skip_full_data_update
-            )
-            clean_all_raw_data_and_save(config)
-        
-            gc.collect();
-        
-        # Optional, can either rerun all the processing, or just update the odds. By default will rerun all processing if new events were found to have completed
-        if skip_full_data_update:
-            
-            # Clear out memory
-            # globals().clear()
-            # # Read in global objects and packages
-            # exec(open('global.py').read())
-            # gc.collect();
-            
-            # # Make sure for the backtesting odds we use whatever upcoming because they're used to assess the model predictions later
-            # model_hyper_params['odds_to_use'] = data_processing_config['upcoming_odds_suffix_for_true_odds']
-            
-            forecasting_data = update_odds_on_merged_data(
-                    cleaned_fight_odds_data_path = './data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet'),
-                    cleaned_event_odds_data_path = './data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet'),
-                    cleaned_betfair_odds_data_path = './data/' + config['betfair_upcoming_odds_file_name'].replace('.parquet', '_clean.parquet'),
-                    # events_path = './data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet'),
-                    final_data_folder = config['final_data_path'],
-                    average_odds_model_path = './results/average_odds_model.joblib',
-                    config = config,
-                    data_processing_config = data_processing_config,
-                    upcoming_only = True
-                    )
-        else:
-            # Refresh the dataset
-            forecasting_data = merge_and_process_all_clean_data(
-                    config,
-                    elo_config,
-                    data_processing_config,
-                    odds_scrape_config,
-                    model_hyper_params,
-                    test_fighter_list = test_fighters,
-                    skip_save_data = skip_save_data # whether to skip the save data and just return merged data
-                    )
-            
-    else:
-        forecasting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset(config['final_data_path']).read().to_pandas()
-        # add in only odds update
-     
-    gc.collect();
-    # pdb.set_trace()
-            
-    # Apply standard filters
-    forecasting_data = standard_data_filter(forecasting_data, include_upcoming = True, keep_rows_with_flag = True)
-
-    ##########################################################################################
-    ### Choose which events to predict ###
-    ##########################################################################################
-
-    upcoming_fights = forecasting_data[forecasting_data['outcome'].isna()]
-    # upcoming_fights = forecasting_data[forecasting_data['event'] == 'ufc311:makhachevvs.moicano']
-
-    upcoming_fights_for_model = upcoming_fights[upcoming_fights['notformodel_exclusion_reason'] == ''].copy()
-
-    ##########################################################################################
-    ### Get the models predictions ###
-    ##########################################################################################
-
-    # Get the data ready for the model
-    X_upcoming, temp1, y_upcoming, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
-        upcoming_fights_for_model,
-        upcoming_fights = True)
-
-    # Load files
-    # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
-    rf_xgb_model = joblib.load(bet_config['model_to_use'])
-
-    # Get the model predictions
-    # prediction_probabilities, temp = rf_xgb_model.predict(X_upcoming)
-    prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_upcoming, [0] * len(y_upcoming), model_hyper_params)
-
-    # Add formatted fighters
-    upcoming_fights_for_model = add_formatted_fighter_names(upcoming_fights_for_model, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)
-    upcoming_fights = add_formatted_fighter_names(upcoming_fights, on = ['fighter1', 'fighter2'], formatted_col_names = ['fighter1', 'fighter2'], config = config)
-
-    gc.collect();
-    # pdb.set_trace()
-    # Summarise the model predictions and betting decisions using the config
-    betting_data = summarise_model_predictions(
-        actuals_data_df = upcoming_fights_for_model, 
-        prediction_probabilities = prediction_probabilities, 
-        min_prob_to_bet = bet_config['min_prob_to_bet'], 
-        min_ev_to_bet = bet_config['min_ev_to_bet'], 
-        min_bet_size = bet_config['min_bet_size'], 
-        max_bet_size = bet_config['max_bet_size'],
-        exchange_commission = bet_config['exchange_commission'],
-        target_ev_after_cutoff = bet_config['min_ev_to_bet'])
-
-    # Add the final bet size based on balance
-    if bet_config['constant_bets'] == False:
-        betting_data['Final_bet'] = np.round((betting_data['bets'] * betting_data['bet_size'] * bet_config['start_balance']) / 5) * 5
-    else:
-        betting_data['Final_bet'] = np.round((betting_data['bets'] * betting_data['bet_size']) / 5) * 5
-
-    betting_data['Potential_win'] = np.round(betting_data['bets'] * betting_data['Final_bet'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'] - 1, betting_data['fighter2_backtesting_odds'] - 1), 2)
-
-    betting_data['bet_assumed_odds'] = betting_data['bets'] * np.where(betting_data['Bet_trigger'] == betting_data['fighter1'], betting_data['fighter1_backtesting_odds'], betting_data['fighter2_backtesting_odds'])
-
-    # Round odds columns
-    for col in [cols for cols in betting_data.columns if 'odds' in cols and 'datetime' not in cols]:
-        betting_data.loc[:, col] = np.round(betting_data[col], 2)
-
-    betting_data.rename(columns = {'fighter1_notformodel_true_odds_asat_datetime': 'f1_scrape_date', 
-                                   'fighter2_notformodel_true_odds_asat_datetime': 'f2_scrape_date',
-                                   'Bet_target_exchange_odds': 'Bet_min_exchange_odds'}, inplace = True)
-
-    # Flag whether odds Betfair imputed
-    
-
-    summary_data = betting_data[['date', 'event', 'f1_scrape_date', 'f2_scrape_date', 'fighter1', 'fighter1_backtesting_odds', 'Fighter1_win_prob', 'Fighter1_win_EV', 'fighter2', 'fighter2_backtesting_odds', 'Fighter2_win_prob', 'Fighter2_win_EV', 'Bet_trigger', 'bet_assumed_odds', 'Bet_min_exchange_odds', 'Final_bet', 'Potential_win']]
-
-    # Add the fights that haven't been modelled along with exclusion reason for info
-    summary_data = pd.concat([
-         summary_data,
-         upcoming_fights[upcoming_fights['notformodel_exclusion_reason'] != ''][['date', 'event', 'fighter1', 'fighter2', 'notformodel_exclusion_reason']]
-    ])
-
-    print(
-          summary_data.to_string()
-    )
-
-    # Get only the bets to place
-    bets_to_place = betting_data[(betting_data['bets'] == 1) & (betting_data['date'] == betting_data['date'].min())].copy()
-    bets_to_place['bet_win_prob'] = np.where(bets_to_place['Bet_trigger'] == bets_to_place['fighter1'], bets_to_place['Fighter1_win_prob'], bets_to_place['Fighter2_win_prob'])
-
-    try:
-        del round
-    except:
-        pass
-
-    for i in range(0, len(bets_to_place)):
-        print("")
-        print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}")
-        print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%")
-        print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds")
-        print(f"Min exchange odds (EV >= {bet_config['min_ev_to_bet']:.2f}): {bets_to_place.iloc[i]['Bet_min_exchange_odds']:.2f}")
-
-    # Output the results
-    summary_data.to_csv('./results/upcoming_predictions.csv')
-
-    # If on Raspberry Pi, output to Gdrive
-    if not output_path == None:
-        
-        summary_data.to_csv(f'{output_path}/upcoming_predictions_{datetime.today()}.csv')
-        
-        # Create text file with the bet summaries
-        text_file_path = f"{output_path}/bets_to_place.txt"
-        
-        with open(text_file_path, "w") as file:
-            for i in range(0, len(bets_to_place)):
-                print("", file = file)
-                print(f"Bet: {bets_to_place.iloc[i]['Bet_trigger']}", file = file)
-                print(f"Win probability: {bets_to_place.iloc[i]['bet_win_prob']:.1f}%", file = file)
-                print(f"EV: {bets_to_place.iloc[i]['bet_ev']:.2f} at {bets_to_place.iloc[i]['bet_assumed_odds']:.2f} odds", file = file)
-                print(f"Min exchange odds (EV >= {bet_config['min_ev_to_bet']:.2f}): {bets_to_place.iloc[i]['Bet_min_exchange_odds']:.2f}", file = file)
-
-    return summary_data
-
 def predict_xgboost_ensemble(models, X_test_df, y_test_df = None, model_hyper_params = {}):
     """
     Generates multi-class predictions from an ensemble of XGBoost models.
@@ -1222,7 +1019,7 @@ def predict_xgboost_ensemble(models, X_test_df, y_test_df = None, model_hyper_pa
     for model in models:
         
         # Clean the test features
-        X_test_df = clean_inf_and_large(X_test_df).copy()
+        X_test_df = cleaning.clean_inf_and_large(X_test_df).copy()
         
         # Get base margin
         base_margin_test = get_base_margin(X_test_df, model_hyper_params['base_margin_cols'])
@@ -1423,211 +1220,55 @@ def train_and_test_random_forests_mlflow(
 
     return "Light GBM model runs completed."
 
-# This function will create a random forest of boosted trees.
+# This function takes a custom xgboost ensemble model and logs the metrics AUC and accuracy in MLflow
 
-def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boost_round=500, colsample_bynode=0.8, subsample=0.8, early_stopping_rounds=30, params=None, verbose_eval = False):
-    """
-    Trains an ensemble of boosted trees with random feature and row sampling for each model,
-    ensuring that the validation sample consists of all data rows not included in the training data.
-
-    Parameters:
-    - X (pd.DataFrame): Feature matrix for training.
-    - y (pd.Series or np.array): Target vector for training.
-    - X_columns_for_training (list): a list of columns that should be used for training
-    - num_models (int): Number of models (boosted trees) in the ensemble.
-    - num_boost_round (int): Max number of boosting rounds for each model.
-    - colsample_bynode (float): Fraction of columns to randomly sample for each tree.
-    - subsample (float): Fraction of rows to sample for each model.
-    - early_stopping_rounds (int): Number of rounds for early stopping.
-    - params (dict): Parameters for the XGBoost model.
-
-    Returns:
-    - models (list): List of trained XGBoost models.
-    """
+def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df, model_hyper_params):
 
     # pdb.set_trace()
 
-    # Default parameters if none are provided
-    if params is None:
-        params = {
-            'objective': 'multi:softprob',  # Set for multi-class classification; use 'binary:logistic' for binary
-            'eval_metric': 'auc',
-            'tree_method': 'hist',  # Efficient training with 'hist' method, use 'gpu_hist' if GPU is available
-            'learning_rate': 0.2,
-            'max_depth': 3,
-            'colsample_bynode': colsample_bynode,
-            'subsample': subsample,
-            'verbosity': 1
-        }
+    # First get the predictions from the ensemble
+    y_pred_prob, y_pred = predict_xgboost_ensemble(models, X_test_df, y_test_df, model_hyper_params)
 
-    # Set random seed for Numpy
-    np.random.seed(config['seed_all'])
+    # Get the outcomes of the test data
+    # Convert the predictions to object in case not already
+    y_test_fold = pd.Series(y_test_df.copy(), dtype="int")
+    y_pred = pd.Series(y_pred.copy(), dtype="int")
+
+    # Convert actual results to binarized format
+    y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
+    y_pred_bin = label_binarize(y_pred, classes=np.unique(y_test_fold))
+
+    # Calculate the AUC of wins and losses. Check the classes of the target column. Was 1 = L/W and 3 = W/L
+    wl_auc = roc_auc_score(y_test_bin[:, 2], y_pred_prob[:, 2])
+    lw_auc = roc_auc_score(y_test_bin[:, 0], y_pred_prob[:, 0])
+
+    # Calculate the accuracies
+    wl_pred = y_pred_bin[:, 2]
+    wl_test = y_test_bin[:, 2]
+    lw_pred = y_pred_bin[:, 0]
+    lw_test = y_test_bin[:, 0]
+
+    wl_accuracy = (wl_pred[wl_pred == 1] == wl_test[wl_pred == 1]).sum() / wl_pred.sum()
+    lw_accuracy = (lw_pred[lw_pred == 1] == lw_test[lw_pred == 1]).sum() / lw_pred.sum()
+
+    # **Calculate LogLoss**
+    log_loss_result = log_loss(y_test_df, y_pred_prob)
     
-    # Get a full list of columns needed for switching fighters then cut down the data
-    all_columns_for_diffs = all_columns_for_differentials(X_columns_for_training)
-    X = X[[col for col in all_columns_for_diffs if col in X.columns] + [col for col in X.columns if 'notformodel' in col or ('odds' in col and col not in all_columns_for_diffs)]].copy()
-    
-    # Add an id column to the X data
-    X['id'] = X.index.copy()
-    
-    # Calculate new odds columns to be removed later
-    X['train_fighter1_odds'] = X['fighter1_backtesting_odds'].to_numpy() # avoids pandas thinking they're the same column
-    X['train_fighter2_odds'] = X['fighter2_backtesting_odds'].to_numpy()
+    ev_mse = ev_loss_function(
+        y_pred_prob,
+        y_test_fold,
+        X_test_df['fighter1_backtesting_odds'],
+        X_test_df['fighter2_backtesting_odds'],
+        return_loss = True,
+        input_probs = True)
 
-    models = []
-    for i in range(num_models):
-        
-        # pdb.set_trace()
-                
-        model = {}
-        
-        # Randomly sample rows with replacement for the training set
-        if subsample < 1:
-            X_train_df, y_train_df = sample_fighters(
-                X = X, 
-                y = y, 
-                n_rows = int(len(X) * subsample),
-                rows_with_bagging = None if not params['xgb_forest_bagging'] else len(X))
-            # X_train_df, y_train_df = resample(X, y, replace=True, n_samples=int(len(X) * subsample), random_state=i)
-        else:
-            X_train_df = X.copy()
-            y_train_df = y.copy()
-        
-        # # Switch fighters if needed
-        if params['switch_fighters_randomly'] == True:
-            X_train_df, y_train_df = switch_fighter1_fighter2(X = X_train_df, y = y_train_df, filter_boolean = np.random.choice([True, False], size = len(X_train_df)))
-            
-        # Add noise to odds if required
-        if params['add_noise_to_odds']:
-            X_train_df = add_noise_to_odds(X_train_df, norm_sd = params['odds_noise_standard_dev'])
-        
-        # Remove split decisions if required
-        if params['split_dec_or_other']:
-            y_train_df = y_train_df[X_train_df['notformodel_split_dec_or_other'] == 0]
-            X_train_df = X_train_df[X_train_df['notformodel_split_dec_or_other'] == 0]
-        
-        # Calculate the number of columns to randomly select
-        if colsample_bynode < 1:
-            num_columns_to_select = int(colsample_bynode * len(X_columns_for_training))
-            
-            # First, duplicate all the diff rows, otherwise 'fighter' rows have 2x the chance of being chosen
-            diff_cols = [col for col in X_columns_for_training if 'fighter1' not in col and 'fighter2' not in col]
-            
-            # Get a random selection of column names
-            selected_columns = list(set(np.random.choice(X_columns_for_training + diff_cols, num_columns_to_select, replace = False)))
-        else:
-            selected_columns = X_columns_for_training
-        
-        # # Make sure both fighter1 and figher2 versions of columns in there or switch will fail
-        # selected_columns = list(set(selected_columns + list_swap_fighter1_fighter2(selected_columns)))
-        
-        # Filter win loss only if applicable
-        if params['win_loss_only'] == True:
-            X_train_df = X_train_df.copy()[y_train_df.isin([0, 2])]
-            y_train_df = y_train_df.copy()[y_train_df.isin([0, 2])]
-
-        # Create the validation set from all rows not included in the training set
-        # Mask to get the validation data
-        train_ids = X_train_df['id'].tolist()
-        X_val = X.copy()[~X['id'].isin(train_ids).to_numpy()]
-        y_val = y.copy()[~X['id'].isin(train_ids).to_numpy()]
-
-        # Get the odds for the custom loss function if needed
-        train_fighter1_odds = X_train_df['train_fighter1_odds'].to_numpy()
-        train_fighter2_odds = X_train_df['train_fighter2_odds'].to_numpy()
-        test_fighter1_odds = X_val['train_fighter1_odds'].to_numpy()
-        test_fighter2_odds = X_val['train_fighter2_odds'].to_numpy()
-
-        # Get the base margins
-        base_margin_train = get_base_margin(X_train_df, params['base_margin_cols'])
-        base_margin_val = get_base_margin(X_val, params['base_margin_cols'])
-
-        X_train_df =  X_train_df[selected_columns + ['id', 'train_fighter1_odds', 'train_fighter2_odds']]
-
-        # Drop the ID column
-        cols_to_drop = [col for col in X_train_df.columns if 'train_fighter' in col or 'backtesting' in col or col == 'id' or 'notformodel' in col]
-        X_train_df.drop(cols_to_drop, axis = 1, inplace = True)
-        X_val.drop(cols_to_drop, axis = 1, inplace = True)
-        
-        # Create the DMatrix for XGBoost with the bootstrap sample for training and the full remaining data for validation
-        dmatrix_train = xgb.DMatrix(X_train_df, label=y_train_df, base_margin = base_margin_train)
-        dmatrix_val = xgb.DMatrix(X_val[X_train_df.columns], label=y_val, base_margin = base_margin_val)
-        
-        # Train the model
-        if params['calibrate_models']: # Calibration doesn't work with EV loss function at the moment. Not built.
-            
-            # Add a dummy 1 value in case it's missing (that causes the fit to fail)
-            X_dummy = np.zeros((1, X_train_df.shape[1]))  # or any constant
-            y_dummy = np.array([1])  # the missing class
-            
-            # Convert to Data Frames
-            X_dummy = pd.DataFrame(X_dummy, columns = X_train_df.columns)
-            
-            X_train_aug = pd.concat([X_train_df, X_dummy], axis = 0)
-            y_train_aug = pd.concat([y_train_df, pd.Series(y_dummy)], axis = 0)
-            
-            # Train the model in a way compatible with SKLearn
-            raw_model = xgb.XGBClassifier(params)
-            raw_model.fit(X_train_aug, y_train_aug,
-                          eval_set = [(X_val[X_train_df.columns], y_val)],
-                          early_stopping_rounds = early_stopping_rounds,
-                          verbose = verbose_eval)                
-            
-            # Create a calibration model
-            model_cal = TemperatureScaler(raw_model)
-            # model_cal = CalibratedClassifierCV(estimator = raw_model, 
-            #                                    method = 'sigmoid', # This is a Platt calibration
-            #                                    cv = 'prefit') # the model has already been trained
-            
-            # Now fit to the validation data
-            model_cal.fit(X_val[X_train_df.columns], y_val)
-            
-            model['xgb_model'] = raw_model
-            model['model'] = model_cal
-        
-        elif model_hyper_params['loss_function'] == 'ev_loss_function': # any eval metric above will be ignored
-            # Pass the odds to the loss function
-            custom_loss = create_custom_loss(train_fighter1_odds, train_fighter2_odds)
-            custom_loss_test = ev_loss_function_test(test_fighter1_odds, test_fighter2_odds)
-            
-            # Train an XGBoost model on the bootstrap sample with column sampling
-            model['model'] = xgb.train(
-                params,
-                dmatrix_train,
-                num_boost_round = num_boost_round,
-                evals=[(dmatrix_val, 'eval')],
-                early_stopping_rounds = early_stopping_rounds,
-                obj = custom_loss,
-                custom_metric = custom_loss_test,
-                verbose_eval = verbose_eval)
-            
-            # model['model'].model_features = X_train_df.columns
-        
-        else:
-            # Train an XGBoost model on the bootstrap sample with column sampling
-            model['model'] = xgb.train(
-                params,
-                dmatrix_train,
-                num_boost_round = num_boost_round,
-                evals=[(dmatrix_val, 'eval')],
-                early_stopping_rounds=early_stopping_rounds,
-                verbose_eval = verbose_eval)
-            
-        # # Manually set the list of model features
-        # model['model'].feature_names = list(X_train_df.columns)
-        
-        # Join the feature names into a single string and save them as a model attribute
-        model['features'] = selected_columns
-        
-        # Save the parameters used
-        model['params'] = params
-        model['calibrated'] = params['calibrate_models']
-        
-        # Add model to the list
-        models.append(model)
-        
-        del X_train_df
-        gc.collect()
-        print(f"Model {i + 1}/{num_models} trained.")
-
-    return models
+    # Log the outcome in MLflow
+    mlflow.log_metric('Accuracy', accuracy_score(y_test_fold, y_pred))
+    mlflow.log_metric('W/L AUC', wl_auc)
+    mlflow.log_metric('L/W AUC', lw_auc)
+    mlflow.log_metric('W/L Accuracy', wl_accuracy)
+    mlflow.log_metric('L/W Accuracy', lw_accuracy)
+    mlflow.log_metric('Avg WL only AUC', np.mean([wl_auc, lw_auc]))
+    mlflow.log_metric('Hmean WL only Accuracy', hmean([lw_accuracy, wl_accuracy]))
+    mlflow.log_metric('Logloss', log_loss_result)
+    mlflow.log_metric('EV MSE', ev_mse)

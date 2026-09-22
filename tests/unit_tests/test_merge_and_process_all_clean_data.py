@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+from ablinston_ml.validation import equals_to_dp
+
+from mma_functions.pipelines import merge_and_process_all_clean_data
+from mma_functions.config import config, data_processing_config, elo_config, model_hyper_params, odds_scrape_config, test_fighters
 
 # This is a test on data that is before the event, and after the event, and tests that it is identical
 

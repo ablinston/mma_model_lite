@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+
+from mma_functions.scraping import scrape_event_details
 
 # Load what answers are expected
 scrape_event_details_data_correct = fp.ParquetFile('./tests/data/scrape_event_details_data_correct.parquet').to_pandas()

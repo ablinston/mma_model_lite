@@ -1,3 +1,18 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import gc
+import mlflow
+import numpy as np
+import pandas as pd
+import pdb
+import polars as pl
+from scipy.stats import hmean
+from sklearn.model_selection import KFold, train_test_split
+from sklearn.preprocessing import LabelEncoder, label_binarize
+import xgboost as xgb
+
+from mma_functions import dataset, modelling, tracking, utils
+from mma_functions.config import config
+
 def add_start_elo_to_fight_results(fight_results, fight_stats, config, elo_config):
     
     """
@@ -123,7 +138,7 @@ def derive_start_elos(elo_df, fight_stats_df, elo_constants):
         return 1, 1
 
     # Convert the constants to numeric
-    elo_constants = dict_to_numeric(elo_constants)
+    elo_constants = utils.dict_to_numeric(elo_constants)
 
     # Calculate ELO for fighters first fights
     merged_data = calculate_end_elo(
@@ -231,10 +246,10 @@ def objective_cv_elo_basic_mlflow(params):
     print("Params received:", params)    
     
     # Check for duplicates
-    if is_duplicate_run(params):
+    if tracking.is_duplicate_run(params):
         
         # If the run existing, find what the loss was and return it without logging in mlflow
-        existing_metric, all_params = get_existing_metric_and_params(params, 'H.Mean of two accuracies')
+        existing_metric, all_params = tracking.get_existing_metric_and_params(params, 'H.Mean of two accuracies')
         
         print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
         return {'loss': 1 - existing_metric, 'params': all_params, 'status': STATUS_OK}
@@ -296,10 +311,10 @@ def objective_cv_elo_dtree_mlflow(params):
     print("Params received:", params)    
     
     # Check for duplicates
-    if is_duplicate_run(params):
+    if tracking.is_duplicate_run(params):
         
         # If the run existing, find what the loss was and return it without logging in mlflow
-        existing_metric, all_params = get_existing_metric_and_params(params, 'Avg of two accuracies')
+        existing_metric, all_params = tracking.get_existing_metric_and_params(params, 'Avg of two accuracies')
         
         print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
         return {'loss': 1 - existing_metric, 'params': all_params, 'status': STATUS_OK}
@@ -341,7 +356,7 @@ def objective_cv_elo_dtree_mlflow(params):
             
             # Precompute DMatrix objects using ThreadPoolExecutor
             with ThreadPoolExecutor(max_workers = config['num_threads']) as executor:
-                futures = {executor.submit(create_dmatrix, X_train, y_train, train_idx, test_idx): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
+                futures = {executor.submit(modelling.create_dmatrix, X_train, y_train, train_idx, test_idx): (train_idx, test_idx) for train_idx, test_idx in kf.split(X_train)}
                 dmatrix_data = [future.result() for future in as_completed(futures)]
             
             # Begin new model in MLflow
@@ -432,7 +447,7 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
     fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\\.', expand = True)
 
     # Merge the two datasets together to get stats for the fight
-    merged_data = merge_df_both_fighters(
+    merged_data = dataset.merge_df_both_fighters(
         left_df =  fight_results[['event', 'bout', 'fighter1', 'fighter2', 'outcome', 'method', 'weightclass', 'date', 'time format']],
         df_list = [
             fight_stats
@@ -461,7 +476,7 @@ def prep_stats_for_elo_calc(fight_results_df, fight_stats_df, config, start_date
     # Remove any duplicates of fighters on dates
     # Sort so we keep records with results first
     merged_data = merged_data.sort_values(['outcome'], kind = 'stable')
-    merged_data = remove_duplicate_fighter_pairs(merged_data)
+    merged_data = dataset.remove_duplicate_fighter_pairs(merged_data)
 
     # Now create a data frame that contains only the fighters and the dates they fought. This will be used to track the existing ELO of a fighter on that date
     start_elo = pd.concat([

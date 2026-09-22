@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+
+from mma_functions.features import aggregate_last_X_fight_data, bayesian_priors
 
 # Load what answers are expected
 test_aggregate_last_X_fight_data_correct = fp.ParquetFile('./tests/data/test_aggregate_last_X_fight_data_correct.parquet').to_pandas()

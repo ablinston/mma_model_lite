@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.features import calculate_percentages
 # # Load what answers are expected
 # test_aggregate_last_X_fight_data_correct = fp.ParquetFile('./tests/data/test_aggregate_last_X_fight_data_correct.parquet').to_pandas()
 
@@ -55,5 +58,3 @@ def test_calculate_percentages():
     for col in ["fighter1_punch_accuracy_percent", "fighter1_kick_accuracy_percent", 
                 "fighter1_punch_bayes_accuracy_percent", "fighter1_kick_bayes_accuracy_percent"]:
         assert (result[col] >= 0).all() and (result[col] <= 1).all(), f"Values in {col} must be between 0 and 1"
-
-

@@ -1,6 +1,10 @@
 
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.odds_scraping import parallel_scrape_odds_fast
+from mma_functions.config import config
 
 # Load what answers are expected
 parallel_scrape_odds_data_correct = fp.ParquetFile('./tests/data/parallel_scrape_odds_data_correct.parquet').to_pandas()

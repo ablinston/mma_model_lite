@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import pandas as pd
+
+from mma_functions.features import longest_streak
 
 def test_longest_streak():
     # Example series

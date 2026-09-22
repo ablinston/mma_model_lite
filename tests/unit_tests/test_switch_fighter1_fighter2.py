@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+
+from mma_functions.features import add_fighter_differentials, switch_fighter1_fighter2
 
 X_val = fp.ParquetFile('./tests/data/test_switch_fighter1_fighter2_input_X.parquet').to_pandas()
 y_val = fp.ParquetFile('./tests/data/test_switch_fighter1_fighter2_input_y.parquet').to_pandas().iloc[:, 0]

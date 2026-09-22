@@ -1,5 +1,9 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.odds import update_odds_on_merged_data
+from mma_functions.config import config, data_processing_config
 
 test_update_odds_on_merged_data_correct = fp.ParquetFile('./tests/data/test_update_odds_on_merged_data_correct.parquet').to_pandas()
 
@@ -99,4 +103,3 @@ def test_update_odds_on_merged_data():
 # # fp.write('./tests/data/test_update_odds_on_merged_data_cleaned_bf.parquet', cleaned_bf, compression = 'ZSTD')
 # # 
 # fp.write('./tests/data/test_update_odds_on_merged_data_correct.parquet', result, compression = 'ZSTD')
-

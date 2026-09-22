@@ -1,3 +1,16 @@
+from ablinston_ml import stop_if_not
+import bz2
+import numpy as np
+import os
+from pathlib import Path
+import queue
+import shutil
+import threading
+import time
+
+from mma_functions import dataset, utils
+from mma_functions.config import betfair_data_config, config
+
 import betfairlightweight
 from betfairlightweight import StreamListener
 from betfairlightweight.filters import market_filter, price_projection, streaming_market_filter, streaming_market_data_filter
@@ -23,7 +36,7 @@ def betfair_add_upcoming_bouts_details(betfair_df, upcoming_bouts_df, threshold 
     df = betfair_df.copy()
     
     # Find the closest names for the fighter
-    df['fighter'] = df['fighter'].apply(lambda x: get_best_match(
+    df['fighter'] = df['fighter'].apply(lambda x: utils.get_best_match(
         x,
         choices = upcoming_bouts_df['fighter1'].tolist() + upcoming_bouts_df['fighter2'].tolist(),
         threshold = threshold  # use token_sort_ratio for good name matching
@@ -193,13 +206,13 @@ def betfair_clean_fighter_names(betfair_df, event_details_df, stats_df, fuzz_thr
     merged_df.rename(columns = {'date': 'event_date'}, inplace = True)
     
     if "opponent" not in betfair_df.columns:
-        add_opponent_column(betfair_df)
+        dataset.add_opponent_column(betfair_df)
     
     if "opponent" not in merged_df.columns:
-        add_opponent_column(merged_df)
+        dataset.add_opponent_column(merged_df)
     
     # Find the closest matches to the fighter
-    matched_names = betfair_df[['fighter', 'event_date']].apply(lambda row: get_best_match_with_date(
+    matched_names = betfair_df[['fighter', 'event_date']].apply(lambda row: utils.get_best_match_with_date(
         row,
         merged_df,
         date_col='event_date',
@@ -209,7 +222,7 @@ def betfair_clean_fighter_names(betfair_df, event_details_df, stats_df, fuzz_thr
     ), axis = 1)
     
     # Now do the same for the opponent. Do a simple rename of fighter to opponent on the UFC data as we only need names
-    matched_opponent_names = betfair_df[['opponent', 'event_date']].apply(lambda row: get_best_match_with_date(
+    matched_opponent_names = betfair_df[['opponent', 'event_date']].apply(lambda row: utils.get_best_match_with_date(
         row,
         merged_df,
         date_col='event_date',
@@ -226,7 +239,7 @@ def betfair_clean_fighter_names(betfair_df, event_details_df, stats_df, fuzz_thr
     betfair_df_surname_matches = betfair_df.copy()
     
     # First clean the surname columns
-    betfair_df.loc[:, ['fighter_surname', 'opponent_surname']] = clean_text_columns(betfair_df[['fighter_surname', 'opponent_surname']])
+    betfair_df.loc[:, ['fighter_surname', 'opponent_surname']] = utils.clean_text_columns(betfair_df[['fighter_surname', 'opponent_surname']])
     
     # Find fights on similar dates where both fighters surnames are in the bout on UFC data
     betfair_df['event_date_m1'] = betfair_df['event_date'] + timedelta(days = -1)
@@ -253,9 +266,9 @@ def betfair_clean_fighter_names(betfair_df, event_details_df, stats_df, fuzz_thr
     
     # Use a fuzzy contains rather than strict
     merged_all['match'] = merged_all.apply(lambda row: 1 if (
-        fuzzy_contains(row['fighter_surname'], row['bout_ufc'], surname_fuzz_threshold)) and (
-            fuzzy_contains(row['opponent_surname'], row['bout_ufc'], surname_fuzz_threshold)) and (
-                fuzzy_contains(row['fighter_surname'], row['fighter_ufc'], surname_fuzz_threshold)) 
+        utils.fuzzy_contains(row['fighter_surname'], row['bout_ufc'], surname_fuzz_threshold)) and (
+            utils.fuzzy_contains(row['opponent_surname'], row['bout_ufc'], surname_fuzz_threshold)) and (
+                utils.fuzzy_contains(row['fighter_surname'], row['fighter_ufc'], surname_fuzz_threshold)) 
                 else 0, axis = 1)
     
     # Find matches for the bouts
@@ -371,7 +384,7 @@ def betfair_filter_bz2_for_fights(input_folder, output_folder):
     #             new_files_df.loc[i, 'fight_flag'] = 0
     
     # Get the flags as to whether the file is a fight or not
-    fight_flags = parallel_run_function(
+    fight_flags = utils.parallel_run_function(
         func = betfair_flag_bz2_as_fight,
         input_list = file_list,
         max_workers = config['num_threads'],
@@ -400,7 +413,7 @@ def betfair_filter_bz2_for_fights(input_folder, output_folder):
     #             f_out.write(f_in.read())
     
     # For each file, extract the bz2 into an output folder
-    parallel_run_function(
+    utils.parallel_run_function(
         func = betfair_extract_bz2,
         input_list = fight_files['filepath'].str.replace("\\", "/").tolist(),
         max_workers = config['num_threads'],
@@ -799,7 +812,7 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
             # Get a list of all the decompressed files
             list_of_decompressed_filepaths = [decompressed_temp_output_dir + file for file in os.listdir(decompressed_temp_output_dir)]
             
-            betfair_odds = parallel_run_function(
+            betfair_odds = utils.parallel_run_function(
                     func = betfair_file_to_final_odds,
                     input_list = list_of_decompressed_filepaths,
                     max_workers = 1, # DO NOT USE MORE CORES FOR PROCESS. THE ODDS GO OFF MAYBE BECAUSE OF STREAM?
@@ -813,7 +826,7 @@ def update_betfair_odds(existing_betfair_odds_df, betfair_login_config, download
             betfair_odds['event_date'] = pd.to_datetime(betfair_odds['event_date'], errors = 'coerce')
             
             # Clear out the downloads folder
-            clear_directory(download_folder)
+            utils.clear_directory(download_folder)
             
             # Move the processed decompressed files                    
             for filename in os.listdir(decompressed_temp_output_dir):

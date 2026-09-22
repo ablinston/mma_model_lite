@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.odds import calculate_true_odds
 
 def test_calculate_true_odds():
     # Test with example odds
@@ -32,5 +35,3 @@ def test_input_dataframe_not_modified():
 
     # Assert the original DataFrame remains unchanged
     pd.testing.assert_frame_equal(df, df_original)
-
-

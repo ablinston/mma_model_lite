@@ -1,3 +1,13 @@
+from ablinston_ml.scraping import get_website_soup
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import itertools
+import numpy as np
+import pandas as pd
+import re
+import sys
+
+from mma_functions import scraping, utils
+
 def combine_fighter_stats_dfs(fighter_a_stats_df, fighter_b_stats_df, soup):
     """
     concat both fighter's stats into one df
@@ -20,7 +30,7 @@ def combine_fighter_stats_dfs(fighter_a_stats_df, fighter_b_stats_df, soup):
         ):
         fighters_names.append(tag.text.strip())
     fight_stats['BOUT'] = ' vs. '.join(fighters_names)
-    fight_stats = move_columns(fight_stats, ['EVENT', 'BOUT'], 'ROUND',
+    fight_stats = utils.move_columns(fight_stats, ['EVENT', 'BOUT'], 'ROUND',
         'before')
     return fight_stats
 
@@ -81,7 +91,7 @@ def fix_fight_details_bout(fight_details, fight_stats_df):
     for df in [fight_details, fight_stats]:
         for col in ['EVENT', 'BOUT']:
             try:
-                df[[col]] = clean_text_columns(df[[col]])
+                df[[col]] = utils.clean_text_columns(df[[col]])
             except:
                 continue
 
@@ -260,7 +270,7 @@ def parse_fight_details(soup):
         fight_urls})
     fight_details_df['EVENT'] = soup.find('h2', class_='b-content__title'
         ).text.strip()
-    fight_details_df = move_columns(fight_details_df, ['EVENT'], 'BOUT',
+    fight_details_df = utils.move_columns(fight_details_df, ['EVENT'], 'BOUT',
         'before')
     return fight_details_df
 
@@ -311,7 +321,7 @@ def parse_fight_details_url(url, config):
     fight_details_df['EVENT'] = soup.find('h2', class_='b-content__title'
         ).text.strip()
     
-    fight_details_df = move_columns(fight_details_df, ['EVENT'], 'BOUT',
+    fight_details_df = utils.move_columns(fight_details_df, ['EVENT'], 'BOUT',
         'before')
     
     fight_details_df['weightclass'] = pd.Series(weightclass)
@@ -540,7 +550,7 @@ def update_fight_results_and_stats_data(existing_fight_results_data, existing_fi
     with ThreadPoolExecutor(max_workers = num_threads) as executor:
         
         # Get the html contents for the url
-        future_to_url = {executor.submit(get_soup, url): url for url in new_fights_url_list}
+        future_to_url = {executor.submit(scraping.get_soup, url): url for url in new_fights_url_list}
 
         # Now iterate through the functions
         for future in as_completed(future_to_url):

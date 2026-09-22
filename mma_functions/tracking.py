@@ -1,3 +1,9 @@
+import mlflow
+import pandas as pd
+import xgboost as xgb
+
+from mma_functions import cleaning, evaluation
+
 # This function deletes all runs in MLflow with duplicate parameters
 
 def delete_duplicate_runs(experiment_name):
@@ -162,7 +168,7 @@ def log_metrics_mlflow(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, cla
     # pdb.set_trace()
 
     # Calculate the metrics
-    metrics = calculate_metrics(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, classes)
+    metrics = evaluation.calculate_metrics(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, classes)
     
     mlflow.log_metrics(metrics)
     
@@ -174,65 +180,12 @@ def log_metrics_mlflow(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, cla
 def log_metrics_odds_mlflow(X_test, y_test):
 
     # Calculate the metrics
-    metrics = calculate_metrics_odds(X_test, y_test) 
+    metrics = evaluation.calculate_metrics_odds(X_test, y_test) 
 
     # Log the metrics
     mlflow.log_metrics(metrics)
     
     return None
-
-# This function takes a custom xgboost ensemble model and logs the metrics AUC and accuracy in MLflow
-
-def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df, model_hyper_params):
-
-    # pdb.set_trace()
-
-    # First get the predictions from the ensemble
-    y_pred_prob, y_pred = predict_xgboost_ensemble(models, X_test_df, y_test_df, model_hyper_params)
-
-    # Get the outcomes of the test data
-    # Convert the predictions to object in case not already
-    y_test_fold = pd.Series(y_test_df.copy(), dtype="int")
-    y_pred = pd.Series(y_pred.copy(), dtype="int")
-
-    # Convert actual results to binarized format
-    y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
-    y_pred_bin = label_binarize(y_pred, classes=np.unique(y_test_fold))
-
-    # Calculate the AUC of wins and losses. Check the classes of the target column. Was 1 = L/W and 3 = W/L
-    wl_auc = roc_auc_score(y_test_bin[:, 2], y_pred_prob[:, 2])
-    lw_auc = roc_auc_score(y_test_bin[:, 0], y_pred_prob[:, 0])
-
-    # Calculate the accuracies
-    wl_pred = y_pred_bin[:, 2]
-    wl_test = y_test_bin[:, 2]
-    lw_pred = y_pred_bin[:, 0]
-    lw_test = y_test_bin[:, 0]
-
-    wl_accuracy = (wl_pred[wl_pred == 1] == wl_test[wl_pred == 1]).sum() / wl_pred.sum()
-    lw_accuracy = (lw_pred[lw_pred == 1] == lw_test[lw_pred == 1]).sum() / lw_pred.sum()
-
-    # **Calculate LogLoss**
-    log_loss_result = log_loss(y_test_df, y_pred_prob)
-    
-    ev_mse = ev_loss_function(
-        y_pred_prob,
-        y_test_fold,
-        X_test_df['fighter1_backtesting_odds'],
-        X_test_df['fighter2_backtesting_odds'],
-        return_loss = True,
-        input_probs = True)
-
-    # Log the outcome in MLflow
-    mlflow.log_metric('Accuracy', accuracy_score(y_test_fold, y_pred))
-    mlflow.log_metric('W/L AUC', wl_auc)
-    mlflow.log_metric('L/W AUC', lw_auc)
-    mlflow.log_metric('W/L Accuracy', wl_accuracy)
-    mlflow.log_metric('L/W Accuracy', lw_accuracy)
-    mlflow.log_metric('Avg WL only AUC', np.mean([wl_auc, lw_auc]))
-    mlflow.log_metric('Hmean WL only Accuracy', hmean([lw_accuracy, wl_accuracy]))
-    mlflow.log_metric('Logloss', log_loss_result)
-    mlflow.log_metric('EV MSE', ev_mse)
 
 # This function logs the SHAP values for a model's predictions on MLflow
 
@@ -242,7 +195,7 @@ def log_shap_values_mlflow(xgb_forest, data):
     
     # Just use the first model in the forest
     # Clean the test features
-    X_test_df = clean_inf_and_large(data).copy()
+    X_test_df = cleaning.clean_inf_and_large(data).copy()
 
     # Go through each of the models to get SHAP values
     shap_values_list = []

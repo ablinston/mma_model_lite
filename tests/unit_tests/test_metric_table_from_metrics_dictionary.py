@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import pandas as pd
+
+from mma_functions.evaluation import metric_table_from_metrics_dictionary
 
 # Sample data for testing
 metrics_dict = {
@@ -27,6 +29,3 @@ def test_metric_table_from_metrics_dictionary():
     # Assert the DataFrame is as expected
     pd.testing.assert_frame_equal(result_df, expected_df)
     
-
-
-

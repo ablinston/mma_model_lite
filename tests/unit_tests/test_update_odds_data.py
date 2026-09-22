@@ -1,5 +1,10 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+from datetime import datetime
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.odds_scraping import update_odds_data
+from mma_functions.config import config
 
 # Load what answers are expected and inputs to the function
 update_fighter_odds_data_input = fp.ParquetFile('./tests/data/update_fighter_odds_data_input.parquet').to_pandas()

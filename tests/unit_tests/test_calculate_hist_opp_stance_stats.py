@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.features import bayesian_priors, calculate_hist_opp_stance_stats
 
 test_calculate_hist_opp_stance_stats_correct = fp.ParquetFile('./tests/data/test_calculate_hist_opp_stance_stats_correct.parquet').to_pandas()
 

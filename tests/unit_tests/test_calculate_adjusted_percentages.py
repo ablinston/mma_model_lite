@@ -1,5 +1,10 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+from datetime import timedelta
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+
+from mma_functions.features import aggregate_last_X_fight_data, calculate_adjusted_percentages
 
 # # Load what answers are expected. This was manually calculated by me in Excel and is correct.
 test_calculate_adjusted_percentage_correct = fp.ParquetFile('./tests/data/test_calculate_adjusted_percentage_correct.parquet').to_pandas()

@@ -1,6 +1,11 @@
 
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+
+from mma_functions.odds import calculate_all_true_odds_columns
+from mma_functions.utils import dataframes_equal_ignore_types
 
 correct_result = fp.ParquetFile('./tests/data/test_calculate_all_true_odds_columns_correct.parquet').to_pandas()
 

@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.evaluation import summarise_bet_roi_by_ev
 
 # This test looks at a specific URL for an historic event and checks that the results match what is expected
 def test_summarise_bet_roi_by_ev():

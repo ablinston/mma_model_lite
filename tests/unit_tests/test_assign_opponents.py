@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import pandas as pd
+
+from mma_functions.dataset import assign_opponents
 
 def test_assign_opponents():
     data = {"fighter": ["A", "B", "C", "D", "E", "F"]}

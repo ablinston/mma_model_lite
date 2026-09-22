@@ -1,6 +1,8 @@
 
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+
+from mma_functions.modelling import ev_loss_function
 
 def test_ev_loss_function():
     # Create dummy data for testing

@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+
+from mma_functions.parsing import update_fight_results_and_stats_data
+from mma_functions.config import config
 
 # Load what answers are expected
 existing_fight_results_data = fp.ParquetFile('./tests/data/update_fight_results_data_input.parquet').to_pandas()
@@ -26,4 +29,3 @@ def test_update_fight_results_and_stats_data():
     fight_stats.sort_values(by = ['BOUT', 'ROUND', 'FIGHTER'], inplace = True)
     
     assert ((fight_results.equals(update_fight_results_data_correct)) & (fight_stats.equals(update_fight_stats_data_correct))) == True
-

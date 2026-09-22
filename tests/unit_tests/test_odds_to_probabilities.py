@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.odds import odds_to_probabilities
 
 # Test cases for the trim_column_list function
 def test_odds_to_probabilities():

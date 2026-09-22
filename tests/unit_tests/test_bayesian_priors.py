@@ -1,6 +1,10 @@
 
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+
+from mma_functions.features import bayesian_priors
 
 # Load what answers are expected
 test_bayesian_priors_correct = fp.ParquetFile('./tests/data/test_bayesian_priors_correct.parquet').to_pandas()

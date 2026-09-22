@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+
+from mma_functions.odds import calculate_target_odds
 
 # Run a test on the target odds bu simulating 1,000,000 outcomes and calculate the actual EV
 

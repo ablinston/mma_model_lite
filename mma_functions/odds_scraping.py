@@ -1,3 +1,20 @@
+from ablinston_ml.scraping import clear_captcha, get_website_soup, start_browser
+from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import copy
+from datetime import timedelta
+from functools import partial
+import pandas as pd
+import random
+from rapidfuzz import fuzz
+from re import sub
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+
+from mma_functions import dataset, parsing, scraping, utils
+from mma_functions.config import config, odds_scrape_config
+
 # This function takes a series of dates from BetFightOdds and converts them to pandas datetime
 
 def betfightodds_dates_to_datetime(dates):
@@ -206,7 +223,7 @@ def get_event_odds_data(fighter_list, date, firefox_location, gecko_driver):
             soup = BeautifulSoup(driver.page_source, 'html.parser')
             
             # Read the first table and convert it to a data frame
-            event_df = html_table_to_dataframe(driver.page_source)
+            event_df = scraping.html_table_to_dataframe(driver.page_source)
             
             ## AB: ABANDONED THIS FUNCTION HERE. THE IMPORTED TABLES ARE TOO FULL OF CRAP
             
@@ -232,7 +249,7 @@ def get_event_odds_url(soup, date):
     table = soup.find('table')
     
     # Specify the target date to search for in the correctly formatted way for the website
-    target_date = date.strftime('%b ') + f'{date.day}' + get_day_suffix(date.day) + ' ' + f'{date.year}'
+    target_date = date.strftime('%b ') + f'{date.day}' + utils.get_day_suffix(date.day) + ' ' + f'{date.year}'
     
     # Find all relevant <td> elements
     tds = soup.find_all('td', colspan="8", scope="row")
@@ -263,7 +280,7 @@ def get_fighter_data(soup, url, **kwargs):
     returns:
     data frame
     """
-    return organise_fighter_tott(parse_fighter_tott(soup), **kwargs, url = url)
+    return parsing.organise_fighter_tott(parsing.parse_fighter_tott(soup), **kwargs, url = url)
 
 # This function is specifically for parallel scraping odds data
 
@@ -541,7 +558,7 @@ def scrape_event_odds_fast(
             
             # Add opponent
             if len(df) % 2 == 0:
-                df = assign_opponents(df)
+                df = dataset.assign_opponents(df)
             else:
                 print(f"Error in length of data for {event_details[1]['event_url']}. Opponent can't be determined")
                 return pd.DataFrame()
@@ -585,7 +602,7 @@ async def scrape_fighter_odds_async(
     try:
                 
         # Extract the page source and convert to xml
-        soup = get_website_soup_async(
+        soup = scraping.get_website_soup_async(
             url = 'https://www.bestfightodds.com/search?query=' + fighter_name,
             fast = fast,
             playwright_context = playwright_context

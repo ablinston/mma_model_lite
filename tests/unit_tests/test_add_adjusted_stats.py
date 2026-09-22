@@ -1,5 +1,7 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+from mma_functions import features
+import pandas as pd
 
 # # Load what answers are expected
 test_add_adjusted_bayes_stats_correct = fp.ParquetFile('./tests/data/test_add_adjusted_bayes_stats_correct.parquet').to_pandas()
@@ -50,7 +52,7 @@ def test_add_adjusted_stats():
     hist_df = pd.DataFrame(hist_rows)
 
     # --- Run function ---
-    result = add_adjusted_stats(stats_df, hist_df, columns_with=["bayes_strikes"]).sort_values(['event', 'fighter'])
+    result = features.add_adjusted_stats(stats_df, hist_df, columns_with=["bayes_strikes"]).sort_values(['event', 'fighter'])
 
     # --- Assertions ---
     # Shape preserved

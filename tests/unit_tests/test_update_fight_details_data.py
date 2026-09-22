@@ -1,5 +1,8 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+
+from mma_functions.parsing import update_fight_details_data
+from mma_functions.config import config
 
 # Load what answers are expected
 existing_fight_details_data = fp.ParquetFile('./tests/data/update_fight_details_data_input.parquet').to_pandas()

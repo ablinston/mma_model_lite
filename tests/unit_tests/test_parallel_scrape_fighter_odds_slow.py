@@ -1,6 +1,10 @@
 
 # Load all the packages and functions needed
-exec(open('global.py').read())
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.odds_scraping import parallel_scrape_odds_fast
+from mma_functions.config import config
 
 
 # This test looks at a specific fighter list and scrapes their odds to ensure these common errors don't occur again. One has a missing capital letter, the other isn't the first entry on the page, and the other goes directly to their page rather than a search results page

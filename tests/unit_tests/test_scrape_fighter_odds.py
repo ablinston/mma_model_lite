@@ -1,5 +1,10 @@
 # Load all the packages and functions needed
-exec(open('global.py').read())
+from ablinston_ml.scraping import clear_captcha, start_browser
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.odds_scraping import scrape_fighter_odds_fast
+from mma_functions.config import config
 
 # Read the fighter odds urls
 fighter_odds_urls = pd.read_csv(config['fighter_odds_urls'])

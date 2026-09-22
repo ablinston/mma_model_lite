@@ -1,3 +1,13 @@
+from ablinston_ml import stop_if_not
+from datetime import datetime, timedelta
+import fastparquet as fp
+import joblib
+import numpy as np
+import pandas as pd
+
+from mma_functions import dataset, features, utils
+from mma_functions.config import config, model_hyper_params, odds_scrape_config
+
 # This function takes the odds data and finds the event and bout information from the event details and fight stats data
 
 # It returns the odds data with the correct event and bout matched along with a correct date
@@ -27,15 +37,15 @@ def add_event_and_bout_to_odds_data(odds_df, event_details_df, stats_df, date_ch
     new_stats_df = stats_df.merge(event_dates[['event', 'event_date']], how = 'left', on = 'event')
         
     # Clean the bouts and fighter columns
-    new_stats_df[['bout', 'fighter']] = clean_text_columns(new_stats_df[['bout', 'fighter']])
-    odds_df.loc[:,['fighter', 'opponent']] = clean_text_columns(odds_df[['fighter', 'opponent']])
+    new_stats_df[['bout', 'fighter']] = utils.clean_text_columns(new_stats_df[['bout', 'fighter']])
+    odds_df.loc[:,['fighter', 'opponent']] = utils.clean_text_columns(odds_df[['fighter', 'opponent']])
     
     # Drop columns not needed and duplicates. Drop NA because they will affect the match
     new_stats_df = new_stats_df[['event', 'bout', 'fighter', 'event_date']].drop_duplicates()
     new_stats_df = new_stats_df.dropna()
     
     # Create an opponent column
-    add_opponent_column(new_stats_df)
+    dataset.add_opponent_column(new_stats_df)
     
     ######################
     # Going in reverse priority, try to replace the event and bout from matches in the data
@@ -128,7 +138,7 @@ def add_noise_to_odds(df, norm_mean = 1, norm_sd = 0.1, include_backtesting_odds
     odds_df = add_true_odds(odds_df, 'mean_closing_odds')
 
     # Add diff columns
-    odds_df = add_fighter_differentials(odds_df) 
+    odds_df = features.add_fighter_differentials(odds_df) 
     
     # Now merge the new odds with the old data
     new_df = df.drop(columns = odds_cols).merge(odds_df[['event', 'bout'] + odds_cols], on = ['event', 'bout'], how = 'left')
@@ -337,7 +347,7 @@ def calculate_true_odds(df, col1, col2):
 
 def clean_odds_dates(odds_df):
     
-    cleaned_dates_df = odds_df.groupby('event').agg({'date': safe_mode})
+    cleaned_dates_df = odds_df.groupby('event').agg({'date': utils.safe_mode})
     
     # Now merge this back onto the odds data
     odds_df.drop('date', axis=1, inplace = True)
@@ -523,7 +533,7 @@ def replace_odds_data(final_data, cleaned_odds_path):
     odds_cols = [col for col in final_data.columns if 'odd' in col]
     
     # Merged with the fight data with the odds columns removed
-    fight_data = merge_df_both_fighters(
+    fight_data = dataset.merge_df_both_fighters(
         left_df =  final_data[[col for col in final_data.columns if col not in odds_cols]],
         df_list = [
             fight_odds
@@ -602,7 +612,7 @@ def update_odds_on_merged_data(
     merged_data.drop(columns = cols_to_remove, inplace = True)
     
     # Merge on the new odds
-    merged_data = merge_df_both_fighters(
+    merged_data = dataset.merge_df_both_fighters(
         left_df =  merged_data,
         df_list = [
             fight_odds
@@ -620,7 +630,7 @@ def update_odds_on_merged_data(
     merged_data['fighter2_backtesting_odds'] = merged_data['fighter2_' + model_hyper_params['odds_to_use']].copy()
     
     # Recalculate differentials
-    merged_data = add_fighter_differentials(merged_data)
+    merged_data = features.add_fighter_differentials(merged_data)
     
     # Check on data
     # cols_that_should_be_in_original = [col for col in merged_data.columns if 'notformodel_true_odds_asat_datetime' not in col]
