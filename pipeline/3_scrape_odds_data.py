@@ -12,7 +12,11 @@ from selenium.webdriver.firefox.service import Service
 import urllib.parse
 # import lxml
 
-exec(open('global.py').read())
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.odds_scraping import parallel_scrape_event_odds_fast, parallel_scrape_odds_fast
+from mma_functions.config import config
 
 # Get a full list of fighters
 fighters = fp.ParquetFile('./data/ufc_fighter_details.parquet').to_pandas()

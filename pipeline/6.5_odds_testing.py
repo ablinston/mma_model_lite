@@ -3,7 +3,14 @@
 from sklearn.linear_model import LinearRegression
 
 # imports
-exec(open('global.py').read())
+from ablinston_ml import stop_if_not
+import fastparquet as fp
+import joblib
+import numpy as np
+import pandas as pd
+
+from mma_functions.odds import american_odds_to_decimal
+from mma_functions.config import config, odds_scrape_config
 
 # Get the two datasets
 fight_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()

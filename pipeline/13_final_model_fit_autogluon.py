@@ -17,7 +17,17 @@ print(torch.cuda.is_available())  # Should be True
 print(torch.cuda.device_count())  # Should be > 0
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import joblib
+import mlflow
+import pandas as pd
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import prep_data_for_model_training, trim_column_list
+from mma_functions.modelling import log_metrics_xgboost_ensemble_mlflow
+from mma_functions.pipelines import btest_model_and_log_mlflow
+from mma_functions.tracking import log_metrics_odds_mlflow
+from mma_functions.config import feature_control, model_hyper_params
 
 from autogluon.tabular import TabularPredictor
 

@@ -12,7 +12,16 @@ from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import joblib
+import numpy as np
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import prep_data_for_model_training
+from mma_functions.modelling import predict_xgboost_ensemble
+from mma_functions.odds import add_noise_to_odds
+from mma_functions.pipelines import btest_model_and_log_mlflow
+from mma_functions.config import config, model_hyper_params
 
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 

@@ -15,7 +15,15 @@ from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+from yaml import dump
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import prep_data_for_model_training
+from mma_functions.modelling import objective_cv_xgboost_mlflow
+from mma_functions.config import config
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()

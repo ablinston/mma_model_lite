@@ -6,7 +6,19 @@ This script takes the cleaned data, merges it and aggregates necessary backgroun
 '''
 
 # imports
-# exec(open('global.py').read())
+from ablinston_ml import stop_if_not
+import fastparquet as fp
+import joblib
+import numpy as np
+import pandas as pd
+
+from mma_functions.cleaning import log_final_data_stats
+from mma_functions.dataset import add_opponent_column, add_upcoming_to_fight_stats, flag_train_test_oot, merge_df_both_fighters
+from mma_functions.elo import derive_start_elos, prep_stats_for_elo_calc
+from mma_functions.features import add_fighter_differentials, aggregate_last_X_fight_data, bayesian_priors, calculate_per_minute_bayesian_stats, calculate_percentages, calculate_win_loss_stats, define_fighter_type
+from mma_functions.odds import add_event_and_bout_to_odds_data, calculate_all_true_odds_columns, process_odds_data
+from mma_functions.utils import check_identical_excl_string, safe_divide_np
+from mma_functions.config import config, data_processing_config, elo_config, model_hyper_params, odds_scrape_config
 
 # Read in the data
 events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()

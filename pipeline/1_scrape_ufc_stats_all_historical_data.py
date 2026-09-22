@@ -15,7 +15,13 @@ import itertools
 import re
 import string
 from tqdm.notebook import tqdm_notebook
-exec(open('./global.py').read())
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.parsing import parse_event_details, parse_fight_details, parse_organise_fight_results_and_stats
+from mma_functions.scraping import get_soup, parallel_scrape
+from mma_functions.config import config
 
 # define url to parse
 events_url = config['completed_events_all_url']

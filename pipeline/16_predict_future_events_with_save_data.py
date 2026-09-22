@@ -2,7 +2,8 @@
 
 
 # Read in global objects and packages
-exec(open('global.py').read())
+from mma_functions.pipelines import predict_future_events
+from mma_functions.config import betfair_login_config, config, data_processing_config, model_hyper_params, test_fighters
 
 # Use this to skip update of data if it's already been done recently
 predict_future_events(

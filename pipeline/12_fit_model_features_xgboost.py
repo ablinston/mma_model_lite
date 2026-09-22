@@ -18,7 +18,17 @@ import xgboost as xgb
 import warnings
 
 # Read in global objects and packages
-exec(open('global.py').read())
+from ablinston_ml.validation import k_fold_id_by_runner
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+from yaml import dump
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import list_swap_fighter1_fighter2, prep_data_for_model_training, standard_feature_removal, trim_column_list
+from mma_functions.features import switch_fighter1_fighter2
+from mma_functions.modelling import objective_xgboost_features_mlflow
+from mma_functions.config import config, feature_control, model_hyper_params
 
 np.warnings = warnings # to avoid ATPE error with hyperopt
 

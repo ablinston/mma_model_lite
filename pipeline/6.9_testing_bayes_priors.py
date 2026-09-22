@@ -15,7 +15,14 @@ from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import joblib
+import numpy as np
+import pandas as pd
+
+from mma_functions.dataset import add_upcoming_to_fight_stats, merge_df_both_fighters, prep_data_for_model_training
+from mma_functions.features import aggregate_last_X_fight_data, bayesian_priors
+from mma_functions.config import config, data_processing_config
 
 
 # Read in the data

@@ -1,6 +1,13 @@
 # This script scrapes data on non-UFC events that are listed on UFCstats.com such as Strikeforce and WEC (acquired by Zuffa)
 
-exec(open('./global.py').read())
+from datetime import datetime, timedelta
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.cleaning import check_data_coverage
+from mma_functions.parsing import fix_fight_details_bout, parse_fighter_details, update_fight_details_data, update_fight_results_and_stats_data
+from mma_functions.scraping import generate_alphabetical_urls, parallel_get_all_event_urls_from_fighters, parallel_scrape, parallel_scrape_event_details
+from mma_functions.config import config
 
 # read existing event details
 parsed_event_details_df = fp.ParquetFile('./data/' + config['event_details_file_name']).to_pandas()
@@ -147,5 +154,3 @@ if checks_passed:
     
 else:
     print("Data checks not passed. Data not saved. See previous output messages for more information.")
-
-

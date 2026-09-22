@@ -17,7 +17,15 @@ from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+import pandas as pd
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import prep_data_for_model_training, standard_feature_removal
+from mma_functions.features import switch_fighter1_fighter2
+from mma_functions.modelling import create_custom_loss
+from mma_functions.config import config, model_hyper_params
 
 # Read in the data for training
 data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()

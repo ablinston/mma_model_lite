@@ -17,7 +17,16 @@ import seaborn as sns
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import joblib
+import numpy as np
+import os
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import prep_data_for_model_training
+from mma_functions.modelling import predict_xgboost_ensemble
+from mma_functions.pipelines import btest_model_and_log_mlflow, clean_all_raw_data_and_save, merge_and_process_all_clean_data, scrape_all_unparsed_data
+from mma_functions.config import bet_config, betfair_login_config, config, data_processing_config, elo_config, model_hyper_params, odds_scrape_config, test_fighters
 
 # Replace the firefox location if we're not on windows
 if not os.name == "nt":

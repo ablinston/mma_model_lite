@@ -17,7 +17,17 @@ from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import joblib
+import pandas as pd
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import prep_data_for_model_training
+from mma_functions.features import switch_fighter1_fighter2
+from mma_functions.modelling import log_metrics_xgboost_ensemble_mlflow
+from mma_functions.pipelines import train_ensemble_xgboost
+from mma_functions.tracking import log_metrics_odds_mlflow
+from mma_functions.config import config, final_model_features, model_hyper_params
 
 # Set the new model version number
 new_version_number = "4.0.31"

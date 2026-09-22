@@ -12,7 +12,13 @@ import xgboost as xgb
 import warnings
 
 # imports
-exec(open('global.py').read())
+import fastparquet as fp
+import numpy as np
+from yaml import dump
+
+from mma_functions.elo import objective_cv_elo_basic_mlflow, prep_stats_for_elo_calc
+from mma_functions.tracking import get_params_by_run_name
+from mma_functions.config import config
 
 np.warnings = warnings # to avoid ATPE error with hyperopt
 

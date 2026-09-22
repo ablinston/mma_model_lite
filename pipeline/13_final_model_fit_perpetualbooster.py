@@ -4,7 +4,15 @@
 from perpetual import PerpetualBooster
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import mlflow
+import pandas as pd
+import time
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.dataset import prep_data_for_model_training, trim_column_list
+from mma_functions.pipelines import btest_model_and_log_mlflow
+from mma_functions.config import config, feature_control, model_hyper_params
 
 # Set the new model version number
 new_version_number = "4.1.0"

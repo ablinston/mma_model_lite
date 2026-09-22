@@ -10,7 +10,12 @@ includes fighter, height, weight, reach, stance, dob
 '''
 
 # Import
-exec(open('global.py').read())
+import fastparquet as fp
+
+from mma_functions.odds_scraping import get_fighter_data
+from mma_functions.parsing import parse_fighter_details
+from mma_functions.scraping import generate_alphabetical_urls, parallel_scrape
+from mma_functions.config import config
 
 # generate list of urls for fighter details
 list_of_alphabetical_urls = generate_alphabetical_urls()
@@ -38,4 +43,3 @@ all_fighter_tott_df = parallel_scrape(
 
 # write to file
 fp.write('./data/' + config['fighter_tott_file_name'], all_fighter_tott_df, compression = 'GZIP')
-

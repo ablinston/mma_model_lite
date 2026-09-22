@@ -7,7 +7,11 @@ from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import numpy as np
+import pandas as pd
+import pyarrow.parquet as pq
+
+from mma_functions.config import config
 
 # Read in the data for training
 data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()

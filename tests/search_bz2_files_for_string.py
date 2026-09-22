@@ -11,7 +11,8 @@ import orjson
 import os
 
 
-exec(open('global.py').read())
+from mma_functions.betfair import betfair_bout_get_chosen_odds, betfair_stream_to_df
+from mma_functions.config import betfair_data_config, betfair_login_config
 
 # Set the download folder. This should be empty to save duplicated searching
 download_folder = './data/raw_betfair/historic/'

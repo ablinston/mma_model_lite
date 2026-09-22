@@ -7,7 +7,12 @@ import orjson
 import os
 
 
-exec(open('global.py').read())
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.betfair import betfair_file_to_final_odds, betfair_filter_bz2_for_fights
+from mma_functions.utils import parallel_run_function
+from mma_functions.config import betfair_data_config, betfair_login_config, config
 
 # Set the download folder. This should be empty to save duplicated searching
 download_folder = './data/raw_betfair/historic/'

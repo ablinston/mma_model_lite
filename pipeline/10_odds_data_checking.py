@@ -1,5 +1,8 @@
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import pandas as pd
+
+from mma_functions.config import config
 
 
 # Read in the final data

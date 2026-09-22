@@ -1,5 +1,8 @@
 
-# exec(open('global.py').read())
+import fastparquet as fp
+
+from mma_functions.pipelines import clean_all_raw_data
+from mma_functions.config import config
 
 # Read in the data
 events = fp.ParquetFile('./data/' + config['event_details_file_name']).to_pandas()

@@ -15,7 +15,17 @@ import seaborn as sns
 import xgboost as xgb
 
 # Read in global objects and packages
-exec(open('global.py').read())
+import fastparquet as fp
+import joblib
+import numpy as np
+import pandas as pd
+
+from mma_functions.dataset import add_opponent_column, add_upcoming_to_fight_stats, prep_data_for_model_training
+from mma_functions.evaluation import summarise_model_predictions
+from mma_functions.features import add_fighter_differentials, bayesian_priors, calculate_hist_opp_stance_stats
+from mma_functions.modelling import predict_xgboost_ensemble
+from mma_functions.odds import calculate_all_true_odds_columns
+from mma_functions.config import bet_config, config, data_processing_config, final_model_features, model_hyper_params
 
 # Set the model location
 # model_path = './results/final_xgboost_forest.joblib'

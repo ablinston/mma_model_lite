@@ -6,8 +6,17 @@ import csv
 import gc
 import itertools
 import mlflow
+import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split, KFold
 import xgboost as xgb
+
+from mma_functions.cleaning import standard_data_filter
+from mma_functions.config import config, elo_config, load_configs, model_hyper_params, odds_scrape_config, test_fighters
+from mma_functions.dataset import prep_data_for_model_training, standard_feature_removal
+from mma_functions.modelling import create_custom_loss
+from mma_functions.pipelines import merge_and_process_all_clean_data
+from mma_functions.tracking import log_metrics_mlflow
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
@@ -18,9 +27,9 @@ for bayes_base_per_minute in [0, 25, 50]: # :range(25, 175, 25):
     for bayes_base_percent in [0, 10, 25, 50, 75, 100]: #range(50, 300, 50):
         # for bayes_fightspan in [50, 150]:
         
-        # Read in global objects and packages
-        exec(open('global.py').read())    
-        
+        # Read the config in fresh each time so the overwrites below don't carry over
+        data_processing_config = load_configs()['data_processing_config']
+
         # Overwrite the base
         data_processing_config['bayes_alpha_plus_beta_rebase_per_minute'] = bayes_base_per_minute
         data_processing_config['bayes_alpha_plus_beta_rebase_percent'] = bayes_base_percent
