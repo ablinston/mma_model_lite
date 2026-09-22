@@ -11,6 +11,7 @@ mlruns/
 *xgb
 mlflow.db
 results/temp/**
+!results/temp/.gitkeep
 
 # Specific files
 results/7.5_random_forest_model.xgb
