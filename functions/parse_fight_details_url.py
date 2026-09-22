@@ -10,10 +10,7 @@ def parse_fight_details_url(url, config):
     a df of fight details
     """
     
-    if not os.name == 'nt':
-        soup = get_website_soup(url, fast = False, chrome_driver = config['chrome_driver_location_pi'], time_delay = True)
-    else:
-        soup = get_website_soup(url, fast = False, chrome_binary = config['chrome_binary_location'], chrome_version_main = config.get('chrome_version_main'), time_delay = True)
+    soup = get_website_soup(url, fast = True, chrome_binary = config['chrome_binary_location'], time_delay = True)
     
     # pdb.set_trace()
     

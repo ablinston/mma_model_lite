@@ -21,10 +21,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     list_of_parsed_events = list(parsed_event_details_df['EVENT'])
 
     # get soup
-    if not os.name == 'nt':
-        soup = get_soup(config['completed_events_all_url'])
-    else:
-        soup = get_website_soup(config['completed_events_all_url'], fast = False, chrome_binary = config['chrome_binary_location'], chrome_version_main = config.get('chrome_version_main'), time_delay = True)
+    soup = get_website_soup(config['completed_events_all_url'], fast = True, chrome_binary = config['chrome_binary_location'], time_delay = True)
         
     # parse event details
     new_event_details_df = parse_event_details(soup)
@@ -41,14 +38,9 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     ###############################################################################
 
     # Get a list of upcoming events
-    if not os.name == 'nt':
-        upcoming_events_df = parse_event_details(
-            get_website_soup(config['upcoming_events_url'], fast = False, chrome_driver = './data/chrome_drivers/chromedriver_64ARM', time_delay = True),
-            upcoming = True)
-    else:
-        upcoming_events_df = parse_event_details(
-            get_website_soup(config['upcoming_events_url'], fast = False, chrome_binary = config['chrome_binary_location'], chrome_version_main = config.get('chrome_version_main'), time_delay = True),
-            upcoming = True)
+    upcoming_events_df = parse_event_details(
+        get_website_soup(config['upcoming_events_url'], fast = True, chrome_binary = config['chrome_binary_location'], time_delay = True),
+        upcoming = True)
 
     # # If missed the event start time because it is today, move it to the upcoming data
     if pd.to_datetime(new_event_details_df.iloc[0]['DATE']) == pd.to_datetime(datetime.today().strftime('%Y-%m-%d')):

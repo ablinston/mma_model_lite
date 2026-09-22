@@ -1,5 +1,7 @@
 {
-    "python.defaultInterpreterPath": "X:/Programs/Miniconda_envs/mma_model_dev/python.exe",
+    // No interpreter path here on purpose. Workspace settings beat the ones the
+    // devcontainer sets, so hardcoding the Windows conda env broke the container.
+    // Pick the interpreter once per machine and VS Code remembers it.
     "python.condaPath": "X:/Programs/miniconda3/Scripts/conda.exe",
     "python.locator": "js",
     "python.terminal.activateEnvironment": true,

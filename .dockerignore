@@ -1,0 +1,15 @@
+# The build only needs requirements.txt, so everything below is just to keep
+# the context small. The devcontainer bind mounts the folder anyway, so the
+# container still sees all of it at runtime.
+
+.git
+.dvc
+*.dvc
+data
+models
+results
+
+__pycache__
+.pytest_cache
+.ipynb_checkpoints
+.virtual_documents

@@ -5,9 +5,6 @@ def parallel_scrape_odds_fast(
         output_df = pd.DataFrame(), 
         config = [],
         num_threads = 1, 
-        firefox_location = '', 
-        gecko_driver = '',
-        chrome_driver = '',
         odds_urls_overide_df = None,
         event_urls = False,
         fast = True,
@@ -46,39 +43,27 @@ def parallel_scrape_odds_fast(
     # Get cookies from Selenium
     # selenium_cookies = driver.get_cookies()
             
-    options = uc.ChromeOptions()
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--start-maximized")
-    options.add_argument('--no-first-run')
-    
     # Look up the true global config (this function is defined via exec() into the
     # caller's namespace, so globals() here is that namespace, not the local
     # 'config' parameter above, which defaults to [] and is otherwise unused)
     _global_config = globals().get('config')
-    version_main = _global_config.get('chrome_version_main') if isinstance(_global_config, dict) else None
     chrome_binary_location = _global_config.get('chrome_binary_location') if isinstance(_global_config, dict) else None
 
-    if chrome_driver == '':
-        if chrome_binary_location:
-            options.binary_location = chrome_binary_location
-        driver = uc.Chrome(options=options, headless=False, browser_executable_path=chrome_binary_location, version_main=version_main)
-    else:
-        driver = uc.Chrome(options=options, headless=False, driver_executable_path = chrome_driver, version_main=version_main)
-    
-    driver.get("https://www.bestfightodds.com/")
-    
-    # Give a delay to allow the checkbox to be manually done
-    time.sleep(20)
-    cookies = driver.get_cookies()
-    
-    cookies_dict = {cookie['name']: cookie['value'] for cookie in cookies}
+    # Run in a window rather than headless so the Cloudflare checkbox can be clicked
+    browser = start_browser(
+        "https://www.bestfightodds.com/",
+        chrome_binary = chrome_binary_location,
+        headless = False)
+
+    # Clear the checkbox, falling back to a delay to allow it to be manually done
+    clear_captcha(browser)
+
+    cookies = browser.get_all_cookies()
+
+    cookies_dict = {cookie.name: cookie.value for cookie in cookies}
     # Quit the browser unless we are going through one at a time
     if num_threads > 1:
-        driver.quit()
+        browser.stop()
     
     scrape_func = partial(
         scrape_fighter_odds_fast,
@@ -87,8 +72,6 @@ def parallel_scrape_odds_fast(
         event_urls = event_urls,
         playwright = playwright,
         fast = fast,
-        firefox_binary = firefox_location,
-        gecko_driver = gecko_driver
     )
     
     # Check if we have more than 1 thread
@@ -123,10 +106,7 @@ def parallel_scrape_odds_fast(
                 event_urls = event_urls,
                 playwright = playwright,
                 fast = fast,
-                firefox_binary = firefox_location,
-                gecko_driver = gecko_driver,
-                chrome_driver = chrome_driver,
-                driver = driver)
+                browser = browser)
             
             odds_scrape_results.append(odds_result)  # Collect the result (url, title)
             event_scrape_results.append(events_result)  # Collect the result (url, title)
@@ -139,8 +119,8 @@ def parallel_scrape_odds_fast(
     else:
         all_fighter_odds = pd.DataFrame()
     
-    driver.quit()
-    
+    browser.stop()
+
     # Combine the results
     if event_urls:
         

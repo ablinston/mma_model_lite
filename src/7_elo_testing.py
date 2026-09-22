@@ -16,9 +16,6 @@ exec(open('global.py').read())
 
 np.warnings = warnings # to avoid ATPE error with hyperopt
 
-# Set the number of threads to be used (replace 4 with your desired number of cores)
-dt.options.nthreads = 3
-
 # Read in the data
 fight_results = fp.ParquetFile('./data/' + config['fight_results_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
 fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()

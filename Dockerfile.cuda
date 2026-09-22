@@ -1,0 +1,40 @@
+
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
+    && apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-venv \
+    git \
+    openssh-client \
+    curl \
+    xvfb \
+    xauth \
+    # deadsnakes keeps tkinter separate, and pyautogui dies without it
+    python3.11-tk \
+    # Get chromium for the scrapers
+    && curl -fsSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/chrome.deb \
+    && apt-get install -y /tmp/chrome.deb \
+    && rm -rf /var/lib/apt/lists/* /tmp/chrome.deb
+
+RUN printf '%b' '[include]\n\tpath = /root/.gitconfig-host\n' \
+                '[user]\n\tname = ablinston\n\temail = ablinston@users.noreply.github.com\n' \
+                '[safe]\n\tdirectory = /workspace\n' > /root/.gitconfig
+
+WORKDIR /workspace
+
+RUN python3.11 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+
+
+CMD ["bash"]

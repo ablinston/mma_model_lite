@@ -1,7 +1,53 @@
 # mma_model
 A model to predict MMA fight results.
 
-To use this, open a conda terminal, navigate to the folder and use `conda activate mma_model`. You can then run `spyder` to use Spyder IDE.
+Everything runs inside Docker.
+
+# Docker
+
+There are two Dockerfiles:
+
+- `Dockerfile` is the CPU image. Python 3.11 slim with everything in `requirements.txt` plus chromium and xvfb for the scrapers. Builds on Windows and on the Raspberry Pi.
+- `Dockerfile.cuda` is the GPU image for training on the Nvidia card. Windows only.
+
+Build from the repo folder:
+
+```
+docker build -t mma_model .
+docker build -f Dockerfile.cuda -t mma_model-cuda .
+```
+
+Only `requirements.txt` goes into the image. The repo itself is bind mounted at `/workspace` at runtime so the container always sees the working copy. The code also depends on `ablinston-ml`, which lives in a sibling folder on the host. It isn't in the image either. It gets mounted at `/opt/ablinston-ml` and installed as editable so changes to it show up without reinstalling.
+
+On Windows the VS Code dev container in `.devcontainer/` does all of this. It builds from `Dockerfile`, mounts both folders and runs the `pip install -e` for you.
+
+On the Pi, or from a plain terminal anywhere, do the same by hand. Create a named container once with both mounts:
+
+```
+docker run -it --name mma_model -v /home/andy/Repos/mma_model_lite:/workspace -v /home/andy/Repos/ablinston-ml:/opt/ablinston-ml mma_model:v1 bash
+```
+
+then inside it install the package:
+
+```
+pip install -e /opt/ablinston-ml
+```
+
+After that just
+
+```
+docker start -ai mma_model
+```
+
+Don't use `--rm`. Stop and start keep the container's filesystem, so the editable install and anything else pip installed inside it is still there next time. It is only lost if the container is deleted with `docker rm` or a new one is made from the image, in which case the `pip install -e` needs doing again. Anything that should survive a rebuild goes in `requirements.txt`.
+
+Mounts are fixed when the container is created, so adding one later also means `docker rm mma_model` and starting over. For the GPU image add `--gpus all` to the run command.
+
+Scripts are run from `/workspace`, e.g. `python src/16_predict_future_events.py`.
+
+## Raspberry Pi
+
+The Pi needs the 64 bit Raspberry Pi OS. There are no 32 bit wheels for polars, pyarrow or xgboost so a 32 bit OS tries to compile them from source and fails. The image built on the Pi is arm64 and the one built on Windows is amd64, so they can't be copied between the two. Each machine builds its own from the same Dockerfile. This is slow on the Pi, 20 minutes or so, but only needed when `requirements.txt` changes.
 
 # Updating training data
 
@@ -31,14 +77,13 @@ For example, if there are 100 submission attempts across 1000 minutes in the his
 
 ## Unit testing
 
-There are some unit test scripts saved within `./tests/functions/`. To run this, open an anaconda prompt, activate the `mma_model` environment and then change directory to `./tests/functions/`. Then use command `pytest`.
+There are some unit test scripts saved within `./tests/functions/`. From inside the container, change directory to `./tests/functions/` and run `pytest`.
 
-# Training Experiments
+# Training experiments
 
-These use MLflow, so ensure the server is running using (or use the .bat file in the root repo)
-`mlflow server --host 127.0.0.1 --port 8080 --backend-store-uri /Documents/mma_model/mlruns/`
+These use MLflow. The server runs on the host, not in the container. Start it with `run_mlflow_server.bat` on Windows or `run_mlflow_server_raspberry_pi.sh` on the Pi. Both clear out the MLflow trash first, then serve on port 8080. The mlflow version on the host needs to match the one pinned in `requirements.txt` or the client and server disagree.
 
-I couldn't get this to work when running in venv, so has to be run outside. Just ensure that a consistent version of mlflow is used inside and outside.
+The scripts point at `http://127.0.0.1:8080`. Inside a container that address is the container itself, not the host, so either run the container with `--network host` (works on the Pi) or point the scripts at `host.docker.internal` on Windows.
 
 ## Metric choice
 
@@ -48,29 +93,17 @@ I chose AUC to assess the models and target rather than accuracy. Although we ar
 
 Training of models runs much faster on GPU than CPU. There is a test script in the tests folder to verify this.
 
-The experiments run with GPU on an Nvidia GTX 1060. To use this, lightgbm needs installing in a specific way. Follow the instructions at https://lightgbm.readthedocs.io/en/latest/Installation-Guide.html#id18
+The experiments run with GPU on an Nvidia GTX 1060 using `Dockerfile.cuda` and xgboost. Run the container with `--gpus all`. Docker Desktop passes the card through from WSL2, so as long as the Nvidia driver is installed on Windows nothing else is needed.
 
-It needs a C++ compiler installed (minGW is how to get it on Windows https://sourceforge.net/projects/mingw/). The gcc is the fidliest to install. Needs to install the gcc part with MinGW and then manually add the path.
-```
-pip install --upgrade cmake
-
-pip install --no-binary lightgbm --config-settings=cmake.define.CMAKE_C_COMPILER=C:/MinGW/bin/gcc --config-settings=cmake.define.CMAKE_CXX_COMPILER=C:/MinGW/bin/g++ --config-settings=cmake.define.PYTHON_INCLUDE_DIR=C:/Users/Andy/AppData/Local/Programs/Python/Python311/include --config-settings=cmake.define.PYTHON_LIBRARY=C:/Users/Andy/AppData/Local/Programs/Python/Python311/libs/python311.lib --config-settings=cmake.define.USE_CUDA=ON lightgbm
-
-```
-AB note: couldn't get GPU training with LightGBM working at all on Windows. Used conda and xgboost instead (for random forests too because it allows GPU training).
-
-```
-conda install -c nvidia cuda-toolkit==11.8 # HAVE TO GET THE RIGHT VERSION THAT's STABLE WITH GTX 1060 
-conda install -c conda-forge libxgboost=*=cuda* py-xgboost=*=cuda* --force-reinstall
-# or
-pip install --force-reinstall --no-deps xgboost==2.1.4
-```
-
-If run into errors and cuda version of xgboost is installed, list `conda list xgboost` and check the lib-xgboost version. I may be different and cpu only.
+I never got GPU training with LightGBM working on Windows, so xgboost is used instead (for random forests too, because it allows GPU training).
 
 # Notes
 
 To undo stupid split in Spyder, use Alt + Shift + W
+
+## Debugging with pdb
+
+At a `pdb.set_trace()` prompt, list comprehensions and lambdas can't see local variables. You get a NameError even though `p name` prints it fine. This is because pdb execs your input with separate globals and locals and the comprehension is a new scope that only sees the globals. Type `interact` to drop into a normal Python shell in the same frame where it all works, Ctrl-D to get back.
 
 ## Odds
 
@@ -91,25 +124,10 @@ MMA is lumped with everything else so the scripts scan the files and see which o
 To install, need to install the package then install the browsers with `python -m playwright install
 ` 
 
-# DVC Setup
+# DVC setup
 
-Set up, using Backblaze (https://secure.backblaze.com/b2_buckets.htm) with S3 is a bit of a nightmare. FIrst need to install dvc that is compatable, then there are some recent updates that don't allow dvc to push properly so need older versions of packages.
+dvc and dvc-s3 are in `requirements.txt` so they're already in the image. Set up, using Backblaze (https://secure.backblaze.com/b2_buckets.htm) with S3 is a bit of a nightmare. Some versions of aiobotocore and botocore didn't push properly, so if pushes start failing after bumping packages those are the first ones to suspect.
 
-```
-pip install dvc[s3]
-pip install boto3==1.35.90
-pip install aiobotocore==2.16.1
-pip install botocore==1.35.88
-```
-
-Or, I've succcessfully installed it with conda with less trouble.
-
-```
-conda install dvc[s3]
-conda install dvc-s3
-# or 
-conda install -c conda-forge dvc-s3 --update-deps --force-reinstall
-```
 Had a common issue with a '128m' error. If this happens go in the .git/config file and comment out the limits in the `[pack]` section.
 
 Then need to set up the remote. I have called it `storage`.

@@ -106,7 +106,8 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     fight_results['fight_minutes'] = time_to_minutes_decimal(fight_results['time'])
     fight_stats = to_numeric(fight_stats, ['round', 'sub.att'])
     fight_results = to_numeric(fight_results, ['round'])
-    fight_stats = fight_stats.merge(fight_results[['bout', 'round', 'fight_minutes']], on = ['bout', 'round'], how = 'left')
+    # Event is needed in the join, otherwise a rematch picks up the first fight's round time
+    fight_stats = fight_stats.merge(fight_results[['event', 'bout', 'round', 'fight_minutes']], on = ['event', 'bout', 'round'], how = 'left')
     # Set fight time (5 minute round assumed)
     fight_stats['fight_minutes'] = fight_stats['fight_minutes'].fillna(config['round_time_default'])
     
@@ -135,7 +136,8 @@ def clean_all_raw_data(events, upcoming_events, upcoming_fight_details, fighters
     del([new_stats, prefix])
     
     # Fill the NAs in the fight stats with 0 for landed and attempts
-    fight_stats_agg.fillna(0, inplace = True)
+    stats_cols = [col for col in fight_stats_agg.columns.to_list() if col not in id_cols]
+    fight_stats_agg.loc[:, stats_cols] = fight_stats_agg.loc[:, stats_cols].fillna(0)
     
     # Calculate the total for all rounds then merge onto data
     fight_stats_all_round = fight_stats.groupby(id_cols)[agg_cols].sum().reset_index().rename(columns = dict(zip(agg_cols, ['allrounds_' + col for col in agg_cols])))

@@ -9,29 +9,16 @@
 def scrape_event_odds_fast(
         event_details, # A tuple with the event url and date together
         cookies_dict,
-        fast = True,
-        firefox_binary = '',
-        gecko_driver = ''):
+        fast = True):
 
     # pdb.set_trace()
 
     try:
         
-        # Get headers for the website request. This is a copy and paste from a manual visit
-        headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Encoding':'gzip, deflate, br, zstd',
-            'Accept-Language':'en-US,en;q=0.5',
-            'Connection':'keep-alive',
-            'Host':'www.bestfightodds.com',
-            'Priority':'u=0, i',
-            'Referer': f'https://www.bestfightodds.com/events/ufc-{random.randint(3500, 3700)}',
-            'Sec-Fetch-Dest':'document',
-            'Sec-Fetch-Mode':'navigate',
-            'Sec-Fetch-Site':'same-origin',
-            'Upgrade-Insecure-Requests':'1',
-            'User-Agent': random_user_agent()} # Use random user agent to bypass bot detection
+        # Arrive from another page on the site rather than cold, to look like normal browsing
+        referer = f'https://www.bestfightodds.com/events/ufc-{random.randint(3500, 3700)}'
 
-        soup = get_website_soup('https://www.bestfightodds.com' + event_details[1]['event_url'], fast = fast, headers=headers, cookies=cookies_dict, firefox_binary = firefox_binary, gecko_driver = gecko_driver)
+        soup = get_website_soup('https://www.bestfightodds.com' + event_details[1]['event_url'], fast = fast, referer = referer, cookies = cookies_dict, chrome_binary = config['chrome_binary_location'])
         # # Navigate to the website
         # response = requests.get('https://www.bestfightodds.com' + event_details[1]['event_url'], headers=headers, cookies=cookies_dict)
         
