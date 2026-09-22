@@ -10,7 +10,7 @@ data/raw_betfair/*
 mlruns/
 *xgb
 mlflow.db
-results/temp/*
+results/temp/**
 
 # Specific files
 results/7.5_random_forest_model.xgb
