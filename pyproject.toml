@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mma_functions"
+version = "0.1.0"
+description = "Internal functions for the mma model pipeline"
+requires-python = ">=3.11"
+readme = "README.md"
+
+[tool.setuptools]
+packages = ["mma_functions"]

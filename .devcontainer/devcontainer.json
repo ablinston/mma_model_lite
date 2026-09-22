@@ -19,8 +19,9 @@
   ],
   "remoteUser": "root",
 
-  // Editable, so edits to ablinston-ml show up here without reinstalling
-  "postCreateCommand": "pip install -e /opt/ablinston-ml",
+  // Both editable, so edits show up here without reinstalling. /workspace is
+  // needed as well now mma_functions is a package, otherwise nothing imports.
+  "postCreateCommand": "pip install -e /workspace && pip install -e /opt/ablinston-ml",
 
   "customizations": {
     "vscode": {

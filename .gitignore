@@ -6,11 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+*.db
 data/raw_betfair/*
 mlruns/
 *xgb
 mlflow.db
-results/temp/*
+results/temp/**
+!results/temp/.gitkeep
 
 # Specific files
 results/7.5_random_forest_model.xgb
@@ -181,3 +183,12 @@ cython_debug/
 .cursor/*
 !.cursor/rules/
 !.cursor/rules/**
+
+# seleniumbase writes these next to wherever it is run from
+downloaded_files/
+archived_files/
+latest_logs/
+archived_logs/
+
+# JupyterLab makes these for the language server when a notebook is open
+.virtual_documents/

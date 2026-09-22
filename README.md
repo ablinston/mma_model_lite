@@ -3,6 +3,16 @@ A model to predict MMA fight results.
 
 Everything runs inside Docker.
 
+# What's where
+
+- `mma_functions/` is the package holding all the model code. It is grouped by topic: `scraping`, `parsing`, `odds_scraping`, `cleaning`, `dataset`, `features`, `elo`, `odds`, `betfair`, `modelling`, `evaluation`, `tracking` and `utils`. `pipelines.py` holds the functions that drive a whole stage and are allowed to reach into everything else. `config.py` loads the yaml files from `configs/`.
+- `pipeline/` is the numbered scripts, one per stage, run in order. They should stay thin and just call into `mma_functions`.
+- `configs/` is the yaml config. Import what you need from `mma_functions.config`, e.g. `from mma_functions.config import config, elo_config`.
+- `tests/unit_tests/` is the pytest suite. `tests/data/` holds the expected outputs the tests compare against.
+- `data/`, `models/` and `results/` are outputs, with the datasets tracked in DVC.
+
+One thing that catches you out: modules inside `mma_functions` refer to each other as `from mma_functions import odds` and then `odds.calculate_true_odds(...)`, rather than importing the function directly. There are circular references between the modules and the direct form fails on those. Tests and scripts sit outside the cycle so they can import functions by name as normal.
+
 # Docker
 
 There are two Dockerfiles:
@@ -19,17 +29,27 @@ docker build -f Dockerfile.cuda -t mma_model-cuda .
 
 Only `requirements.txt` goes into the image. The repo itself is bind mounted at `/workspace` at runtime so the container always sees the working copy. The code also depends on `ablinston-ml`, which lives in a sibling folder on the host. It isn't in the image either. It gets mounted at `/opt/ablinston-ml` and installed as editable so changes to it show up without reinstalling.
 
+Two editable installs are needed in the container, not one. `mma_functions` is a package now, so the repo itself has to be installed as well or nothing can import it:
+
+```
+pip install -e /workspace
+pip install -e /opt/ablinston-ml
+```
+
+Both are editable, so neither needs reinstalling when the code changes. Only a change to `pyproject.toml` needs it done again.
+
 On Windows the VS Code dev container in `.devcontainer/` does all of this. It builds from `Dockerfile`, mounts both folders and runs the `pip install -e` for you.
 
 On the Pi, or from a plain terminal anywhere, do the same by hand. Create a named container once with both mounts:
 
 ```
-docker run -it --name mma_model -v /home/andy/Repos/mma_model_lite:/workspace -v /home/andy/Repos/ablinston-ml:/opt/ablinston-ml mma_model:v1 bash
+docker create -it --name mma_model -v /home/andy/Repos/mma_model_lite:/workspace -v /home/andy/Repos/ablinston-ml:/opt/ablinston-ml mma_model:v1 bash
 ```
 
-then inside it install the package:
+then inside it install both packages:
 
 ```
+pip install -e /workspace
 pip install -e /opt/ablinston-ml
 ```
 
@@ -43,7 +63,7 @@ Don't use `--rm`. Stop and start keep the container's filesystem, so the editabl
 
 Mounts are fixed when the container is created, so adding one later also means `docker rm mma_model` and starting over. For the GPU image add `--gpus all` to the run command.
 
-Scripts are run from `/workspace`, e.g. `python src/16_predict_future_events.py`.
+Scripts are run from `/workspace`, e.g. `python pipeline/16_predict_future_events.py`. They have to be run from there because the paths to `data/` are relative to it.
 
 ## Raspberry Pi
 
@@ -51,7 +71,7 @@ The Pi needs the 64 bit Raspberry Pi OS. There are no 32 bit wheels for polars, 
 
 # Updating training data
 
-The full data scrape code is found in the `src` folder. Scripts 1, 2 and 3 will perform a full scrape of the data and all fighters stats.
+The full data scrape code is found in the `pipeline` folder. Scripts 1, 2 and 3 will perform a full scrape of the data and all fighters stats.
 
 Once this has been done, script 4 can be run to add new events and fighter stats to the existing data. **To update, only script 4 needs to be run.**
 
@@ -77,7 +97,7 @@ For example, if there are 100 submission attempts across 1000 minutes in the his
 
 ## Unit testing
 
-There are some unit test scripts saved within `./tests/functions/`. From inside the container, change directory to `./tests/functions/` and run `pytest`.
+The unit tests live in `./tests/unit_tests/`. Run `pytest` from `/workspace` and it picks them up, the paths are set in `pytest.ini`. Don't run it from inside the test folder, the tests load their expected outputs from `./tests/data/` relative to the repo root.
 
 # Training experiments
 
@@ -87,7 +107,7 @@ The scripts point at `http://127.0.0.1:8080`. Inside a container that address is
 
 ## Metric choice
 
-I chose AUC to assess the models and target rather than accuracy. Although we are only interested in predicting the winners, if we want to make money then the odds/probability of each outcome is the most important thing to get correct.
+I chose logloss to assess the models and target rather than accuracy. Although we are only interested in predicting the winners, if we want to make money then the odds/probability of each outcome is the most important thing to get correct.
 
 # GPU
 
