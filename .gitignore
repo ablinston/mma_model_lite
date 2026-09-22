@@ -10,10 +10,12 @@ data/raw_betfair/*
 mlruns/
 *xgb
 mlflow.db
+results/temp/*
 
 # Specific files
 results/7.5_random_forest_model.xgb
 results/final_xgboost_forest.joblib
+results/upcoming_predictions.csv
 
 # Ignore everything under data
 /data/**/*.parquet

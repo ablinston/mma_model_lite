@@ -13,8 +13,8 @@ There are two Dockerfiles:
 Build from the repo folder:
 
 ```
-docker build -t mma_model_lite .
-docker build -f Dockerfile.cuda -t mma_model_lite-cuda .
+docker build -t mma_model .
+docker build -f Dockerfile.cuda -t mma_model-cuda .
 ```
 
 Only `requirements.txt` goes into the image. The repo itself is bind mounted at `/workspace` at runtime so the container always sees the working copy. The code also depends on `ablinston-ml`, which lives in a sibling folder on the host. It isn't in the image either. It gets mounted at `/opt/ablinston-ml` and installed as editable so changes to it show up without reinstalling.
@@ -24,7 +24,7 @@ On Windows the VS Code dev container in `.devcontainer/` does all of this. It bu
 On the Pi, or from a plain terminal anywhere, do the same by hand. Create a named container once with both mounts:
 
 ```
-docker run -it --name mma_model -v /home/andy/mma_model_lite:/workspace -v /home/andy/ablinston-ml:/opt/ablinston-ml mma_model_lite bash
+docker run -it --name mma_model -v /home/andy/Repos/mma_model_lite:/workspace -v /home/andy/Repos/ablinston-ml:/opt/ablinston-ml mma_model:v1 bash
 ```
 
 then inside it install the package:
