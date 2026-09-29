@@ -1,28 +1,16 @@
 {
   "name": "mma_model_lite (CPU)",
 
-  // Built from the non-CUDA Dockerfile. Context is the project folder because
-  // the Dockerfile copies requirements.txt out of it.
-  "build": {
-    "dockerfile": "../Dockerfile",
-    "context": ".."
-  },
+  // Nothing is built or mounted here any more, it all comes from compose.yaml
+  // so that this and a plain terminal get the same container. The pip install
+  // -e lines are in the service command there, not in postCreateCommand.
+  "dockerComposeFile": "../compose.yaml",
+  "service": "mma_model",
 
+  // Only tells VS Code where to open now. It has to match the mount in
+  // compose.yaml, with compose it would otherwise default to /.
   "workspaceFolder": "/workspace",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-
-  // ablinston-ml is a sibling folder on the host, kept out of /workspace so it
-  // does not show up in the project tree
-  "mounts": [
-    "source=${localWorkspaceFolder}/../ablinston-ml,target=/opt/ablinston-ml,type=bind,consistency=cached",
-    "source=${localWorkspaceFolder}/../.claude,target=/root/.claude,type=bind"
-  ],
   "remoteUser": "root",
-
-  // Both editable, so edits show up here without reinstalling. /workspace is
-  // needed as well now mma_functions is a package, otherwise nothing imports.
-  "postCreateCommand": "pip install -e /workspace && pip install -e /opt/ablinston-ml",
-
   "customizations": {
     "vscode": {
       "extensions": [
