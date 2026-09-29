@@ -1,5 +1,6 @@
+import fastparquet as fp
 import itertools
-import lightgbm as lgb
+# import lightgbm as lgb
 import mlflow
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split, KFold
@@ -14,7 +15,7 @@ import pyarrow.parquet as pq
 from mma_functions.config import config
 
 # Read in the data for training
-data = pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+data = fp.ParquetFile('./data/final_dataset/').to_pandas()
 
 data.replace([np.inf], 99999, inplace = True)
 data.replace([-np.inf], -99999, inplace = True)
@@ -56,59 +57,59 @@ no_of_classes = len(set(y_train))
 max_bins = 63
 
 # Set up experiment training
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
-mlflow.set_experiment('cpu_vs_gpu_test')
+mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
+mlflow.set_experiment('Tests')
 
 
-# Format the data for the model
-train = lgb.Dataset(X_train, label = y_train)
+# # Format the data for the model
+# train = lgb.Dataset(X_train, label = y_train)
 
-# Run the test using the CPU
-with mlflow.start_run():
+# # Run the test using the CPU
+# with mlflow.start_run():
 
-    params = {
-        'objective': 'multiclass',      # Binary classification
-        'metric': 'multi_logloss', # Evaluation metric
-        'boosting_type': 'gbdt',    # Gradient Boosting Decision Tree
-        'num_leaves': 31,           # Controls the complexity of the model
-        'learning_rate': 0.01,      # Smaller learning rate for better accuracy
-        'feature_fraction': 0.9,    # Subsampling of features to speed up training
-        'bagging_fraction': 0.8,    # Subsampling of data to prevent overfitting
-        'bagging_freq': 5,          # Perform bagging every 5 iterations
-        'n_jobs': 3,               # Use all CPU cores
-        'verbose': -1,            # Suppress output
-        'num_class': no_of_classes,
-        'num_iterations': 200
-    }
+#     params = {
+#         'objective': 'multiclass',      # Binary classification
+#         'metric': 'multi_logloss', # Evaluation metric
+#         'boosting_type': 'gbdt',    # Gradient Boosting Decision Tree
+#         'num_leaves': 31,           # Controls the complexity of the model
+#         'learning_rate': 0.01,      # Smaller learning rate for better accuracy
+#         'feature_fraction': 0.9,    # Subsampling of features to speed up training
+#         'bagging_fraction': 0.8,    # Subsampling of data to prevent overfitting
+#         'bagging_freq': 5,          # Perform bagging every 5 iterations
+#         'n_jobs': 3,               # Use all CPU cores
+#         'verbose': -1,            # Suppress output
+#         'num_class': no_of_classes,
+#         'num_iterations': 200
+#     }
 
-    lightgbm_model = lgb.train(params, train)
+#     lightgbm_model = lgb.train(params, train)
 
-    mlflow.log_param('model', 'LightGBM')
-    mlflow.log_params(params)
+#     mlflow.log_param('model', 'LightGBM')
+#     mlflow.log_params(params)
 
-# # Run the same model using the GPU
+# # # Run the same model using the GPU
 
-## AB: Couldn't get LightGBM to actually use the GPU
+# ## AB: Couldn't get LightGBM to actually use the GPU
 
-with mlflow.start_run():
+# with mlflow.start_run():
 
-    params.update({
-        'device': 'cuda',  # Use GPU
-        'gpu_platform_id': 0,  # Platform ID, 0 for default
-        'gpu_device_id': 0,  # Device ID, 0 for the first GPU
-    })
+#     params.update({
+#         'device': 'cuda',  # Use GPU
+#         'gpu_platform_id': 0,  # Platform ID, 0 for default
+#         'gpu_device_id': 0,  # Device ID, 0 for the first GPU
+#     })
 
-    lightgbm_model = lgb.train(params, train)
+#     lightgbm_model = lgb.train(params, train)
 
-    mlflow.log_param('model', 'LightGBM')
-    mlflow.log_params(params)
+#     mlflow.log_param('model', 'LightGBM')
+#     mlflow.log_params(params)
 
 
 # Run the same test with xgboost
 
 train = xgb.DMatrix(X_train, label = y_train)
 
-with mlflow.start_run():
+with mlflow.start_run(description = "CPU test"):
 
     params = {
         'max_depth': 5,                 # Maximum depth of a tree
@@ -128,7 +129,7 @@ with mlflow.start_run():
     mlflow.log_param('model', 'XGBoost')
     mlflow.log_params(params)
 
-with mlflow.start_run():
+with mlflow.start_run(description = "CUDA test"):
     
     params.update({
         'device': 'cuda',           # Use CUDA / GPU

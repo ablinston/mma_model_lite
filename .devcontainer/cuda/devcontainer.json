@@ -4,7 +4,7 @@
   // Nothing is built or mounted here any more, it all comes from compose.yaml
   // so that this and a plain terminal get the same container. The pip install
   // -e lines are in the service command there, not in postCreateCommand.
-  "dockerComposeFile": "../compose_cuda.yaml",
+  "dockerComposeFile": "../../compose_cuda.yaml",
   "service": "mma_model_cuda",
 
   // Only tells VS Code where to open now. It has to match the mount in
