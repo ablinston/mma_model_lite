@@ -1,0 +1,12 @@
+name: mma_model_cuda
+
+services:
+  mma_model_cuda:
+    extends:
+      file: compose.yaml
+      service: mma_model
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: mma_model_cuda:v1
+    gpus: all
