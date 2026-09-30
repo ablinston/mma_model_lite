@@ -23,9 +23,11 @@ There are two Dockerfiles:
 Build from the repo folder:
 
 ```
-docker build -t mma_model .
+docker compose build
 docker build -f Dockerfile.cuda -t mma_model-cuda .
 ```
+
+Compose only covers the CPU image. The GPU one is still built and run by hand.
 
 Only `requirements.txt` goes into the image. The repo itself is bind mounted at `/workspace` at runtime so the container always sees the working copy. The code also depends on `ablinston-ml`, which lives in a sibling folder on the host. It isn't in the image either. It gets mounted at `/opt/ablinston-ml` and installed as editable so changes to it show up without reinstalling.
 
@@ -36,32 +38,24 @@ pip install -e /workspace
 pip install -e /opt/ablinston-ml
 ```
 
-Both are editable, so neither needs reinstalling when the code changes. Only a change to `pyproject.toml` needs it done again.
+Both of those are in the service `command` in `compose.yaml` so they happen on every start. They go into the venv inside the container rather than onto the mount, so they are lost whenever the container is recreated, and doing them every time means they come back without me having to remember.
 
-On Windows the VS Code dev container in `.devcontainer/` does all of this. It builds from `Dockerfile`, mounts both folders and runs the `pip install -e` for you.
-
-On the Pi, or from a plain terminal anywhere, do the same by hand. Create a named container once with both mounts:
+## Running it
 
 ```
-docker create -it --name mma_model -v /home/andy/Repos/mma_model_lite:/workspace -v /home/andy/Repos/ablinston-ml:/opt/ablinston-ml mma_model:v1 bash
+docker compose up -d
+docker compose exec mma_model bash
 ```
 
-then inside it install both packages:
+`up -d` builds the image if it is missing, creates the container with both mounts, does the installs and leaves it sitting there. After that `exec` is how you get a shell. `docker compose down` stops and deletes the container, and the next `up -d` puts it all back.
 
-```
-pip install -e /workspace
-pip install -e /opt/ablinston-ml
-```
+If it won't stay up, `docker compose logs mma_model` says why. Normally it is a failed `pip install -e`, which kills the command before it reaches the `sleep`.
 
-After that just
+Adding a mount is a line under `volumes:` and then `docker compose up -d` again, which recreates the container for you. After a change to `requirements.txt` use `docker compose up -d --build`.
 
-```
-docker start -ai mma_model
-```
+The VS Code dev container in `.devcontainer/` points at the same compose file, so it gets the same mounts and the same installs. It doesn't build or mount anything of its own now.
 
-Don't use `--rm`. Stop and start keep the container's filesystem, so the editable install and anything else pip installed inside it is still there next time. It is only lost if the container is deleted with `docker rm` or a new one is made from the image, in which case the `pip install -e` needs doing again. Anything that should survive a rebuild goes in `requirements.txt`.
-
-Mounts are fixed when the container is created, so adding one later also means `docker rm mma_model` and starting over. For the GPU image add `--gpus all` to the run command.
+For the GPU image add `--gpus all` to a plain `docker run`.
 
 Scripts are run from `/workspace`, e.g. `python pipeline/16_predict_future_events.py`. They have to be run from there because the paths to `data/` are relative to it.
 

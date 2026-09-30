@@ -1,0 +1,14 @@
+services:
+  mma_model:
+    build: .
+    image: mma_model:v1
+    volumes: 
+      - .:/workspace
+      # This package must be located in the parent folder
+      - ../ablinston-ml:/opt/ablinston-ml
+    # Both installs go into the venv inside the container, not onto the mount,
+    # so they are lost whenever compose recreates it. Doing them on every start
+    # means they come back on their own. The sleep is what keeps the container
+    # up, bash on its own exits as soon as it starts with nothing attached.
+    command:
+      ["bash", "-c", "pip install -e /workspace && pip install -e /opt/ablinston-ml && sleep infinity"]

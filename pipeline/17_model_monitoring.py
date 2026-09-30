@@ -37,7 +37,7 @@ skip_data_update = False
 skip_save_data = False
 
 # # Load files
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
 mlflow.set_experiment('Model_Monitoring_v2')
 
 # Load all model versions

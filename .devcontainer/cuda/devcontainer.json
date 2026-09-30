@@ -1,0 +1,26 @@
+{
+  "name": "mma_model_lite (CUDA)",
+
+  // Nothing is built or mounted here any more, it all comes from compose.yaml
+  // so that this and a plain terminal get the same container. The pip install
+  // -e lines are in the service command there, not in postCreateCommand.
+  "dockerComposeFile": "../../compose_cuda.yaml",
+  "service": "mma_model_cuda",
+
+  // Only tells VS Code where to open now. It has to match the mount in
+  // compose.yaml, with compose it would otherwise default to /.
+  "workspaceFolder": "/workspace",
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python"
+      }
+    }
+  }
+}
