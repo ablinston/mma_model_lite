@@ -15,28 +15,28 @@ import pyarrow.parquet as pq
 from mma_functions.config import config
 
 # Read in the data for training
-data = fp.ParquetFile('./data/final_dataset/').to_pandas()
+data = fp.ParquetFile("./data/final_dataset/").to_pandas()
 
-data.replace([np.inf], 99999, inplace = True)
-data.replace([-np.inf], -99999, inplace = True)
+data.replace([np.inf], 99999, inplace=True)
+data.replace([-np.inf], -99999, inplace=True)
 
 # Remove column that has results
-data.drop(columns = ['method', 'fighter1', 'fighter2'], inplace = True)
+data.drop(columns=["method", "fighter1", "fighter2"], inplace=True)
 
 # Set target
-target = 'outcome'
+target = "outcome"
 
 # Recode the target. Don't need to distinguish between D and NC
 data[target] = np.where((data[target] == "D/D") | (data[target] == "NC/NC"), "OTH", data[target])
 
 # Convert all dates to integers
-date_cols = [col for col in data.columns if data.dtypes[col] == 'datetime64[ns]']
-data[date_cols] = data[date_cols].astype('int64')
+date_cols = [col for col in data.columns if data.dtypes[col] == "datetime64[ns]"]
+data[date_cols] = data[date_cols].astype("int64")
 
 # Convert object columns into series' of dummies
-obj_cols = [col for col in data.columns if data.dtypes[col] == 'object']
+obj_cols = [col for col in data.columns if data.dtypes[col] == "object"]
 obj_cols.remove(target)
-data = pd.get_dummies(data, columns = obj_cols)
+data = pd.get_dummies(data, columns=obj_cols)
 
 # Convert the target into a labelled column ready for multiclass modelling
 le = LabelEncoder()
@@ -44,10 +44,10 @@ data[target] =le.fit_transform(data[target])
 
 # Split into train and test
 X_train, X_test, y_train, y_test = train_test_split(
-    data.drop(columns = [target]),
+    data.drop(columns=[target]),
     data[target],
-    test_size = 0.1,
-    random_state = config['seed_all']
+    test_size=0.1,
+    random_state=config["seed_all"]
 )
 
 # Set number of classes for training
@@ -58,7 +58,7 @@ max_bins = 63
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
-mlflow.set_experiment('Tests')
+mlflow.set_experiment("Tests")
 
 
 # # Format the data for the model
@@ -107,36 +107,36 @@ mlflow.set_experiment('Tests')
 
 # Run the same test with xgboost
 
-train = xgb.DMatrix(X_train, label = y_train)
+train = xgb.DMatrix(X_train, label=y_train)
 
-with mlflow.start_run(description = "CPU test"):
+with mlflow.start_run(description="CPU test"):
 
     params = {
-        'max_depth': 5,                 # Maximum depth of a tree
-        'eta': 0.01,                     # Learning rate
-        'objective': 'multi:softprob', # Binary classification objective
-        'eval_metric': 'mlogloss',       # Evaluation metric
-        'tree_method': 'hist',      # Use GPU accelerated algorithm
-        'verbosity': 1,
-        'num_class': no_of_classes,
-        'n_folds': 5,                   # Number of folds for the cross-validation
-        'random_seed': config['seed_all'],
-        'num_iterations': 200
+        "max_depth": 5,                 # Maximum depth of a tree
+        "eta": 0.01,                     # Learning rate
+        "objective": "multi:softprob", # Binary classification objective
+        "eval_metric": "mlogloss",       # Evaluation metric
+        "tree_method": "hist",      # Use GPU accelerated algorithm
+        "verbosity": 1,
+        "num_class": no_of_classes,
+        "n_folds": 5,                   # Number of folds for the cross-validation
+        "random_seed": config["seed_all"],
+        "num_iterations": 200
     }
 
-    model = xgb.train(params, train, num_boost_round = params['num_iterations'])
+    model = xgb.train(params, train, num_boost_round=params["num_iterations"])
 
-    mlflow.log_param('model', 'XGBoost')
+    mlflow.log_param("model", "XGBoost")
     mlflow.log_params(params)
 
-with mlflow.start_run(description = "CUDA test"):
+with mlflow.start_run(description="CUDA test"):
     
     params.update({
-        'device': 'cuda',           # Use CUDA / GPU
-        'predictor': 'gpu_predictor',   # Use GPU for prediction
+        "device": "cuda",           # Use CUDA / GPU
+        "predictor": "gpu_predictor",   # Use GPU for prediction
     })
 
-    model = xgb.train(params, train, num_boost_round = params['num_iterations'])
+    model = xgb.train(params, train, num_boost_round=params["num_iterations"])
 
-    mlflow.log_param('model', 'XGBoost')
+    mlflow.log_param("model", "XGBoost")
     mlflow.log_params(params)

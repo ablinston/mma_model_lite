@@ -7,23 +7,23 @@ from mma_functions.dataset import remove_duplicate_fighter_pairs
 def test_remove_duplicate_fighter_pairs():
 # Test data
     data = {
-        'date': ['2024-11-01', '2024-11-01', '2024-11-01', '2024-11-02', '2024-11-03'],
-        'fighter1': ['Fighter A', 'Fighter C', 'Fighter A', 'Fighter C', 'Fighter A'],
-        'fighter2': ['Fighter B', 'Fighter B', 'Fighter C', 'Fighter A', 'Fighter D']
+        "date": ["2024-11-01", "2024-11-01", "2024-11-01", "2024-11-02", "2024-11-03"],
+        "fighter1": ["Fighter A", "Fighter C", "Fighter A", "Fighter C", "Fighter A"],
+        "fighter2": ["Fighter B", "Fighter B", "Fighter C", "Fighter A", "Fighter D"]
     }
 
     # Expected result
     expected_data = {
-        'date': ['2024-11-01', '2024-11-02', '2024-11-03'],
-        'fighter1': ['Fighter A', 'Fighter C', 'Fighter A'],
-        'fighter2': ['Fighter B', 'Fighter A', 'Fighter D']
+        "date": ["2024-11-01", "2024-11-02", "2024-11-03"],
+        "fighter1": ["Fighter A", "Fighter C", "Fighter A"],
+        "fighter2": ["Fighter B", "Fighter A", "Fighter D"]
     }
     
     data = pd.DataFrame(data)
     
     expected_df = pd.DataFrame(expected_data)
-    data['date'] = pd.to_datetime(data['date'])
-    expected_df['date'] = pd.to_datetime(expected_df['date'])
+    data["date"] = pd.to_datetime(data["date"])
+    expected_df["date"] = pd.to_datetime(expected_df["date"])
 
     # Run the function
     result_df = remove_duplicate_fighter_pairs(data)

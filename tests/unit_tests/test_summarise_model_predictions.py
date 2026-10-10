@@ -10,10 +10,10 @@ def test_summarise_model_predictions():
     
     # Create a basic test dataset
     df = pd.DataFrame({
-        'fighter1': ['A'],
-        'fighter2': ['B'],
-        'fighter1_backtesting_odds': [2.5],
-        'fighter2_backtesting_odds': [1.5]
+        "fighter1": ["A"],
+        "fighter2": ["B"],
+        "fighter1_backtesting_odds": [2.5],
+        "fighter2_backtesting_odds": [1.5]
     })
 
     # Example probabilities: [fighter2_win, draw, fighter1_win]
@@ -33,8 +33,8 @@ def test_summarise_model_predictions():
 
     # Swap fighters and probs
     df_swapped = df.copy()
-    df_swapped[['fighter1', 'fighter2']] = df_swapped[['fighter2', 'fighter1']]
-    df_swapped[['fighter1_backtesting_odds', 'fighter2_backtesting_odds']] = df_swapped[['fighter2_backtesting_odds', 'fighter1_backtesting_odds']]
+    df_swapped[["fighter1", "fighter2"]] = df_swapped[["fighter2", "fighter1"]]
+    df_swapped[["fighter1_backtesting_odds", "fighter2_backtesting_odds"]] = df_swapped[["fighter2_backtesting_odds", "fighter1_backtesting_odds"]]
     swapped_probs = probs[:, [2, 1, 0]]
 
     result_swapped = summarise_model_predictions(
@@ -49,12 +49,12 @@ def test_summarise_model_predictions():
     )
 
     # Perform assertions
-    assert result['Bet_trigger'].values[0] == 'A'
-    assert result_swapped['Bet_trigger'].values[0] == 'A'
+    assert result["Bet_trigger"].values[0] == "A"
+    assert result_swapped["Bet_trigger"].values[0] == "A"
 
-    assert np.isclose(result['bet_ev'].values[0], result_swapped['bet_ev'].values[0], atol=1e-6)
-    assert np.isclose(result['fighter1_target_exchange_odds'].values[0], result_swapped['fighter2_target_exchange_odds'].values[0], atol=1e-6)
-    assert np.isclose(result['fighter2_target_exchange_odds'].values[0], result_swapped['fighter1_target_exchange_odds'].values[0], atol=1e-6)
+    assert np.isclose(result["bet_ev"].values[0], result_swapped["bet_ev"].values[0], atol=1e-6)
+    assert np.isclose(result["fighter1_target_exchange_odds"].values[0], result_swapped["fighter2_target_exchange_odds"].values[0], atol=1e-6)
+    assert np.isclose(result["fighter2_target_exchange_odds"].values[0], result_swapped["fighter1_target_exchange_odds"].values[0], atol=1e-6)
 
     print("All basic symmetry tests passed.")
     
@@ -62,10 +62,10 @@ def test_summarise_model_predictions():
     
     # Create a basic test dataset
     df = pd.DataFrame({
-        'fighter1': ['A'],
-        'fighter2': ['B'],
-        'fighter1_backtesting_odds': [1.99],
-        'fighter2_backtesting_odds': [1.99]
+        "fighter1": ["A"],
+        "fighter2": ["B"],
+        "fighter1_backtesting_odds": [1.99],
+        "fighter2_backtesting_odds": [1.99]
     })
 
     # Example probabilities: [fighter2_win, draw, fighter1_win]
@@ -83,4 +83,4 @@ def test_summarise_model_predictions():
         return_triggers=False
     )
 
-    assert result['Bet_trigger'].values[0] == 'None'
+    assert result["Bet_trigger"].values[0] == "None"

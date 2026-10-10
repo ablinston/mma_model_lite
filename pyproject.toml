@@ -11,3 +11,13 @@ readme = "README.md"
 
 [tool.setuptools]
 packages = ["mma_functions"]
+
+[tool.ruff.lint]
+preview = true
+select = ["E251", "E252", "Q"]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "double"
+
+[tool.ruff]
+extend-exclude = ["data", "models", "results", "downloaded_files"]

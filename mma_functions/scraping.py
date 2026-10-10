@@ -15,7 +15,7 @@ import random
 
 # headers is the headers of the table we're looking in for the urls
 
-def extract_event_urls(url, headers, url_starts_with = "http://ufcstats.com/event-details"):
+def extract_event_urls(url, headers, url_starts_with="http://ufcstats.com/event-details"):
     
     # Get soup from the url
     soup = get_soup(url)
@@ -42,8 +42,8 @@ def extract_event_urls(url, headers, url_starts_with = "http://ufcstats.com/even
     urls = []
     for row in table.find_all("tr")[1:]:  # Skip the header row
         for link in row.find_all("a", href=True):
-            if link['href'].startswith(url_starts_with):
-                urls.append(link['href'])
+            if link["href"].startswith(url_starts_with):
+                urls.append(link["href"])
 
     return urls
 
@@ -63,8 +63,8 @@ def generate_alphabetical_urls():
     list_of_alphabetical_urls = []
     for character in list(string.ascii_lowercase):
         list_of_alphabetical_urls.append(
-            'http://ufcstats.com/statistics/fighters?char=' + character +
-            '&page=all')
+            "http://ufcstats.com/statistics/fighters?char=" + character +
+            "&page=all")
     return list_of_alphabetical_urls
 
 def get_soup(url):
@@ -78,8 +78,8 @@ def get_soup(url):
     soup
     """
     # get_website_soup drops to a browser itself if the fast fetch gets blocked
-    return get_website_soup(url, fast = True, time_delay = True,
-                            chrome_binary = config['chrome_binary_location'])
+    return get_website_soup(url, fast=True, time_delay=True,
+                            chrome_binary=config["chrome_binary_location"])
 
 # This function gets the response soup from a website either using selenium or a fast response
 
@@ -95,7 +95,7 @@ async def get_website_soup_async(
     await page.close()
     
     # Get the soup
-    soup = BeautifulSoup(page.content(), 'html.parser')
+    soup = BeautifulSoup(page.content(), "html.parser")
         
     return soup
 
@@ -103,18 +103,18 @@ async def get_website_soup_async(
 
 def html_table_to_dataframe(html):
     # Parse the HTML using BeautifulSoup
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, "html.parser")
     
     # Find the first table in the HTML
-    table = soup.find('table')
+    table = soup.find("table")
     
     # Initialize a list to hold the rows
     data = []
     
     # Iterate through the table rows
-    for row in table.find_all('tr'):
+    for row in table.find_all("tr"):
         # Extract cell text from each row
-        cells = [cell.get_text(strip=True) for cell in row.find_all(['th', 'td'])]
+        cells = [cell.get_text(strip=True) for cell in row.find_all(["th", "td"])]
         data.append(cells)
     
     # Create a DataFrame from the extracted data
@@ -129,14 +129,14 @@ def html_table_to_dataframe(html):
 
 # This function gets all event urls for UFCstats.com given a list of fighter urls
 
-def parallel_get_all_event_urls_from_fighters(fighter_list_urls, fighter_result_headers, num_threads = 3):
+def parallel_get_all_event_urls_from_fighters(fighter_list_urls, fighter_result_headers, num_threads=3):
 
     # Keep counters to track progress
     total_fighters = len(fighter_list_urls)
     completed_count = 0
 
     scrape_results = []
-    with ThreadPoolExecutor(max_workers = num_threads) as executor:
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
         future_to_url = {executor.submit(extract_event_urls, fighter_url, fighter_result_headers): fighter_url for fighter_url in fighter_list_urls}
 
         # Collect results as they complete
@@ -157,7 +157,7 @@ def parallel_get_all_event_urls_from_fighters(fighter_list_urls, fighter_result_
     # Combine the results
     return [item for sublist in scrape_results for item in sublist]
 
-def parallel_scrape(url_list, parse_function, output_df = pd.DataFrame(), num_threads = 1, **kwargs):
+def parallel_scrape(url_list, parse_function, output_df=pd.DataFrame(), num_threads=1, **kwargs):
     """
     scrape from a list of urls
 
@@ -170,7 +170,7 @@ def parallel_scrape(url_list, parse_function, output_df = pd.DataFrame(), num_th
 
     """
     #pdb.set_trace()
-    with ThreadPoolExecutor(max_workers = num_threads) as executor:
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
         future_to_url = {executor.submit(get_soup, url): url for url in url_list}
 
         # Now iterate through the functions
@@ -178,14 +178,14 @@ def parallel_scrape(url_list, parse_function, output_df = pd.DataFrame(), num_th
             url = future_to_url[future]
             try:
                 # Check to see whether we need the url in the function and input it if needed
-                if 'url' in inspect.signature(parse_function).parameters:
-                    result = parse_function(future.result(), **kwargs, url = url)
+                if "url" in inspect.signature(parse_function).parameters:
+                    result = parse_function(future.result(), **kwargs, url=url)
                 else:
                     result = parse_function(future.result(), **kwargs)
                 output_df = pd.concat([output_df, result])
-                print(f'Scraped url: {url}')
+                print(f"Scraped url: {url}")
             except Exception as exc:
-                print(f'Error scraping {url}: {exc}')
+                print(f"Error scraping {url}: {exc}")
 
     return output_df
 
@@ -193,14 +193,14 @@ def parallel_scrape(url_list, parse_function, output_df = pd.DataFrame(), num_th
 
 def parallel_scrape_event_details(
         url_list,
-        num_threads = 1):
+        num_threads=1):
 
     # Keep counters to track progress
     total_urls = len(url_list)
     completed_count = 0
 
     scrape_results = []
-    with ThreadPoolExecutor(max_workers = num_threads) as executor:
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
         future_to_url = {executor.submit(scrape_event_details, [url]): url for url in url_list}
 
         # Collect results as they complete
@@ -299,16 +299,16 @@ def scrape_event_details(url_list):
             soup = get_soup(url)
 
             # Extract the event name (assumes it's in an h2 tag)
-            event_name = soup.find('h2').get_text(strip=True)
+            event_name = soup.find("h2").get_text(strip=True)
 
             # Locate the list items for date and location within the ul with the specific class
-            details_list = soup.find('ul', class_='b-list__box-list')
+            details_list = soup.find("ul", class_="b-list__box-list")
             date = None
             location = None
 
             if details_list:
-                for item in details_list.find_all('li', class_='b-list__box-list-item'):
-                    title = item.find('i', class_='b-list__box-item-title')
+                for item in details_list.find_all("li", class_="b-list__box-list-item"):
+                    title = item.find("i", class_="b-list__box-item-title")
                     if title:
                         if "Date:" in title.get_text():
                             date = title.next_sibling.strip()  # Gets the date text after the <i> tag

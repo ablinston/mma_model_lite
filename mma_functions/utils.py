@@ -7,19 +7,19 @@ from rapidfuzz import fuzz, process
 from re import sub
 import shutil
 
-def check_identical_excl_string(list1, list2, string1, string2, check_both = False):
+def check_identical_excl_string(list1, list2, string1, string2, check_both=False):
     """
     This function checks whether two lists are identical once strings are removed from each
 
     arguments:
 
     """
-    list1 = [element.replace(string1, '') for element in list1]
-    list2 = [element.replace(string2, '') for element in list2]
+    list1 = [element.replace(string1, "") for element in list1]
+    list2 = [element.replace(string2, "") for element in list2]
     
     if check_both:
-        list1 = [element.replace(string2, '') for element in list1]
-        list2 = [element.replace(string1, '') for element in list2]
+        list1 = [element.replace(string2, "") for element in list1]
+        list2 = [element.replace(string1, "") for element in list2]
 
     return list1 == list2
 
@@ -50,7 +50,7 @@ def concat_parquets_fastparquet(folder_path):
         pd.DataFrame: The concatenated DataFrame.
     """
     # Get all parquet file paths in the folder
-    parquet_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.parquet')]
+    parquet_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith(".parquet")]
     if not parquet_files:
         raise ValueError(f"No parquet files found in folder: {folder_path}")
 
@@ -90,21 +90,21 @@ def dataframes_equal_ignore_types(df1, df2, sort_rows=True):
 # This function converts elements of a dictionary to numeric where possible
 def dict_to_numeric(dict):
     
-    return pd.to_numeric(pd.Series(dict), errors='coerce').fillna(pd.Series(dict)).to_dict()
+    return pd.to_numeric(pd.Series(dict), errors="coerce").fillna(pd.Series(dict)).to_dict()
 
 # This function takes a column and fills NAs with 0 except where it is the first entry for a certain group
 
 def fill_na_exclude_first_entry(df, group_by, column_to_fill):
         # Create a mask to identify the first entry in each group
-    df['is_first'] = df.groupby(group_by).cumcount() == 0
+    df["is_first"] = df.groupby(group_by).cumcount() == 0
     
     # Fill NAs with 0, except for the first entry in each group
     df[column_to_fill] = df.apply(
-        lambda x: 0 if pd.isna(x[column_to_fill]) and not x['is_first'] else x[column_to_fill], axis=1
+        lambda x: 0 if pd.isna(x[column_to_fill]) and not x["is_first"] else x[column_to_fill], axis=1
     )
     
     # Drop the auxiliary 'is_first' column
-    df = df.drop('is_first', axis=1)
+    df = df.drop("is_first", axis=1)
     
     return df[column_to_fill]
 
@@ -125,8 +125,8 @@ def get_best_match(x, choices, threshold=70):
 def get_best_match_with_date(
     row,
     df2,
-    date_col='date',
-    text_col='name',
+    date_col="date",
+    text_col="name",
     threshold=85,
     max_days=2
 ):
@@ -190,9 +190,9 @@ def get_best_match_with_date(
 def get_day_suffix(day):
     # Determine the suffix for the day
     if 10 <= day % 100 <= 20:
-        suffix = 'th'
+        suffix = "th"
     else:
-        suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
     return suffix
 
 # This function takes a pandas series and works out what the minimum possible sum is from all starting points and all points, summing in sequence. This is used to calculate max drawdown
@@ -236,7 +236,7 @@ def move_column(df, column_name, new_position):
     df.insert(new_position, column_name, col)  # Insert it at the new position
     return df
 
-def move_columns(df, cols_to_move=[], ref_col='', place=''):
+def move_columns(df, cols_to_move=[], ref_col="", place=""):
     """
     reoder columns in df
     move a list of columns before or after a reference column
@@ -250,10 +250,10 @@ def move_columns(df, cols_to_move=[], ref_col='', place=''):
 
     """
     cols = df.columns.tolist()
-    if place == 'after':
+    if place == "after":
         seg1 = cols[:list(cols).index(ref_col) + 1]
         seg2 = cols_to_move
-    if place == 'before':
+    if place == "before":
         seg1 = cols[:list(cols).index(ref_col)]
         seg2 = cols_to_move + [ref_col]
     seg1 = [i for i in seg1 if i not in seg2]
@@ -277,7 +277,7 @@ def parallel_run_function(
     completed_count = 0
     
     # Run the function in parallel
-    with ThreadPoolExecutor(max_workers = max_workers) as executor:
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_url = {executor.submit(func, item, **kwargs): item for item in input_list}
 
         # Collect results as they complete
@@ -293,17 +293,17 @@ def parallel_run_function(
             # Increment the completed count
             completed_count += 1
             if completed_count % 100 == 0:
-                print('Completed ' + str(completed_count) + ' of ' + str(len(input_list)))
+                print("Completed " + str(completed_count) + " of " + str(len(input_list)))
                 
     # This ensures that all threads are done
     executor.shutdown(wait=True)
     
     if collapse_output_to_df:
-        return pd.concat(output_list, axis = 0)
+        return pd.concat(output_list, axis=0)
     else:
         return output_list
 
-def safe_divide_np(numerator, denominator, zero_zero_fill = 1):
+def safe_divide_np(numerator, denominator, zero_zero_fill=1):
     # Perform element-wise division using np.divide
     result = np.divide(numerator, denominator, where=denominator != 0)
         
@@ -336,7 +336,7 @@ def save_group_to_parquet(year, group, output_folder, compression):
     fp.write(file_path, group, compression=compression)
     print(f"Saved {file_path}")
 
-def split_by_year_and_save_fastparquet(df, date_column, output_folder, compression='ZSTD'):
+def split_by_year_and_save_fastparquet(df, date_column, output_folder, compression="ZSTD"):
     """
     Splits the DataFrame into parts by year and saves each part as a parquet file using fastparquet.
     
@@ -388,12 +388,12 @@ def split_of_columns(df, col_list):
     # Loop through each column
     for col in col_list:
         try:
-            df[[col + '_landed', col + '_attempt']] = df[col].str.split(" of ", expand = True).apply(pd.to_numeric)
+            df[[col + "_landed", col + "_attempt"]] = df[col].str.split(" of ", expand=True).apply(pd.to_numeric)
         except:
-            print(f'{col} column encountered error')
+            print(f"{col} column encountered error")
         # df[col + '_accuracy'] = df[col + '_landed'] / df[col + '_attempt']
 
-    return df.drop(columns = col_list)
+    return df.drop(columns=col_list)
 
 def time_to_minutes_decimal(series):
     """
@@ -406,11 +406,11 @@ def time_to_minutes_decimal(series):
     series
     """
    # pdb.set_trace()
-    df = pd.DataFrame(columns = ['minutes', 'seconds'])
-    df[['minutes', 'seconds']] = series.str.replace('-', '').str.split(":", expand = True)
-    df = to_numeric(df, ['minutes', 'seconds'])
+    df = pd.DataFrame(columns=["minutes", "seconds"])
+    df[["minutes", "seconds"]] = series.str.replace("-", "").str.split(":", expand=True)
+    df = to_numeric(df, ["minutes", "seconds"])
 
-    return df['minutes'] + df['seconds'] / 60
+    return df["minutes"] + df["seconds"] / 60
 
 def to_numeric(df, cols):
     """
@@ -427,11 +427,11 @@ def to_numeric(df, cols):
         except:
             pass
         try:
-            df[col] = pd.to_numeric(df[col].apply(lambda x: sub("[^0-9]", "", str(x))), errors = 'coerce')
+            df[col] = pd.to_numeric(df[col].apply(lambda x: sub("[^0-9]", "", str(x))), errors="coerce")
         except:
             pass
         try:
-            df[col] = pd.to_numeric(df[col].apply(lambda x: sub("[^0-9]", "", x)), errors = 'coerce')
+            df[col] = pd.to_numeric(df[col].apply(lambda x: sub("[^0-9]", "", x)), errors="coerce")
         except:
             pass
 
@@ -443,28 +443,28 @@ def clean_text_columns(df):
     
     # Loop through the columns. This is faster than .apply with lambda
     for col in df.columns:
-        df.loc[:, col] = df[col].str.replace(' ', '')
+        df.loc[:, col] = df[col].str.replace(" ", "")
         # Remove capitals and special characters
         df.loc[:, col] = df[col].str.lower()
-        df.loc[:, col] = df[col].str.replace('-', '')
+        df.loc[:, col] = df[col].str.replace("-", "")
         df.loc[:, col] = df[col].str.replace("'", "")
 
         # If looking at bouts, need to put in a placeholder for vs. before getting rid of full stops
-        if col in ['bout', 'BOUT']:
-            df.loc[:, col] = df[col].str.replace('vs.', 'vs##')
-        df.loc[:, col] = df[col].str.replace('.', '')
-        if col in ['bout', 'BOUT']:
-            df.loc[:, col] = df[col].str.replace('vs##', 'vs.')
-        df.loc[:, col] = df[col].str.replace('saint', 'st')
+        if col in ["bout", "BOUT"]:
+            df.loc[:, col] = df[col].str.replace("vs.", "vs##")
+        df.loc[:, col] = df[col].str.replace(".", "")
+        if col in ["bout", "BOUT"]:
+            df.loc[:, col] = df[col].str.replace("vs##", "vs.")
+        df.loc[:, col] = df[col].str.replace("saint", "st")
         
         # Clean any names that are equivalent.
         # This is to get alignment between the fighter names on UFCstats/fighters and bout stats
-        if col in ['fighter', 'FIGHTER']:
-            df.loc[:, col] = df[col].str.replace('montserendon', 'montserratrendon')
-            df.loc[:, col] = df[col].str.replace('michaelaswell', 'michaelaswelljr').str.replace('jrjr', 'jr')
-            df.loc[:, col] = df[col].str.replace('zachreese', 'zacharyreese')
-            df.loc[:, col] = df[col].str.replace('shaquemerock', 'shemrock')
-            df.loc[:, col] = df[col].str.replace('patrickyfreire', 'patriciofreire')
-            df.loc[:, col] = df[col].str.replace('kaikamakaiii', 'kaikamaka')
+        if col in ["fighter", "FIGHTER"]:
+            df.loc[:, col] = df[col].str.replace("montserendon", "montserratrendon")
+            df.loc[:, col] = df[col].str.replace("michaelaswell", "michaelaswelljr").str.replace("jrjr", "jr")
+            df.loc[:, col] = df[col].str.replace("zachreese", "zacharyreese")
+            df.loc[:, col] = df[col].str.replace("shaquemerock", "shemrock")
+            df.loc[:, col] = df[col].str.replace("patrickyfreire", "patriciofreire")
+            df.loc[:, col] = df[col].str.replace("kaikamakaiii", "kaikamaka")
             
     return df

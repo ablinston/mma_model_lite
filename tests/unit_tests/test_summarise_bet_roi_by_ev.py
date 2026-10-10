@@ -25,9 +25,9 @@ def test_summarise_bet_roi_by_ev():
     roi = pos_band["ROI_on_constant_bets"].iloc[0]
     assert np.isclose(roi, 100.0)
     
-    assert np.isclose(result['ROI_on_constant_bets'].iloc[0],- 100.0)
+    assert np.isclose(result["ROI_on_constant_bets"].iloc[0],- 100.0)
     
-    assert np.isclose(result['ROI_on_constant_bets'].iloc[-1], 150.0)
+    assert np.isclose(result["ROI_on_constant_bets"].iloc[-1], 150.0)
     
 
 
