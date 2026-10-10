@@ -10,20 +10,12 @@ import json
 import os
 import pandas as pd
 import re
+import time
 
 from ablinston_ml.scraping import clear_captcha, start_browser
 
 from mma_functions.odds_scraping import clean_name_for_odds_search
 from mma_functions.config import bet_config, config
-
-# Replace the chrome location if we're not on windows
-if not os.name == "nt":
-    config['chrome_binary_location'] = config['chrome_binary_location_linux']
-
-# The bookies to consider, matched against oddschecker's own names, case insensitive. This is a dummy
-# until the list goes in the config file. Note oddschecker lists Betfair the exchange and Betfair
-# Sportsbook separately, so 'Betfair' here means the exchange only
-bookies_to_use = ['Bet365', 'Betfair']
 
 # The listing page holding the upcoming fights
 oddschecker_mma_url = 'https://www.oddschecker.com/ufc-mma'
@@ -31,10 +23,62 @@ oddschecker_mma_url = 'https://www.oddschecker.com/ufc-mma'
 # The market to read odds from, as oddschecker names it
 market_to_use = 'Win Market'
 
+# How many of the best priced bookies to report per bet
+bookies_to_show = 3
+
+# Page titles that mean the site has blocked us rather than served the page. Checked against the title
+# only, because the word cloudflare on its own appears in the real pages too
+blocked_page_titles = ['just a moment', 'attention required', 'verifying you are human',
+                       'checking your browser', 'access denied']
+
+# The challenge page loads this, and the real pages do not
+challenge_script = 'challenges.cloudflare.com'
+
+# The real pages run to several hundred thousand characters and a challenge page to a few thousand, so
+# anything short is a block I haven't seen the wording of
+min_page_characters = 50000
+
+# Wait between pages so a card's worth of fights isn't hammered out in a few seconds
+seconds_between_pages = 5
+
 
 ##########################################################################################
 ### Functions ###
 ##########################################################################################
+
+def clean_bookie_name(name):
+
+    return name.lower().replace(' ', '')
+
+
+def check_page_source(url, page_source):
+
+    """
+    Stops with a message saying what came back if the page is a block or an error rather than the real
+    thing. Without this a challenge page just turns into nothing found much later on.
+    """
+
+    title_match = re.search(r'<title>(.*?)</title>', page_source, re.S)
+    title = title_match.group(1).strip() if title_match else ''
+
+    print('  ' + str(len(page_source)) + ' characters, title: ' + title)
+
+    for marker in blocked_page_titles:
+        if marker in title.lower():
+            raise RuntimeError('Blocked by oddschecker on ' + url + ', it returned "' + title
+                               + '" instead of the page. Leave it a while before running again.')
+
+    if challenge_script in page_source[:5000]:
+        raise RuntimeError('Got a Cloudflare challenge on ' + url
+                           + '. Leave it a while before running again.')
+
+    if len(page_source) < min_page_characters:
+        raise RuntimeError('Only got ' + str(len(page_source)) + ' characters from ' + url
+                           + ', titled "' + title + '". Too short to be the real page.')
+
+    if '404' in title:
+        raise RuntimeError('Got a 404 page for ' + url + ', so the url has probably moved')
+
 
 def get_page_source(url):
 
@@ -42,6 +86,8 @@ def get_page_source(url):
     Opens a page in a real browser, clears the Cloudflare check and returns the html. A browser per
     page is slow but it is the only path that gets through.
     """
+
+    print('Fetching ' + url)
 
     browser = start_browser(
         url,
@@ -53,6 +99,10 @@ def get_page_source(url):
     page_source = browser.get_page_source()
 
     browser.stop()
+
+    check_page_source(url, page_source)
+
+    time.sleep(seconds_between_pages)
 
     return page_source
 
@@ -103,7 +153,12 @@ def get_subevent_markets(page_source):
     payload = re.search(
         r'<script type="application/json" data-hypernova-key="subeventmarkets"[^>]*>(.*?)</script>',
         page_source,
-        re.S).group(1).strip()
+        re.S)
+
+    if payload is None:
+        raise RuntimeError('No odds data in the page. The layout has changed, or the page is not a fight page')
+
+    payload = payload.group(1).strip()
 
     # Hypernova wraps its payloads in an html comment
     payload = re.sub(r'-->$', '', re.sub(r'^<!--', '', payload)).strip()
@@ -115,8 +170,8 @@ def get_fighter_odds(markets, fighter_name):
 
     """
     Returns a data frame of the odds for one fighter in the win market, one row per bookmaker, with
-    the odds after commission. Commission only comes off exchange winnings, which matches the
-    commission used in calculate_target_odds.
+    the odds after commission. Commission only comes off exchange winnings, and which bookmakers are
+    exchanges comes from oddschecker rather than from a list I keep.
     """
 
     # Find the win market rather than method of victory, round betting and the rest
@@ -129,7 +184,7 @@ def get_fighter_odds(markets, fighter_name):
     bet_ids = [bet['ocBetId'] for bet in markets['bets']['entities'].values()
                if bet['marketId'] in win_market_ids and clean_name_for_odds_search(bet['betName']) == cleaned_name]
 
-    wanted_bookies = [bookie.lower() for bookie in bookies_to_use]
+    wanted_bookies = [clean_bookie_name(bookie) for bookie in bet_config['bookies_to_use']]
 
     odds_rows = []
 
@@ -138,7 +193,7 @@ def get_fighter_odds(markets, fighter_name):
 
             bookie = markets['bookmakers']['entities'][bookie_code]
 
-            if bookie['bookmakerName'].lower() not in wanted_bookies:
+            if clean_bookie_name(bookie['bookmakerName']) not in wanted_bookies:
                 continue
 
             if price['status'] != 'ACTIVE' or price['oddsDecimal'] is None:
@@ -158,6 +213,21 @@ def get_fighter_odds(markets, fighter_name):
                 })
 
     return pd.DataFrame(odds_rows)
+
+
+def report_missing_bookies(markets):
+
+    """
+    Says which of the configured bookmakers oddschecker isn't offering, so a name that never matches
+    doesn't just quietly produce no odds.
+    """
+
+    available = [clean_bookie_name(bookie['bookmakerName']) for bookie in markets['bookmakers']['entities'].values()]
+
+    missing = [bookie for bookie in bet_config['bookies_to_use'] if clean_bookie_name(bookie) not in available]
+
+    if len(missing) > 0:
+        print('Not offered on this page: ' + ', '.join(missing))
 
 
 ##########################################################################################
@@ -186,7 +256,11 @@ fight_urls = get_fight_urls(get_page_source(oddschecker_mma_url))
 
 print(str(len(fight_urls)) + ' fights found on ' + oddschecker_mma_url)
 
+if len(fight_urls) == 0:
+    raise RuntimeError('No fight urls on ' + oddschecker_mma_url + ', so either the card is empty or the page layout has changed')
+
 recommendations = []
+bookies_reported = False
 
 for row in bets.itertuples():
 
@@ -196,23 +270,46 @@ for row in bets.itertuples():
         print('No fight page found for ' + row.Bet_trigger)
         continue
 
-    odds_data = get_fighter_odds(get_subevent_markets(get_page_source(fight_url)), row.Bet_trigger)
+    markets = get_subevent_markets(get_page_source(fight_url))
+
+    # Say once which configured bookmakers aren't on offer
+    if not bookies_reported:
+        report_missing_bookies(markets)
+        bookies_reported = True
+
+    odds_data = get_fighter_odds(markets, row.Bet_trigger)
 
     if len(odds_data) == 0:
-        print('None of ' + str(bookies_to_use) + ' priced ' + row.Bet_trigger)
+        print('None of the configured bookies priced ' + row.Bet_trigger)
         continue
 
-    best = odds_data.loc[odds_data['effective_odds'].idxmax()]
+    # The model's probability for the fighter being backed
+    if row.Bet_trigger == row.fighter1:
+        probability = row.Fighter1_win_prob / 100
+    else:
+        probability = row.Fighter2_win_prob / 100
 
-    recommendations.append({
-        'fighter': row.Bet_trigger,
-        'model_odds': row.bet_assumed_odds,
-        'bookie': best['bookie'],
-        'odds': best['odds'],
-        'effective_odds': best['effective_odds'],
-        'stake': row.Final_bet,
-        'fight_url': fight_url
-        })
+    # The odds needed to still hit the EV threshold. These are compared against the odds after
+    # commission, so the commission is not in the threshold as well, which would count it twice
+    required_odds = (1 + bet_config['min_ev_to_bet']) / probability
+
+    # Take the best priced bookies in order, best first
+    top_bookies = odds_data.sort_values('effective_odds', ascending = False).head(bookies_to_show)
+
+    for place, bookie in enumerate(top_bookies.itertuples(), start = 1):
+
+        recommendations.append({
+            'fighter': row.Bet_trigger,
+            'place': place,
+            'bookie': bookie.bookie,
+            'odds': bookie.odds,
+            'effective_odds': bookie.effective_odds,
+            'model_odds': row.bet_assumed_odds,
+            'required_odds': round(required_odds, 3),
+            'ev_at_odds': round(probability * bookie.effective_odds - 1, 3),
+            'stake': row.Final_bet,
+            'fight_url': fight_url
+            })
 
 recommendations = pd.DataFrame(recommendations)
 
@@ -224,8 +321,8 @@ recommendations = pd.DataFrame(recommendations)
 if len(recommendations) == 0:
     print('No bets could be priced')
 else:
-    # Flag anything where the best price available now is worse than the odds the bet was triggered on
-    recommendations['still_worth_it'] = recommendations['effective_odds'] >= recommendations['model_odds']
+    # Whether each price still clears the EV threshold the bet was triggered on
+    recommendations['still_worth_it'] = recommendations['ev_at_odds'] >= bet_config['min_ev_to_bet']
 
     print(recommendations.to_string(index = False))
 

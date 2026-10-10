@@ -15,3 +15,23 @@ start_balance: 3290.70
 
 # Set the commission the exchange will charge on winnings
 exchange_commission: 0.02
+
+# The bookmakers to check odds at on oddschecker. Matching ignores case and spaces, so 'Bet Victor'
+# and 'BetVictor' both find the same one, but the rest of the spelling has to match oddschecker's own
+# name for it. Betfair here means the exchange, oddschecker lists Betfair Sportsbook separately.
+# Commission only comes off the exchanges, and which ones those are comes from oddschecker itself
+# rather than from this list.
+bookies_to_use:
+  - bet365
+  - Betfair
+  - Betway
+  - William Hill
+  - BetVictor
+  - Smarkets
+  - Betfred
+  - BetGoodwin
+  - 10bet
+  - Paddy Power
+  - PricedUp
+  - Matchbook
+  - Coral
