@@ -187,6 +187,146 @@ def metric_chart(x, y_model, y_odds, x_label, y_label):
     
     return fig, ax
 
+# This function calculates the log loss over a trailing window of months ending at each fight date
+
+def rolling_log_loss(actuals_data, prediction_probabilities, target, months = 8, min_sample_size = 50, classes = np.array([0, 1, 2])):
+
+    """
+    Calculates the log loss of the model and of the odds over a trailing window of fights ending at
+    each date in the data, so a drift in performance shows up as a trend rather than as noise.
+
+    Args:
+        actuals_data (data frame): the data the predictions are for, with date and backtesting odds columns
+        prediction_probabilities (array): the probabilities for each class of the outcome
+        target (series): the outcome as classes, from clean_target_column
+        months (int): the length of the trailing window
+        min_sample_size (int): windows holding fewer fights than this are dropped, since a log loss on a handful of fights says nothing
+
+    Returns:
+        A data frame of one row per window with the model and odds log loss and the sample size
+    """
+
+    # The probabilities and the target line up with the rows positionally, so a length mismatch means
+    # they are for a different sample and the metrics would be quietly wrong rather than wrong loudly
+    stop_if_not(len(prediction_probabilities) == len(actuals_data) and len(target) == len(actuals_data),
+                'Rolling logloss - row count check')
+
+    # Get the probabilities implied by the odds to compare against
+    odds_probabilities = odds.odds_to_probabilities(actuals_data['fighter1_backtesting_odds'], actuals_data['fighter2_backtesting_odds'])
+
+    rolling_rows = []
+
+    for window_end in sorted(actuals_data['date'].unique()):
+
+        window_start = pd.Timestamp(window_end) - pd.DateOffset(months = months)
+
+        row_filter = (actuals_data['date'] > window_start) & (actuals_data['date'] <= window_end)
+
+        if row_filter.sum() < min_sample_size:
+            continue
+
+        rolling_rows.append({
+            'date': pd.Timestamp(window_end),
+            'Logloss': log_loss(target[row_filter], prediction_probabilities[row_filter], labels = classes),
+            'X Odds Logloss': log_loss(target[row_filter], odds_probabilities[row_filter], labels = classes),
+            'Sample Size': int(row_filter.sum()),
+            # Draws and no contests are class 1 and get almost no probability, so log loss jumps when one
+            # lands in the window. Counting them makes a spike explainable rather than looking like drift
+            'OTH Fights': int((target[row_filter] == 1).sum())
+            })
+
+    # Name the columns so an empty result is still usable rather than a frame with nothing on it
+    return pd.DataFrame(rolling_rows, columns = ['date', 'Logloss', 'X Odds Logloss', 'Sample Size', 'OTH Fights'])
+
+# This function charts the rolling log loss of the model against the odds
+
+def plot_rolling_log_loss(rolling_log_loss_df, months):
+
+    # Set Seaborn style
+    sns.set_theme(style = "whitegrid")
+
+    fig, ax = plt.subplots(figsize = (9, 5))
+
+    ax.plot(rolling_log_loss_df['date'], rolling_log_loss_df['Logloss'], label = 'Model', color = 'tab:blue')
+    ax.plot(rolling_log_loss_df['date'], rolling_log_loss_df['X Odds Logloss'], label = 'Odds', color = 'orange')
+
+    ax.set_xlabel('Window end date')
+    ax.set_ylabel('Logloss')
+    ax.set_title('Rolling ' + str(months) + ' month logloss')
+    ax.legend()
+
+    # Rotate the dates so they don't overlap
+    plt.setp(ax.get_xticklabels(), rotation = 45, ha = 'right')
+
+    plt.tight_layout()
+
+    return fig, ax
+
+# This function compares the log loss of groups of fights between two periods
+
+def log_loss_by_group_and_period(actuals_data, prediction_probabilities, target, group_col, period_col, min_sample_size = 20, classes = np.array([0, 1, 2])):
+
+    """
+    Calculates the log loss of the model and of the odds for each group of fights within each period,
+    and the change between the first and last period. The odds columns are there to separate a model
+    that has got worse from a kind of fight that got harder for everyone to call.
+
+    Args:
+        actuals_data (data frame): the data the predictions are for, with the group and period columns on it
+        prediction_probabilities (array): the probabilities for each class of the outcome
+        target (series): the outcome as classes, from clean_target_column
+        group_col (str): the column splitting the fights, e.g. the method of victory
+        period_col (str): the column splitting the dates. Name the values so they sort in date order
+        min_sample_size (int): cells holding fewer fights than this are left out, since a log loss on a handful of fights is meaningless and a single draw in a small cell sends it into double figures
+
+    Returns:
+        A data frame of one row per group with a column per period and the change between them
+    """
+
+    # Same positional alignment as the rolling version, so check it before calculating anything
+    stop_if_not(len(prediction_probabilities) == len(actuals_data) and len(target) == len(actuals_data),
+                'Logloss by group and period - row count check')
+
+    # Get the probabilities implied by the odds to compare against
+    odds_probabilities = odds.odds_to_probabilities(actuals_data['fighter1_backtesting_odds'], actuals_data['fighter2_backtesting_odds'])
+
+    group_rows = []
+
+    for group in sorted(actuals_data[group_col].unique()):
+        for period in sorted(actuals_data[period_col].unique()):
+
+            row_filter = (actuals_data[group_col] == group) & (actuals_data[period_col] == period)
+
+            if row_filter.sum() < min_sample_size:
+                continue
+
+            group_rows.append({
+                group_col: group,
+                period_col: period,
+                'Logloss': log_loss(target[row_filter], prediction_probabilities[row_filter], labels = classes),
+                'X Odds Logloss': log_loss(target[row_filter], odds_probabilities[row_filter], labels = classes),
+                'Sample Size': int(row_filter.sum()),
+                # A draw or no contest costs about three times what an ordinary fight does, so a cell
+                # going from one to three of them looks like the model falling apart
+                'OTH Fights': int((target[row_filter] == 1).sum())
+                })
+
+    group_metrics = pd.DataFrame(group_rows)
+
+    # Put the periods side by side so the change can be read off
+    period_metrics = group_metrics.pivot(index = group_col, columns = period_col, values = ['Logloss', 'X Odds Logloss', 'Sample Size', 'OTH Fights'])
+    period_metrics.columns = [metric + ' ' + str(period) for metric, period in period_metrics.columns]
+
+    # Add the change between the first and last period. With only one period there is nothing to
+    # compare, and a change column of zeroes would read as nothing having changed
+    periods = sorted(group_metrics[period_col].unique())
+
+    if len(periods) > 1:
+        for metric in ['Logloss', 'X Odds Logloss']:
+            period_metrics['Change ' + metric] = period_metrics[metric + ' ' + str(periods[-1])] - period_metrics[metric + ' ' + str(periods[0])]
+
+    return period_metrics
+
 # Converts the metrics saved in dictionaries into a pandas dataframe
 
 def metric_table_from_metrics_dictionary(data_dict, col):
