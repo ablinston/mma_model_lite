@@ -35,8 +35,8 @@ if not os.name == "nt":
     config['firefox_location'] = config['firefox_location_linux']
 
 # Use this to skip update of data if it's already been done recently
-skip_data_update = True
-skip_save_data = True
+skip_data_update = False
+skip_save_data = False
 
 # The length of the trailing window for the rolling logloss
 rolling_window_months = 8
