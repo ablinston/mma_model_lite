@@ -27,8 +27,9 @@ def test_betfair_bout_get_chosen_odds():
     df = pd.DataFrame(data)
 
     # Cutoff at 16:15 means we'll use odds before 2025-04-22 16:15 (i.e., prior day cutoff)
+    
     result = betfair_bout_get_chosen_odds(df.copy(), "16:15", average_last_n = 1)
-
+    
     # Basic shape and columns
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 2  # One row per fighter

@@ -13,6 +13,22 @@ Everything runs inside Docker.
 
 One thing that catches you out: modules inside `mma_functions` refer to each other as `from mma_functions import odds` and then `odds.calculate_true_odds(...)`, rather than importing the function directly. There are circular references between the modules and the direct form fails on those. Tests and scripts sit outside the cycle so they can import functions by name as normal.
 
+# Monitoring
+
+`pipeline/17_model_monitoring.py` scores the out of time sample with each model version and logs it to the `Model_Monitoring_v2` experiment. Metrics are broken down by weightclass, year, month, time format, fighter history and date, and two of the artifacts are aimed at drift specifically.
+
+The rolling logloss chart is the trailing 8 month logloss at each fight date, with the model and the odds plotted together. That pairing is the point of it: if both lines rise then the fights got harder to call and the model is fine, if only the model's line rises then it has drifted. The window length is set at the top of the script.
+
+![Rolling logloss](results/rolling_logloss_example.png)
+
+That chart is an example showing model drift from one run rather than a live figure, the current numbers are in MLflow.
+
+The logloss by method and period table splits the sample either side of a date and breaks it down by method of victory, so I can ask whether one kind of fight got harder rather than just whether the whole thing got worse. The odds columns do the same job here.
+
+Draws and no contests are excluded from the monitoring sample. A bet on one is voided and the stake comes back, so they have no bearing on whether the model makes money, and the model gives them so little probability that each one costs around five times what an ordinary fight does in logloss. Four of the eight in the sample fell in the decision group, one before the August 2025 split and three after, and that alone made decisions look like they had degraded by 0.49 when the figure without them is 0.01. They are only excluded from monitoring, training is unchanged.
+
+Windows and breakdown cells below a minimum sample size get dropped rather than reported, because a logloss on three fights says nothing and it distorts the chart it sits in.
+
 # Docker
 
 There are two Dockerfiles:
@@ -102,18 +118,6 @@ The scripts point at `http://127.0.0.1:8080`. Inside a container that address is
 ## Metric choice
 
 I chose logloss to assess the models and target rather than accuracy. Although we are only interested in predicting the winners, if we want to make money then the odds/probability of each outcome is the most important thing to get correct.
-
-# Monitoring
-
-`pipeline/17_model_monitoring.py` scores the out of time sample with each model version and logs it to the `Model_Monitoring_v2` experiment. Metrics are broken down by weightclass, year, month, time format, fighter history and date, and two of the artifacts are aimed at drift specifically.
-
-The rolling logloss chart is the trailing 8 month logloss at each fight date, with the model and the odds plotted together. That pairing is the point of it: if both lines rise then the fights got harder to call and the model is fine, if only the model's line rises then it has drifted. The window length is set at the top of the script.
-
-The logloss by method and period table splits the sample either side of a date and breaks it down by method of victory, so I can ask whether one kind of fight got harder rather than just whether the whole thing got worse. The odds columns do the same job here.
-
-Draws and no contests are excluded from the monitoring sample. A bet on one is voided and the stake comes back, so they have no bearing on whether the model makes money, and the model gives them so little probability that each one costs around five times what an ordinary fight does in logloss. Four of the eight in the sample fell in the decision group, one before the August 2025 split and three after, and that alone made decisions look like they had degraded by 0.49 when the figure without them is 0.01. They are only excluded from monitoring, training is unchanged.
-
-Windows and breakdown cells below a minimum sample size get dropped rather than reported, because a logloss on three fights says nothing and it distorts the chart it sits in.
 
 # GPU
 
