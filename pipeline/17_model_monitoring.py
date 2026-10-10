@@ -21,8 +21,10 @@ import fastparquet as fp
 import joblib
 import numpy as np
 import os
+import pandas as pd
 
-from mma_functions.cleaning import standard_data_filter
+from mma_functions import evaluation
+from mma_functions.cleaning import clean_target_column, standard_data_filter
 from mma_functions.dataset import prep_data_for_model_training
 from mma_functions.modelling import predict_xgboost_ensemble
 from mma_functions.pipelines import btest_model_and_log_mlflow, clean_all_raw_data_and_save, merge_and_process_all_clean_data, scrape_all_unparsed_data
@@ -35,6 +37,12 @@ if not os.name == "nt":
 # Use this to skip update of data if it's already been done recently
 skip_data_update = False
 skip_save_data = False
+
+# The length of the trailing window for the rolling logloss
+rolling_window_months = 8
+
+# The date to split the sample on when comparing logloss by method of victory
+period_split_date = '2025-08-01'
 
 # # Load files
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
@@ -124,13 +132,37 @@ backtesting_data['favourite'] = np.where(
              "Non-favourite win"
              ))
 
+# Group the method of victory so all the decisions can be looked at together
+backtesting_data['method_group'] = np.where(
+    backtesting_data['method'].str.startswith('Decision', na = False),
+    'Decision',
+    np.where(
+        backtesting_data['method'].isin(['KO/TKO', 'Submission']),
+        backtesting_data['method'],
+        'Other'))
+
+# Split the sample either side of the split date. Numbered so they sort into date order
+backtesting_data['period'] = np.where(
+    backtesting_data['date'] < pd.Timestamp(period_split_date),
+    '1. Pre ' + period_split_date,
+    '2. Post ' + period_split_date)
+
 ##########################################################################################
 ### Data prep for model ###
 ##########################################################################################
 
 # Get the model input data
+# Exclude fights that haven't happened yet. They carry the oot flag because of their date, but have
+# no outcome, and clean_target_column raises on a missing outcome.
+# Draws and no contests go too. A bet on one is voided and the stake comes back, so they say nothing
+# about how the model is doing, and the model gives them so little probability that a couple of them
+# landing in a window moves the logloss more than everything else put together
+oot_data = backtesting_data[(backtesting_data['train_test_oot_flag'] == 'oot')
+                            & backtesting_data['outcome'].notna()
+                            & ~backtesting_data['outcome'].isin(['D/D', 'NC/NC'])]
+
 X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
-    backtesting_data[backtesting_data['train_test_oot_flag'] == 'oot'],
+    oot_data,
     oot_testing = True)
 
 
@@ -165,8 +197,48 @@ for model_version in model_versions:
             [0] * len(X_oot), 
             model_hyper_params = model_hyper_params)
         
+        # Merge the data on the train to ensure the same order of rows
+        oot_actuals = X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left')
+
+        # The outcome as classes, the same way btest_model_and_log_mlflow does it
+        oot_target = clean_target_column(oot_actuals['outcome'])
+
+        # These two have to run before btest_model_and_log_mlflow, which converts its breakdown
+        # columns to strings and so would leave the date column unusable for date arithmetic
+
+        # Log the logloss over a trailing window, so a drift shows up as a trend
+        rolling_logloss = evaluation.rolling_log_loss(
+            oot_actuals,
+            prediction_probabilities,
+            oot_target,
+            months = rolling_window_months)
+
+        # Nothing to chart if the sample is too short or too thin for any window to qualify
+        if len(rolling_logloss) == 0:
+            print('No rolling logloss logged, no ' + str(rolling_window_months) + ' month window held enough fights')
+        else:
+            fig, ax = evaluation.plot_rolling_log_loss(rolling_logloss, rolling_window_months)
+            mlflow.log_figure(fig, 'Rolling logloss/rolling_logloss.png')
+
+            rolling_logloss.to_csv('results/temp/summary.csv', index = False)
+            mlflow.log_artifact('results/temp/summary.csv', 'Rolling logloss')
+
+        # Log the logloss by method of victory either side of the split date, to see whether
+        # decisions in particular got harder to call, and whether they did for the odds too
+        period_logloss = evaluation.log_loss_by_group_and_period(
+            oot_actuals,
+            prediction_probabilities,
+            oot_target,
+            'method_group',
+            'period')
+
+        print(period_logloss)
+
+        period_logloss.to_csv('results/temp/summary.csv')
+        mlflow.log_artifact('results/temp/summary.csv', 'Logloss by method and period')
+
         btest_model_and_log_mlflow(
-            X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+            oot_actuals,
             prediction_probabilities, 
             breakdown_cols = breakdown_cols, 
             breakdown_metrics = breakdown_metrics, 
@@ -174,6 +246,6 @@ for model_version in model_versions:
             target_column = target,
             backtesting_params = backtesting_params)
         
-        mlflow.log_param('OOT_start_date', min(backtesting_data[backtesting_data['train_test_oot_flag'] == 'oot']['date']))
+        mlflow.log_param('OOT_start_date', min(oot_data['date']))
         mlflow.log_param('Last_event_date', max(backtesting_data['date']))
         mlflow.set_tag('Sample', 'OOT')

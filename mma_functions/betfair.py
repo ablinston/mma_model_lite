@@ -93,6 +93,7 @@ def betfair_bout_get_chosen_odds(bout_df, time_cutoff, average_last_n):
 
     # Format the date
     cutoff_datetime = pd.to_datetime(cutoff_datetime, utc=True)
+    df['GMT_datetime'] = pd.to_datetime(df['GMT_datetime'], utc=True)
 
     # Now filter the data after the cutoff time
     df_cutoff = df[df['GMT_datetime'] < cutoff_datetime]
