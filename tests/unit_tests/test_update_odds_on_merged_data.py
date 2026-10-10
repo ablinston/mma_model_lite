@@ -5,18 +5,18 @@ import pandas as pd
 from mma_functions.odds import update_odds_on_merged_data
 from mma_functions.config import config, data_processing_config
 
-test_update_odds_on_merged_data_correct = fp.ParquetFile('./tests/data/test_update_odds_on_merged_data_correct.parquet').to_pandas()
+test_update_odds_on_merged_data_correct = fp.ParquetFile("./tests/data/test_update_odds_on_merged_data_correct.parquet").to_pandas()
 
 def test_update_odds_on_merged_data():
 
     result = update_odds_on_merged_data(
-        cleaned_fight_odds_data_path = './tests/data/test_update_odds_on_merged_data_fight_odds.parquet',
-        cleaned_event_odds_data_path = './tests/data/test_update_odds_on_merged_data_event_odds.parquet',
-        cleaned_betfair_odds_data_path = './tests/data/test_update_odds_on_merged_data_cleaned_bf.parquet',
-        final_data_folder = './tests/data/test_update_odds_on_merged_data/',
-        average_odds_model_path = './results/average_odds_model.joblib',
-        config = config,
-        data_processing_config = data_processing_config
+        cleaned_fight_odds_data_path="./tests/data/test_update_odds_on_merged_data_fight_odds.parquet",
+        cleaned_event_odds_data_path="./tests/data/test_update_odds_on_merged_data_event_odds.parquet",
+        cleaned_betfair_odds_data_path="./tests/data/test_update_odds_on_merged_data_cleaned_bf.parquet",
+        final_data_folder="./tests/data/test_update_odds_on_merged_data/",
+        average_odds_model_path="./results/average_odds_model.joblib",
+        config=config,
+        data_processing_config=data_processing_config
     )
 
     assert isinstance(result, pd.DataFrame)

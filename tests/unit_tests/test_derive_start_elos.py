@@ -59,22 +59,22 @@ def test_derive_start_elos():
     ])
 
     # Format dates
-    fight_results['date'] = pd.to_datetime(fight_results['date'])
-    fight_stats['date'] = pd.to_datetime(fight_stats['date'])
+    fight_results["date"] = pd.to_datetime(fight_results["date"])
+    fight_stats["date"] = pd.to_datetime(fight_stats["date"])
     
     # Add fighter
-    fight_results[['fighter1', 'fighter2']] = fight_results['bout'].str.split('vs\\.', expand = True)
+    fight_results[["fighter1", "fighter2"]] = fight_results["bout"].str.split("vs\\.", expand=True)
     
     # Run function to add ELOs
     start_elo = add_start_elo_to_fight_results(fight_results, fight_stats, config, elo_config)
 
     # Compare starting elos on second fight after first result
-    assert all(start_elo[start_elo['event'] == 'UFC3']['fighter1_start_elo'] < int(elo_config['starting_elo']))
-    assert all(start_elo[start_elo['event'] == 'UFC4']['fighter1_start_elo'] > int(elo_config['starting_elo']))
-    assert all(start_elo[start_elo['event'] == 'UFC4']['fighter2_start_elo'] > int(elo_config['starting_elo']))
-    assert all(start_elo[start_elo['event'] == 'UFC3']['fighter2_start_elo'] == int(elo_config['starting_elo']))
+    assert all(start_elo[start_elo["event"] == "UFC3"]["fighter1_start_elo"] < int(elo_config["starting_elo"]))
+    assert all(start_elo[start_elo["event"] == "UFC4"]["fighter1_start_elo"] > int(elo_config["starting_elo"]))
+    assert all(start_elo[start_elo["event"] == "UFC4"]["fighter2_start_elo"] > int(elo_config["starting_elo"]))
+    assert all(start_elo[start_elo["event"] == "UFC3"]["fighter2_start_elo"] == int(elo_config["starting_elo"]))
     
     # Check that the 'Other' method of victory (usually DQ or something) doesn't affect ELO
-    assert start_elo[start_elo['event'] == 'UFC2']['fighter1_start_elo'].tolist() == start_elo[start_elo['event'] == 'UFC4']['fighter1_start_elo'].tolist()
+    assert start_elo[start_elo["event"] == "UFC2"]["fighter1_start_elo"].tolist() == start_elo[start_elo["event"] == "UFC4"]["fighter1_start_elo"].tolist()
 
 # fp.write('./tests/data/update_fighter_odds_data_data_correct3.parquet', result3, compression = 'ZSTD')

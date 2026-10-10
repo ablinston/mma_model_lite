@@ -15,12 +15,12 @@ from mma_functions.betfair import betfair_bout_get_chosen_odds, betfair_stream_t
 from mma_functions.config import betfair_data_config, betfair_login_config
 
 # Set the download folder. This should be empty to save duplicated searching
-download_folder = './data/raw_betfair/historic/'
-decompressed_output_dir = './data/raw_betfair/decompressed_fight_files/'
+download_folder = "./data/raw_betfair/historic/"
+decompressed_output_dir = "./data/raw_betfair/decompressed_fight_files/"
 
 
 # Open the connection with Betfair. This requires the betfair config which is not tracked by git because it contains passwords
-trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = './data/betfair_certs')
+trading = betfairlightweight.APIClient(betfair_login_config["username"], betfair_login_config["password"], app_key=betfair_login_config["delay_feed_app_key"], certs="./data/betfair_certs")
 
 trading.login()
 
@@ -52,7 +52,7 @@ file_list = trading.historic.get_file_list(
 # download the files
 for file in file_list:
     print(file)
-    download = trading.historic.download_file(file_path = file, store_directory = download_folder)
+    download = trading.historic.download_file(file_path=file, store_directory=download_folder)
     print(download)
 
 
@@ -69,17 +69,17 @@ for file in file_list:
 
 # === CONFIGURATION ===
 folder_path = download_folder  # <- CHANGE THIS
-search_string = 'perez'     # <- CHANGE THIS
+search_string = "perez"     # <- CHANGE THIS
 
 # === SEARCH FUNCTION ===
 def search_bz2_files(folder, target):
     matches = []
 
     for filename in os.listdir(folder):
-        if filename.endswith('.bz2'):
+        if filename.endswith(".bz2"):
             full_path = os.path.join(folder, filename)
             try:
-                with bz2.open(full_path, 'rt', encoding='utf-8', errors='ignore') as file:
+                with bz2.open(full_path, "rt", encoding="utf-8", errors="ignore") as file:
                     for i, line in enumerate(file, 1):
                         if target.lower() in line.lower():
                             matches.append((filename, i, line.strip()))
@@ -120,12 +120,12 @@ listener = StreamListener(max_latency=None)
 
 # Create historical stream (update file_path to your file location)
 stream = trading.streaming.create_historical_generator_stream(
-    file_path = decompressed_output_dir + results[0][0].replace('.bz2', ''),
-    listener = listener,
+    file_path=decompressed_output_dir + results[0][0].replace(".bz2", ""),
+    listener=listener,
 )
 
 # Convert the list of series into a data frame
-betfair_odds_df = betfair_stream_to_df(stream = stream)
+betfair_odds_df = betfair_stream_to_df(stream=stream)
 
 # Get the last odds before the chosen cutoff time
-betfair_odds_summary_df = betfair_bout_get_chosen_odds(betfair_odds_df, betfair_data_config['odds_cutoff_time'])
+betfair_odds_summary_df = betfair_bout_get_chosen_odds(betfair_odds_df, betfair_data_config["odds_cutoff_time"])

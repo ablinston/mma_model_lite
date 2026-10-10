@@ -26,19 +26,19 @@ from mma_functions.config import config, data_processing_config
 
 
 # Read in the data
-events = fp.ParquetFile('./data/' + config['event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-upcoming_events = fp.ParquetFile('./data/' + config['upcoming_event_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-fighters = fp.ParquetFile('./data/' + config['fighter_tott_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-fight_results = fp.ParquetFile('./data/' + config['fight_results_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-upcoming_fight_details = fp.ParquetFile('./data/' + config['upcoming_fight_details_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-fight_stats = fp.ParquetFile('./data/' + config['fight_stats_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-fight_odds = fp.ParquetFile('./data/' + config['fighter_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-event_odds = fp.ParquetFile('./data/' + config['event_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-betfair_odds = fp.ParquetFile('./data/' + config['betfair_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
-betfair_upcoming_odds = fp.ParquetFile('./data/' + config['betfair_upcoming_odds_file_name'].replace('.parquet', '_clean.parquet')).to_pandas()
+events = fp.ParquetFile("./data/" + config["event_details_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+upcoming_events = fp.ParquetFile("./data/" + config["upcoming_event_details_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+fighters = fp.ParquetFile("./data/" + config["fighter_tott_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+fight_results = fp.ParquetFile("./data/" + config["fight_results_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+upcoming_fight_details = fp.ParquetFile("./data/" + config["upcoming_fight_details_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+fight_stats = fp.ParquetFile("./data/" + config["fight_stats_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+fight_odds = fp.ParquetFile("./data/" + config["fighter_odds_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+event_odds = fp.ParquetFile("./data/" + config["event_odds_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+betfair_odds = fp.ParquetFile("./data/" + config["betfair_odds_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
+betfair_upcoming_odds = fp.ParquetFile("./data/" + config["betfair_upcoming_odds_file_name"].replace(".parquet", "_clean.parquet")).to_pandas()
 
 # Read in the average odds model
-average_odds_model = joblib.load('./results/average_odds_model.joblib')
+average_odds_model = joblib.load("./results/average_odds_model.joblib")
 
 ###########################################################################################
 # UPCOMING
@@ -47,97 +47,97 @@ average_odds_model = joblib.load('./results/average_odds_model.joblib')
 fight_stats = add_upcoming_to_fight_stats(fight_stats, upcoming_fight_details, events, upcoming_events)
 
 # Add upcoming events
-events = pd.concat([upcoming_events, events], axis = 0)
+events = pd.concat([upcoming_events, events], axis=0)
 
 # Add the date to the upcoming fights
-upcoming_fight_details = upcoming_fight_details.merge(upcoming_events[['event', 'date']], on = 'event', how = 'left')
+upcoming_fight_details = upcoming_fight_details.merge(upcoming_events[["event", "date"]], on="event", how="left")
 
 # Add upcoming fights to the results with empty results
-fight_results = pd.concat([upcoming_fight_details.drop('url', axis = 1), fight_results])
+fight_results = pd.concat([upcoming_fight_details.drop("url", axis=1), fight_results])
 
 
 ###########################################################################################
 # FIGHT STATS PROCESSING
 
 # Calculate the historical stats of each fighter at the fight date
-fight_stats = fight_stats.sort_values(by=['fighter', 'date'], axis = 0)
+fight_stats = fight_stats.sort_values(by=["fighter", "date"], axis=0)
 
 # Copy the fight stats but for against a fighter, then merge onto stats
 fight_stats_against = fight_stats.copy()
-fight_stats_against.rename(columns = lambda x: x + "_against" if "attempt" in x else x, inplace = True)
-fight_stats_against.rename(columns = lambda x: x + "_against" if "landed" in x else x, inplace = True)
-fight_stats_against.rename(columns = lambda x: x + "_against" if "ctrl_minutes" in x else x, inplace = True)
-fight_stats_against.rename(columns = lambda x: x + "_against" if "kd" in x else x, inplace = True)
+fight_stats_against.rename(columns=lambda x: x + "_against" if "attempt" in x else x, inplace=True)
+fight_stats_against.rename(columns=lambda x: x + "_against" if "landed" in x else x, inplace=True)
+fight_stats_against.rename(columns=lambda x: x + "_against" if "ctrl_minutes" in x else x, inplace=True)
+fight_stats_against.rename(columns=lambda x: x + "_against" if "kd" in x else x, inplace=True)
 # fight_stats_against.rename(columns = lambda x: x + "_against" if "sub.att" in x else x, inplace = True)
 
 # Split the bout into fighters
 # Set the opponent to the fighter for merging
-fight_stats_against[['fighter1', 'fighter2']] = fight_stats_against['bout'].str.split('vs\\.', expand = True)
-fight_stats_against['fighter'] = np.where(fight_stats_against['fighter'] == fight_stats_against['fighter1'], fight_stats_against['fighter2'], fight_stats_against['fighter1'])
+fight_stats_against[["fighter1", "fighter2"]] = fight_stats_against["bout"].str.split("vs\\.", expand=True)
+fight_stats_against["fighter"] = np.where(fight_stats_against["fighter"] == fight_stats_against["fighter1"], fight_stats_against["fighter2"], fight_stats_against["fighter1"])
 # Get only the columns we want
 against_columns = [col for col in fight_stats_against.columns if "against" in col]
-fight_stats_against = fight_stats_against[['event', 'bout', 'fighter'] + against_columns]
+fight_stats_against = fight_stats_against[["event", "bout", "fighter"] + against_columns]
 
 # Merge onto the fight stats
 rows_before = len(fight_stats)
-fight_stats = fight_stats.merge(fight_stats_against, on = ['event', 'bout', 'fighter'], how = 'left')
+fight_stats = fight_stats.merge(fight_stats_against, on=["event", "bout", "fighter"], how="left")
 
 # Check that all the rows are correct
 if rows_before == len(fight_stats):
-    print('Row check PASSED')
+    print("Row check PASSED")
 else:
-    print('Row check FAILED')
+    print("Row check FAILED")
     raise SystemExit
 del fight_stats_against
 
 fight_stats_bayes_priors = bayesian_priors(
-    fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
-    id_cols = ['event', 'bout', 'fighter'], 
-    group_by = [], 
-    fight_span = data_processing_config['bayes_fightspan'],
-    ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
+    fight_stats.sort_values("date").reset_index(drop=True).merge(fight_results[["event", "bout", "weightclass"]], on=["event", "bout"], how="left"), # Join on the weightclass for grouping
+    id_cols=["event", "bout", "fighter"], 
+    group_by=[], 
+    fight_span=data_processing_config["bayes_fightspan"],
+    ignore_last_n_fights=30 if data_processing_config["bayesian_groupby"] == [] else 10
 )
 
 fight_stats_bayes_priors_weightclass = bayesian_priors(
-    fight_stats.sort_values('date').reset_index(drop = True).merge(fight_results[['event', 'bout', 'weightclass']], on = ['event', 'bout'], how = 'left'), # Join on the weightclass for grouping
-    id_cols = ['event', 'bout', 'fighter'], 
-    group_by = ['weightclass'], 
-    fight_span = data_processing_config['bayes_fightspan'],
-    ignore_last_n_fights = 30 if data_processing_config['bayesian_groupby'] == [] else 10
+    fight_stats.sort_values("date").reset_index(drop=True).merge(fight_results[["event", "bout", "weightclass"]], on=["event", "bout"], how="left"), # Join on the weightclass for grouping
+    id_cols=["event", "bout", "fighter"], 
+    group_by=["weightclass"], 
+    fight_span=data_processing_config["bayes_fightspan"],
+    ignore_last_n_fights=30 if data_processing_config["bayesian_groupby"] == [] else 10
 )
 
 
 # Now aggrgate
 fight_stats_hist_none = aggregate_last_X_fight_data(
     fight_stats,
-    id_cols = ['date', 'event', 'bout', 'fighter'],
-    group_by = ['fighter'],
-    prefix = "hist_nogroup_",
-    X = 5,
-    per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors,
-    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-).drop(columns = ['date'])
+    id_cols=["date", "event", "bout", "fighter"],
+    group_by=["fighter"],
+    prefix="hist_nogroup_",
+    X=5,
+    per_minute_calc=True, 
+    bayes_priors_df=fight_stats_bayes_priors,
+    bayes_alpha_plus_beta_rebase=data_processing_config["bayes_alpha_plus_beta_rebase_per_minute"]
+).drop(columns=["date"])
 
 fight_stats_hist_wc = aggregate_last_X_fight_data(
     fight_stats,
-    id_cols = ['date', 'event', 'bout', 'fighter'],
-    group_by = ['fighter'],
-    prefix = "hist_weightclass_",
-    X = 5,
-    per_minute_calc = True, 
-    bayes_priors_df = fight_stats_bayes_priors_weightclass,
-    bayes_alpha_plus_beta_rebase = data_processing_config['bayes_alpha_plus_beta_rebase_per_minute']
-).drop(columns = ['date'])
+    id_cols=["date", "event", "bout", "fighter"],
+    group_by=["fighter"],
+    prefix="hist_weightclass_",
+    X=5,
+    per_minute_calc=True, 
+    bayes_priors_df=fight_stats_bayes_priors_weightclass,
+    bayes_alpha_plus_beta_rebase=data_processing_config["bayes_alpha_plus_beta_rebase_per_minute"]
+).drop(columns=["date"])
 
 
 merged_data = merge_df_both_fighters(
-    left_df =  fight_results[['event', 'bout', 'fighter1', 'fighter2', 'outcome', 'method']],
-    df_list = [
+    left_df=fight_results[["event", "bout", "fighter1", "fighter2", "outcome", "method"]],
+    df_list=[
         fight_stats_hist_none,
         fight_stats_hist_wc
     ]
-).reset_index(drop = True)
+).reset_index(drop=True)
 
 
 
@@ -145,52 +145,52 @@ merged_data = merge_df_both_fighters(
 # FIT MODEL
 
 # Filter out missing
-merged_data = merged_data[~merged_data['outcome'].isna()]
-merged_data = merged_data[(merged_data['fighter1_hist_weightclass_fights'] > 2) & (merged_data['fighter2_hist_weightclass_fights'] > 2)]
+merged_data = merged_data[~merged_data["outcome"].isna()]
+merged_data = merged_data[(merged_data["fighter1_hist_weightclass_fights"] > 2) & (merged_data["fighter2_hist_weightclass_fights"] > 2)]
 
-merged_data['train_test_oot_flag'] = 'oot'
+merged_data["train_test_oot_flag"] = "oot"
 
-X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(merged_data, config, oot_testing = True)
+X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(merged_data, config, oot_testing=True)
 
-X_train = X_train[[col for col in X_train.columns if 'notformodel' not in col and 'allrounds' in col]]
+X_train = X_train[[col for col in X_train.columns if "notformodel" not in col and "allrounds" in col]]
 
 # Create the matrix for the model
-train = xgb.DMatrix(X_train, label = y_train)
+train = xgb.DMatrix(X_train, label=y_train)
 
 # Set the parameters for the model
 params = {
-    'nthread': 3, # Only applies to CPU cores
-    'booster': 'gbtree',
-    'num_boost_round': 1, # to tell the package to train only 1 random forest
-    'colsample_bynode': np.sqrt(len(X_train.columns)) / len(X_train.columns), # fraction of columns to select for each tree
-    'num_parallel_tree': 800, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
-    'learning_rate': 1, # Learning rate
-    'min_child_weight': 15,                 # The min observations that should be left in a leaf node    
-    'subsample': 0.85,
+    "nthread": 3, # Only applies to CPU cores
+    "booster": "gbtree",
+    "num_boost_round": 1, # to tell the package to train only 1 random forest
+    "colsample_bynode": np.sqrt(len(X_train.columns)) / len(X_train.columns), # fraction of columns to select for each tree
+    "num_parallel_tree": 800, # the size of the forest. For 16k features, and choosing sqrt, 2500 gives 99.998% chance all features selected at least once
+    "learning_rate": 1, # Learning rate
+    "min_child_weight": 15,                 # The min observations that should be left in a leaf node    
+    "subsample": 0.85,
     # 'max_depth': 6,
-    'max_bin': 175, # used in the hist method to speed up, this says how many bins the vars should be split into
-    'objective': 'multi:softprob', # Multi classification objective
-    'eval_metric': 'mlogloss',       # Evaluation metric
-    'tree_method': 'hist',      # Use GPU accelerated algorithm
-    'device': 'cuda',           # Use CUDA / GPU
-    'predictor': 'gpu_predictor',   # Use GPU for prediction
-    'verbosity': 1,
-    'num_class': no_of_classes,
-    'n_folds': 5,                   # Number of folds for the cross-validation
-    'random_state': config['seed_all'] + 38
+    "max_bin": 175, # used in the hist method to speed up, this says how many bins the vars should be split into
+    "objective": "multi:softprob", # Multi classification objective
+    "eval_metric": "mlogloss",       # Evaluation metric
+    "tree_method": "hist",      # Use GPU accelerated algorithm
+    "device": "cuda",           # Use CUDA / GPU
+    "predictor": "gpu_predictor",   # Use GPU for prediction
+    "verbosity": 1,
+    "num_class": no_of_classes,
+    "n_folds": 5,                   # Number of folds for the cross-validation
+    "random_state": config["seed_all"] + 38
 }
 
 rf_model = xgb.train(params, train)
 
 
 # Get feature importance scores
-importance = rf_model.get_score(importance_type='total_gain')
+importance = rf_model.get_score(importance_type="total_gain")
 
 # Sort features by importance
 sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
 
 # Save the variable importance plot to csv
-with open('results/random_forest_bayes_group_test_variable_importance.csv', mode='w', newline='') as file:
+with open("results/random_forest_bayes_group_test_variable_importance.csv", mode="w", newline="") as file:
     writer = csv.writer(file)
     writer.writerow(["Feature", "Importance"])  # Write the header
     writer.writerows(sorted_importance)
@@ -214,12 +214,12 @@ shap_values = explainer.shap_values(X_train)
 mean_shap_values = np.mean(np.abs(shap_values), axis=(0, 2))
 
 # Create a DataFrame for better readability
-shap_importance_df = pd.DataFrame({'Feature': X_train.columns, 'Mean SHAP Value': mean_shap_values})
+shap_importance_df = pd.DataFrame({"Feature": X_train.columns, "Mean SHAP Value": mean_shap_values})
 
 # Sort features by importance
-shap_importance_df = shap_importance_df.sort_values(by='Mean SHAP Value', ascending=False).reset_index(drop=True)
+shap_importance_df = shap_importance_df.sort_values(by="Mean SHAP Value", ascending=False).reset_index(drop=True)
 
 # Display or save the table
 print(shap_importance_df.head(10))  # Shows the top 10 most important features
 # Optionally, save to CSV
-shap_importance_df.to_csv('./results/rf_bayes_group_test_shap_feature_importance.csv', index=False)
+shap_importance_df.to_csv("./results/rf_bayes_group_test_shap_feature_importance.csv", index=False)

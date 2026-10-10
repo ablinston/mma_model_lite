@@ -23,15 +23,15 @@ def combine_fighter_stats_dfs(fighter_a_stats_df, fighter_b_stats_df, soup):
     a dataframe of stats for the fight
     """
     fight_stats = pd.concat([fighter_a_stats_df, fighter_b_stats_df])
-    fight_stats['EVENT'] = soup.find('h2', class_='b-content__title'
+    fight_stats["EVENT"] = soup.find("h2", class_="b-content__title"
         ).text.strip()
     fighters_names = []
-    for tag in soup.find_all('a', class_='b-link b-fight-details__person-link'
+    for tag in soup.find_all("a", class_="b-link b-fight-details__person-link"
         ):
         fighters_names.append(tag.text.strip())
-    fight_stats['BOUT'] = ' vs. '.join(fighters_names)
-    fight_stats = utils.move_columns(fight_stats, ['EVENT', 'BOUT'], 'ROUND',
-        'before')
+    fight_stats["BOUT"] = " vs. ".join(fighters_names)
+    fight_stats = utils.move_columns(fight_stats, ["EVENT", "BOUT"], "ROUND",
+        "before")
     return fight_stats
 
 def convert_fight_stats_to_df(clean_fighter_stats, totals_column_names,
@@ -54,8 +54,7 @@ def convert_fight_stats_to_df(clean_fighter_stats, totals_column_names,
     a dataframe of fight stats
     """
     totals_df = pd.DataFrame(columns=totals_column_names)
-    significant_strikes_df = pd.DataFrame(columns=
-        significant_strikes_column_names)
+    significant_strikes_df = pd.DataFrame(columns=significant_strikes_column_names)
     if len(clean_fighter_stats) == 0:
         totals_df.loc[len(totals_df)] = [np.nan] * len(list(totals_df))
         significant_strikes_df.loc[len(significant_strikes_df)] = [np.nan
@@ -63,15 +62,14 @@ def convert_fight_stats_to_df(clean_fighter_stats, totals_column_names,
     else:
         number_of_rounds = int((len(clean_fighter_stats) - 2) / 2)
         totals_df = pd.DataFrame(columns=totals_column_names)
-        significant_strikes_df = pd.DataFrame(columns=
-            significant_strikes_column_names)
+        significant_strikes_df = pd.DataFrame(columns=significant_strikes_column_names)
         for round in range(number_of_rounds):
-            totals_df.loc[len(totals_df)] = ['Round ' + str(round + 1)
+            totals_df.loc[len(totals_df)] = ["Round " + str(round + 1)
                 ] + clean_fighter_stats[round + 1]
             significant_strikes_df.loc[len(significant_strikes_df)] = [
-                'Round ' + str(round + 1)] + clean_fighter_stats[round + 1 +
+                "Round " + str(round + 1)] + clean_fighter_stats[round + 1 +
                 int(len(clean_fighter_stats) / 2)]
-    fighter_stats_df = totals_df.merge(significant_strikes_df, how='inner')
+    fighter_stats_df = totals_df.merge(significant_strikes_df, how="inner")
     return fighter_stats_df
 
 # The 'bout' column on the fight details page of UFCstats sometimes has the fighters in the 
@@ -85,11 +83,11 @@ def fix_fight_details_bout(fight_details, fight_stats_df):
     # pdb.set_trace()
     
     # Create a copy of stats so the original isn't modified and with stripped columns
-    fight_stats = fight_stats_df[['EVENT', 'BOUT']].drop_duplicates()
+    fight_stats = fight_stats_df[["EVENT", "BOUT"]].drop_duplicates()
     
     # This function requires spaces to be removed, or they cause issues
     for df in [fight_details, fight_stats]:
-        for col in ['EVENT', 'BOUT']:
+        for col in ["EVENT", "BOUT"]:
             try:
                 df[[col]] = utils.clean_text_columns(df[[col]])
             except:
@@ -97,19 +95,19 @@ def fix_fight_details_bout(fight_details, fight_stats_df):
 
     
     # First, get individual columns for the fighters on the details data
-    fight_details[['fighter1', 'fighter2']] = fight_details['BOUT'].str.split('vs\\.', expand = True)
+    fight_details[["fighter1", "fighter2"]] = fight_details["BOUT"].str.split("vs\\.", expand=True)
     
     # Now reverse the bout
-    fight_details['BOUT_ALT'] = fight_details['fighter2'] + 'vs.' + fight_details['fighter1']
+    fight_details["BOUT_ALT"] = fight_details["fighter2"] + "vs." + fight_details["fighter1"]
 
     ## Now find which fights are in the stats data frame under the alternate ordering on the same event
     
     # Create a data frame to merge with a flag
-    fight_alt_flag_df = fight_stats.rename(columns = {'BOUT': 'BOUT_STATS'})
-    fight_alt_flag_df.loc[:, 'ALT_FLAG'] = 1
+    fight_alt_flag_df = fight_stats.rename(columns={"BOUT": "BOUT_STATS"})
+    fight_alt_flag_df.loc[:, "ALT_FLAG"] = 1
     
     # Create a new fight data frame merging whether the alt bout was found
-    new_fight_details = fight_details.merge(fight_alt_flag_df, how = 'left', left_on = ['EVENT', 'BOUT_ALT'], right_on = ['EVENT', 'BOUT_STATS'])
+    new_fight_details = fight_details.merge(fight_alt_flag_df, how="left", left_on=["EVENT", "BOUT_ALT"], right_on=["EVENT", "BOUT_STATS"])
     
     # Check the new data has the same length of rows
     if len(fight_details) != len(new_fight_details):
@@ -117,10 +115,10 @@ def fix_fight_details_bout(fight_details, fight_stats_df):
         return None
     
     # Replace bouts where required
-    new_fight_details['BOUT'] = np.where(new_fight_details['ALT_FLAG'] == 1, new_fight_details['BOUT_ALT'], new_fight_details['BOUT'])
+    new_fight_details["BOUT"] = np.where(new_fight_details["ALT_FLAG"] == 1, new_fight_details["BOUT_ALT"], new_fight_details["BOUT"])
     
     # Drop all columns that were added
-    new_fight_details.drop(['BOUT_ALT', 'fighter1', 'fighter2', 'ALT_FLAG', 'BOUT_STATS'], axis = 1, inplace = True)
+    new_fight_details.drop(["BOUT_ALT", "fighter1", "fighter2", "ALT_FLAG", "BOUT_STATS"], axis=1, inplace=True)
 
     return new_fight_details
 
@@ -142,9 +140,9 @@ def organise_fight_results(results_from_soup, fight_results_column_names):
     """
     fight_results_clean = []
     fight_results_clean.append(results_from_soup[0])
-    fight_results_clean.append(' vs. '.join(results_from_soup[1:3]))
-    fight_results_clean.append('/'.join(results_from_soup[3:5]))
-    fight_results_clean.extend([re.sub('^(.+?): ?', '', text) for text in
+    fight_results_clean.append(" vs. ".join(results_from_soup[1:3]))
+    fight_results_clean.append("/".join(results_from_soup[3:5]))
+    fight_results_clean.extend([re.sub("^(.+?): ?", "", text) for text in
         results_from_soup[5:]])
     fight_result_df = pd.DataFrame(columns=fight_results_column_names)
     fight_result_df.loc[len(fight_result_df)] = fight_results_clean
@@ -193,14 +191,14 @@ def organise_fighter_tott(tott_from_soup, fighter_tott_column_names, url):
     a df of fighter tale of the tape
     """
     # pdb.set_trace()
-    fighter_tott_clean = [re.sub('^(.+?): ?', '', text) for text in
+    fighter_tott_clean = [re.sub("^(.+?): ?", "", text) for text in
         tott_from_soup]
     fighter_tott_clean.append(url)
     fighter_tott_df = pd.DataFrame(columns=fighter_tott_column_names)
     fighter_tott_df.loc[len(fighter_tott_df)] = fighter_tott_clean
     return fighter_tott_df
 
-def parse_event_details(soup, upcoming = False):
+def parse_event_details(soup, upcoming=False):
     """
     parse event details from soup
     includes names, urls, dates, locations of events
@@ -224,13 +222,12 @@ def parse_event_details(soup, upcoming = False):
     event_urls = []
     event_dates = []
     event_locations = []
-    for tag in soup.find_all('a', class_='b-link b-link_style_black'):
+    for tag in soup.find_all("a", class_="b-link b-link_style_black"):
         event_names.append(tag.text.strip())
-        event_urls.append(tag['href'])
-    for tag in soup.find_all('span', class_='b-statistics__date'):
+        event_urls.append(tag["href"])
+    for tag in soup.find_all("span", class_="b-statistics__date"):
         event_dates.append(tag.text.strip())
-    for tag in soup.find_all('td', class_=
-        'b-statistics__table-col b-statistics__table-col_style_big-top-padding'
+    for tag in soup.find_all("td", class_="b-statistics__table-col b-statistics__table-col_style_big-top-padding"
         ):
         event_locations.append(tag.text.strip())
         
@@ -239,8 +236,8 @@ def parse_event_details(soup, upcoming = False):
         event_dates = event_dates[1:]
         event_locations = event_locations[1:]
         
-    event_details_df = pd.DataFrame({'EVENT': event_names, 'URL':
-        event_urls, 'DATE': event_dates, 'LOCATION': event_locations})
+    event_details_df = pd.DataFrame({"EVENT": event_names, "URL":
+        event_urls, "DATE": event_dates, "LOCATION": event_locations})
     return event_details_df
 
 def parse_fight_details(soup):
@@ -257,21 +254,20 @@ def parse_fight_details(soup):
     a df of fight details
     """
     fight_urls = []
-    for tag in soup.find_all('tr', class_=
-        'b-fight-details__table-row b-fight-details__table-row__hover js-fight-details-click'
+    for tag in soup.find_all("tr", class_="b-fight-details__table-row b-fight-details__table-row__hover js-fight-details-click"
         ):
-        fight_urls.append(tag['data-link'])
+        fight_urls.append(tag["data-link"])
     fighters_in_event = []
-    for tag in soup.find_all('a', class_='b-link b-link_style_black'):
+    for tag in soup.find_all("a", class_="b-link b-link_style_black"):
         fighters_in_event.append(tag.text.strip())
-    fights_in_event = [(fighter_a + ' vs. ' + fighter_b) for fighter_a,
+    fights_in_event = [(fighter_a + " vs. " + fighter_b) for fighter_a,
         fighter_b in zip(fighters_in_event[::2], fighters_in_event[1::2])]
-    fight_details_df = pd.DataFrame({'BOUT': fights_in_event, 'URL':
+    fight_details_df = pd.DataFrame({"BOUT": fights_in_event, "URL":
         fight_urls})
-    fight_details_df['EVENT'] = soup.find('h2', class_='b-content__title'
+    fight_details_df["EVENT"] = soup.find("h2", class_="b-content__title"
         ).text.strip()
-    fight_details_df = utils.move_columns(fight_details_df, ['EVENT'], 'BOUT',
-        'before')
+    fight_details_df = utils.move_columns(fight_details_df, ["EVENT"], "BOUT",
+        "before")
     return fight_details_df
 
 def parse_fight_details_url(url, config):
@@ -286,45 +282,44 @@ def parse_fight_details_url(url, config):
     a df of fight details
     """
     
-    soup = get_website_soup(url, fast = True, chrome_binary = config['chrome_binary_location'], time_delay = True)
+    soup = get_website_soup(url, fast=True, chrome_binary=config["chrome_binary_location"], time_delay=True)
     
     # pdb.set_trace()
     
     fight_urls = []
     
-    for tag in soup.find_all('tr', class_=
-        'b-fight-details__table-row b-fight-details__table-row__hover js-fight-details-click'
+    for tag in soup.find_all("tr", class_="b-fight-details__table-row b-fight-details__table-row__hover js-fight-details-click"
         ):
-        fight_urls.append(tag['data-link'])
+        fight_urls.append(tag["data-link"])
         
     fighters_in_event = []
     
-    for tag in soup.find_all('a', class_='b-link b-link_style_black'):
+    for tag in soup.find_all("a", class_="b-link b-link_style_black"):
         fighters_in_event.append(tag.text.strip())
         
     weightclass = []
     
-    for tag in soup.find_all('p', class_='b-fight-details__table-text'):
+    for tag in soup.find_all("p", class_="b-fight-details__table-text"):
         weightclass.append(tag.text.strip())
         
-    weightclass = [item for item in weightclass if 'weight' in item]
+    weightclass = [item for item in weightclass if "weight" in item]
         
     # Remove any 'view matchup that might have been introduced
-    fighters_in_event = [fighter for fighter in fighters_in_event if fighter != 'View Matchup']
+    fighters_in_event = [fighter for fighter in fighters_in_event if fighter != "View Matchup"]
     
-    fights_in_event = [(fighter_a + ' vs. ' + fighter_b) for fighter_a,
+    fights_in_event = [(fighter_a + " vs. " + fighter_b) for fighter_a,
         fighter_b in zip(fighters_in_event[::2], fighters_in_event[1::2])]
     
-    fight_details_df = pd.DataFrame({'BOUT': fights_in_event, 'URL':
+    fight_details_df = pd.DataFrame({"BOUT": fights_in_event, "URL":
         fight_urls})
         
-    fight_details_df['EVENT'] = soup.find('h2', class_='b-content__title'
+    fight_details_df["EVENT"] = soup.find("h2", class_="b-content__title"
         ).text.strip()
     
-    fight_details_df = utils.move_columns(fight_details_df, ['EVENT'], 'BOUT',
-        'before')
+    fight_details_df = utils.move_columns(fight_details_df, ["EVENT"], "BOUT",
+        "before")
     
-    fight_details_df['weightclass'] = pd.Series(weightclass)
+    fight_details_df["weightclass"] = pd.Series(weightclass)
    
     return fight_details_df
 
@@ -349,23 +344,20 @@ def parse_fight_results(soup):
     a list of fight results
     """
     fight_results = []
-    fight_results.append(soup.find('h2', class_='b-content__title').text)
-    for tag in soup.find_all('a', class_='b-link b-fight-details__person-link'
+    fight_results.append(soup.find("h2", class_="b-content__title").text)
+    for tag in soup.find_all("a", class_="b-link b-fight-details__person-link"
         ):
         fight_results.append(tag.text)
-    for tag in soup.find_all('div', class_='b-fight-details__person'):
-        for i_text in tag.find_all('i'):
+    for tag in soup.find_all("div", class_="b-fight-details__person"):
+        for i_text in tag.find_all("i"):
             fight_results.append(i_text.text)
-    fight_results.append(soup.find('div', class_=
-        'b-fight-details__fight-head').text)
-    fight_results.append(soup.find('i', class_=
-        'b-fight-details__text-item_first').text)
-    remaining_results = soup.find_all('p', class_='b-fight-details__text')
-    for tag in remaining_results[0].find_all('i', class_=
-        'b-fight-details__text-item'):
+    fight_results.append(soup.find("div", class_="b-fight-details__fight-head").text)
+    fight_results.append(soup.find("i", class_="b-fight-details__text-item_first").text)
+    remaining_results = soup.find_all("p", class_="b-fight-details__text")
+    for tag in remaining_results[0].find_all("i", class_="b-fight-details__text-item"):
         fight_results.append(tag.text.strip())
     fight_results.append(remaining_results[1].get_text())
-    fight_results = [text.replace('\n', '').replace('  ', '') for text in
+    fight_results = [text.replace("\n", "").replace("  ", "") for text in
         fight_results]
     return fight_results
 
@@ -393,8 +385,8 @@ def parse_fight_stats(soup):
     """
     fighter_a_stats = []
     fighter_b_stats = []
-    for tag in soup.find_all('td', class_='b-fight-details__table-col'):
-        for index, p_text in enumerate(tag.find_all('p')):
+    for tag in soup.find_all("td", class_="b-fight-details__table-col"):
+        for index, p_text in enumerate(tag.find_all("p")):
             if index % 2 == 0:
                 fighter_a_stats.append(p_text.text.strip())
             else:
@@ -414,15 +406,14 @@ def parse_fighter_details(soup, fighter_details_column_names):
     a dataframe of fighter details
     """
     fighter_names = []
-    for tag in soup.find_all('a', class_='b-link b-link_style_black'):
+    for tag in soup.find_all("a", class_="b-link b-link_style_black"):
         fighter_names.append(tag.text)
     fighter_urls = []
-    for tag in soup.find_all('a', class_='b-link b-link_style_black'):
-        fighter_urls.append(tag['href'])
+    for tag in soup.find_all("a", class_="b-link b-link_style_black"):
+        fighter_urls.append(tag["href"])
     fighter_details = list(zip(fighter_names[0::3], fighter_names[1::3],
         fighter_names[2::3], fighter_urls[0::3]))
-    fighter_details_df = pd.DataFrame(fighter_details, columns=
-        fighter_details_column_names)
+    fighter_details_df = pd.DataFrame(fighter_details, columns=fighter_details_column_names)
     return fighter_details_df
 
 def parse_fighter_tott(soup):
@@ -443,12 +434,12 @@ def parse_fighter_tott(soup):
     a list of fighter tale of the tape
     """
     fighter_tott = []
-    fighter_name = soup.find('span', class_='b-content__title-highlight').text
-    fighter_tott.append('Fighter:' + fighter_name)
-    tott = soup.find_all('ul', class_='b-list__box-list')[0]
-    for tag in tott.find_all('i'):
+    fighter_name = soup.find("span", class_="b-content__title-highlight").text
+    fighter_tott.append("Fighter:" + fighter_name)
+    tott = soup.find_all("ul", class_="b-list__box-list")[0]
+    for tag in tott.find_all("i"):
         fighter_tott.append(tag.text + tag.next_sibling)
-    fighter_tott = [text.replace('\n', '').replace('  ', '') for text in
+    fighter_tott = [text.replace("\n", "").replace("  ", "") for text in
         fighter_tott]
     return fighter_tott
 
@@ -474,7 +465,7 @@ def parse_organise_fight_results_and_stats(soup, url,
     """
     # pdb.set_trace()
     fight_results = parse_fight_results(soup)
-    fight_results.append('URL:' + url)
+    fight_results.append("URL:" + url)
     fight_results_df = organise_fight_results(fight_results,
         fight_results_column_names)
     fighter_a_stats, fighter_b_stats = parse_fight_stats(soup)
@@ -491,13 +482,13 @@ def parse_organise_fight_results_and_stats(soup, url,
 # This function takes a data frame of fight details and a list of new UFC events. It then
 # scrapes for the UFC events and updates the data
 
-def update_fight_details_data(existing_fights_data, new_events_url_list, config, num_threads = 1, debug = False):
+def update_fight_details_data(existing_fights_data, new_events_url_list, config, num_threads=1, debug=False):
 
     # Create empty list for results
     scrape_results = []
 
     # Run a parallel scrape of the new fights data
-    with ThreadPoolExecutor(max_workers = num_threads) as executor:
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
         future_to_url = {executor.submit(parse_fight_details_url, url, config): url for url in new_events_url_list}
 
         # Now iterate through the functions
@@ -523,7 +514,7 @@ def update_fight_details_data(existing_fights_data, new_events_url_list, config,
         new_fights_data = scrape_results[0]
     
     # Check we have the correct columns
-    if (list(new_fights_data.columns) == config['fight_details_column_names']):
+    if (list(new_fights_data.columns) == config["fight_details_column_names"]):
         # If they are, add on the rows to the existing data
         parsed_fight_details_df = pd.concat([new_fights_data, existing_fights_data])
         del([existing_fights_data, new_fights_data])
@@ -532,7 +523,7 @@ def update_fight_details_data(existing_fights_data, new_events_url_list, config,
         print("Got:")
         print(list(new_fights_data.columns))
         print("Expecting:")
-        print(config['fight_details_column_names'])
+        print(config["fight_details_column_names"])
         sys.exit()
 
     return parsed_fight_details_df
@@ -540,14 +531,14 @@ def update_fight_details_data(existing_fights_data, new_events_url_list, config,
 # This function takes a data frame of fight results and a list of new UFC results urls. It then
 # scrapes for the UFC events and updates the data. It does this using parallel scrapes
 
-def update_fight_results_and_stats_data(existing_fight_results_data, existing_fight_stats_data, new_fights_url_list, config, num_threads = 1):
+def update_fight_results_and_stats_data(existing_fight_results_data, existing_fight_stats_data, new_fights_url_list, config, num_threads=1):
 
     # Create empty list for results
     scraped_fight_results = []
     scraped_fight_stats = []
     
     # Run a parallel scrape of the new fights data
-    with ThreadPoolExecutor(max_workers = num_threads) as executor:
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
         
         # Get the html contents for the url
         future_to_url = {executor.submit(scraping.get_soup, url): url for url in new_fights_url_list}
@@ -561,9 +552,9 @@ def update_fight_results_and_stats_data(existing_fight_results_data, existing_fi
                 fight_result, fight_stats = parse_organise_fight_results_and_stats(
                     future.result(),
                     url,
-                    config['fight_results_column_names'],
-                    config['totals_column_names'],
-                    config['significant_strikes_column_names']      
+                    config["fight_results_column_names"],
+                    config["totals_column_names"],
+                    config["significant_strikes_column_names"]      
                 )
                 
                 # Save these results to the results list then remove

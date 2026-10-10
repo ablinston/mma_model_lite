@@ -4,7 +4,7 @@ from mma_functions import features
 import pandas as pd
 
 # # Load what answers are expected
-test_add_adjusted_bayes_stats_correct = fp.ParquetFile('./tests/data/test_add_adjusted_bayes_stats_correct.parquet').to_pandas()
+test_add_adjusted_bayes_stats_correct = fp.ParquetFile("./tests/data/test_add_adjusted_bayes_stats_correct.parquet").to_pandas()
 
 def test_add_adjusted_stats():
     # --- Build stats_df with 10 bouts (20 rows) ---
@@ -36,7 +36,7 @@ def test_add_adjusted_stats():
     stats_df = pd.DataFrame(rows)
 
     # Scramble the index to ensure robustness
-    stats_df = stats_df.sample(frac=1).reset_index(drop=True).sort_values(['event', 'fighter'])
+    stats_df = stats_df.sample(frac=1).reset_index(drop=True).sort_values(["event", "fighter"])
 
     # --- Build hist_df: same shape, event = bout ---
     hist_rows = []
@@ -52,10 +52,10 @@ def test_add_adjusted_stats():
     hist_df = pd.DataFrame(hist_rows)
 
     # --- Run function ---
-    result = features.add_adjusted_stats(stats_df, hist_df, columns_with=["bayes_strikes"]).sort_values(['event', 'fighter'])
+    result = features.add_adjusted_stats(stats_df, hist_df, columns_with=["bayes_strikes"]).sort_values(["event", "fighter"])
 
     # --- Assertions ---
     # Shape preserved
-    assert test_add_adjusted_bayes_stats_correct.reset_index(drop = True).equals(result.reset_index(drop = True))
+    assert test_add_adjusted_bayes_stats_correct.reset_index(drop=True).equals(result.reset_index(drop=True))
 
 # fp.write('./tests/data/test_add_adjusted_bayes_stats_correct.parquet', result, compression = 'ZSTD')

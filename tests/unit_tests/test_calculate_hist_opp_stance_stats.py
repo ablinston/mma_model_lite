@@ -4,7 +4,7 @@ import pandas as pd
 
 from mma_functions.features import bayesian_priors, calculate_hist_opp_stance_stats
 
-test_calculate_hist_opp_stance_stats_correct = fp.ParquetFile('./tests/data/test_calculate_hist_opp_stance_stats_correct.parquet').to_pandas()
+test_calculate_hist_opp_stance_stats_correct = fp.ParquetFile("./tests/data/test_calculate_hist_opp_stance_stats_correct.parquet").to_pandas()
 
 def test_calculate_hist_opp_stance_stats():
     
@@ -50,24 +50,24 @@ def test_calculate_hist_opp_stance_stats():
 
     fight_stats = pd.DataFrame(bouts)
 
-    id_cols = ['event', 'bout', 'fighter']
-    group_by = ['weightclass']
+    id_cols = ["event", "bout", "fighter"]
+    group_by = ["weightclass"]
     fight_span = 2  # Using a larger span for robust testing
 
     # Priors (not used in mock, but passed through)
-    fight_stats_bayes_priors = bayesian_priors(fight_stats, id_cols, group_by, fight_span, ignore_last_n_fights = 1)
+    fight_stats_bayes_priors = bayesian_priors(fight_stats, id_cols, group_by, fight_span, ignore_last_n_fights=1)
 
     data_processing_config = {"bayes_alpha_plus_beta_rebase_per_minute": 10,
                               "add_bayes_per_minute_columns": True}
 
     # Run function
     result = calculate_hist_opp_stance_stats(
-        fight_stats.drop(columns = 'weightclass'), fighters, fight_stats_bayes_priors, data_processing_config
+        fight_stats.drop(columns="weightclass"), fighters, fight_stats_bayes_priors, data_processing_config
     )
 
     # --- Assertions ---
     # Shape must match
-    assert test_calculate_hist_opp_stance_stats_correct.sort_values(['event', 'fighter']).equals(result.sort_values(['event', 'fighter'])[test_calculate_hist_opp_stance_stats_correct.columns])
+    assert test_calculate_hist_opp_stance_stats_correct.sort_values(["event", "fighter"]).equals(result.sort_values(["event", "fighter"])[test_calculate_hist_opp_stance_stats_correct.columns])
 
 
 # fp.write('./tests/data/test_calculate_hist_opp_stance_stats_correct.parquet', result, compression = "ZSTD")

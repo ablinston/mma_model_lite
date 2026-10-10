@@ -26,11 +26,11 @@ from mma_functions.config import config, model_hyper_params
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
 # Set the model location
-model_path = './models/xgb_forest_v3.0.10.joblib'
-new_version_number = '3.0.10'
+model_path = "./models/xgb_forest_v3.0.10.joblib"
+new_version_number = "3.0.10"
 
 # Read in the data for training
-backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+backtesting_data = fp.ParquetFile("./data/final_dataset/final_dataset.parquet").to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 # Load files
 rf_xgb_model = joblib.load(model_path)
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')._model_impl.python_model.model
@@ -43,37 +43,37 @@ rf_xgb_model = joblib.load(model_path)
 backtesting_data = standard_data_filter(backtesting_data)
 
 # Create an ID column to easily filter the data
-backtesting_data['id'] = backtesting_data.index
+backtesting_data["id"] = backtesting_data.index
 
 # Calculate the year of the fight
-backtesting_data['year'] = backtesting_data['date'].dt.year
+backtesting_data["year"] = backtesting_data["date"].dt.year
 
 # Calculate total fights of both fighters
-backtesting_data['total_fights'] = backtesting_data['fighter1_hist_fights'] + backtesting_data['fighter2_hist_fights']
+backtesting_data["total_fights"] = backtesting_data["fighter1_hist_fights"] + backtesting_data["fighter2_hist_fights"]
 
 # Create a column showing if both fighters veterans or not
-backtesting_data['fighter_history'] = np.where(
-    (backtesting_data['fighter1_hist_fights'] > 3) & (backtesting_data['fighter2_hist_fights'] > 3),
-    '1. Both > 3 fights',
+backtesting_data["fighter_history"] = np.where(
+    (backtesting_data["fighter1_hist_fights"] > 3) & (backtesting_data["fighter2_hist_fights"] > 3),
+    "1. Both > 3 fights",
     np.where(
-        (backtesting_data['fighter1_hist_fights'] > 2) & (backtesting_data['fighter2_hist_fights'] > 2),
-        '2. Both > 2 fights',
+        (backtesting_data["fighter1_hist_fights"] > 2) & (backtesting_data["fighter2_hist_fights"] > 2),
+        "2. Both > 2 fights",
         np.where(
-            (backtesting_data['fighter1_hist_fights'] > 3) | (backtesting_data['fighter2_hist_fights'] > 3),
-            '3. Only one fighter > 3 fights',
+            (backtesting_data["fighter1_hist_fights"] > 3) | (backtesting_data["fighter2_hist_fights"] > 3),
+            "3. Only one fighter > 3 fights",
             np.where(
-                (backtesting_data['fighter1_hist_fights'] == 0) | (backtesting_data['fighter2_hist_fights'] == 0),
-                '5. One noob',
+                (backtesting_data["fighter1_hist_fights"] == 0) | (backtesting_data["fighter2_hist_fights"] == 0),
+                "5. One noob",
                 np.where(
-                    (backtesting_data['fighter1_hist_fights'] == 0) & (backtesting_data['fighter2_hist_fights'] == 0),
-                    '6. Both noobs',
-                    '4. Other')))))
+                    (backtesting_data["fighter1_hist_fights"] == 0) & (backtesting_data["fighter2_hist_fights"] == 0),
+                    "6. Both noobs",
+                    "4. Other")))))
 
-backtesting_data['favourite'] = np.where(
-    ((backtesting_data['fighter1_backtesting_odds'] < backtesting_data['fighter2_backtesting_odds']) & (backtesting_data['outcome'] == 'W/L')) |
-    ((backtesting_data['fighter1_backtesting_odds'] > backtesting_data['fighter2_backtesting_odds']) & (backtesting_data['outcome'] == 'L/W')),
+backtesting_data["favourite"] = np.where(
+    ((backtesting_data["fighter1_backtesting_odds"] < backtesting_data["fighter2_backtesting_odds"]) & (backtesting_data["outcome"] == "W/L")) |
+    ((backtesting_data["fighter1_backtesting_odds"] > backtesting_data["fighter2_backtesting_odds"]) & (backtesting_data["outcome"] == "L/W")),
     "Favourite win",
-    np.where(~backtesting_data['outcome'].isin(['W/L', 'L/W']),
+    np.where(~backtesting_data["outcome"].isin(["W/L", "L/W"]),
              "Other",
              "Non-favourite win"
              ))
@@ -84,21 +84,21 @@ backtesting_data['favourite'] = np.where(
 ##########################################################################################
 
 # Set up experiment training
-mlflow.set_experiment('rand_odds_testing_v3.0.10')
+mlflow.set_experiment("rand_odds_testing_v3.0.10")
 
 # Set this model's description for MLflow
-model_description = 'XGB forest v' + new_version_number + ', ' + str(len(rf_xgb_model)) + ' trees, ' + str(len(rf_xgb_model[0]['features'])) + ' features ' + str(config['test_proportion']) + ' test size'
+model_description = "XGB forest v" + new_version_number + ", " + str(len(rf_xgb_model)) + " trees, " + str(len(rf_xgb_model[0]["features"])) + " features " + str(config["test_proportion"]) + " test size"
 
 ##########################################################################################
 ### Calculating metrics ###
 ##########################################################################################
 
 # Set which columns and metrics we're interested in
-breakdown_cols = ['weightclass', 'year', 'total_fights', 'fighter_history']
-breakdown_metrics= ['Logloss', 'EV MSE', 'Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Sample Size']
-target = 'outcome'
+breakdown_cols = ["weightclass", "year", "total_fights", "fighter_history"]
+breakdown_metrics= ["Logloss", "EV MSE", "Avg WL only AUC", "X Odds Avg WL only AUC", "Hmean WL only Accuracy", "X Odds Hmean WL only Accuracy", "Sample Size"]
+target = "outcome"
 
-np.random.seed(config['seed_all'])
+np.random.seed(config["seed_all"])
 
 # Loop through some iterations
 for i in range(0, 10):
@@ -108,17 +108,17 @@ for i in range(0, 10):
         # On first run, just run the testing without any randomness in odds
         backtesting_data_rand_odds = backtesting_data.copy()
     else:
-        backtesting_data_rand_odds = add_noise_to_odds(backtesting_data, norm_mean = 1, norm_sd = model_hyper_params['odds_noise_standard_dev'], include_backtesting_odds = True)
+        backtesting_data_rand_odds = add_noise_to_odds(backtesting_data, norm_mean=1, norm_sd=model_hyper_params["odds_noise_standard_dev"], include_backtesting_odds=True)
     
     # Prep the data ready for model training as it was done in the overall model training
     X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data_rand_odds)
 
     backtesting_params = {
-        'min_prob_to_bet': 0.485,
-        'min_ev_to_bet': 0.0,
-        'max_bet_size': 100,
-        'min_bet_size': 100,
-        'constant_bets': True
+        "min_prob_to_bet": 0.485,
+        "min_ev_to_bet": 0.0,
+        "max_bet_size": 100,
+        "min_bet_size": 100,
+        "constant_bets": True
     }
     
     # Run the metrics on the training data
@@ -131,17 +131,17 @@ for i in range(0, 10):
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_train, y_train, model_hyper_params)
         
         btest_model_and_log_mlflow(
-            X_train[['id']].merge(backtesting_data_rand_odds, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows
+            X_train[["id"]].merge(backtesting_data_rand_odds, on="id", how="left"), # merge the data on the train to ensure the same order of rows
             prediction_probabilities, 
-            breakdown_cols = breakdown_cols, 
-            breakdown_metrics = breakdown_metrics, 
-            mlflow_description = model_description + ' - Train data', 
-            target_column = target,
-            backtesting_params = backtesting_params)
+            breakdown_cols=breakdown_cols, 
+            breakdown_metrics=breakdown_metrics, 
+            mlflow_description=model_description + " - Train data", 
+            target_column=target,
+            backtesting_params=backtesting_params)
         
         # Log the model as an artifact so we have a record of it
         # mlflow.log_artifact(model_path, 'Model object')
-        mlflow.set_tag('Sample', 'Train')
+        mlflow.set_tag("Sample", "Train")
         
     mlflow.end_run()
     
@@ -155,15 +155,15 @@ for i in range(0, 10):
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_test, y_test, model_hyper_params)
         
         btest_model_and_log_mlflow(
-            X_test[['id']].merge(backtesting_data_rand_odds, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+            X_test[["id"]].merge(backtesting_data_rand_odds, on="id", how="left"), # merge the data on the train to ensure the same order of rows, 
             prediction_probabilities, 
-            breakdown_cols = breakdown_cols, 
-            breakdown_metrics = breakdown_metrics, 
-            mlflow_description = model_description + '  - Test data', 
-            target_column = target,
-            backtesting_params = backtesting_params)
+            breakdown_cols=breakdown_cols, 
+            breakdown_metrics=breakdown_metrics, 
+            mlflow_description=model_description + "  - Test data", 
+            target_column=target,
+            backtesting_params=backtesting_params)
         
-        mlflow.set_tag('Sample', 'Test')
+        mlflow.set_tag("Sample", "Test")
         
     mlflow.end_run()
     
@@ -176,20 +176,20 @@ for i in range(0, 10):
         # Get the model input data
         X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
             oot, 
-            oot_testing = True)
+            oot_testing=True)
         
         # Get the model predictions
         prediction_probabilities, temp = predict_xgboost_ensemble(rf_xgb_model, X_oot, y_oot, model_hyper_params)
         
         btest_model_and_log_mlflow(
-            X_oot[['id']].merge(backtesting_data_rand_odds, on = 'id', how = 'left'), # merge the data on the train to ensure the same order of rows, 
+            X_oot[["id"]].merge(backtesting_data_rand_odds, on="id", how="left"), # merge the data on the train to ensure the same order of rows, 
             prediction_probabilities, 
-            breakdown_cols = breakdown_cols, 
-            breakdown_metrics = breakdown_metrics, 
-            mlflow_description = model_description + '  - OOT data', 
-            target_column = target,
-            backtesting_params = backtesting_params)
+            breakdown_cols=breakdown_cols, 
+            breakdown_metrics=breakdown_metrics, 
+            mlflow_description=model_description + "  - OOT data", 
+            target_column=target,
+            backtesting_params=backtesting_params)
         
-        mlflow.set_tag('Sample', 'OOT')
+        mlflow.set_tag("Sample", "OOT")
         
     # mlflow.end_run()

@@ -32,7 +32,7 @@ from mma_functions.config import bet_config, betfair_login_config, config, data_
 
 # Replace the firefox location if we're not on windows
 if not os.name == "nt":
-    config['firefox_location'] = config['firefox_location_linux']
+    config["firefox_location"] = config["firefox_location_linux"]
 
 # Use this to skip update of data if it's already been done recently
 skip_data_update = False
@@ -42,18 +42,18 @@ skip_save_data = False
 rolling_window_months = 8
 
 # The date to split the sample on when comparing logloss by method of victory
-period_split_date = '2025-08-01'
+period_split_date = "2025-08-01"
 
 # # Load files
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
-mlflow.set_experiment('Model_Monitoring_v2')
+mlflow.set_experiment("Model_Monitoring_v2")
 
 # Load all model versions
 rf_xgb_models = {}
-model_versions = ['4.0.14']
+model_versions = ["4.0.14"]
 
 for i in model_versions:
-    rf_xgb_models.update({str(i): joblib.load('./models/xgb_forest_v' + str(i) + '.joblib')})
+    rf_xgb_models.update({str(i): joblib.load("./models/xgb_forest_v" + str(i) + ".joblib")})
 
 
 ##########################################################################################
@@ -77,13 +77,13 @@ if not skip_data_update:
                 data_processing_config,
                 odds_scrape_config,
                 model_hyper_params,
-                test_fighter_list = test_fighters,
-                skip_save_data = skip_save_data # whether to skip the save data and just return merged data
+                test_fighter_list=test_fighters,
+                skip_save_data=skip_save_data # whether to skip the save data and just return merged data
                 )
         
 else:
         
-    backtesting_data = fp.ParquetFile('./data/final_dataset/final_dataset.parquet').to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
+    backtesting_data = fp.ParquetFile("./data/final_dataset/final_dataset.parquet").to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
        
 
 
@@ -96,56 +96,56 @@ else:
 backtesting_data = standard_data_filter(backtesting_data)
 
 # Create an ID column to easily filter the data
-backtesting_data['id'] = backtesting_data.index
+backtesting_data["id"] = backtesting_data.index
 
 # Calculate the year and month of the fight
-backtesting_data['year'] = backtesting_data['date'].dt.year
-backtesting_data['month_year'] = backtesting_data['date'].dt.to_period('M').astype(str)
+backtesting_data["year"] = backtesting_data["date"].dt.year
+backtesting_data["month_year"] = backtesting_data["date"].dt.to_period("M").astype(str)
 
 # Calculate total fights of both fighters
-backtesting_data['total_fights'] = backtesting_data['fighter1_hist_fights'] + backtesting_data['fighter2_hist_fights']
+backtesting_data["total_fights"] = backtesting_data["fighter1_hist_fights"] + backtesting_data["fighter2_hist_fights"]
 
 # Create a column showing if both fighters veterans or not
-backtesting_data['fighter_history'] = np.where(
-    (backtesting_data['fighter1_hist_fights'] > 3) & (backtesting_data['fighter2_hist_fights'] > 3),
-    '1. Both > 3 fights',
+backtesting_data["fighter_history"] = np.where(
+    (backtesting_data["fighter1_hist_fights"] > 3) & (backtesting_data["fighter2_hist_fights"] > 3),
+    "1. Both > 3 fights",
     np.where(
-        (backtesting_data['fighter1_hist_fights'] > 2) & (backtesting_data['fighter2_hist_fights'] > 2),
-        '2. Both > 2 fights',
+        (backtesting_data["fighter1_hist_fights"] > 2) & (backtesting_data["fighter2_hist_fights"] > 2),
+        "2. Both > 2 fights",
         np.where(
-            (backtesting_data['fighter1_hist_fights'] > 3) | (backtesting_data['fighter2_hist_fights'] > 3),
-            '3. Only one fighter > 3 fights',
+            (backtesting_data["fighter1_hist_fights"] > 3) | (backtesting_data["fighter2_hist_fights"] > 3),
+            "3. Only one fighter > 3 fights",
             np.where(
-                (backtesting_data['fighter1_hist_fights'] == 0) | (backtesting_data['fighter2_hist_fights'] == 0),
-                '5. One noob',
+                (backtesting_data["fighter1_hist_fights"] == 0) | (backtesting_data["fighter2_hist_fights"] == 0),
+                "5. One noob",
                 np.where(
-                    (backtesting_data['fighter1_hist_fights'] == 0) & (backtesting_data['fighter2_hist_fights'] == 0),
-                    '6. Both noobs',
-                    '4. Other')))))
+                    (backtesting_data["fighter1_hist_fights"] == 0) & (backtesting_data["fighter2_hist_fights"] == 0),
+                    "6. Both noobs",
+                    "4. Other")))))
 
-backtesting_data['favourite'] = np.where(
-    ((backtesting_data['fighter1_backtesting_odds'] < backtesting_data['fighter2_backtesting_odds']) & (backtesting_data['outcome'] == 'W/L')) |
-    ((backtesting_data['fighter1_backtesting_odds'] > backtesting_data['fighter2_backtesting_odds']) & (backtesting_data['outcome'] == 'L/W')),
+backtesting_data["favourite"] = np.where(
+    ((backtesting_data["fighter1_backtesting_odds"] < backtesting_data["fighter2_backtesting_odds"]) & (backtesting_data["outcome"] == "W/L")) |
+    ((backtesting_data["fighter1_backtesting_odds"] > backtesting_data["fighter2_backtesting_odds"]) & (backtesting_data["outcome"] == "L/W")),
     "Favourite win",
-    np.where(~backtesting_data['outcome'].isin(['W/L', 'L/W']),
+    np.where(~backtesting_data["outcome"].isin(["W/L", "L/W"]),
              "Other",
              "Non-favourite win"
              ))
 
 # Group the method of victory so all the decisions can be looked at together
-backtesting_data['method_group'] = np.where(
-    backtesting_data['method'].str.startswith('Decision', na = False),
-    'Decision',
+backtesting_data["method_group"] = np.where(
+    backtesting_data["method"].str.startswith("Decision", na=False),
+    "Decision",
     np.where(
-        backtesting_data['method'].isin(['KO/TKO', 'Submission']),
-        backtesting_data['method'],
-        'Other'))
+        backtesting_data["method"].isin(["KO/TKO", "Submission"]),
+        backtesting_data["method"],
+        "Other"))
 
 # Split the sample either side of the split date. Numbered so they sort into date order
-backtesting_data['period'] = np.where(
-    backtesting_data['date'] < pd.Timestamp(period_split_date),
-    '1. Pre ' + period_split_date,
-    '2. Post ' + period_split_date)
+backtesting_data["period"] = np.where(
+    backtesting_data["date"] < pd.Timestamp(period_split_date),
+    "1. Pre " + period_split_date,
+    "2. Post " + period_split_date)
 
 ##########################################################################################
 ### Data prep for model ###
@@ -157,13 +157,13 @@ backtesting_data['period'] = np.where(
 # Draws and no contests go too. A bet on one is voided and the stake comes back, so they say nothing
 # about how the model is doing, and the model gives them so little probability that a couple of them
 # landing in a window moves the logloss more than everything else put together
-oot_data = backtesting_data[(backtesting_data['train_test_oot_flag'] == 'oot')
-                            & backtesting_data['outcome'].notna()
-                            & ~backtesting_data['outcome'].isin(['D/D', 'NC/NC'])]
+oot_data = backtesting_data[(backtesting_data["train_test_oot_flag"] == "oot")
+                            & backtesting_data["outcome"].notna()
+                            & ~backtesting_data["outcome"].isin(["D/D", "NC/NC"])]
 
 X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
     oot_data,
-    oot_testing = True)
+    oot_testing=True)
 
 
 
@@ -172,16 +172,16 @@ X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
 ##########################################################################################
 
 # Set which columns and metrics we're interested in
-breakdown_cols = ['weightclass', 'year', 'month_year', 'time_format', 'fighter_history', 'date']
-breakdown_metrics= ['Avg WL only AUC', 'X Odds Avg WL only AUC', 'Hmean WL only Accuracy', 'X Odds Hmean WL only Accuracy', 'Logloss', 'X Odds Logloss', 'EV MSE', 'X Odds EV MSE', 'Sample Size']
-target = 'outcome'
+breakdown_cols = ["weightclass", "year", "month_year", "time_format", "fighter_history", "date"]
+breakdown_metrics= ["Avg WL only AUC", "X Odds Avg WL only AUC", "Hmean WL only Accuracy", "X Odds Hmean WL only Accuracy", "Logloss", "X Odds Logloss", "EV MSE", "X Odds EV MSE", "Sample Size"]
+target = "outcome"
 
 backtesting_params = {
-    'min_prob_to_bet': bet_config['min_prob_to_bet'],
-    'min_ev_to_bet': bet_config['min_ev_to_bet'],
-    'max_bet_size': 100,
-    'min_bet_size': 100,
-    'constant_bets': True
+    "min_prob_to_bet": bet_config["min_prob_to_bet"],
+    "min_ev_to_bet": bet_config["min_ev_to_bet"],
+    "max_bet_size": 100,
+    "min_bet_size": 100,
+    "constant_bets": True
 }
 
 
@@ -195,13 +195,13 @@ for model_version in model_versions:
             rf_xgb_models[str(model_version)], 
             X_oot, 
             [0] * len(X_oot), 
-            model_hyper_params = model_hyper_params)
+            model_hyper_params=model_hyper_params)
         
         # Merge the data on the train to ensure the same order of rows
-        oot_actuals = X_oot[['id']].merge(backtesting_data, on = 'id', how = 'left')
+        oot_actuals = X_oot[["id"]].merge(backtesting_data, on="id", how="left")
 
         # The outcome as classes, the same way btest_model_and_log_mlflow does it
-        oot_target = clean_target_column(oot_actuals['outcome'])
+        oot_target = clean_target_column(oot_actuals["outcome"])
 
         # These two have to run before btest_model_and_log_mlflow, which converts its breakdown
         # columns to strings and so would leave the date column unusable for date arithmetic
@@ -211,17 +211,17 @@ for model_version in model_versions:
             oot_actuals,
             prediction_probabilities,
             oot_target,
-            months = rolling_window_months)
+            months=rolling_window_months)
 
         # Nothing to chart if the sample is too short or too thin for any window to qualify
         if len(rolling_logloss) == 0:
-            print('No rolling logloss logged, no ' + str(rolling_window_months) + ' month window held enough fights')
+            print("No rolling logloss logged, no " + str(rolling_window_months) + " month window held enough fights")
         else:
             fig, ax = evaluation.plot_rolling_log_loss(rolling_logloss, rolling_window_months)
-            mlflow.log_figure(fig, 'Rolling logloss/rolling_logloss.png')
+            mlflow.log_figure(fig, "Rolling logloss/rolling_logloss.png")
 
-            rolling_logloss.to_csv('results/temp/summary.csv', index = False)
-            mlflow.log_artifact('results/temp/summary.csv', 'Rolling logloss')
+            rolling_logloss.to_csv("results/temp/summary.csv", index=False)
+            mlflow.log_artifact("results/temp/summary.csv", "Rolling logloss")
 
         # Log the logloss by method of victory either side of the split date, to see whether
         # decisions in particular got harder to call, and whether they did for the odds too
@@ -229,23 +229,23 @@ for model_version in model_versions:
             oot_actuals,
             prediction_probabilities,
             oot_target,
-            'method_group',
-            'period')
+            "method_group",
+            "period")
 
         print(period_logloss)
 
-        period_logloss.to_csv('results/temp/summary.csv')
-        mlflow.log_artifact('results/temp/summary.csv', 'Logloss by method and period')
+        period_logloss.to_csv("results/temp/summary.csv")
+        mlflow.log_artifact("results/temp/summary.csv", "Logloss by method and period")
 
         btest_model_and_log_mlflow(
             oot_actuals,
             prediction_probabilities, 
-            breakdown_cols = breakdown_cols, 
-            breakdown_metrics = breakdown_metrics, 
-            mlflow_description = 'XGB Forest v' + str(model_version), 
-            target_column = target,
-            backtesting_params = backtesting_params)
+            breakdown_cols=breakdown_cols, 
+            breakdown_metrics=breakdown_metrics, 
+            mlflow_description="XGB Forest v" + str(model_version), 
+            target_column=target,
+            backtesting_params=backtesting_params)
         
-        mlflow.log_param('OOT_start_date', min(oot_data['date']))
-        mlflow.log_param('Last_event_date', max(backtesting_data['date']))
-        mlflow.set_tag('Sample', 'OOT')
+        mlflow.log_param("OOT_start_date", min(oot_data["date"]))
+        mlflow.log_param("Last_event_date", max(backtesting_data["date"]))
+        mlflow.set_tag("Sample", "OOT")

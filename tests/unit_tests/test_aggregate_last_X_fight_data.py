@@ -6,35 +6,35 @@ import pandas as pd
 from mma_functions.features import aggregate_last_X_fight_data, bayesian_priors
 
 # Load what answers are expected
-test_aggregate_last_X_fight_data_correct = fp.ParquetFile('./tests/data/test_aggregate_last_X_fight_data_correct.parquet').to_pandas()
+test_aggregate_last_X_fight_data_correct = fp.ParquetFile("./tests/data/test_aggregate_last_X_fight_data_correct.parquet").to_pandas()
 
 # This test looks at a specific URL for an historic event and checks that the results match what is expected
 def test_aggregate_last_X_fight_data():
     
     # Creating a dataframe with multiple fighters and time series
     data = {
-        'event': range(1, 7),
-        'fighter_id': ['fighter_1', 'fighter_1', 'fighter_1', 'fighter_2', 'fighter_2', 'fighter_2'],
-        'date': pd.to_datetime(['2024-01-01', '2024-02-01', '2024-03-01', '2024-01-01', '2024-02-01', '2024-03-01']),
-        'score': [10, np.nan, 20, 15, 5, np.nan],  # Contains NAs
-        'hits': [5, 10, 15, 7, np.nan, 9],  # Contains NAs
-        'opponent': ['fighter_2', 'fighter_2', 'fighter_2', 'fighter_1', 'fighter_1', 'fighter_1']  # Grouping by fighter
+        "event": range(1, 7),
+        "fighter_id": ["fighter_1", "fighter_1", "fighter_1", "fighter_2", "fighter_2", "fighter_2"],
+        "date": pd.to_datetime(["2024-01-01", "2024-02-01", "2024-03-01", "2024-01-01", "2024-02-01", "2024-03-01"]),
+        "score": [10, np.nan, 20, 15, 5, np.nan],  # Contains NAs
+        "hits": [5, 10, 15, 7, np.nan, 9],  # Contains NAs
+        "opponent": ["fighter_2", "fighter_2", "fighter_2", "fighter_1", "fighter_1", "fighter_1"]  # Grouping by fighter
     }
     df = pd.DataFrame(data)
 
     # Define columns and parameters
-    ignore_cols = ['event', 'fighter_id', 'date', 'opponent']  # Columns to ignore in aggregation
-    group_by = ['fighter_id']  # Group by fighter_id
-    prefix = 'cumulative_'  # Prefix for new columns
+    ignore_cols = ["event", "fighter_id", "date", "opponent"]  # Columns to ignore in aggregation
+    group_by = ["fighter_id"]  # Group by fighter_id
+    prefix = "cumulative_"  # Prefix for new columns
 
     # Apply the function
-    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000, per_minute_bayes = False, per_minute_calc = True)
+    result = aggregate_last_X_fight_data(df, ignore_cols, group_by, prefix, 1000, per_minute_bayes=False, per_minute_calc=True)
 
     # Ensure that 'fighter_id' and 'date' columns are preserved and not included in the aggregation
-    assert 'fighter_id' in result.columns
-    assert 'date' in result.columns
-    assert 'score' not in result.columns
-    assert 'hits' not in result.columns
+    assert "fighter_id" in result.columns
+    assert "date" in result.columns
+    assert "score" not in result.columns
+    assert "hits" not in result.columns
 
     # Expected cumulative sums
     # Fighter 1:
@@ -42,16 +42,16 @@ def test_aggregate_last_X_fight_data():
     # Fighter 2:
     # score: [0, 5, NaN], hits: [0, 7, 16]
     expected_result = {
-        'fighter_id': ['fighter_1', 'fighter_1', 'fighter_1', 'fighter_2', 'fighter_2', 'fighter_2'],
-        'opponent': ['fighter_2', 'fighter_2', 'fighter_2', 'fighter_1', 'fighter_1', 'fighter_1'],
-        'date': pd.to_datetime(['2024-01-01', '2024-02-01', '2024-03-01', '2024-01-01', '2024-02-01', '2024-03-01']),
-        'cumulative_score': [np.nan, 10, 10, np.nan, 15, 20],  # Expected cumulative sums with handling for NAs
-        'cumulative_hits': [np.nan, 5, 15, np.nan, 7, 7]  # Expected cumulative sums with handling for NAs
+        "fighter_id": ["fighter_1", "fighter_1", "fighter_1", "fighter_2", "fighter_2", "fighter_2"],
+        "opponent": ["fighter_2", "fighter_2", "fighter_2", "fighter_1", "fighter_1", "fighter_1"],
+        "date": pd.to_datetime(["2024-01-01", "2024-02-01", "2024-03-01", "2024-01-01", "2024-02-01", "2024-03-01"]),
+        "cumulative_score": [np.nan, 10, 10, np.nan, 15, 20],  # Expected cumulative sums with handling for NAs
+        "cumulative_hits": [np.nan, 5, 15, np.nan, 7, 7]  # Expected cumulative sums with handling for NAs
     }
     expected_df = pd.DataFrame(expected_result)
 
     # Compare the result to the expected dataframe
-    pd.testing.assert_frame_equal(result[['fighter_id', 'opponent', 'date', 'cumulative_score', 'cumulative_hits']], expected_df)
+    pd.testing.assert_frame_equal(result[["fighter_id", "opponent", "date", "cumulative_score", "cumulative_hits"]], expected_df)
     
     
     #################
@@ -76,20 +76,20 @@ def test_aggregate_last_X_fight_data():
 
     bayes_result = aggregate_last_X_fight_data(
         df, 
-        id_cols = ['event', 'bout', 'date', 'fighter', 'weightclass'], 
-        group_by = ['fighter'], 
-        prefix = 'test_', 
-        X = 3, 
-        per_minute_bayes = True,
-        per_minute_calc = True, 
-        bayes_priors_df = bayesian_priors(
+        id_cols=["event", "bout", "date", "fighter", "weightclass"], 
+        group_by=["fighter"], 
+        prefix="test_", 
+        X=3, 
+        per_minute_bayes=True,
+        per_minute_calc=True, 
+        bayes_priors_df=bayesian_priors(
             df,
-            id_cols = ['event', 'bout', 'fighter'], 
-            group_by = ['weightclass'], 
-            fight_span = 3,
-            ignore_last_n_fights = 1
+            id_cols=["event", "bout", "fighter"], 
+            group_by=["weightclass"], 
+            fight_span=3,
+            ignore_last_n_fights=1
             ),
-        bayes_alpha_plus_beta_rebase = 10)
+        bayes_alpha_plus_beta_rebase=10)
     
     assert bayes_result.equals(test_aggregate_last_X_fight_data_correct[bayes_result.columns])
 

@@ -15,13 +15,13 @@ from mma_functions.utils import parallel_run_function
 from mma_functions.config import betfair_data_config, betfair_login_config, config
 
 # Set the download folder. This should be empty to save duplicated searching
-download_folder = './data/raw_betfair/historic/'
-decompressed_output_dir = './data/raw_betfair/decompressed_fight_files/'
+download_folder = "./data/raw_betfair/historic/"
+decompressed_output_dir = "./data/raw_betfair/decompressed_fight_files/"
 # decompressed_output_dir = './data/raw_betfair/temp_decompressed_files/'
 
 
 # Open the connection with Betfair. This requires the betfair config which is not tracked by git because it contains passwords
-trading = betfairlightweight.APIClient(betfair_login_config['username'], betfair_login_config['password'], app_key = betfair_login_config['delay_feed_app_key'], certs = betfair_login_config['certs_location'])
+trading = betfairlightweight.APIClient(betfair_login_config["username"], betfair_login_config["password"], app_key=betfair_login_config["delay_feed_app_key"], certs=betfair_login_config["certs_location"])
 
 trading.login()
 
@@ -50,7 +50,7 @@ file_list = trading.historic.get_file_list(
 # download the files
 for file in file_list:
     print(file)
-    download = trading.historic.download_file(file_path = file, store_directory = download_folder)
+    download = trading.historic.download_file(file_path=file, store_directory=download_folder)
     print(download)
 
 
@@ -104,17 +104,17 @@ bz2_file_log = betfair_filter_bz2_for_fights(download_folder, decompressed_outpu
 list_of_decompressed_filepaths = [decompressed_output_dir + file for file in os.listdir(decompressed_output_dir)]
 
 betfair_odds = parallel_run_function(
-        func = betfair_file_to_final_odds,
-        input_list = list_of_decompressed_filepaths,
-        max_workers = 1, # DO NOT USE MORE CORES FOR PROCESS. THE ODDS GO OFF MAYBE BECAUSE OF STREAM?
-        collapse_output_to_df = True,
-        odds_cutoff_time = betfair_data_config['odds_cutoff_time'],
-        average_last_n = betfair_data_config['last_n_bets_to_average'],
-        trading = trading)
+        func=betfair_file_to_final_odds,
+        input_list=list_of_decompressed_filepaths,
+        max_workers=1, # DO NOT USE MORE CORES FOR PROCESS. THE ODDS GO OFF MAYBE BECAUSE OF STREAM?
+        collapse_output_to_df=True,
+        odds_cutoff_time=betfair_data_config["odds_cutoff_time"],
+        average_last_n=betfair_data_config["last_n_bets_to_average"],
+        trading=trading)
 
 
 # Change the date to a proper date to avoid parquet errors
-betfair_odds['event_date'] = pd.to_datetime(betfair_odds['event_date'], errors = 'coerce')
+betfair_odds["event_date"] = pd.to_datetime(betfair_odds["event_date"], errors="coerce")
 
 # Output the data
-fp.write('./data/' + config['betfair_odds_file_name'], betfair_odds, compression = 'ZSTD')
+fp.write("./data/" + config["betfair_odds_file_name"], betfair_odds, compression="ZSTD")

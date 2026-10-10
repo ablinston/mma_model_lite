@@ -30,7 +30,7 @@ def test_calculate_percentages():
         "bayes_total_kick_landed": [1, 1, 2, 2]
     })
     
-    result = calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase = 10)
+    result = calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_plus_beta_rebase=10)
 
     # Ensure the function runs and returns a DataFrame
     assert isinstance(result, pd.DataFrame), "Function must return a DataFrame"
