@@ -153,13 +153,10 @@ backtesting_data["period"] = np.where(
 
 # Get the model input data
 # Exclude fights that haven't happened yet. They carry the oot flag because of their date, but have
-# no outcome, and clean_target_column raises on a missing outcome.
-# Draws and no contests go too. A bet on one is voided and the stake comes back, so they say nothing
-# about how the model is doing, and the model gives them so little probability that a couple of them
-# landing in a window moves the logloss more than everything else put together
+# no outcome, and clean_target_column raises on a missing outcome. Draws and no contests are already
+# gone, standard_data_filter drops them
 oot_data = backtesting_data[(backtesting_data["train_test_oot_flag"] == "oot")
-                            & backtesting_data["outcome"].notna()
-                            & ~backtesting_data["outcome"].isin(["D/D", "NC/NC"])]
+                            & backtesting_data["outcome"].notna()]
 
 X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
     oot_data,

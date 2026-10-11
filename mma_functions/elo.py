@@ -391,8 +391,8 @@ def objective_cv_elo_dtree_mlflow(params):
                     y_test_fold = test_dmatrix.get_label().astype(int)
         
                     # Convert actual results to binarized format
-                    y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
-                    y_pred_bin = label_binarize(y_pred_prob, classes=np.unique(y_test_fold))
+                    y_test_bin = label_binarize(y_test_fold, classes=np.array([0, 1, 2]))
+                    y_pred_bin = label_binarize(y_pred_prob, classes=np.array([0, 1, 2]))
         
                     # Calculate the accuracy of wins and losses. Check the classes of the target column. Was 1 = L/W and 3 = W/L (should be alphabetical)
                     wl_accuracy = (y_test_bin[:, 2] == y_pred_bin[:, 2]).mean()

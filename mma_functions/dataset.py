@@ -327,7 +327,7 @@ def prep_data_for_model_training(df, split_or_other_flag=False, upcoming_fights=
     
     if not upcoming_fights and len(X_test) > 0:
         # Convert the test output to a binarised data frame. Can help with AUC calculations
-        y_test_bin = label_binarize(y_test, classes=np.unique(y_test))
+        y_test_bin = label_binarize(y_test, classes=np.array([0, 1, 2]))
     
         # # Exclude split decisions and other if required
         # if exclude_split_other_from_train:
