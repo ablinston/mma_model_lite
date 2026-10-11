@@ -10,6 +10,13 @@ Everything runs inside Docker.
 - `configs/` is the yaml config. Import what you need from `mma_functions.config`, e.g. `from mma_functions.config import config, elo_config`.
 - `tests/unit_tests/` is the pytest suite. `tests/data/` holds the expected outputs the tests compare against.
 - `data/`, `models/` and `results/` are outputs, with the datasets tracked in DVC.
+- `secrets/` holds the Betfair certificate pair, `client-2048.crt` and `client-2048.key`. Everything under it is gitignored.
+
+Three things are gitignored, so a fresh clone doesn't have them and nothing will run until they exist:
+
+- `configs/betfair_login_config.yaml` with `username`, `password`, `delay_feed_app_key`, `live_feed_app_key` and `certs_location` set to `./secrets/betfair_certs`.
+- `secrets/betfair_certs/` with the certificate pair. Generate it with `openssl req -x509 -newkey rsa:2048 -nodes -days 3650 -subj "/CN=betfair" -keyout client-2048.key -out client-2048.crt` and upload the `.crt` to Betfair. Keep those two filenames, betfairlightweight looks for them by name and takes the folder rather than the files.
+- `.dvc/config` with the Backblaze keys, see the DVC setup section below.
 
 One thing that catches you out: modules inside `mma_functions` refer to each other as `from mma_functions import odds` and then `odds.calculate_true_odds(...)`, rather than importing the function directly. There are circular references between the modules and the direct form fails on those. Tests and scripts sit outside the cycle so they can import functions by name as normal.
 
@@ -164,15 +171,12 @@ Then need to set up the remote. I have called it `storage`.
 
 ```
 dvc remote add -d storage s3://mma-model-lite
-dvc remote modify storage endpointurl https://
-s3.eu-central-003.backblazeb2.com
+dvc remote modify storage endpointurl https://s3.eu-central-003.backblazeb2.com
 dvc remote modify storage access_key_id YOUR_KEY_ID_HERE
 dvc remote modify storage secret_access_key YOUR_APP_KEY_HERE
 ```
 
 Push all git commits for dvc data with `dvc push -r storage --all-commits`. Otherwise, dvc will just push the datasets from the active commit. (doesn't seem to work right now so push frequently. Might start working if the latest version of DVC finally works with Backblaze.)
-
-Had a common issue with a '128m' error. If this happens go in the .git/config file and comment out the limits in the `[pack]` section.
 
 ## Clearing cache
 

@@ -14,6 +14,9 @@ mlflow.db
 results/temp/**
 !results/temp/.gitkeep
 
+secrets/**
+!secrets/.gitkeep
+
 # Specific files
 results/7.5_random_forest_model.xgb
 results/final_xgboost_forest.joblib
