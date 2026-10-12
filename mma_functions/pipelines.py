@@ -2235,7 +2235,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
             model["xgb_model"] = raw_model
             model["model"] = model_cal
         
-        elif model_hyper_params["loss_function"] == "ev_loss_function": # any eval metric above will be ignored
+        elif params["loss_function"] == "ev_loss_function": # any eval metric above will be ignored
             # Pass the odds to the loss function
             custom_loss = modelling.create_custom_loss(train_fighter1_odds, train_fighter2_odds)
             custom_loss_test = modelling.ev_loss_function_test(test_fighter1_odds, test_fighter2_odds)

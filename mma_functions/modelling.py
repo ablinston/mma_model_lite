@@ -689,7 +689,7 @@ def objective_cv_xgboost(
             avg_accuracies.append(hmean([lw_accuracy, wl_accuracy]))
             
             # Calculate the log loss
-            log_loss_fold = log_loss(y_test_fold, y_pred_prob)
+            log_loss_fold = log_loss(y_test_fold, y_pred_prob, labels=[0, 1, 2])
             log_losses.append(log_loss_fold)
             
             # Get the logit predictions for use in custom loss function
@@ -830,7 +830,7 @@ def objective_cv_xgboost_mlflow(
             avg_accuracies.append(hmean([lw_accuracy, wl_accuracy]))
             
             # **Calculate LogLoss for the fold**
-            log_loss_fold = log_loss(y_test_fold, y_pred_prob)
+            log_loss_fold = log_loss(y_test_fold, y_pred_prob, labels=[0, 1, 2])
             log_losses.append(log_loss_fold)
             
             # Clean up memory
@@ -1254,7 +1254,7 @@ def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df, model_hype
     lw_accuracy = (lw_pred[lw_pred == 1] == lw_test[lw_pred == 1]).sum() / lw_pred.sum()
 
     # **Calculate LogLoss**
-    log_loss_result = log_loss(y_test_df, y_pred_prob)
+    log_loss_result = log_loss(y_test_df, y_pred_prob, labels=[0, 1, 2])
     
     ev_mse = ev_loss_function(
         y_pred_prob,

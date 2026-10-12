@@ -23,7 +23,7 @@ from mma_functions.odds import add_noise_to_odds
 from mma_functions.pipelines import btest_model_and_log_mlflow
 from mma_functions.config import config, model_hyper_params
 
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
 
 # Set the model location
 model_path = "./models/xgb_forest_v3.0.10.joblib"

@@ -97,7 +97,7 @@ if "v3" in model_path:
 X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for_model_training(backtesting_data)
 
 # Set up experiment training
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
 mlflow.set_experiment("OOT_testing_v5")
 
 # Set this model's description for MLflow

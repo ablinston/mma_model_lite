@@ -3,3 +3,4 @@ outs:
   size: 1314124
   hash: md5
   path: betfair_fileflags.parquet
+  isexec: true

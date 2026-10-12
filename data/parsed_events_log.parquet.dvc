@@ -3,3 +3,4 @@ outs:
   size: 924
   hash: md5
   path: parsed_events_log.parquet
+  isexec: true

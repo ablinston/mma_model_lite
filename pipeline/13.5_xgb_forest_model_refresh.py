@@ -1,17 +1,6 @@
 # This script fits XGBoost models to the final data
 
-import gc
-import h2o
-from h2o.automl import H2OAutoML
-import itertools
-import lightgbm as lgb
 import mlflow
-import pickle
-from sklearn.utils import resample
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
-from sklearn.model_selection import train_test_split, KFold
-from sklearn.preprocessing import LabelEncoder, label_binarize
-import xgboost as xgb
 
 # Read in global objects and packages
 import fastparquet as fp
@@ -29,7 +18,7 @@ from mma_functions.tracking import log_metrics_odds_mlflow
 from mma_functions.config import bet_config, config, model_hyper_params
 
 # Set the version number for the model this run will save
-new_version_number = "4.1"
+new_version_number = "4.1.0d1"
 
 # Load the model to be refreshed
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
@@ -81,7 +70,6 @@ X_train_master = X_train_master[all_features + ["fighter1_backtesting_odds", "fi
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
-mlflow.set_experiment("xgb_model_v2_refresh")
 
 
 
@@ -96,40 +84,6 @@ with open("./configs/final_model_features.yaml", "w") as file:
 
 # Prep the data ready for model training
 X_train, X_test, y_train, y_test, y_test_bin, temp, oot = prep_data_for_model_training(data, split_or_other_flag=True)
-
-
-params.update({
-# params = {
-    # 'nthread': 3, # Only applies to CPU cores
-    # 'learning_rate': 0.0225, # Learning rate
-    # 'min_child_weight': 15,                 # The min observations that should be left in a leaf node
-    # 'split_dec_or_other': params['exclude_split_other_from_train'],
-    # 'subsample': 0.85,
-    # 'colsample_bytree': 0.95,
-    # 'max_depth': 1,
-    # # 'max_bin': 200, # used in the hist method to speed up, this says how many bins the vars should be split into
-    # 'objective': 'multi:softprob', # Multi classification objective
-    # 'eval_metric': 'mlogloss',       # Evaluation metric
-    # 'tree_method': 'hist',      # Use GPU accelerated algorithm
-    # 'device': 'cuda',           # Use CUDA / GPU
-    # 'predictor': 'gpu_predictor',   # Use GPU for prediction
-    # 'verbosity': 1,
-    # 'num_class': no_of_classes,
-    # 'random_state': config['seed_all'] + 38,
-    # 'num_iterations': 5000,
-    # 'early_stopping_rounds': 30,
-    # 'reg_alpha': 0.3, # Lasso regularisation
-    # 'reg_lambda': 0.02, # ridge regularisation
-    # # 'gamma': 1.13,
-    # 'win_loss_only': False,
-    "switch_fighters_randomly": False if model_hyper_params["switch_all_fighters_and_stack"] else model_hyper_params["switch_fighters_randomly"], # Set whether each tree should have randomised fighters
-    # 'loss_function' : model_hyper_params['loss_function'],
-    "add_noise_to_odds": model_hyper_params["add_noise_to_odds"],
-    "odds_noise_standard_dev": model_hyper_params["odds_noise_standard_dev"],
-    "xgb_forest_bagging": model_hyper_params["xgb_forest_bagging"],
-    "base_margin_cols": model_hyper_params["base_margin_cols"] 
-}
-)
 
 
 # Set hyperparameters for the forest
