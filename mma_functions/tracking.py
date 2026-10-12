@@ -63,9 +63,8 @@ def get_best_params_mlflow(experiment_name, metric_name, maximise=True):
 
 # This function gets an existing metric from the MLflow experiment for a set of parameters and also return the full set of parameters
 
-def get_existing_metric_and_params(params, metric):
-    filters = " and ".join([f"params.{key} = '{value}'" for key, value in params.items()])
-    existing_runs = mlflow.search_runs(filter_string=filters)
+def get_existing_metric_and_params(params, metric, use_cache=False):
+    existing_runs = matching_runs(params, use_cache=use_cache)
     if not existing_runs.empty:
         # Retrieve the first matched run's metric (assuming metric name is 'loss')
         
@@ -123,8 +122,83 @@ def get_params_by_run_name(experiment_name, target_run_name):
 
     return params
 
+# Every run already in the active experiment, fetched once. Searching the tracking server on every
+# hyperopt trial costs a round trip and gets slower as the experiment grows, which matters now that a
+# trial itself takes a fraction of a second
+_cached_runs = None
+
+def refresh_run_cache():
+    """
+    Pulls every run in the active experiment into memory. Called automatically the first time a
+    duplicate is checked for, and worth calling by hand after switching experiment.
+    """
+    global _cached_runs
+
+    # The default limit is 1000 runs, which an experiment can easily pass
+    _cached_runs = mlflow.search_runs(max_results=100000)
+
+    return _cached_runs
+
+def record_run(params, metrics):
+    """
+    Adds a run that has just been logged to the cache, so that repeating the same parameters later in
+    the same session is caught without going back to the server.
+    """
+    global _cached_runs
+
+    new_row = {"params." + key: str(value) for key, value in params.items()}
+    new_row.update({"metrics." + key: value for key, value in metrics.items()})
+
+    _cached_runs = pd.concat([get_cached_runs(), pd.DataFrame([new_row])], ignore_index=True)
+
+def get_cached_runs():
+
+    if _cached_runs is None:
+        refresh_run_cache()
+
+    return _cached_runs
+
+def matching_runs(params, parameter_to_check=None, use_cache=False):
+    """
+    The runs whose parameters match. By default this asks the tracking server, which is the only way
+    to see runs logged by another process. With use_cache it filters the in memory copy instead,
+    which is much faster but only sees what this session knows about.
+    """
+    if not use_cache:
+
+        if parameter_to_check:
+            filters = f"params.{parameter_to_check} = '{params[parameter_to_check]}'"
+        else:
+            filters = " and ".join([f"params.{key} = '{value}'" for key, value in params.items()])
+
+        return mlflow.search_runs(filter_string=filters)
+
+    runs = get_cached_runs()
+
+    if runs.empty:
+        return runs
+
+    if parameter_to_check:
+        to_match = {parameter_to_check: params[parameter_to_check]}
+    else:
+        to_match = params
+
+    matches = pd.Series(True, index=runs.index)
+
+    for key, value in to_match.items():
+
+        column = "params." + key
+
+        # A parameter no column exists for means nothing has ever been logged with it
+        if column not in runs.columns:
+            return runs.iloc[0:0]
+
+        matches &= runs[column] == str(value)
+
+    return runs[matches]
+
 # This function checks if there is a duplicate run in mlflow
-def is_duplicate_run(params, parameter_to_check=None):
+def is_duplicate_run(params, parameter_to_check=None, use_cache=False):
     """
     Check if there is a duplicate run in MLflow based on a specific parameter or all parameters.
 
@@ -132,24 +206,17 @@ def is_duplicate_run(params, parameter_to_check=None):
         params (dict): Dictionary of parameters to search for.
         parameter_to_check (str, optional): The name of the parameter to check for.
                                             If None, checks all parameters.
+        use_cache (bool): check the in memory copy of the runs rather than asking the server. Faster,
+                          but only sees runs this session knows about, so it needs record_run calling
+                          each time a run is logged and it cannot see other processes.
     
     Returns:
         bool: True if a duplicate run exists, False otherwise.
     """
-    if parameter_to_check:
-        # Ensure the specified parameter exists in params
-        if parameter_to_check not in params:
-            raise ValueError(f"The parameter '{parameter_to_check}' is missing in params.")
-        # Build the filter string using only the specified parameter
-        filters = f"params.{parameter_to_check} = '{params[parameter_to_check]}'"
-    else:
-        # Build the filter string using all parameters
-        filters = " and ".join([f"params.{key} = '{value}'" for key, value in params.items()])
-    
-    # Search for existing runs with the constructed filter
-    existing_runs = mlflow.search_runs(filter_string=filters)
-    
-    return not existing_runs.empty
+    if parameter_to_check and parameter_to_check not in params:
+        raise ValueError(f"The parameter '{parameter_to_check}' is missing in params.")
+
+    return not matching_runs(params, parameter_to_check, use_cache).empty
 
 def log_metrics_mlflow(y_pred_prob, y_test_df, fighter1_odds, fighter2_odds, classes):
     

@@ -105,17 +105,26 @@ def calculate_end_elo(pl_frame, constants):
     pl_frame = pl_frame.with_columns(
         dominance_stat=pl.when(pl.col("outcome") == "L/W").then(-pl.col("fighter1_D")).otherwise(pl.col("fighter1_D")))
 
+    # Squash the dominance into the multiplier rather than using 1 + D directly. A raw 1 + D goes
+    # negative once D drops below -1, which flipped the sign of the update and docked the winner
+    # while rewarding the loser. 1 + tanh(D) matches 1 + D for small D, is strictly positive for any
+    # D, and caps the amplification at twice K
+    pl_frame = pl_frame.with_columns(
+        dominance_multiplier=1 + pl.col("dominance_stat").tanh())
+
     # Calculate fighter1_end_elo and fighter2_end_elo
     # Shrinkage is applied within the calculation directly
     pl_frame = pl_frame.with_columns(
-        fighter1_end_elo=pl.col("fighter1_start_elo") + (constants["starting_elo"] - pl.col("fighter1_start_elo")) * constants["constants_shrinkage_factor"] + (1 + (constants["K_factor"] / pl.col("fighter1_fight_number"))) * constants["K"] * (pl.col("fighter1_S") - pl.col("fighter1_E")) * (1 + pl.col("dominance_stat")),
-        fighter2_end_elo=pl.col("fighter2_start_elo") + (constants["starting_elo"] - pl.col("fighter2_start_elo")) * constants["constants_shrinkage_factor"] + (1 + (constants["K_factor"] / pl.col("fighter2_fight_number"))) * constants["K"] *  ((1 - pl.col("fighter1_S")) - (1 - pl.col("fighter1_E"))) * (1 + pl.col("dominance_stat"))
+        fighter1_end_elo=pl.col("fighter1_start_elo") + (1 + (constants["K_factor"] / pl.col("fighter1_fight_number"))) * constants["K"] * (pl.col("fighter1_S") - pl.col("fighter1_E")) * pl.col("dominance_multiplier"),
+        fighter2_end_elo=pl.col("fighter2_start_elo") + (1 + (constants["K_factor"] / pl.col("fighter2_fight_number"))) * constants["K"] *  ((1 - pl.col("fighter1_S")) - (1 - pl.col("fighter1_E"))) * pl.col("dominance_multiplier")
     )
 
-    # Overwrite where the outcome wasn't W/L or L/W so that the ELO remains unchanged
+    # Leave the ELO alone unless the fight actually had a winner. A whitelist rather than checking for
+    # OTH, because an upcoming fight has a null outcome and used to fall through here and move both
+    # ratings as though fighter 2 had won
     pl_frame = pl_frame.with_columns(
-        fighter1_end_elo=pl.when(pl.col("outcome") == "OTH").then(pl.col("fighter1_start_elo")).otherwise(pl.col("fighter1_end_elo")),
-        fighter2_end_elo=pl.when(pl.col("outcome") == "OTH").then(pl.col("fighter2_start_elo")).otherwise(pl.col("fighter2_end_elo")))
+        fighter1_end_elo=pl.when(pl.col("outcome").is_in(["W/L", "L/W"])).then(pl.col("fighter1_end_elo")).otherwise(pl.col("fighter1_start_elo")),
+        fighter2_end_elo=pl.when(pl.col("outcome").is_in(["W/L", "L/W"])).then(pl.col("fighter2_end_elo")).otherwise(pl.col("fighter2_start_elo")))
 
     return pl_frame
 
@@ -126,8 +135,6 @@ def calculate_end_elo(pl_frame, constants):
 # prep_stats_for_elo_calc()
 
 def derive_start_elos(elo_df, fight_stats_df, elo_constants):
-
-    # pdb.set_trace()
 
     merged_data = fight_stats_df.clone()
     start_elo = elo_df.clone()
@@ -141,98 +148,108 @@ def derive_start_elos(elo_df, fight_stats_df, elo_constants):
     # Convert the constants to numeric
     elo_constants = utils.dict_to_numeric(elo_constants)
 
-    # Calculate ELO for fighters first fights
-    merged_data = calculate_end_elo(
-        merged_data,
-        constants=elo_constants)
+    # Every fight only ever depends on fights that happened before it, so one pass in date order is
+    # enough. Walk the fights oldest first holding each fighter's running ELO, and whatever is in the
+    # lookup when a fight comes round is that fighter's starting ELO for it. This used to iterate on
+    # fight number instead, which moved every fighter forward one career fight per pass and so took as
+    # many passes over the whole dataset as the longest career
+    ordered = merged_data.with_row_index("elo_row_order").sort("date")
 
-    # # Do a check on the ELO for the first fights. All should be True
-    # # Check 1: Max end elo for fighter1 where outcome is 'L/W' is less than start elo
+    fighter1 = ordered["fighter1"].to_list()
+    fighter2 = ordered["fighter2"].to_list()
+    outcome = ordered["outcome"].to_list()
+    fighter1_fight_number = ordered["fighter1_fight_number"].to_numpy()
+    fighter2_fight_number = ordered["fighter2_fight_number"].to_numpy()
 
-    # # Check 1: Max end elo for fighter1 where outcome is 'L/W' is less than start elo
-    # check1 = merged_data.filter(pl.col('outcome') == 'L/W')['fighter1_end_elo'].max() < config['start_elo']
-    # # Check 2: Min end elo for fighter1 where outcome is 'W/L' is greater than start elo
-    # check2 = merged_data.filter(pl.col('outcome') == 'W/L')['fighter1_end_elo'].min() > config['start_elo']
-    # # Check 3: Max end elo for fighter2 where outcome is 'W/L' is less than start elo
-    # check3 = merged_data.filter(pl.col('outcome') == 'W/L')['fighter2_end_elo'].max() < config['start_elo']
-    # # Check 4: Min end elo for fighter2 where outcome is 'L/W' is greater than start elo
-    # check4 = merged_data.filter(pl.col('outcome') == 'L/W')['fighter2_end_elo'].min() > config['start_elo']
+    # The dominance stat doesn't depend on the ELOs, so it can be worked out for every fight up front
+    fighter1_D = (
+        elo_constants["constant_control_proportion_diff"] * ordered["control_proportion_diff"] +
+        elo_constants["constant_sig_strikes_landed_per_minute_diff"] * ordered["sig_strikes_landed_per_minute_diff"] +
+        elo_constants["constant_kds_diff"] * ordered["kds_diff"] +
+        elo_constants["constant_submissions_diff"] * ordered["submissions_diff"] +
+        elo_constants["constant_knockouts_diff"] * ordered["knockouts_diff"] +
+        elo_constants["constant_unanimous_decs_diff"] * ordered["unanimous_decs_diff"] +
+        elo_constants["constant_inverse_fight_length_proportion"] * ordered["inverse_fight_length_proportion"]
+    ).to_numpy()
 
-    # if not check1 == check2 == check3 == check4 == True:
-    #     print("Checks failed. Initial ELO for this configuration does not rise and fall as expected from fight 1")
-    #     return 1, 1
+    starting_elo = elo_constants["starting_elo"]
+    C = elo_constants["C"]
+    K = elo_constants["K"]
+    K_factor = elo_constants["K_factor"]
+    half_life = elo_constants["shrinkage_half_life_days"]
 
-    # Now loop through the rest of the fights in a career and fill in the ELO
-    for fight in range(2, 500): #start_elo['fight_number'].max() + 1):
+    date = ordered["date"].to_list()
 
-        # First, match on the end ELO from the results data onto the next fight as the starting ELO
-        join_df = merged_data.select(["date", "fighter1", "fighter1_end_elo"]).rename({"fighter1": "fighter"})
-        new_start_elo = start_elo.join(join_df, on=["date", "fighter"], how="left", maintain_order="left")
+    current_elo = {}
+    last_fight_date = {}
+    fighter1_start = np.empty(len(ordered))
+    fighter2_start = np.empty(len(ordered))
 
-        # Repeat for fighter2
-        join_df = merged_data.select(["date", "fighter2", "fighter2_end_elo"]).rename({"fighter2": "fighter"})
-        new_start_elo = new_start_elo.join(join_df, on=["date", "fighter"], how="left", maintain_order="left")
+    for i in range(len(ordered)):
 
-        # Now combine the ELOs regardless of whether fighter 1 or 2
-        new_start_elo = new_start_elo.with_columns(
-            end_elo=pl.when(pl.col("fighter1_end_elo").is_null())
-                        .then(pl.col("fighter2_end_elo"))
-                        .otherwise(pl.col("fighter1_end_elo")))
+        elo1 = current_elo.get(fighter1[i], starting_elo)
+        elo2 = current_elo.get(fighter2[i], starting_elo)
 
-        # Now shift the ending elo to the starting elo of the next fight. The frame is in
-        # date order within a fighter, so a plain lag gives the previous fight
-        new_start_elo = new_start_elo.with_columns(
-            next_start_elo=pl.col("end_elo").shift().over("fighter"))
+        # Regress towards the starting ELO for the time out of competition, before the fight rather
+        # than after it, so the ELO the model sees is the one a layoff has already been priced into.
+        # Decaying by days rather than by fights means someone out for three years is regressed hard
+        # and someone fighting every eight weeks is barely touched, which is the way round it should be
+        last1 = last_fight_date.get(fighter1[i])
+        if last1 is not None:
+            elo1 = starting_elo + (elo1 - starting_elo) * 0.5 ** ((date[i] - last1).days / half_life)
 
-        # Update start_elo where the fighter has a previous fight to carry the ELO over from
-        new_start_elo = new_start_elo.with_columns(
-            start_elo=pl.when((pl.col("fight_number") > 1) & pl.col("next_start_elo").is_not_null())
-                          .then(pl.col("next_start_elo"))
-                          .otherwise(pl.col("start_elo")))
+        last2 = last_fight_date.get(fighter2[i])
+        if last2 is not None:
+            elo2 = starting_elo + (elo2 - starting_elo) * 0.5 ** ((date[i] - last2).days / half_life)
 
-        # Drop columns no longer needed
-        new_start_elo = new_start_elo.select(["date", "fighter", "fight_number", "start_elo"])
+        fighter1_start[i] = elo1
+        fighter2_start[i] = elo2
 
-        ## Now merge the start ELOs onto the merged data
+        # The clock restarts whatever the result, so this happens even when the ELO doesn't move
+        last_fight_date[fighter1[i]] = date[i]
+        last_fight_date[fighter2[i]] = date[i]
 
-        # Drop the fighter ELO columns if they exist on the data already
-        try:
-            new_merged_data = merged_data.drop(["fighter1_start_elo", "fighter2_start_elo"])
-        except:
+        # Only a fight with a winner moves the ELO. A draw, a no contest or an upcoming fight leaves
+        # both where they are
+        if outcome[i] not in ("W/L", "L/W"):
+            current_elo[fighter1[i]] = elo1
+            current_elo[fighter2[i]] = elo2
             continue
 
-        # Now join on the updated fighter start ELOs
-        join_df = new_start_elo.select(["date", "fighter", "start_elo"]).rename({"fighter": "fighter1", "start_elo": "fighter1_start_elo"})
-        new_merged_data = new_merged_data.join(join_df, on=["date", "fighter1"], how="left", maintain_order="left")
+        S = 1.0 if outcome[i] == "W/L" else 0.0
+        E = (10 ** (elo1 / C)) / ((10 ** (elo1 / C)) + (10 ** (elo2 / C)))
+        dominance_stat = -fighter1_D[i] if outcome[i] == "L/W" else fighter1_D[i]
+        dominance_multiplier = 1 + np.tanh(dominance_stat)
 
-        # Repeat for fighter2
-        join_df = new_start_elo.select(["date", "fighter", "start_elo"]).rename({"fighter": "fighter2", "start_elo": "fighter2_start_elo"})
-        new_merged_data = new_merged_data.join(join_df, on=["date", "fighter2"], how="left", maintain_order="left")
+        current_elo[fighter1[i]] = elo1 + (1 + (K_factor / fighter1_fight_number[i])) * K * (S - E) * dominance_multiplier
+        current_elo[fighter2[i]] = elo2 + (1 + (K_factor / fighter2_fight_number[i])) * K * ((1 - S) - (1 - E)) * dominance_multiplier
 
-        # Now calculate the end ELOs again
-        new_merged_data = calculate_end_elo(
-            new_merged_data,
-            constants=elo_constants)
+    # Put the starting ELOs back in the original row order
+    ordered = ordered.with_columns(
+        fighter1_start_elo=pl.Series(fighter1_start),
+        fighter2_start_elo=pl.Series(fighter2_start))
 
-        # Now repeat the loop until all ELOs have been calculated
-        # Clean up memory for efficiency
-        start_elo = new_start_elo
-        merged_data = new_merged_data
-        del[new_start_elo, new_merged_data, join_df]
-        gc.collect()
+    merged_data = ordered.sort("elo_row_order").drop("elo_row_order")
 
-        # Check how many start ELOs are missing. If none, finish the loop
-        na_count = start_elo["start_elo"].is_null().sum()
-        if na_count > 0:
-            pass
-            # print(f"{na_count} ELOs missing. Continuing loop {fight}")
-        else:
-            return start_elo, merged_data
+    # Run the normal end ELO calculation so every derived column is produced the same way as before
+    merged_data = calculate_end_elo(merged_data, constants=elo_constants)
 
+    # Carry the starting ELOs back onto the per fighter frame
+    both_sides = pl.concat([
+        merged_data.select(["date", pl.col("fighter1").alias("fighter"), pl.col("fighter1_start_elo").alias("new_start_elo")]),
+        merged_data.select(["date", pl.col("fighter2").alias("fighter"), pl.col("fighter2_start_elo").alias("new_start_elo")])
+    ])
 
-    print("ELOs failed to compute after 500 rounds of iteration")
-    pdb.set_trace()
-    return 1, 1
+    start_elo = start_elo.join(both_sides, on=["date", "fighter"], how="left", maintain_order="left")
+
+    start_elo = start_elo.with_columns(
+        start_elo=pl.when(pl.col("new_start_elo").is_not_null())
+                    .then(pl.col("new_start_elo"))
+                    .otherwise(pl.col("start_elo")))
+
+    start_elo = start_elo.select(["date", "fighter", "fight_number", "start_elo"])
+
+    return start_elo, merged_data
 
 # This function is used to predict fight outcomes based only on the elo and assess how good it is at
 # predicting the fight outcomes on it's own. It takes the highest ELO as the predicted winner.
@@ -247,10 +264,10 @@ def objective_cv_elo_basic_mlflow(params):
     print("Params received:", params)    
     
     # Check for duplicates
-    if tracking.is_duplicate_run(params):
+    if tracking.is_duplicate_run(params, use_cache=True):
         
         # If the run existing, find what the loss was and return it without logging in mlflow
-        existing_metric, all_params = tracking.get_existing_metric_and_params(params, "Logloss")
+        existing_metric, all_params = tracking.get_existing_metric_and_params(params, "Logloss", use_cache=True)
         
         print(f"Duplicate run found, skipping logging. Logloss: {existing_metric:.4f}")
         return {"loss": existing_metric, "params": all_params, "status": STATUS_OK}
@@ -298,13 +315,21 @@ def objective_cv_elo_basic_mlflow(params):
                 wl_accuracy = np.mean(correct_binary[y_pred == "W/L"])
                 lw_accuracy = np.mean(correct_binary[y_pred == "L/W"])
         
-                # Log the outcome in MLflow
-                mlflow.log_metric("Logloss", elo_logloss)
-                mlflow.log_metric("W/L accuracy", wl_accuracy)
-                mlflow.log_metric("L/W accuracy", lw_accuracy)
-                mlflow.log_metric("H.Mean of two accuracies", hmean([wl_accuracy, lw_accuracy]))
-                mlflow.log_metric("Overall accuracy", np.mean(correct_binary))
-         
+                # Log the outcome in MLflow. One call rather than one per metric, because each is a
+                # round trip to the server and the trial itself now takes a fraction of a second
+                elo_metrics = {
+                    "Logloss": elo_logloss,
+                    "W/L accuracy": wl_accuracy,
+                    "L/W accuracy": lw_accuracy,
+                    "H.Mean of two accuracies": hmean([wl_accuracy, lw_accuracy]),
+                    "Overall accuracy": np.mean(correct_binary)
+                }
+
+                mlflow.log_metrics(elo_metrics)
+
+            # Keep the cache in step so repeating these parameters is caught without asking the server
+            tracking.record_run(params, elo_metrics)
+
             # Return whatever metric we wish to optimise for the model
             return {"loss": elo_logloss, "params": params, "status": STATUS_OK} 
         

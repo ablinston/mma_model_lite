@@ -66,7 +66,7 @@ start_elo, merged_data = prep_stats_for_elo_calc(fight_results, fight_stats, con
 ######################################################################################
 ## Begin optimising the ELO
 
-experiment_name = "elo_testing_v11"
+experiment_name = "elo_testing_v1"
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
@@ -77,14 +77,14 @@ mlflow.set_experiment(experiment_name)
 
 # Set the parameters for the Decision tree model and ELO
 elo_constants_hp = {
-    "C": hp.quniform("C", 100, 600, 20),  # Elo rating scaling constant
-    "K": hp.quniform("K", 10, 80, 2),   # K-factor (rate at which the rating adjusts)
+    "C": 400,  # Elo rating scaling constant
+    "K": hp.quniform("K", 30, 140, 2),   # K-factor (rate at which the rating adjusts)
     # 'C': 200,  # Elo rating scaling constant
     # 'K': 54,
     
     "K_factor": 0, # This is an additional factor to adjust K depending on the number of fights someone has. 0 means no effect, because this is added onto the given K value
     "starting_elo": config["start_elo"],
-    "constants_shrinkage_factor": 0, # How strongly the ELOs revert to mean over time. 0 is no shrinkage
+    "shrinkage_half_life_days": 1000000, # Days for half the deviation from the starting ELO to decay away. Very large means no reversion
     
     # Coefficients for fight metrics differences
     "constant_control_proportion_diff": 0,
@@ -109,23 +109,31 @@ best = fmin(
 ######################################################################################
 ## Standard ELO trials with customisation
 
+# C is fixed rather than searched. Only the ratio K/C affects anything, because every rating starts
+# at 1500 so the spread scales with K, and the expected score only sees the gap divided by C. Doubling
+# both gives an identical logloss to eight decimal places, so searching both wastes most of the trials
+# on a flat ridge. 400 is the chess convention, which puts the ratings on a familiar scale.
+# K is searched here as well as in the plain ELO run above, because the dominance constants multiply
+# the same update and the two move together
 elo_constants_hp = {
-    "C": 140,  # Elo rating scaling constant
-    "K": 76,   # K-factor (rate at which the rating adjusts)
+    "C": 400,  # Elo rating scaling constant. Redundant given K, so held fixed
+    "K": hp.quniform("K", 30, 140, 2),   # K-factor (rate at which the rating adjusts). Flat bottom around 60 to 80 at C=400
     
     "K_factor": hp.quniform("K_factor", 0, 0.04, 0.001), # This is an additional factor to adjust K depending on the number of fights someone has. 0 means no effect
     
     "starting_elo": config["start_elo"],
     
-    "constants_shrinkage_factor": hp.quniform("constants_shrinkage_factor", 0.01, 0.1, 0.0001),  # How strongly the ELOs revert to mean over time. 0 is no shrinkage
-    # Coefficients for fight metrics differences
-    "constant_control_proportion_diff": hp.quniform("constant_control_proportion_diff", 0.25, 0.5, 0.01),  # Control proportion difference weight ranges from -1.2 to 1.5
-    "constant_sig_strikes_landed_per_minute_diff": hp.quniform("constant_sig_strikes_landed_per_minute_diff", 0.7, 0.9, 0.005),  # Indicator for which fighter landed more significant strikes
-    "constant_kds_diff": 0.96, #hp.quniform('constant_kds_diff', 0.4, 0.5, 0.005),  # Indicator for which fighter had more knockdowns
-    "constant_submissions_diff": 0.975, #hp.quniform('constant_submissions_diff', 0.85, 1, 0.005),  # Submissions difference weight
+    "shrinkage_half_life_days": hp.quniform("shrinkage_half_life_days", 300, 5000, 60),  # Days for half the deviation from the starting ELO to decay away. Larger means less reversion
+    # Coefficients for fight metrics differences. The ranges start at zero so the search can turn one
+    # off, and reach well above the old values because tanh squashes the top end, so the best scale
+    # now sits around half of what it used to be
+    "constant_control_proportion_diff": hp.quniform("constant_control_proportion_diff", 0, 0.6, 0.02),  # Control proportion difference weight
+    "constant_sig_strikes_landed_per_minute_diff": hp.quniform("constant_sig_strikes_landed_per_minute_diff", 0, 1.2, 0.02),  # Indicator for which fighter landed more significant strikes
+    "constant_kds_diff": hp.quniform("constant_kds_diff", 0, 1.2, 0.02),  # Indicator for which fighter had more knockdowns
+    "constant_submissions_diff": hp.quniform("constant_submissions_diff", 0, 1.2, 0.02),  # Submissions difference weight
     "constant_inverse_fight_length_proportion": 0, #hp.quniform('constant_inverse_fight_length_proportion', 0, 0.2, 0.01), # The inverse of proportion of fight, so 25 / fight length. Potential values 1 to 300
-    "constant_knockouts_diff": hp.quniform("constant_knockouts_diff", 0.95, 1.1, 0.001),  # Knockouts difference weight
-    "constant_unanimous_decs_diff": hp.quniform("constant_unanimous_decs_diff", 0.45, 0.65, 0.005)  # Unanimous decisions difference weight
+    "constant_knockouts_diff": hp.quniform("constant_knockouts_diff", 0, 1.4, 0.02),  # Knockouts difference weight
+    "constant_unanimous_decs_diff": hp.quniform("constant_unanimous_decs_diff", 0, 1.0, 0.02)  # Unanimous decisions difference weight
     # 'constant_split_decs_diff': hp.quniform('constant_split_decs_diff', 0, 1, 0.2),  # Split decisions difference weight
 }
 

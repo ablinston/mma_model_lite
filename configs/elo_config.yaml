@@ -10,6 +10,6 @@ constant_knockouts_diff: '0.967'
 constant_sig_strikes_landed_per_minute_diff: '0.88'
 constant_submissions_diff: '0.965'
 constant_unanimous_decs_diff: '0.535'
-constants_shrinkage_factor: '0.07050000000000001'
+shrinkage_half_life_days: '1825'
 model: Basic
 starting_elo: '1500'
