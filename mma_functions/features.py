@@ -33,7 +33,7 @@ def add_adjusted_stats(
     """
     # pdb.set_trace()
 
-    stop_if_not(type(columns_with) == type(["list"]), "columns_with type check")
+    stop_if_not(type(columns_with) == type(["list"]), "columns_with is a list in add_adjusted_stats")
 
     # We want to merge the historic stats of opponents onto the data
     # FIrst get opponent column
@@ -64,14 +64,14 @@ def add_adjusted_stats(
     stop_if_not((
         pd.Series(columns_to_adjust).str.replace("_against", "") == pd.Series(
             adjustment_cols).str.replace("_against", "")).sum() == 0,
-        "adjusted stats column correspondence check")
+        "Columns to adjust line up with their adjustment columns in add_adjusted_stats")
     
     # Now merge on each opponents historic stats
     new_stats_df = new_stats_df.merge(hist_df, left_on=["event", "bout", "opponent"], right_on=["event", "bout", "fighter"], how="left")
     
     # Check all the columns are in the data
     missing_cols =  [col for col in adjustment_cols if col not in new_stats_df.columns]
-    stop_if_not(len(missing_cols) == 0, "Columns in hist data check")
+    stop_if_not(len(missing_cols) == 0, "Adjustment columns all present in the historic stats in add_adjusted_stats")
     
     # Calculate the adjusted stats
     new_stats = pd.DataFrame(
@@ -82,7 +82,7 @@ def add_adjusted_stats(
     final_stats_df = pd.concat([stats_df.reset_index(drop=True), new_stats], axis=1)
     
     # Check length
-    stop_if_not(len(final_stats_df) == len(stats_df), "Dataset length")
+    stop_if_not(len(final_stats_df) == len(stats_df), "Row count unchanged by add_adjusted_stats")
     
     return final_stats_df
 
@@ -110,8 +110,8 @@ def add_fighter_differentials(df, zero_over_zero_fill=1):
     fighter2_accuracy_def_cols = [col for col in sorted_columns if ("accuracy_percent" in col or "ctrl_minutes_against_per_minute" in col) and "diff" not in col and "fighter2" in col and "against" in col]
     
     # Check the columns line up
-    stop_if_not(utils.check_identical_excl_string(fighter1_accuracy_off_cols, [col.replace("_against", "") for col in fighter2_accuracy_def_cols], "fighter1", "fighter2"))
-    stop_if_not(utils.check_identical_excl_string(fighter2_accuracy_off_cols, [col.replace("_against", "") for col in fighter1_accuracy_def_cols], "fighter2", "fighter1"))
+    stop_if_not(utils.check_identical_excl_string(fighter1_accuracy_off_cols, [col.replace("_against", "") for col in fighter2_accuracy_def_cols], "fighter1", "fighter2"), "fighter1 offence columns match fighter2 defence columns in add_fighter_differentials")
+    stop_if_not(utils.check_identical_excl_string(fighter2_accuracy_off_cols, [col.replace("_against", "") for col in fighter1_accuracy_def_cols], "fighter2", "fighter1"), "fighter2 offence columns match fighter1 defence columns in add_fighter_differentials")
     
     first_exprs = []
 
@@ -161,7 +161,7 @@ def add_fighter_differentials(df, zero_over_zero_fill=1):
     f1_dates = [c for c in fighter1_cols if c in date_cols]
     f2_dates = [c for c in fighter2_cols if c in date_cols]
     
-    stop_if_not(utils.check_identical_excl_string(f1_no_dates, f2_no_dates, "fighter1_", "fighter2_", check_both=True))
+    stop_if_not(utils.check_identical_excl_string(f1_no_dates, f2_no_dates, "fighter1_", "fighter2_", check_both=True), "fighter1 and fighter2 non date columns match in add_fighter_differentials")
 
     # --- Differences ---
     # Build a set of all boolean columns
@@ -246,7 +246,7 @@ def add_submissions_landed(fight_stats, fight_results):
         how="left")
     
     # Check there are no NAs after 2010. Settled for 10 because some tiny misalignments are too cumbersome to fix
-    stop_if_not(new_stats[new_stats["date"] > "2016-01-01"]["submission"].isna().sum() < 10)
+    stop_if_not(new_stats[new_stats["date"] > "2016-01-01"]["submission"].isna().sum() < 20, "Fewer than 20 fights missing a submission count after 2016 in add_submissions_landed")
         
     # Create round columns
     for round in range(1, 6):
@@ -273,8 +273,8 @@ def add_submissions_landed(fight_stats, fight_results):
     new_stats.drop(columns=["submission"], inplace=True)
     
     # Final checks
-    stop_if_not(new_stats["allrounds_sub_landed"].max() == 1, "Max submissions landed check")
-    stop_if_not(len(new_stats) == len(fight_stats), "Data length subs landed")
+    stop_if_not(new_stats["allrounds_sub_landed"].max() == 1, "No more than one submission landed per fight in add_submissions_landed")
+    stop_if_not(len(new_stats) == len(fight_stats), "Row count unchanged by add_submissions_landed")
     
     return new_stats
     
@@ -312,7 +312,7 @@ def aggregate_last_X_fight_data(df, id_cols, group_by, prefix, X, per_minute_bay
     join_cols = [col for col in id_cols if "date" not in col]
     
     # Check that the join cols give unique rows
-    stop_if_not(len(pl_sorted) == len(pl_sorted.unique(subset=join_cols)), "Check that join cols identified in aggregate_last_X_fight_data inputs have a unique row for each occurance.")
+    stop_if_not(len(pl_sorted) == len(pl_sorted.unique(subset=join_cols)), "Join columns give one row per occurrence in aggregate_last_X_fight_data")
     
     # pdb.set_trace()
     
@@ -587,7 +587,7 @@ def bayesian_priors(fight_stats_df, id_cols, group_by, fight_span, ignore_last_n
     final_data = stats_df[id_cols + group_by].merge(total_stats, left_index=True, right_index=True, how="left")
  
     # Check we have the correct number of rows
-    stop_if_not(len(final_data) == len(fight_stats_df))
+    stop_if_not(len(final_data) == len(fight_stats_df), "Row count unchanged by bayesian_priors")
     
     # Drop the group column and also only keep one record per bout. We want both fighters to use the same priors when calculating the bayes numbers
     final_data = final_data.drop_duplicates(subset=[col for col in id_cols if "fighter" not in col]).drop(group_by + ["fighter"], axis=1)
@@ -645,7 +645,7 @@ def calculate_adjusted_percentages(
     # Check all the row numbers are correct
     stop_if_not(
         len(fight_stats) == len(fight_stats_percentages),
-        "Percentages data check")
+        "Row count unchanged by calculate_adjusted_percentages")
         
     del(fight_stats_hist_percentages)
     
@@ -684,7 +684,7 @@ def calculate_hist_opp_stance_stats(fight_stats, fighters, fight_stats_bayes_pri
     ).drop(columns=["date", "opponent", "opponent_stance"])
 
     # Check the row numbers are correct
-    stop_if_not(len(fight_stats) == len(fight_stats_hist_opponent_stance), "Opponent data length check")
+    stop_if_not(len(fight_stats) == len(fight_stats_hist_opponent_stance), "Row count unchanged by calculate_hist_opp_stance_stats")
     
     return(fight_stats_hist_opponent_stance)
 
@@ -739,7 +739,7 @@ def calculate_knocked_out_stats(fighter_results):
     dates_knocked_out["date_last_knocked_out"] = pd.to_datetime(dates_knocked_out["date_last_knocked_out"].fillna("1900-01-01"))
 
     # Check number of rows hasn't changed
-    stop_if_not(len(dates_knocked_out) == len(fighter_results))
+    stop_if_not(len(dates_knocked_out) == len(fighter_results), "Row count unchanged by calculate_knocked_out_stats")
     
     return dates_knocked_out
 
@@ -800,7 +800,7 @@ def calculate_per_minute_bayesian_stats(fight_stats_hist, bayes_priors_df, bayes
     # Merge the bayesian prios onto the data
     stats_df = fight_stats_hist.merge(bayes_priors_df, on=["event", "bout"], how="left")
     
-    stop_if_not(len(stats_df) == len(fight_stats_hist))
+    stop_if_not(len(stats_df) == len(fight_stats_hist), "Row count unchanged by merging the bayes priors in calculate_per_minute_bayesian_stats")
     
     # pdb.set_trace()
     
@@ -825,9 +825,9 @@ def calculate_per_minute_bayesian_stats(fight_stats_hist, bayes_priors_df, bayes
     
         # Check all the Bayes prior columns are in the data
         if prefix == "":
-            stop_if_not(all(item.replace("_against", "") in stats_df.columns for item in ["bayes_total_" + col for col in round_columns]), "Bayes columns check in data")
+            stop_if_not(all(item.replace("_against", "") in stats_df.columns for item in ["bayes_total_" + col for col in round_columns]), "Bayes total columns present for the unprefixed rounds in calculate_per_minute_bayesian_stats")
         else:
-            stop_if_not(all(item.replace("_against", "") in stats_df.columns for item in [col.replace(prefix, "bayes_total_") for col in round_columns]), "Bayes columns check in data")
+            stop_if_not(all(item.replace("_against", "") in stats_df.columns for item in [col.replace(prefix, "bayes_total_") for col in round_columns]), "Bayes total columns present for the prefixed rounds in calculate_per_minute_bayesian_stats")
         
         # Work out the associated bayes columns for numerator and denominator
         if prefix == "":
@@ -944,7 +944,7 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
         bayes_denominators = ["bayes_total_" + (col.replace("fighter1_", "").replace("fighter2_", "").replace("hist_", "").replace("opp_type_", "").replace("opp_stance_", "").replace("_against", "").replace("last_1_fights_", "").replace("last_2_fights_", "").replace("last_3_fights_", "")) for col in percent_columns]
         
         # Check these are in the bayes data
-        stop_if_not(all(item in merged_data_bayes.columns for item in bayes_numerators + bayes_denominators), "Bayes priors check in data")
+        stop_if_not(all(item in merged_data_bayes.columns for item in bayes_numerators + bayes_denominators), "Bayes numerator and denominator columns present in calculate_percentages")
         
         # Calculate the bayes percentage accuracies
         new_bayes_percent_cols = [col.replace("_attempt", "_bayes_accuracy_percent") for col in percent_columns]
@@ -962,18 +962,18 @@ def calculate_percentages(merged_data_df, fight_stats_bayes_priors, bayes_alpha_
         )
         
         # Check there are non > 0
-        stop_if_not(new_data[new_data>1].sum().sum() == 0, "Bayes percentages less than 1")
-        stop_if_not(new_data[new_data<0].sum().sum() == 0, "Bayes percentages greater than 0")
+        stop_if_not(new_data[new_data>1].sum().sum() == 0, "No bayes percentage above 1 in calculate_percentages")
+        stop_if_not(new_data[new_data<0].sum().sum() == 0, "No bayes percentage below 0 in calculate_percentages")
         
         # Merge the data
         merged_data = pd.concat([merged_data, new_data], axis=1)
     
     # Check we have the correct number of rows
-    stop_if_not(len(merged_data_df) == len(merged_data), "Dataset length")
+    stop_if_not(len(merged_data_df) == len(merged_data), "Row count unchanged by calculate_percentages")
     
     # Percent check
-    stop_if_not(merged_data[new_percent_cols].max().max() <= 1.0, "Percentage calculations 100 max")
-    stop_if_not(merged_data[new_percent_cols].min().min() >= 0.0, "Percentage calculations 100 max")
+    stop_if_not(merged_data[new_percent_cols].max().max() <= 1.0, "New percentage columns do not exceed 1 in calculate_percentages")
+    stop_if_not(merged_data[new_percent_cols].min().min() >= 0.0, "New percentage columns are not below 0 in calculate_percentages")
     
     del([new_data, percent_columns, landed_columns, new_percent_cols])
     
@@ -1342,9 +1342,9 @@ def switch_fighter1_fighter2(df_original=None, filter_boolean=None, X=None, y=No
     
     # Check we have the correct number of rows and columns
     if X is None:
-        stop_if_not(final_df.shape == df_original.shape, "Dataset length check")
+        stop_if_not(final_df.shape == df_original.shape, "Shape unchanged against the input data in switch_fighter1_fighter2")
     else:
-        stop_if_not(final_df.shape == X.shape, "Dataset length check")
+        stop_if_not(final_df.shape == X.shape, "Shape unchanged against X in switch_fighter1_fighter2")
 
     # # Ensure the old index is preserved
     # ## CAN'T GET IT TO WORK

@@ -201,7 +201,7 @@ fight_stats_hist = aggregate_last_X_fight_data(
 # Calculate average fight length, win length and loss length
 fight_stats_hist["hist_fight_length_minutes_avg"] = np.where(fight_stats_hist["hist_fights"] == 0, np.nan, fight_stats_hist["hist_allrounds_fight_minutes"] / fight_stats_hist["hist_fights"])
 
-stop_if_not(len(fight_stats) == len(fight_stats_hist), "Agg stats check")
+stop_if_not(len(fight_stats) == len(fight_stats_hist), "Row count unchanged by the aggregated historic stats")
     
     
 ###########################################################################################
@@ -263,7 +263,7 @@ fight_stats_hist_opponent_stance = aggregate_last_X_fight_data(
 ).drop(columns=["date", "opponent", "opponent_stance"])
 
 # Check the row numbers are correct
-stop_if_not(len(fight_stats) == len(fight_stats_hist_opponent_stance), "Opponent data length check")
+stop_if_not(len(fight_stats) == len(fight_stats_hist_opponent_stance), "Row count unchanged by the opponent stance stats")
 
 
 
@@ -276,7 +276,7 @@ stop_if_not(len(fight_stats) == len(fight_stats_hist_opponent_stance), "Opponent
 # Check all the row numbers are correct
 stop_if_not(
     len(fight_stats) == len(fight_stats_hist_opponent_stance) == len(fight_stats_hist_last_3),
-    "All hist stats data length check")
+    "Opponent stance and last 3 fight stats keep the fight stats row count")
 
 
 ###########################################################################################
@@ -315,7 +315,7 @@ fighter_results = calculate_win_loss_stats(fighter_results)
 # Check that the win and loss finshes make sense
 check = fighter_results[(fighter_results["hist_wins"] < fighter_results["hist_wins_finishes"]) | (fighter_results["hist_losses"] < fighter_results["hist_losses_finishes"])]
 
-stop_if_not(len(check) == 0, "Hist finishes and wins/losses check")
+stop_if_not(len(check) == 0, "Historic finishes do not exceed historic wins or losses")
 
 ###########################################################################################
 # Record the last 10 results
@@ -362,7 +362,7 @@ fight_stats_hist_opponent_type = aggregate_last_X_fight_data(
 
 
 # Check that we have the correct number of rows
-stop_if_not(len(fight_stats_hist_opponent_type) == len(fight_stats_hist), "Opponent type row count check")
+stop_if_not(len(fight_stats_hist_opponent_type) == len(fight_stats_hist), "Row count unchanged by the opponent type stats")
 
 # test = fight_stats_hist_opponent_type[fight_stats_hist_opponent_type['fighter']=='ConorMcGregor'][['bout', 'fighter', 'opponent', 'opponent_type', 'hist_opp_type_allrounds_fight_minutes']]
 
@@ -594,8 +594,8 @@ body_columns = [col for col in merged_data.columns if "body_attempt" in col and 
 leg_columns = [col for col in merged_data.columns if "leg_attempt" in col and "against" not in col and "per_minute" not in col]
 
 # Do checks on columns
-stop_if_not(check_identical_excl_string(head_columns, body_columns, "head", "body"))
-stop_if_not(check_identical_excl_string(head_columns, leg_columns, "head", "leg"))
+stop_if_not(check_identical_excl_string(head_columns, body_columns, "head", "body"), "head and body strike columns match")
+stop_if_not(check_identical_excl_string(head_columns, leg_columns, "head", "leg"), "head and leg strike columns match")
 
 # Calculate ratios of attempts on body and leg
 head_body_ratios = pd.DataFrame(
@@ -613,7 +613,7 @@ merged_data = pd.concat([merged_data, head_leg_ratios], axis=1)
 del(head_body_ratios, head_leg_ratios, head_columns, body_columns, leg_columns)
 
 # Do a check to see if row number has stayed the same
-stop_if_not(len(merged_data) == merged_original_rows)
+stop_if_not(len(merged_data) == merged_original_rows, "Row count unchanged by the head, body and leg ratios")
 
 # Calculate ratio of striking to takedowns by looking at distance striking compared with td attempts, and distance compared with ground and pound
 for fighter in ["fighter1", "fighter2"]:
@@ -649,7 +649,7 @@ for fighter in ["fighter1", "fighter2"]:
         merged_data[fighter + "_hist_last_3_fights_round" + str(round) + "_total str._accuracy_percent"] / merged_data[fighter + "_hist_last_3_fights_round" + str(round - 1) + "_total str._accuracy_percent"]
         
 # Do a check to see if row number has stayed the same
-stop_if_not(len(merged_data) == merged_original_rows)
+stop_if_not(len(merged_data) == merged_original_rows, "Row count unchanged by the striking to takedown ratios")
 
 ###########################################################################################
 # PER FIGHT CALCULATIONS

@@ -19,6 +19,10 @@ RUN apt-get update && apt-get install -y \
     # Get chromium for the scrapers
     && curl -fsSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/chrome.deb \
     && apt-get install -y /tmp/chrome.deb \
+    # The config points the scrapers at /usr/bin/chromium, which is the name the
+    # apt package in the CPU image gives it. Ubuntu's chromium is a snap stub so
+    # it has to be Google's deb here, and that installs under a different name
+    && ln -s /usr/bin/google-chrome /usr/bin/chromium \
     && rm -rf /var/lib/apt/lists/* /tmp/chrome.deb
 
 RUN printf '%b' '[include]\n\tpath = /root/.gitconfig-host\n' \

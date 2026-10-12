@@ -209,7 +209,7 @@ def rolling_log_loss(actuals_data, prediction_probabilities, target, months=8, m
     # The probabilities and the target line up with the rows positionally, so a length mismatch means
     # they are for a different sample and the metrics would be quietly wrong rather than wrong loudly
     stop_if_not(len(prediction_probabilities) == len(actuals_data) and len(target) == len(actuals_data),
-                "Rolling logloss - row count check")
+                "Predictions and target match the actuals row count in rolling_log_loss")
 
     # Get the probabilities implied by the odds to compare against
     odds_probabilities = odds.odds_to_probabilities(actuals_data["fighter1_backtesting_odds"], actuals_data["fighter2_backtesting_odds"])
@@ -285,7 +285,7 @@ def log_loss_by_group_and_period(actuals_data, prediction_probabilities, target,
 
     # Same positional alignment as the rolling version, so check it before calculating anything
     stop_if_not(len(prediction_probabilities) == len(actuals_data) and len(target) == len(actuals_data),
-                "Logloss by group and period - row count check")
+                "Predictions and target match the actuals row count in log_loss_by_group_and_period")
 
     # Get the probabilities implied by the odds to compare against
     odds_probabilities = odds.odds_to_probabilities(actuals_data["fighter1_backtesting_odds"], actuals_data["fighter2_backtesting_odds"])
@@ -518,16 +518,16 @@ def summarise_model_predictions(
     # Perform a check that kelly is correct if only +EV bets, it should always be positive.
     if min_ev_to_bet >= 0:
         stop_if_not((actuals_data["kelly_criterion"].max() <= 1) and (actuals_data["kelly_criterion"].min() >= 0),
-                    "Kelly criterion check")
+                    "Kelly criterion between 0 and 1 with no negative EV bets in summarise_model_predictions")
     else:
         stop_if_not((actuals_data["kelly_criterion"].max() <= 1),
-                    "Kelly criterion check")
+                    "Kelly criterion no greater than 1 in summarise_model_predictions")
     
     # And use it to calculate how much to increase from the min
     actuals_data["bet_size"] = actuals_data["bets"] * (min_bet_size + (max_bet_size - min_bet_size) * actuals_data["kelly_criterion"])
 
     # Check no bets breach the max
-    stop_if_not(actuals_data["bet_size"].max() <= max_bet_size, "Max bet check")
+    stop_if_not(actuals_data["bet_size"].max() <= max_bet_size, "No bet size above max_bet_size in summarise_model_predictions")
     
     
     #######################################

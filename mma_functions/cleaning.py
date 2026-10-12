@@ -302,6 +302,11 @@ def standard_data_filter(df, include_upcoming=False, keep_rows_with_flag=False):
 
     df.loc[(df["womens"] == 1), "notformodel_exclusion_reason"] = "Womens"
 
+    # Drop draws and no contests. A bet on one is voided so they say nothing about whether the model
+    # makes money, and the model gives them so little probability that they dominate the logloss.
+    # Upcoming fights have a null outcome rather than one of these, so they are not caught by this
+    df.loc[df["outcome"].isin(["D/D", "NC/NC"]), "notformodel_exclusion_reason"] = "Draw or no contest"
+
     if not keep_rows_with_flag:
         df = df[df["notformodel_exclusion_reason"] == ""].drop(columns=["notformodel_exclusion_reason"]).copy()
 

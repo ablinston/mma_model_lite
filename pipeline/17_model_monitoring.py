@@ -153,13 +153,10 @@ backtesting_data["period"] = np.where(
 
 # Get the model input data
 # Exclude fights that haven't happened yet. They carry the oot flag because of their date, but have
-# no outcome, and clean_target_column raises on a missing outcome.
-# Draws and no contests go too. A bet on one is voided and the stake comes back, so they say nothing
-# about how the model is doing, and the model gives them so little probability that a couple of them
-# landing in a window moves the logloss more than everything else put together
+# no outcome, and clean_target_column raises on a missing outcome. Draws and no contests are already
+# gone, standard_data_filter drops them
 oot_data = backtesting_data[(backtesting_data["train_test_oot_flag"] == "oot")
-                            & backtesting_data["outcome"].notna()
-                            & ~backtesting_data["outcome"].isin(["D/D", "NC/NC"])]
+                            & backtesting_data["outcome"].notna()]
 
 X_oot, temp1, y_oot, temp2, temp3, temp4, temp5 = prep_data_for_model_training(
     oot_data,
@@ -203,25 +200,8 @@ for model_version in model_versions:
         # The outcome as classes, the same way btest_model_and_log_mlflow does it
         oot_target = clean_target_column(oot_actuals["outcome"])
 
-        # These two have to run before btest_model_and_log_mlflow, which converts its breakdown
+        # This has to run before btest_model_and_log_mlflow, which converts its breakdown
         # columns to strings and so would leave the date column unusable for date arithmetic
-
-        # Log the logloss over a trailing window, so a drift shows up as a trend
-        rolling_logloss = evaluation.rolling_log_loss(
-            oot_actuals,
-            prediction_probabilities,
-            oot_target,
-            months=rolling_window_months)
-
-        # Nothing to chart if the sample is too short or too thin for any window to qualify
-        if len(rolling_logloss) == 0:
-            print("No rolling logloss logged, no " + str(rolling_window_months) + " month window held enough fights")
-        else:
-            fig, ax = evaluation.plot_rolling_log_loss(rolling_logloss, rolling_window_months)
-            mlflow.log_figure(fig, "Rolling logloss/rolling_logloss.png")
-
-            rolling_logloss.to_csv("results/temp/summary.csv", index=False)
-            mlflow.log_artifact("results/temp/summary.csv", "Rolling logloss")
 
         # Log the logloss by method of victory either side of the split date, to see whether
         # decisions in particular got harder to call, and whether they did for the odds too
@@ -244,7 +224,8 @@ for model_version in model_versions:
             breakdown_metrics=breakdown_metrics, 
             mlflow_description="XGB Forest v" + str(model_version), 
             target_column=target,
-            backtesting_params=backtesting_params)
+            backtesting_params=backtesting_params,
+            rolling_window_months=rolling_window_months)
         
         mlflow.log_param("OOT_start_date", min(oot_data["date"]))
         mlflow.log_param("Last_event_date", max(backtesting_data["date"]))

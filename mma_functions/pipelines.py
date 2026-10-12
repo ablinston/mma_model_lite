@@ -219,7 +219,7 @@ def merge_and_process_all_clean_data(
     # Calculate average fight length, win length and loss length
     fight_stats_hist["hist_fight_length_minutes_avg"] = np.where(fight_stats_hist["hist_fights"] == 0, np.nan, fight_stats_hist["hist_allrounds_fight_minutes"] / fight_stats_hist["hist_fights"])
 
-    stop_if_not(len(fight_stats) == len(fight_stats_hist), "Agg stats check")
+    stop_if_not(len(fight_stats) == len(fight_stats_hist), "Row count unchanged by the aggregated historic stats in merge_and_process_all_clean_data")
         
         
     ###########################################################################################
@@ -287,7 +287,7 @@ def merge_and_process_all_clean_data(
     # Check all the row numbers are correct
     stop_if_not(
         len(fight_stats) == len(fight_stats_hist_opponent_stance) == len(fight_stats_hist_last_3),
-        "All hist stats data length check")
+        "Opponent stance and last 3 fight stats keep the fight stats row count in merge_and_process_all_clean_data")
 
     
 
@@ -328,7 +328,7 @@ def merge_and_process_all_clean_data(
     # Check that the win and loss finshes make sense
     check = fighter_results[(fighter_results["hist_wins"] < fighter_results["hist_wins_finishes"]) | (fighter_results["hist_losses"] < fighter_results["hist_losses_finishes"])]
 
-    stop_if_not(len(check) == 0, "Hist finishes and wins/losses check")
+    stop_if_not(len(check) == 0, "Historic finishes do not exceed historic wins or losses in merge_and_process_all_clean_data")
 
     ###########################################################################################
     # Record the last 10 results
@@ -376,7 +376,7 @@ def merge_and_process_all_clean_data(
 
 
     # Check that we have the correct number of rows
-    stop_if_not(len(fight_stats_hist_opponent_type) == len(fight_stats_hist), "Opponent type row count check")
+    stop_if_not(len(fight_stats_hist_opponent_type) == len(fight_stats_hist), "Row count unchanged by the opponent type stats in merge_and_process_all_clean_data")
 
     # test = fight_stats_hist_opponent_type[fight_stats_hist_opponent_type['fighter']=='ConorMcGregor'][['bout', 'fighter', 'opponent', 'opponent_type', 'hist_opp_type_allrounds_fight_minutes']]
     
@@ -575,8 +575,8 @@ def merge_and_process_all_clean_data(
     leg_columns = [col for col in merged_data.columns if "leg_attempt" in col and "against" not in col and "per_minute" not in col]
 
     # Do checks on columns
-    stop_if_not(utils.check_identical_excl_string(head_columns, body_columns, "head", "body"))
-    stop_if_not(utils.check_identical_excl_string(head_columns, leg_columns, "head", "leg"))
+    stop_if_not(utils.check_identical_excl_string(head_columns, body_columns, "head", "body"), "head and body strike columns match in merge_and_process_all_clean_data")
+    stop_if_not(utils.check_identical_excl_string(head_columns, leg_columns, "head", "leg"), "head and leg strike columns match in merge_and_process_all_clean_data")
 
     # Calculate ratios of attempts on body and leg
     head_body_ratios = pd.DataFrame(
@@ -594,7 +594,7 @@ def merge_and_process_all_clean_data(
     del(head_body_ratios, head_leg_ratios, head_columns, body_columns, leg_columns)
 
     # Do a check to see if row number has stayed the same
-    stop_if_not(len(merged_data) == merged_original_rows)
+    stop_if_not(len(merged_data) == merged_original_rows, "Row count unchanged by the head, body and leg ratios in merge_and_process_all_clean_data")
 
     # Calculate ratio of striking to takedowns by looking at distance striking compared with td attempts, and distance compared with ground and pound
     for fighter in ["fighter1", "fighter2"]:
@@ -630,7 +630,7 @@ def merge_and_process_all_clean_data(
             merged_data[fighter + "_hist_last_3_fights_round" + str(round) + "_total str._accuracy_percent"] / merged_data[fighter + "_hist_last_3_fights_round" + str(round - 1) + "_total str._accuracy_percent"]
             
     # Do a check to see if row number has stayed the same
-    stop_if_not(len(merged_data) == merged_original_rows)
+    stop_if_not(len(merged_data) == merged_original_rows, "Row count unchanged by the striking to takedown ratios in merge_and_process_all_clean_data")
 
     ###########################################################################################
     # PER FIGHT CALCULATIONS
@@ -1265,7 +1265,7 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
                             len(new_parsed_odds_df) >= len(parsed_odds_df)) & (
                                 len(new_parsed_fighter_tott_df) >= len(parsed_fighter_tott_df)) & (
                                     len(new_parsed_event_odds_df) >= len(parsed_event_odds_df)),
-                                "Row change checks")
+                                "Every parsed dataset has at least as many rows as before the scrape in scrape_all_unparsed_data")
         
         # AB: If the fighter_tott has missing info, just run the whole thing rather than update old one
         
@@ -1459,7 +1459,7 @@ def backtest_model(
         
     # Do a check that the inputs are consistent if doing a non constant bets. If using non constant bets, the bet sizing should be as proportions, not £ amounts
     if not constant_bets:
-        stop_if_not((min_bet_size < 1) and (max_bet_size < 1), "Bet size for non-constant bets check")
+        stop_if_not((min_bet_size < 1) and (max_bet_size < 1), "Min and max bet sizes are proportions when constant_bets is off in backtest_model")
         
     # Now calculate the returns if a bet was made
     actuals_data["profit_loss"] = ((fighter1_backtesting_odds - 1) * wl_trigger * (actuals_data["outcome"] == "W/L") - wl_trigger * (actuals_data["outcome"] != "W/L") + (fighter2_backtesting_odds - 1) * lw_trigger * (actuals_data["outcome"] == "L/W") - lw_trigger * (actuals_data["outcome"] != "L/W")) * actuals_data["bet_size"]
@@ -1543,7 +1543,7 @@ def backtest_model(
 
 # This function takes a model and a test dataset and computes test statistics then logs them in mlflow.
 
-def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column="outcome", backtesting_params={"min_prob_to_bet": 0.5, "min_ev_to_bet": 0.05, "max_bet_size": 1}, log_mlflow=True):
+def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column="outcome", backtesting_params={"min_prob_to_bet": 0.5, "min_ev_to_bet": 0.05, "max_bet_size": 1}, log_mlflow=True, rolling_window_months=8):
 
     """
     Tests a model by taking in some actuals data, a set of prediction probabilities, and any breakdown variables to use. It logs various metrics in MLflow as well as outputing some statistics
@@ -1555,6 +1555,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
         breakdown_metrics (list): the metrics to output for the breakdown. These names must align with metrics calculated in the calculate_metrics() function
         mlflow_description: a description to give for the run in MLflow
         log_mlflow (bool): set to False to skip the MLflow logging and just return the backtesting results
+        rolling_window_months (int): the length of the trailing window for the rolling logloss chart
 
     Returns:
         None, but prints the breakdown outputs and logs everything in MLflow
@@ -1591,6 +1592,25 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
 
         # Log the overall odds metrics in MLflow
         tracking.log_metrics_odds_mlflow(actuals_data, actuals_data["target"])
+
+        # Log the logloss over a trailing window, so a drift in performance shows up as a trend
+        # rather than as noise. This has to come before the breakdown loop below, which converts
+        # its columns to strings and would leave the date column unusable for date arithmetic
+        rolling_logloss = evaluation.rolling_log_loss(
+            actuals_data,
+            prediction_probabilities,
+            actuals_data["target"],
+            months=rolling_window_months)
+
+        # Nothing to chart if the sample is too short or too thin for any window to qualify
+        if len(rolling_logloss) == 0:
+            print("No rolling logloss logged, no " + str(rolling_window_months) + " month window held enough fights")
+        else:
+            fig, ax = evaluation.plot_rolling_log_loss(rolling_logloss, rolling_window_months)
+            mlflow.log_figure(fig, "Rolling logloss/rolling_logloss.png")
+
+            rolling_logloss.to_csv("results/temp/summary.csv", index=False)
+            mlflow.log_artifact("results/temp/summary.csv", "Rolling logloss")
     
     # # Log the parameters of the model
     # mlflow.log_params(model['params'])
@@ -2235,7 +2255,7 @@ def train_ensemble_xgboost(X, y, X_columns_for_training, num_models=10, num_boos
             model["xgb_model"] = raw_model
             model["model"] = model_cal
         
-        elif model_hyper_params["loss_function"] == "ev_loss_function": # any eval metric above will be ignored
+        elif params["loss_function"] == "ev_loss_function": # any eval metric above will be ignored
             # Pass the odds to the loss function
             custom_loss = modelling.create_custom_loss(train_fighter1_odds, train_fighter2_odds)
             custom_loss_test = modelling.ev_loss_function_test(test_fighter1_odds, test_fighter2_odds)

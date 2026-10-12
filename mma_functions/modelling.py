@@ -177,7 +177,7 @@ def cv_light_gbm_mlflow(
             y_pred = np.argmax(y_pred_prob, axis=1)
 
             # Convert the actual results into a binarised format so that AUC functions can work for individual outcomes
-            y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
+            y_test_bin = label_binarize(y_test_fold, classes=np.array([0, 1, 2]))
 
             # Evaluate the model based on accuracy and add it to the list of accuracies
             accuracies.append(accuracy_score(y_test_fold, y_pred))
@@ -372,7 +372,7 @@ def get_base_margin(df, base_margin_cols):
         rv = np.log(p).ravel()
         
         # Check length
-        stop_if_not(len(rv) == 3 * len(df), "Base margin length check")
+        stop_if_not(len(rv) == 3 * len(df), "Base margin has three values per row in get_base_margin")
         
         return rv  
 
@@ -447,7 +447,7 @@ def objective_cv_light_gbm_mlflow(
             y_pred = np.argmax(y_pred_prob, axis=1)
 
             # Convert the actual results into a binarised format so that AUC functions can work for individual outcomes
-            y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
+            y_test_bin = label_binarize(y_test_fold, classes=np.array([0, 1, 2]))
 
             # Evaluate the model based on accuracy and add it to the list of accuracies
             accuracies.append(accuracy_score(y_test_fold, y_pred))
@@ -534,7 +534,7 @@ def objective_cv_randomforest_mlflow(
             y_pred = np.argmax(y_pred_prob, axis=1)
 
             # Convert the actual results into a binarised format so that AUC functions can work for individual outcomes
-            y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
+            y_test_bin = label_binarize(y_test_fold, classes=np.array([0, 1, 2]))
 
             # Evaluate the model based on accuracy and add it to the list of accuracies
             accuracies.append(accuracy_score(y_test_fold, y_pred))
@@ -689,7 +689,7 @@ def objective_cv_xgboost(
             avg_accuracies.append(hmean([lw_accuracy, wl_accuracy]))
             
             # Calculate the log loss
-            log_loss_fold = log_loss(y_test_fold, y_pred_prob)
+            log_loss_fold = log_loss(y_test_fold, y_pred_prob, labels=[0, 1, 2])
             log_losses.append(log_loss_fold)
             
             # Get the logit predictions for use in custom loss function
@@ -830,7 +830,7 @@ def objective_cv_xgboost_mlflow(
             avg_accuracies.append(hmean([lw_accuracy, wl_accuracy]))
             
             # **Calculate LogLoss for the fold**
-            log_loss_fold = log_loss(y_test_fold, y_pred_prob)
+            log_loss_fold = log_loss(y_test_fold, y_pred_prob, labels=[0, 1, 2])
             log_losses.append(log_loss_fold)
             
             # Clean up memory
@@ -1234,9 +1234,11 @@ def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df, model_hype
     y_test_fold = pd.Series(y_test_df.copy(), dtype="int")
     y_pred = pd.Series(y_pred.copy(), dtype="int")
 
-    # Convert actual results to binarized format
-    y_test_bin = label_binarize(y_test_fold, classes=np.unique(y_test_fold))
-    y_pred_bin = label_binarize(y_pred, classes=np.unique(y_test_fold))
+    # Convert actual results to binarized format. The classes are fixed rather than taken from the
+    # data, because with draws and no contests excluded only two appear and label_binarize then
+    # returns a single column, which breaks the indexing below
+    y_test_bin = label_binarize(y_test_fold, classes=[0, 1, 2])
+    y_pred_bin = label_binarize(y_pred, classes=[0, 1, 2])
 
     # Calculate the AUC of wins and losses. Check the classes of the target column. Was 1 = L/W and 3 = W/L
     wl_auc = roc_auc_score(y_test_bin[:, 2], y_pred_prob[:, 2])
@@ -1252,7 +1254,7 @@ def log_metrics_xgboost_ensemble_mlflow(models, X_test_df, y_test_df, model_hype
     lw_accuracy = (lw_pred[lw_pred == 1] == lw_test[lw_pred == 1]).sum() / lw_pred.sum()
 
     # **Calculate LogLoss**
-    log_loss_result = log_loss(y_test_df, y_pred_prob)
+    log_loss_result = log_loss(y_test_df, y_pred_prob, labels=[0, 1, 2])
     
     ev_mse = ev_loss_function(
         y_pred_prob,

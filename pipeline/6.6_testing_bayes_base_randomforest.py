@@ -19,7 +19,7 @@ from mma_functions.pipelines import merge_and_process_all_clean_data
 from mma_functions.tracking import log_metrics_mlflow
 
 # Set up experiment training
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
 mlflow.set_experiment("bayes_base_testing_rf_v4")
 
 # Choose a new base for the bayes variables

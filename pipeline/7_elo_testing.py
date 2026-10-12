@@ -69,7 +69,7 @@ start_elo, merged_data = prep_stats_for_elo_calc(fight_results, fight_stats, con
 experiment_name = "elo_testing_v11"
 
 # Set up experiment training
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
 mlflow.set_experiment(experiment_name)
 
 ######################################################################################

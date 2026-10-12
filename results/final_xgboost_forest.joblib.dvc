@@ -3,3 +3,4 @@ outs:
   size: 3204736
   hash: md5
   path: final_xgboost_forest.joblib
+  isexec: true

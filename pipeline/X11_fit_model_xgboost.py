@@ -87,7 +87,7 @@ X_train = X_train[[col for col in X_train.columns if col not in feature_to_remov
 # X_train = X_train[[col for col in X_train.columns if 'diff' in col]]
 
 # Set up experiment training
-mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
+mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
 mlflow.set_experiment("2014+_mens_fights_gt3_features_set_10")
 
 
