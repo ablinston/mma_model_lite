@@ -6,6 +6,7 @@ import pandas as pd
 import pdb
 import polars as pl
 from scipy.stats import hmean
+from sklearn.metrics import log_loss
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.preprocessing import LabelEncoder, label_binarize
 import xgboost as xgb
@@ -249,10 +250,10 @@ def objective_cv_elo_basic_mlflow(params):
     if tracking.is_duplicate_run(params):
         
         # If the run existing, find what the loss was and return it without logging in mlflow
-        existing_metric, all_params = tracking.get_existing_metric_and_params(params, "H.Mean of two accuracies")
+        existing_metric, all_params = tracking.get_existing_metric_and_params(params, "Logloss")
         
-        print(f"Duplicate run found, skipping logging. Accuracy: {existing_metric:.4f}")
-        return {"loss": 1 - existing_metric, "params": all_params, "status": STATUS_OK}
+        print(f"Duplicate run found, skipping logging. Logloss: {existing_metric:.4f}")
+        return {"loss": existing_metric, "params": all_params, "status": STATUS_OK}
         
     else:
     
@@ -268,7 +269,7 @@ def objective_cv_elo_basic_mlflow(params):
                 train = fight_data.to_pandas()
                 train = train[train["date"] >= config["min_training_date"]][["outcome", "fighter1_start_elo", "fighter2_start_elo"]]
         
-                mlflow.set_tag("Description", "Basic prediction, highest ELO wins")
+                mlflow.set_tag("Description", "Win probability from the ELO difference, scored on logloss")
         
                 # Log the training parameters
                 mlflow.log_param("model", "Basic")
@@ -276,7 +277,20 @@ def objective_cv_elo_basic_mlflow(params):
                 mlflow.log_param("Fighter 1 Max ELO", train["fighter1_start_elo"].max())
                 mlflow.log_param("Fighter 1 Min ELO", train["fighter1_start_elo"].min())
                         
-                # Make predictions on the test set
+                # Only fights with a winner can be scored against a win probability
+                train = train[train["outcome"].isin(["W/L", "L/W"])]
+                
+                # The probability fighter 1 wins. This is the same logistic form the rating update
+                # uses for the expected score, so it has to use the same C, otherwise the ratings and
+                # the probabilities would be on different scales
+                fighter1_win_prob = 1 / (1 + 10 ** ((train["fighter2_start_elo"] - train["fighter1_start_elo"]) / params["C"]))
+                
+                # The outcome as a 1 where fighter 1 won
+                fighter1_won = np.where(train["outcome"] == "W/L", 1, 0)
+                
+                elo_logloss = log_loss(fighter1_won, fighter1_win_prob, labels=[0, 1])
+                
+                # Keep the accuracies as well so runs can still be compared with the older ones
                 y_pred = np.where(train["fighter1_start_elo"] >= train["fighter2_start_elo"], "W/L", "L/W")
                 correct_binary = y_pred == train["outcome"]
             
@@ -285,15 +299,16 @@ def objective_cv_elo_basic_mlflow(params):
                 lw_accuracy = np.mean(correct_binary[y_pred == "L/W"])
         
                 # Log the outcome in MLflow
+                mlflow.log_metric("Logloss", elo_logloss)
                 mlflow.log_metric("W/L accuracy", wl_accuracy)
                 mlflow.log_metric("L/W accuracy", lw_accuracy)
                 mlflow.log_metric("H.Mean of two accuracies", hmean([wl_accuracy, lw_accuracy]))
                 mlflow.log_metric("Overall accuracy", np.mean(correct_binary))
          
             # Return whatever metric we wish to optimise for the model
-            return {"loss": 1 - np.mean(correct_binary), "params": params, "status": STATUS_OK} 
+            return {"loss": elo_logloss, "params": params, "status": STATUS_OK} 
         
-        except:
+        except Exception as e:
             print("Error encountered. Model fit abandoned")
             return {"loss": float("inf"), "params": params, "status": STATUS_FAIL, "error": str(e)}
 
