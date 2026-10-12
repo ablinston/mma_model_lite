@@ -22,7 +22,7 @@ event_odds = event_odds.drop_duplicates(subset=["fighter", "event", "bout"])
 all_odds = fight_odds.merge(event_odds.drop(columns=["date", "opponent"]), on=["fighter", "event", "bout"], how="left")
 
 # Check rows in data
-stop_if_not(len(fight_odds) == len(fight_odds))
+stop_if_not(len(fight_odds) == len(fight_odds), "Row count in the fight odds data")
 
 # Look at how many cols are na
 event_odds_cols = odds_scrape_config["events_colnames"]

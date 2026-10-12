@@ -144,7 +144,7 @@ def add_noise_to_odds(df, norm_mean=1, norm_sd=0.1, include_backtesting_odds=Fal
     new_df = df.drop(columns=odds_cols).merge(odds_df[["event", "bout"] + odds_cols], on=["event", "bout"], how="left")
     
     # check the data is the right shape
-    stop_if_not(new_df.shape == df.shape, "Add noise - shape check")
+    stop_if_not(new_df.shape == df.shape, "Shape unchanged by add_noise_to_odds")
     
     return new_df
     
@@ -425,7 +425,7 @@ def process_odds_data(fight_df, event_df, betfair_df, odds_scrape_config, averag
     new_fight_df = fight_df.merge(new_event_df[["event", "bout", "fighter", "mean_closing_odds"]], on=["event", "bout", "fighter"], how="left")
     
     # Check row number
-    stop_if_not(len(new_fight_df) == len(fight_df), "Odds merge check")
+    stop_if_not(len(new_fight_df) == len(fight_df), "Row count unchanged by the odds merge in process_odds_data")
     
     if impute_missing_averages:
         # Fill in missing odds with modelled results
@@ -456,7 +456,7 @@ def process_odds_data(fight_df, event_df, betfair_df, odds_scrape_config, averag
     new_fight_df["odds_change_gt_0"] = np.where(new_fight_df["odds_change"] < 0, -1, np.where(new_fight_df["odds_change"] > 0, 1, 0))     
     
     # Check the number of rows
-    stop_if_not(len(new_fight_df) >= len(fight_df), "Process odds length check")
+    stop_if_not(len(new_fight_df) >= len(fight_df), "Row count not reduced by process_odds_data")
     
     return new_fight_df
 
@@ -508,8 +508,8 @@ def replace_event_and_bout_odds(odds_df, stats_df, join_on=["fighter", "date", "
         pass
     
     # Do some final checks on the data
-    stop_if_not(new_odds_df["date"].tolist() == odds_df["date"].tolist(), "Date check")
-    stop_if_not(new_odds_df.shape == odds_df.shape, "Dataset shape check")
+    stop_if_not(new_odds_df["date"].tolist() == odds_df["date"].tolist(), "Dates unchanged by replace_event_and_bout_odds")
+    stop_if_not(new_odds_df.shape == odds_df.shape, "Shape unchanged by replace_event_and_bout_odds")
     
     return new_odds_df
 
@@ -634,7 +634,7 @@ def update_odds_on_merged_data(
     
     # Check on data
     # cols_that_should_be_in_original = [col for col in merged_data.columns if 'notformodel_true_odds_asat_datetime' not in col]
-    stop_if_not(len(merged_data) == original_shape[0])
-    stop_if_not(len(merged_data.columns) == original_shape[1])
+    stop_if_not(len(merged_data) == original_shape[0], "Row count unchanged by update_odds_on_merged_data")
+    stop_if_not(len(merged_data.columns) == original_shape[1], "Column count unchanged by update_odds_on_merged_data")
 
     return merged_data

@@ -283,7 +283,7 @@ if unparsed_events:
                         len(new_parsed_odds_df) >= len(parsed_odds_df)) & (
                             len(new_parsed_fighter_tott_df) >= len(parsed_fighter_tott_df)) & (
                                 len(new_parsed_event_odds_df) >= len(parsed_event_odds_df)),
-                            "Row change checks")
+                            "Every parsed dataset has at least as many rows as before the scrape")
     
     # AB: If the fighter_tott has missing info, just run the whole thing rather than update old one
     

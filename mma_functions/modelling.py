@@ -372,7 +372,7 @@ def get_base_margin(df, base_margin_cols):
         rv = np.log(p).ravel()
         
         # Check length
-        stop_if_not(len(rv) == 3 * len(df), "Base margin length check")
+        stop_if_not(len(rv) == 3 * len(df), "Base margin has three values per row in get_base_margin")
         
         return rv  
 

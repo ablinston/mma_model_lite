@@ -282,7 +282,7 @@ def betfair_clean_fighter_names(betfair_df, event_details_df, stats_df, fuzz_thr
     betfair_merged_ufc = betfair_df.merge(surname_matches_df, on=["fighter", "bout", "event_date"], how="left")
 
     # Check we have the right number of rows
-    stop_if_not(len(betfair_merged_ufc) == len(betfair_df), "Surname match row number check")
+    stop_if_not(len(betfair_merged_ufc) == len(betfair_df), "Row count unchanged by the surname match in betfair_clean_fighter_names")
         
     # For QA, can check the non-matches
     qa = betfair_merged_ufc[(betfair_merged_ufc["fighter"] != betfair_merged_ufc["fighter_ufc"]) & ~(betfair_merged_ufc["fighter_ufc"].isna()) & (matched_names.reset_index(drop=True).isna())]

@@ -32,7 +32,7 @@ def add_formatted_fighter_names(df, on=["fighter"], formatted_col_names=["Fighte
         # new_df.rename(columns = {'fighter': formatted_col_name[i]}, inplace = True)
     
     # Check rows correct
-    stop_if_not(len(new_df) == len(df))
+    stop_if_not(len(new_df) == len(df), "Row count unchanged by add_formatted_fighter_names")
     
     return new_df
 
