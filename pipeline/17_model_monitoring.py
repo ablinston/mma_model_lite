@@ -200,25 +200,8 @@ for model_version in model_versions:
         # The outcome as classes, the same way btest_model_and_log_mlflow does it
         oot_target = clean_target_column(oot_actuals["outcome"])
 
-        # These two have to run before btest_model_and_log_mlflow, which converts its breakdown
+        # This has to run before btest_model_and_log_mlflow, which converts its breakdown
         # columns to strings and so would leave the date column unusable for date arithmetic
-
-        # Log the logloss over a trailing window, so a drift shows up as a trend
-        rolling_logloss = evaluation.rolling_log_loss(
-            oot_actuals,
-            prediction_probabilities,
-            oot_target,
-            months=rolling_window_months)
-
-        # Nothing to chart if the sample is too short or too thin for any window to qualify
-        if len(rolling_logloss) == 0:
-            print("No rolling logloss logged, no " + str(rolling_window_months) + " month window held enough fights")
-        else:
-            fig, ax = evaluation.plot_rolling_log_loss(rolling_logloss, rolling_window_months)
-            mlflow.log_figure(fig, "Rolling logloss/rolling_logloss.png")
-
-            rolling_logloss.to_csv("results/temp/summary.csv", index=False)
-            mlflow.log_artifact("results/temp/summary.csv", "Rolling logloss")
 
         # Log the logloss by method of victory either side of the split date, to see whether
         # decisions in particular got harder to call, and whether they did for the odds too
@@ -241,7 +224,8 @@ for model_version in model_versions:
             breakdown_metrics=breakdown_metrics, 
             mlflow_description="XGB Forest v" + str(model_version), 
             target_column=target,
-            backtesting_params=backtesting_params)
+            backtesting_params=backtesting_params,
+            rolling_window_months=rolling_window_months)
         
         mlflow.log_param("OOT_start_date", min(oot_data["date"]))
         mlflow.log_param("Last_event_date", max(backtesting_data["date"]))

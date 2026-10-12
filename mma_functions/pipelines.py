@@ -1543,7 +1543,7 @@ def backtest_model(
 
 # This function takes a model and a test dataset and computes test statistics then logs them in mlflow.
 
-def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column="outcome", backtesting_params={"min_prob_to_bet": 0.5, "min_ev_to_bet": 0.05, "max_bet_size": 1}, log_mlflow=True):
+def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown_cols, breakdown_metrics, mlflow_description, target_column="outcome", backtesting_params={"min_prob_to_bet": 0.5, "min_ev_to_bet": 0.05, "max_bet_size": 1}, log_mlflow=True, rolling_window_months=8):
 
     """
     Tests a model by taking in some actuals data, a set of prediction probabilities, and any breakdown variables to use. It logs various metrics in MLflow as well as outputing some statistics
@@ -1555,6 +1555,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
         breakdown_metrics (list): the metrics to output for the breakdown. These names must align with metrics calculated in the calculate_metrics() function
         mlflow_description: a description to give for the run in MLflow
         log_mlflow (bool): set to False to skip the MLflow logging and just return the backtesting results
+        rolling_window_months (int): the length of the trailing window for the rolling logloss chart
 
     Returns:
         None, but prints the breakdown outputs and logs everything in MLflow
@@ -1591,6 +1592,25 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
 
         # Log the overall odds metrics in MLflow
         tracking.log_metrics_odds_mlflow(actuals_data, actuals_data["target"])
+
+        # Log the logloss over a trailing window, so a drift in performance shows up as a trend
+        # rather than as noise. This has to come before the breakdown loop below, which converts
+        # its columns to strings and would leave the date column unusable for date arithmetic
+        rolling_logloss = evaluation.rolling_log_loss(
+            actuals_data,
+            prediction_probabilities,
+            actuals_data["target"],
+            months=rolling_window_months)
+
+        # Nothing to chart if the sample is too short or too thin for any window to qualify
+        if len(rolling_logloss) == 0:
+            print("No rolling logloss logged, no " + str(rolling_window_months) + " month window held enough fights")
+        else:
+            fig, ax = evaluation.plot_rolling_log_loss(rolling_logloss, rolling_window_months)
+            mlflow.log_figure(fig, "Rolling logloss/rolling_logloss.png")
+
+            rolling_logloss.to_csv("results/temp/summary.csv", index=False)
+            mlflow.log_artifact("results/temp/summary.csv", "Rolling logloss")
     
     # # Log the parameters of the model
     # mlflow.log_params(model['params'])

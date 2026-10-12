@@ -32,7 +32,7 @@ model_path = "./results/final_xgboost_forest.joblib"
 
 # model_path = './models/xgb_forest_v4.0.14.joblib'
 # # Set the version number to be used in outputs
-# new_version_number = '4.0.14'
+new_version_number = '4.1.0d1'
 
 # Read in the data for training
 backtesting_data = fp.ParquetFile("./data/final_dataset/final_dataset.parquet").to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
@@ -98,7 +98,7 @@ X_train, X_test, y_train, y_test, y_test_bin, no_of_classes, oot = prep_data_for
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
-mlflow.set_experiment("OOT_testing_v5")
+mlflow.set_experiment("OOT_testing")
 
 # Set this model's description for MLflow
 model_description = "XGB forest v" + new_version_number + ", " + str(len(rf_xgb_model)) + " trees, " + str(len(rf_xgb_model[0]["features"])) + " features " + str(config["test_proportion"]) + " test size"
