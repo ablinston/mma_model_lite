@@ -254,11 +254,14 @@ def derive_start_elos(elo_df, fight_stats_df, elo_constants):
 # This function is used to predict fight outcomes based only on the elo and assess how good it is at
 # predicting the fight outcomes on it's own. It takes the highest ELO as the predicted winner.
 
-# It relies on the following objects being available in memory:
-    # - start_elo, merged_data: these are the standard outputs of the prep_stats_for_elo_calc() function
+# start_elo and merged_data are the two outputs of prep_stats_for_elo_calc()
   
 
-def objective_cv_elo_basic_mlflow(params):
+def objective_cv_elo_basic_mlflow(params, start_elo, merged_data):
+
+    # Imported here rather than at the top. hyperopt is not in requirements.txt, and pipelines.py
+    # imports this module for the main pipeline, which has no need of it
+    from hyperopt import STATUS_FAIL, STATUS_OK
 
     # pdb.set_trace()
     print("Params received:", params)    

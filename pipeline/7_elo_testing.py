@@ -2,6 +2,7 @@
 
 from hyperopt import hp, STATUS_OK, STATUS_FAIL, tpe, fmin, Trials, atpe # hyperparameter optimisation functions
 from hyperopt.atpe import suggest as atpe_suggest
+from functools import partial
 import itertools
 import mlflow
 import pickle
@@ -100,7 +101,7 @@ elo_constants_hp = {
 trials = Trials()
 
 best = fmin(
-    fn=objective_cv_elo_basic_mlflow,
+    fn=partial(objective_cv_elo_basic_mlflow, start_elo=start_elo, merged_data=merged_data),
     space=elo_constants_hp,
     algo=tpe.suggest,
     max_evals=200,
@@ -141,7 +142,7 @@ elo_constants_hp = {
 trials = Trials()
 
 best = fmin(
-    fn=objective_cv_elo_basic_mlflow,
+    fn=partial(objective_cv_elo_basic_mlflow, start_elo=start_elo, merged_data=merged_data),
     space=elo_constants_hp,
     algo=tpe.suggest, # tpe.suggest,
     max_evals=3000,
