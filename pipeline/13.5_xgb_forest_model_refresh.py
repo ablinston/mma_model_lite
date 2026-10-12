@@ -30,6 +30,10 @@ params = rf_xgb_model[0]["params"].copy()
 all_features = rf_xgb_model[0]["features"]
 num_models = len(rf_xgb_model)
 
+# Train this many trees beyond the size being refreshed, so the metrics can be read either side
+# of it rather than at one size only
+trees_either_side = 5
+
 # Read in the data for training
 data = fp.ParquetFile("./data/final_dataset/final_dataset.parquet").to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()
 
@@ -100,7 +104,7 @@ xgboost_rf = train_ensemble_xgboost(
     X_train,
     y_train,
     X_columns_for_training=all_features,
-    num_models=num_models,
+    num_models=num_models + trees_either_side,
     num_boost_round=params["num_iterations"],
     colsample_bynode=colsample_bynode, # If it's only 1 tree, train the full XGboost model
     subsample=subsample,
@@ -108,45 +112,43 @@ xgboost_rf = train_ensemble_xgboost(
     params=params
     )
 
-# Try different numbers of trees
+# Try each number of trees either side of the size being refreshed
 mlflow.set_experiment("xgb_model_v" + new_version_number + "_refresh_trees")
 
 # for num_trees in [1]:
-for num_trees_i in list(range(1, 51, 2)) + list(range(50, len(xgboost_rf) + 1, 10)):
+for num_trees_i in range(max(1, num_models - trees_either_side), len(xgboost_rf) + 1):
+
+    # Start a new model run in MLflow
+    with mlflow.start_run():
         
-    if len(xgboost_rf) >= num_trees_i:
+        # Log the initial metrics
+        mlflow.log_params(params)
+        mlflow.log_param("num_trees", num_trees_i)
+        mlflow.log_param("Forest col proportion", colsample_bynode)
+        mlflow.log_param("Forest subsample", subsample)
+        mlflow.set_tag("Sample", "Train")
+                    
+        # Log the metrics of the forest with that many trees in MLflow
+        log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_train, y_train, params)
         
-        # Start a new model run in MLflow
-        with mlflow.start_run():
-            
-            # Log the initial metrics
-            mlflow.log_params(params)
-            mlflow.log_param("num_trees", num_trees_i)
-            mlflow.log_param("Forest col proportion", colsample_bynode)
-            mlflow.log_param("Forest subsample", subsample)
-            mlflow.set_tag("Sample", "Train")
-                        
-            # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_train, y_train, params)
-            
-            # Log the predictions just from the odds for info
-            log_metrics_odds_mlflow(X_train, y_train)
-            
-        # Start a new model run in MLflow
-        with mlflow.start_run():
-            
-            # Log the initial metrics
-            mlflow.log_params(params)
-            mlflow.log_param("num_trees", num_trees_i)
-            mlflow.log_param("Forest col proportion", colsample_bynode)
-            mlflow.log_param("Forest subsample", subsample)
-            mlflow.set_tag("Sample", "Test")
-                        
-            # Log the metrics of the forest with that many trees in MLflow
-            log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_test, y_test, params)
-            
-            # Log the predictions just from the odds for info
-            log_metrics_odds_mlflow(X_test, y_test)
+        # Log the predictions just from the odds for info
+        log_metrics_odds_mlflow(X_train, y_train)
+        
+    # Start a new model run in MLflow
+    with mlflow.start_run():
+        
+        # Log the initial metrics
+        mlflow.log_params(params)
+        mlflow.log_param("num_trees", num_trees_i)
+        mlflow.log_param("Forest col proportion", colsample_bynode)
+        mlflow.log_param("Forest subsample", subsample)
+        mlflow.set_tag("Sample", "Test")
+                    
+        # Log the metrics of the forest with that many trees in MLflow
+        log_metrics_xgboost_ensemble_mlflow(xgboost_rf[0:(num_trees_i)], X_test, y_test, params)
+        
+        # Log the predictions just from the odds for info
+        log_metrics_odds_mlflow(X_test, y_test)
 
 
 # Keep the same number of models as the ensemble being refreshed
