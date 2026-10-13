@@ -67,7 +67,7 @@ start_elo, merged_data = prep_stats_for_elo_calc(fight_results, fight_stats, con
 ######################################################################################
 ## Begin optimising the ELO
 
-experiment_name = "elo_testing_v1"
+experiment_name = "elo_testing_goat_v1"
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
@@ -120,11 +120,11 @@ elo_constants_hp = {
     "C": 400,  # Elo rating scaling constant. Redundant given K, so held fixed
     "K": hp.quniform("K", 30, 140, 2),   # K-factor (rate at which the rating adjusts). Flat bottom around 60 to 80 at C=400
     
-    "K_factor": hp.quniform("K_factor", 0, 0.04, 0.001), # This is an additional factor to adjust K depending on the number of fights someone has. 0 means no effect
+    "K_factor": 0, #hp.quniform("K_factor", 0, 0.04, 0.001), # This is an additional factor to adjust K depending on the number of fights someone has. 0 means no effect
     
     "starting_elo": config["start_elo"],
     
-    "shrinkage_half_life_days": hp.quniform("shrinkage_half_life_days", 300, 5000, 60),  # Days for half the deviation from the starting ELO to decay away. Larger means less reversion
+    "shrinkage_half_life_days": 1e9, #hp.quniform("shrinkage_half_life_days", 300, 5000, 60),  # Days for half the deviation from the starting ELO to decay away. Larger means less reversion
     # Coefficients for fight metrics differences. The ranges start at zero so the search can turn one
     # off, and reach well above the old values because tanh squashes the top end, so the best scale
     # now sits around half of what it used to be
@@ -145,7 +145,7 @@ best = fmin(
     fn=partial(objective_cv_elo_basic_mlflow, start_elo=start_elo, merged_data=merged_data),
     space=elo_constants_hp,
     algo=tpe.suggest, # tpe.suggest,
-    max_evals=3000,
+    max_evals=2500,
     trials=trials
     )
 
@@ -156,7 +156,7 @@ best = fmin(
 # best_params = get_best_params_mlflow(experiment_name, metric_name = 'Overall accuracy')
 
 # # Or choose a specific run to get
-best_params = get_params_by_run_name(experiment_name, target_run_name="youthful-mule-443") # chose this because high KDs doesn't make as much sense and I don't like the outputs when kfactor isn't 0. Fighters end up dropping ELO even on wins and it didn't really look right
+best_params = get_params_by_run_name(experiment_name, target_run_name="resilient-zebra-603") # chose this because high KDs doesn't make as much sense and I don't like the outputs when kfactor isn't 0. Fighters end up dropping ELO even on wins and it didn't really look right
 
-with open("./configs/elo_params.yaml", "w") as file:
+with open("./configs/elo_config.yaml", "w") as file:
     dump(best_params, file, default_flow_style=False)
