@@ -8,8 +8,8 @@ method,Submission
 weightclass,Lightweight
 date,2018-10-06 00:00:00
 time_format,5 Rnd (5-5-5-5-5)
-fighter1_start_elo,1952.7363993108747
-fighter2_start_elo,1980.740129971069
+fighter1_start_elo,1814.492381531586
+fighter2_start_elo,1743.4171012859008
 fighter1_date_last_fight,2018-04-07 00:00:00
 fighter2_date_last_fight,2016-11-12 00:00:00
 fighter1_date_last_knocked_out,1900-01-01 00:00:00
@@ -4373,16 +4373,16 @@ fighter1_hist_losses_Decision-Unanimous_per_fight,0.0
 fighter1_hist_losses_Decision-Split_per_fight,0.0
 fighter1_hist_win_streak,10
 fighter1_hist_loss_streak,0
-fighter1_hist_W_KO/TKO,2
 fighter1_hist_W_Decision-Split,0
-fighter1_hist_W_Decision-Unanimous,6
-fighter1_hist_W_Submission,2
 fighter1_hist_W_Other,0
-fighter1_hist_L_KO/TKO,0
+fighter1_hist_W_Submission,2
+fighter1_hist_W_KO/TKO,2
+fighter1_hist_W_Decision-Unanimous,6
 fighter1_hist_L_Decision-Split,0
-fighter1_hist_L_Decision-Unanimous,0
-fighter1_hist_L_Submission,0
 fighter1_hist_L_Other,0
+fighter1_hist_L_Submission,0
+fighter1_hist_L_KO/TKO,0
+fighter1_hist_L_Decision-Unanimous,0
 fighter2_date_last_win,2016-11-12 00:00:00
 fighter2_date_last_loss,2016-03-05 00:00:00
 fighter2_hist_wins,9
@@ -4446,16 +4446,16 @@ fighter2_hist_losses_Decision-Unanimous_per_fight,0.0
 fighter2_hist_losses_Decision-Split_per_fight,0.0
 fighter2_hist_win_streak,2
 fighter2_hist_loss_streak,0
-fighter2_hist_W_KO/TKO,7
 fighter2_hist_W_Decision-Split,1
-fighter2_hist_W_Decision-Unanimous,1
-fighter2_hist_W_Submission,0
 fighter2_hist_W_Other,0
-fighter2_hist_L_KO/TKO,0
+fighter2_hist_W_Submission,0
+fighter2_hist_W_KO/TKO,7
+fighter2_hist_W_Decision-Unanimous,1
 fighter2_hist_L_Decision-Split,0
-fighter2_hist_L_Decision-Unanimous,0
-fighter2_hist_L_Submission,1
 fighter2_hist_L_Other,0
+fighter2_hist_L_Submission,1
+fighter2_hist_L_KO/TKO,0
+fighter2_hist_L_Decision-Unanimous,0
 fighter1_open_odds,1.4081632653061225
 fighter1_mean_closing_odds,1.5616700625979676
 fighter1_best_closing_odds,1.529100529100529
@@ -11352,7 +11352,7 @@ diff_round5to4_total_strike_accuracy_ratio,0.2693917025224015
 diff_round5to4_total_strike_per_minute_ratio,0.28144536134033493
 diff_sig.str._per_td_attempt,-113.07912844036697
 diff_sig.str.per_sub_attempt,-inf
-diff_start_elo,-28.00373066019438
+diff_start_elo,71.07528024568524
 diff_sub_attempt.per_td_landed,0.10204081632653061
 diff_subs_per_attempt,inf
 diff_true_closing_odds,-0.9088664708636616
@@ -15129,7 +15129,7 @@ diff_ratio_round5to4_total_strike_accuracy_ratio,1.2424893847602465
 diff_ratio_round5to4_total_strike_per_minute_ratio,1.5149851292610383
 diff_ratio_sig.str._per_td_attempt,0.08898990178959136
 diff_ratio_sig.str.per_sub_attempt,0.0
-diff_ratio_start_elo,0.9858619865188457
+diff_ratio_start_elo,1.0407678003119631
 diff_ratio_sub_attempt.per_td_landed,inf
 diff_ratio_subs_per_attempt,-0.0
 diff_ratio_true_closing_odds,0.643979057591623
