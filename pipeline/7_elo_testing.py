@@ -67,7 +67,11 @@ start_elo, merged_data = prep_stats_for_elo_calc(fight_results, fight_stats, con
 ######################################################################################
 ## Begin optimising the ELO
 
+<<<<<<< Updated upstream
 experiment_name = "elo_testing_v1"
+=======
+experiment_name = "elo_testing_v2"
+>>>>>>> Stashed changes
 
 # Set up experiment training
 mlflow.set_tracking_uri(uri="http://mlflow-mma-model.192.168.68.51.nip.io:8081")
@@ -120,7 +124,7 @@ elo_constants_hp = {
     "C": 400,  # Elo rating scaling constant. Redundant given K, so held fixed
     "K": hp.quniform("K", 30, 140, 2),   # K-factor (rate at which the rating adjusts). Flat bottom around 60 to 80 at C=400
     
-    "K_factor": hp.quniform("K_factor", 0, 0.04, 0.001), # This is an additional factor to adjust K depending on the number of fights someone has. 0 means no effect
+    "K_factor": hp.quniform("K_factor", 0, 0.2, 0.001), # This is an additional factor to adjust K depending on the number of fights someone has. 0 means no effect
     
     "starting_elo": config["start_elo"],
     
@@ -128,7 +132,7 @@ elo_constants_hp = {
     # Coefficients for fight metrics differences. The ranges start at zero so the search can turn one
     # off, and reach well above the old values because tanh squashes the top end, so the best scale
     # now sits around half of what it used to be
-    "constant_control_proportion_diff": hp.quniform("constant_control_proportion_diff", 0, 0.6, 0.02),  # Control proportion difference weight
+    "constant_control_proportion_diff": hp.quniform("constant_control_proportion_diff", 0, 2, 0.02),  # Control proportion difference weight
     "constant_sig_strikes_landed_per_minute_diff": hp.quniform("constant_sig_strikes_landed_per_minute_diff", 0, 1.2, 0.02),  # Indicator for which fighter landed more significant strikes
     "constant_kds_diff": hp.quniform("constant_kds_diff", 0, 1.2, 0.02),  # Indicator for which fighter had more knockdowns
     "constant_submissions_diff": hp.quniform("constant_submissions_diff", 0, 1.2, 0.02),  # Submissions difference weight
