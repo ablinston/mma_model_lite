@@ -4,6 +4,7 @@ import fastparquet as fp
 import joblib
 import numpy as np
 import pandas as pd
+import pdb
 
 from mma_functions import dataset, features, utils
 from mma_functions.config import config, model_hyper_params, odds_scrape_config
@@ -588,6 +589,7 @@ def update_odds_on_merged_data(
     
     # Save original shape for later
     original_shape = merged_data.shape
+    original_columns = merged_data.columns.copy()
         
     # Assume that the event and bout have been added correctly as part of the data cleaning process.
     # But need to remove any with event or bout still missing
@@ -635,6 +637,6 @@ def update_odds_on_merged_data(
     # Check on data
     # cols_that_should_be_in_original = [col for col in merged_data.columns if 'notformodel_true_odds_asat_datetime' not in col]
     stop_if_not(len(merged_data) == original_shape[0], "Row count unchanged by update_odds_on_merged_data")
-    stop_if_not(len(merged_data.columns) == original_shape[1], "Column count unchanged by update_odds_on_merged_data")
+    stop_if_not(set(original_columns).issubset(set(merged_data.columns)), "Original columns all present after update_odds_on_merged_data")
 
     return merged_data
