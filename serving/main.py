@@ -2,14 +2,19 @@
 # then scores a single bout against odds supplied by the caller.
 
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from contextvars import ContextVar
+from datetime import datetime, timedelta, timezone
 from fastapi import FastAPI, HTTPException, Request
 import fastparquet as fp
 import joblib
+import json
+import logging
 import pandas as pd
 from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import sys
+import uuid
 
 # These can import by name because serving sits outside the circular references between the mma_functions modules
 from mma_functions.config import data_processing_config, model_hyper_params
@@ -18,6 +23,7 @@ from mma_functions.features import add_fighter_differentials
 from mma_functions.modelling import predict_xgboost_ensemble
 from mma_functions.odds import calculate_all_true_odds_columns
 
+logger = logging.getLogger(__name__)
 
 ################################################################################
 ### Request and response shapes, and settings ###
@@ -43,11 +49,26 @@ class FightSummary(BaseModel):
     fighter1: str | None
     fighter2: str | None
 
+# Set up the json formatter for the logs
+class JsonFormatter(logging.Formatter):
+    def format(self, record):
+        # Build the dictionary for the log
+        log = {'timestamp': datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
+         'level': record.levelname,
+         'logger': record.name,
+         'message': record.getMessage()}
+
+        if record.exc_info:
+            log['exception'] = self.formatException(record.exc_info)
+
+        return json.dumps(log)
+
 # Define the settings, which are used to configure the API such as model version etc
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file = Path(__file__).parent / '.env')
     ensemble_path: str # These will come automatically from the environment ENSEMBLE_PATH, from an .env file like in docker or Kubernetes
     dataset_path: str
+    log_level: str = 'INFO'
 
 # The environment gets read here at import, so a missing variable stops the process now rather than on the first request
 settings = Settings()
@@ -58,6 +79,11 @@ if data_processing_config['impute_missing_betfair'] and model_hyper_params['odds
 else:
     odds_to_use = model_hyper_params['odds_to_use']
 
+# Setup logging handler
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(JsonFormatter())
+# Set this logging on the root logger. This is the final handler applied (after the serving.main handler) so will apply it for all our logs
+logging.basicConfig(level=settings.log_level, handlers=[handler], force=True)
 
 ################################################################################
 ### Startup ###
@@ -68,7 +94,7 @@ else:
 async def lifespan(app: FastAPI):
     # Load the XGBoost ensemble
     app.state.model = joblib.load(settings.ensemble_path) # Can use settings object here without as an input because it is imported
-    print('Loaded model ' + settings.ensemble_path)
+    logger.info('Loaded model %s', settings.ensemble_path)
 
     # Load the upcoming fights data
     full_data = fp.ParquetFile(settings.dataset_path).to_pandas()
@@ -76,7 +102,7 @@ async def lifespan(app: FastAPI):
 
     # Record when the dataset was last written, so /ready can report how stale the card is
     app.state.data_modified = datetime.fromtimestamp(Path(settings.dataset_path).stat().st_mtime).isoformat()
-    print('Data loaded from ' + settings.dataset_path + ', last modified: ' + app.state.data_modified)
+    logger.info('Data loaded from %s, last modified: %s', settings.dataset_path, app.state.data_modified)
     del full_data
 
     # Everything above runs before the server accepts a request. Anything after the yield would run on shutdown
@@ -85,6 +111,22 @@ async def lifespan(app: FastAPI):
 # Build the app and register the startup hook. This has to come before the endpoints, which register themselves against it
 app = FastAPI(lifespan = lifespan)
 
+
+################################################################################
+### Middleware ###
+################################################################################
+
+request_id_var = ContextVar('request_id_var', default='-')
+
+# Runs before every path request
+@app.middleware("http")
+def assign_id_to_context(request: Request):
+
+    # Get the id from the request header
+    id = request.headers.get('X-Request-Id') or str(uuid.uuid4())
+
+    # Set the id in context
+    request_id_var.set(id)
 
 ################################################################################
 ### Endpoints ###
@@ -141,7 +183,7 @@ def predict_fight(fight: FightRequest, request: Request):
     if not mask.any():
         raise HTTPException(status_code = 404, detail = f'No upcoming fight for bout {fight.bout}')
     elif mask.sum() > 1:
-        raise HTTPException(status_code = 404, detail = f'Duplicate fight for bout {fight.bout} found in data')
+        raise HTTPException(status_code = 500, detail = f'Duplicate fight for bout {fight.bout} found in data')
 
     # Replace the odds
     card.loc[mask, 'fighter1_betfair_exch_odds'] = fight.fighter1_odds
@@ -180,7 +222,7 @@ def predict_fight(fight: FightRequest, request: Request):
 
     # A large number here means more is out of step than a few absent dummy levels
     if filled > 0:
-        print(str(filled) + ' of ' + str(len(expected)) + ' model features were missing from the prepped card and filled with zero')
+        logger.warning('%s of %s model features were missing from the prepped card and filled with zero', filled, len(expected))
 
     # Predict across the ensemble and pull out the requested bout
     probabilities, predicted_classes = predict_xgboost_ensemble(ensemble, X, model_hyper_params = model_hyper_params)
