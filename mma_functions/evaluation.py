@@ -563,11 +563,23 @@ def summarise_model_predictions(
     actuals_data["Fighter2_win_prob"] = np.round(prediction_probabilities[:, 0] * 100, 1)
     actuals_data["Fighter2_win_EV"] = np.round(ev_lw, 2)
     actuals_data["Bet_trigger"] = np.where(wl_trigger == 1, actuals_data["fighter1"], np.where(lw_trigger == 1, actuals_data["fighter2"], "None"))
+    # Whether the model picks the same fighter as the market. This is about the prediction, not about
+    # which fighter the bet went on, which is Bet_on below
     actuals_data["Predict_to_win"] = np.where((actuals_data["Fighter1_win_prob"] > actuals_data["Fighter2_win_prob"]) & (actuals_data["fighter1_backtesting_odds"] > actuals_data["fighter2_backtesting_odds"]), 
-                                              "Underdog to win",
+                                              "Model and odds disagree winner",
                                              np.where((actuals_data["Fighter2_win_prob"] > actuals_data["Fighter1_win_prob"]) & (actuals_data["fighter2_backtesting_odds"] > actuals_data["fighter1_backtesting_odds"]),
-                                             "Underdog to win",
-                                             "Favourite to win"))
+                                             "Model and odds disagree winner",
+                                             "Model and odds agree winner"))
+
+    actuals_data["Model_and_odds_agree"] = actuals_data["Predict_to_win"] == "Model and odds agree winner"
+
+    # Which side the money actually went on. Below a min_prob_to_bet of about 0.5 this comes apart
+    # from Predict_to_win, because a bet can land on the fighter the model rates lower
+    actuals_data["Bet_on"] = np.where(wl_trigger == 1,
+                                      np.where(actuals_data["fighter1_backtesting_odds"] > actuals_data["fighter2_backtesting_odds"], "Bet on underdog", "Bet on favourite"),
+                             np.where(lw_trigger == 1,
+                                      np.where(actuals_data["fighter2_backtesting_odds"] > actuals_data["fighter1_backtesting_odds"], "Bet on underdog", "Bet on favourite"),
+                                      "No bet"))
     actuals_data["Fighter_to_win"] = np.where(actuals_data["Fighter1_win_prob"] > actuals_data["Fighter2_win_prob"], "Fighter 1 to win", "Fighter 2 to win")
     actuals_data["fighter1_target_exchange_odds"] = wl_target_odds_inc_commission
     actuals_data["fighter2_target_exchange_odds"] = lw_target_odds_inc_commission

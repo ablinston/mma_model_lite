@@ -50,7 +50,7 @@ mlflow.set_experiment("Model_Monitoring_v2")
 
 # Load all model versions
 rf_xgb_models = {}
-model_versions = ["4.0.14"]
+model_versions = ["4.0.14", "4.1.0"]
 
 for i in model_versions:
     rf_xgb_models.update({str(i): joblib.load("./models/xgb_forest_v" + str(i) + ".joblib")})
@@ -176,6 +176,7 @@ target = "outcome"
 backtesting_params = {
     "min_prob_to_bet": bet_config["min_prob_to_bet"],
     "min_ev_to_bet": bet_config["min_ev_to_bet"],
+    "only_bet_when_model_and_odds_agree": bet_config["only_bet_when_model_and_odds_agree"],
     "max_bet_size": 100,
     "min_bet_size": 100,
     "constant_bets": True

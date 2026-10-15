@@ -1,9 +1,13 @@
 # Set which version of the model to use for predicting upcoming fights
-model_to_use: './models/xgb_forest_v4.0.14.joblib'
+model_to_use: './models/xgb_forest_v4.1.0.joblib'
 
 # Set the minimum values to trigger a bet when predicting upcoming events. Works as strictly greater than
-min_prob_to_bet: 0.485
+min_prob_to_bet: 0.25
 min_ev_to_bet: 0.1
+
+# Only place a bet when the model picks the same winner as the market does. False lets a value bet
+# go on an underdog the model rates below its opponent, which is what happens at a low min_prob_to_bet
+only_bet_when_model_and_odds_agree: True
 
 # Set either constant bets or proportion bets
 constant_bets: False

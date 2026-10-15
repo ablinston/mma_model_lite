@@ -916,6 +916,11 @@ def predict_future_events(
         exchange_commission=bet_config["exchange_commission"],
         target_ev_after_cutoff=bet_config["min_ev_to_bet"])
 
+    # Drop any bet where the model is picking against the market, if the config asks for that. This
+    # happens before sizing so the summary and the bets to place both reflect it
+    if bet_config["only_bet_when_model_and_odds_agree"]:
+        betting_data["bets"] = betting_data["bets"] * betting_data["Model_and_odds_agree"]
+
     # Add the final bet size based on balance
     if bet_config["constant_bets"] == False:
         betting_data["Final_bet"] = np.round((betting_data["bets"] * betting_data["bet_size"] * bet_config["start_balance"]) / 5) * 5
@@ -937,7 +942,7 @@ def predict_future_events(
     # Flag whether odds Betfair imputed
     
 
-    summary_data = betting_data[["date", "event", "f1_scrape_date", "f2_scrape_date", "fighter1", "fighter1_backtesting_odds", "Fighter1_win_prob", "Fighter1_win_EV", "fighter2", "fighter2_backtesting_odds", "Fighter2_win_prob", "Fighter2_win_EV", "Bet_trigger", "bet_assumed_odds", "Bet_min_exchange_odds", "Final_bet", "Potential_win"]]
+    summary_data = betting_data[["date", "event", "f1_scrape_date", "f2_scrape_date", "fighter1", "fighter1_backtesting_odds", "Fighter1_win_prob", "Fighter1_win_EV", "fighter2", "fighter2_backtesting_odds", "Fighter2_win_prob", "Fighter2_win_EV", "Model_and_odds_agree", "Bet_trigger", "bet_assumed_odds", "Bet_min_exchange_odds", "Final_bet", "Potential_win"]]
 
     # Add the fights that haven't been modelled along with exclusion reason for info
     summary_data = pd.concat([
@@ -1362,6 +1367,7 @@ def backtest_model(
         start_balance=1000,
         point_in_time_only_odds=True,
         target_ev_after_cutoff=0,
+        only_bet_when_model_and_odds_agree=False,
         output_data_for_debug=True, ):
     """
     
@@ -1407,7 +1413,7 @@ def backtest_model(
     
     # pdb.set_trace()
     
-    breakdown_cols = ["bet_ev_band", "Predict_to_win", "Fighter_to_win"] + breakdown_columns.copy()
+    breakdown_cols = ["bet_ev_band", "Predict_to_win", "Bet_on", "Fighter_to_win"] + breakdown_columns.copy()
     
     # Use the new function to summarise the model predictions and bet triggers
     actuals_data, wl_trigger, lw_trigger = evaluation.summarise_model_predictions(actuals_data, prediction_probabilities, min_prob_to_bet, min_ev_to_bet, min_bet_size, max_bet_size, return_triggers=True, point_in_time_only_odds=point_in_time_only_odds, target_ev_after_cutoff=target_ev_after_cutoff)
@@ -1425,13 +1431,13 @@ def backtest_model(
         additional_wl_trigger = np.where((wl_trigger == 0) & (
             actuals_data["fighter1_notformodel_best_betfair_odds_after_cutoff"] >=
             actuals_data["fighter1_target_exchange_odds"]) & (
-            actuals_data["Fighter1_win_prob"] >= min_prob_to_bet),
+            prediction_probabilities[:, 2] >= min_prob_to_bet),
                 1, 0)
                 
         additional_lw_trigger = np.where((lw_trigger == 0) & (
             actuals_data["fighter2_notformodel_best_betfair_odds_after_cutoff"] >=
             actuals_data["fighter2_target_exchange_odds"]) & (
-            actuals_data["Fighter2_win_prob"] >= min_prob_to_bet),
+            prediction_probabilities[:, 0] >= min_prob_to_bet),
                 1, 0)
         
         # Deal with double triggers
@@ -1457,6 +1463,14 @@ def backtest_model(
     else:
         actuals_data["bet_triggered_after_cutoff"] = 0
         
+    # Drop any bet where the model is picking against the market, if asked. This sits after the
+    # after-cutoff block because that block can put a trigger back on
+    if only_bet_when_model_and_odds_agree:
+        agree = actuals_data["Model_and_odds_agree"].to_numpy()
+        wl_trigger = wl_trigger * agree
+        lw_trigger = lw_trigger * agree
+        actuals_data["bets"] = actuals_data["bets"] * agree
+
     # Do a check that the inputs are consistent if doing a non constant bets. If using non constant bets, the bet sizing should be as proportions, not £ amounts
     if not constant_bets:
         stop_if_not((min_bet_size < 1) and (max_bet_size < 1), "Min and max bet sizes are proportions when constant_bets is off in backtest_model")
