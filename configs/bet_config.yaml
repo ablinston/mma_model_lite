@@ -7,7 +7,7 @@ min_ev_to_bet: 0.1
 
 # Only place a bet when the model picks the same winner as the market does. False lets a value bet
 # go on an underdog the model rates below its opponent, which is what happens at a low min_prob_to_bet
-only_bet_when_model_and_odds_agree: True
+only_bet_when_model_and_odds_agree: False
 
 # Set either constant bets or proportion bets
 constant_bets: False
