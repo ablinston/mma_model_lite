@@ -116,7 +116,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_sche
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the XGBoost ensemble
-    app.state.model = joblib.load(settings.ensemble_path) # Can use settings object here without as an input because it is imported
+    app.state.ensemble = joblib.load(settings.ensemble_path) # Can use settings object here without as an input because it is imported
     logger.info('Loaded model %s', settings.ensemble_path)
 
     # Load the upcoming fights data
@@ -243,7 +243,7 @@ def predict_fight(fight: FightRequest, request: Request):
     X = prep_data_for_model_training(card, upcoming_fights = True)[0]
 
     # Rename to match the model's own feature names before the reindex, the same way predict_xgboost_ensemble does internally
-    ensemble = request.app.state.model
+    ensemble = request.app.state.ensemble
     if any('_sub.att' in feature for feature in ensemble[0]['features']):
         X.columns = X.columns.str.replace('_sub_attempt', '_sub.att')
 
