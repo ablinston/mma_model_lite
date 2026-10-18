@@ -4,7 +4,8 @@
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from datetime import datetime, timedelta, timezone
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import fastparquet as fp
 import joblib
 import json
@@ -13,6 +14,7 @@ import pandas as pd
 from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from secrets import compare_digest
 import sys
 import uuid
 
@@ -24,6 +26,9 @@ from mma_functions.modelling import predict_xgboost_ensemble
 from mma_functions.odds import calculate_all_true_odds_columns
 
 logger = logging.getLogger(__name__)
+
+# Define the context var for the Request ID, to be set later
+request_id_var = ContextVar('request_id_var', default='-')
 
 ################################################################################
 ### Request and response shapes, and settings ###
@@ -54,6 +59,7 @@ class JsonFormatter(logging.Formatter):
     def format(self, record):
         # Build the dictionary for the log
         log = {'timestamp': datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
+         'request_id': request_id_var.get(),
          'level': record.levelname,
          'logger': record.name,
          'message': record.getMessage()}
@@ -69,9 +75,11 @@ class Settings(BaseSettings):
     ensemble_path: str # These will come automatically from the environment ENSEMBLE_PATH, from an .env file like in docker or Kubernetes
     dataset_path: str
     log_level: str = 'INFO'
+    auth_token: str
 
 # The environment gets read here at import, so a missing variable stops the process now rather than on the first request
 settings = Settings()
+bearer_scheme = HTTPBearer(auto_error = False) # Makes a missing header return the raised Exception rather than default 403
 
 # Work out which odds column the model was trained on once here, rather than writing back to the config inside a request
 if data_processing_config['impute_missing_betfair'] and model_hyper_params['odds_to_use'] == 'betfair_exch_odds':
@@ -84,6 +92,21 @@ handler = logging.StreamHandler(sys.stdout)
 handler.setFormatter(JsonFormatter())
 # Set this logging on the root logger. This is the final handler applied (after the serving.main handler) so will apply it for all our logs
 logging.basicConfig(level=settings.log_level, handlers=[handler], force=True)
+
+################################################################################
+### Security ###
+################################################################################
+
+# Verification function for endpoint authorisation
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+
+    # Verify using compare_digest, which always takes a fixed time so avoids issues of solving token by time taken to match
+    if credentials is None:
+        raise HTTPException(status_code = 401, detail = "Authentication credentials missing")
+    else:
+        if not compare_digest(credentials.credentials, settings.auth_token):
+                    raise HTTPException(status_code = 401, detail = "Authentication failed")
+
 
 ################################################################################
 ### Startup ###
@@ -116,17 +139,23 @@ app = FastAPI(lifespan = lifespan)
 ### Middleware ###
 ################################################################################
 
-request_id_var = ContextVar('request_id_var', default='-')
-
 # Runs before every path request
 @app.middleware("http")
-def assign_id_to_context(request: Request):
+async def assign_id_to_context(request: Request, call_next):
 
     # Get the id from the request header
-    id = request.headers.get('X-Request-Id') or str(uuid.uuid4())
+    u_id = request.headers.get('X-Request-Id') or str(uuid.uuid4())
 
     # Set the id in context
-    request_id_var.set(id)
+    request_id_var.set(u_id)
+
+    # Get the response from the app functions/endpoint
+    response = await call_next(request)
+
+    # Set the same ID in the headers of the response to report to the user for debugging purposes
+    response.headers['X-Request-Id'] = u_id
+
+    return response
 
 ################################################################################
 ### Endpoints ###
@@ -169,9 +198,12 @@ def ready_check(request: Request):
 
     return ready_check
     
-
-@app.post('/predict')
+# Prediction end point, authorised using fn verify_token
+@app.post('/predict', dependencies = [Depends(verify_token)])
 def predict_fight(fight: FightRequest, request: Request):
+
+    # Log the prediction call
+    logger.info('Predicting %s', fight.bout)
 
     # Copy the card, because the frame is shared between requests and the functions below write to whatever they are given
     card = request.app.state.fights.copy()
@@ -241,7 +273,8 @@ def predict_fight(fight: FightRequest, request: Request):
         'predicted_class': int(predicted_classes[position])
     }
 
-# Define the fights endpoint which gives a list of fights in the upcoming event that can be predicted
+# Define the fights endpoint which gives a list of fights in the upcoming event that can be predicted.
+# Not protected with authentication as nothing sensitive will be released here.
 @app.get('/fights')
 def list_fights(request: Request) -> list[FightSummary]:
     # ##
