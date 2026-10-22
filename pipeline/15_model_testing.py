@@ -30,9 +30,9 @@ from mma_functions.config import config, model_hyper_params
 # Set the model location
 model_path = "./results/final_xgboost_forest.joblib"
 
-# model_path = './models/xgb_forest_v4.0.14.joblib'
+# model_path = './models/xgb_forest_v4.1.0.joblib'
 # # Set the version number to be used in outputs
-new_version_number = '4.1.0d1'
+new_version_number = '4.3.0'
 
 # Read in the data for training
 backtesting_data = fp.ParquetFile("./data/final_dataset/final_dataset.parquet").to_pandas() # pq.ParquetDataset('./data/final_dataset/').read().to_pandas()

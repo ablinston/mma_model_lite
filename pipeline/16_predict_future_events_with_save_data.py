@@ -10,7 +10,7 @@ predict_future_events(
     skip_data_update=False,
     skip_full_data_update=False,
     skip_save_data=False,
-    skip_data_scrape=False,
+    skip_data_scrape=True,
     skip_betfair_history=True,
     config=config,
     data_processing_config=data_processing_config,
