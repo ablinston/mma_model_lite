@@ -18,7 +18,7 @@ from mma_functions.tracking import log_metrics_odds_mlflow
 from mma_functions.config import bet_config, config, model_hyper_params
 
 # Set the version number for the model this run will save
-new_version_number = "4.3.1"
+new_version_number = "4.4.0"
 
 # Load the model to be refreshed
 # rf_xgb_model = mlflow.pyfunc.load_model('models:/xgb_forest_model/2')
