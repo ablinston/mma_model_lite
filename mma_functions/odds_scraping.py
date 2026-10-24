@@ -1061,6 +1061,13 @@ def get_fighter_odds(markets, fighter_name):
     for bet_id in bet_ids:
         for bookie_code, price in markets["odds"].get(str(bet_id), {}).items():
 
+            # oddschecker sometimes prices a bookmaker code that isn't in the bookmakers list on
+            # the page, and there is then no name or type to look up. Say which one it was and
+            # carry on, rather than losing the whole card over one missing bookie
+            if bookie_code not in markets["bookmakers"]["entities"]:
+                # print("No bookmaker found for code " + bookie_code + " when pricing " + fighter_name)
+                continue
+
             bookie = markets["bookmakers"]["entities"][bookie_code]
 
             if clean_bookie_name(bookie["bookmakerName"]) not in wanted_bookies:
