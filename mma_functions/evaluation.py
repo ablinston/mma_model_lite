@@ -280,7 +280,8 @@ def log_loss_by_group_and_period(actuals_data, prediction_probabilities, target,
         min_sample_size (int): cells holding fewer fights than this are left out, since a log loss on a handful of fights is meaningless and a single draw in a small cell sends it into double figures
 
     Returns:
-        A data frame of one row per group with a column per period and the change between them
+        A data frame of one row per group with a column per period and the change between them,
+        or an empty data frame if no group and period held min_sample_size fights
     """
 
     # Same positional alignment as the rolling version, so check it before calculating anything
@@ -311,10 +312,10 @@ def log_loss_by_group_and_period(actuals_data, prediction_probabilities, target,
                 "OTH Fights": int((target[row_filter] == 1).sum())
                 })
 
-    # Nothing collected means every cell fell below min_sample_size, and the pivot below would
-    # throw a bare KeyError on the group column instead of saying what the problem was
-    stop_if_not(len(group_rows) > 0,
-                "At least one group and period holds min_sample_size fights in log_loss_by_group_and_period")
+    # Nothing collected means every cell fell below min_sample_size. Hand back the empty frame so
+    # the rest of the monitoring run carries on, rather than dying in the pivot on a missing column
+    if len(group_rows) == 0:
+        return pd.DataFrame()
 
     group_metrics = pd.DataFrame(group_rows)
     
