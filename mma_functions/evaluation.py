@@ -311,8 +311,13 @@ def log_loss_by_group_and_period(actuals_data, prediction_probabilities, target,
                 "OTH Fights": int((target[row_filter] == 1).sum())
                 })
 
-    group_metrics = pd.DataFrame(group_rows)
+    # Nothing collected means every cell fell below min_sample_size, and the pivot below would
+    # throw a bare KeyError on the group column instead of saying what the problem was
+    stop_if_not(len(group_rows) > 0,
+                "At least one group and period holds min_sample_size fights in log_loss_by_group_and_period")
 
+    group_metrics = pd.DataFrame(group_rows)
+    
     # Put the periods side by side so the change can be read off
     period_metrics = group_metrics.pivot(index=group_col, columns=period_col, values=["Logloss", "X Odds Logloss", "Sample Size", "OTH Fights"])
     period_metrics.columns = [metric + " " + str(period) for metric, period in period_metrics.columns]
