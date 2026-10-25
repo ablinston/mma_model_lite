@@ -10,18 +10,19 @@ import fastparquet as fp
 import joblib
 import json
 import logging
+import numpy as np
 import pandas as pd
 from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from secrets import compare_digest
 import sys
+import time
 import uuid
 
 # These can import by name because serving sits outside the circular references between the mma_functions modules
 from mma_functions.config import data_processing_config, model_hyper_params
 from mma_functions.dataset import prep_data_for_model_training
-from mma_functions.features import add_fighter_differentials
 from mma_functions.modelling import predict_xgboost_ensemble
 from mma_functions.odds import calculate_all_true_odds_columns
 
@@ -221,6 +222,8 @@ def predict_fight(fight: FightRequest, request: Request):
     card.loc[mask, 'fighter1_betfair_exch_odds'] = fight.fighter1_odds
     card.loc[mask, 'fighter2_betfair_exch_odds'] = fight.fighter2_odds
 
+    t0 = time.perf_counter()
+
     # Recalculate the true odds off the new odds, for the whole card
     card = calculate_all_true_odds_columns(
         card,
@@ -232,23 +235,41 @@ def predict_fight(fight: FightRequest, request: Request):
     card['fighter1_backtesting_odds'] = card['fighter1_' + odds_to_use].copy()
     card['fighter2_backtesting_odds'] = card['fighter2_' + odds_to_use].copy()
 
+    # t1 = time.perf_counter()
+
     # Recalculate the differentials. This comes back through polars with a new index, so find the bout again rather than reusing the mask
-    card = add_fighter_differentials(card)
+    # The fighter history differentials are already on the dataset and cannot change between
+    # requests, so skip add_fighter_differentials, which rebuilds all 15,000 columns and costs 13
+    # seconds, and redo only the two ratios the supplied odds affect. Same formula it uses
+    for stat in ['true_closing_odds', 'true_odds_change']:
+        fighter1_stat = card['fighter1_' + stat]
+        fighter2_stat = card['fighter2_' + stat]
+        card['diff_ratio_' + stat] = np.where((fighter1_stat == 0) & (fighter2_stat == 0), 1,
+                                              np.where(fighter2_stat == 0, np.inf, fighter1_stat / fighter2_stat))
     row = card[card['bout'] == fight.bout]
 
     # Note the index label of the requested bout now, because prep turns the bout column itself into dummies
     bout_label = row.index[0]
 
+    # t2 = time.perf_counter()
+
+    ensemble = request.app.state.ensemble
+    expected = ensemble[0]['model'].feature_names
+
+    # Hand prep only the columns the model wants plus the target it insists on dropping. The card is
+    # 15,000 columns wide and clean_inf_and_large walks all of them, which is 22 seconds against 0.1.
+    # Map the names back to the data's spelling first, in case the model was fitted with _sub.att
+    needed = [col.replace('_sub.att', '_sub_attempt') for col in expected]
+    needed = [col for col in needed if col in card.columns] + ['outcome']
+
     # Prep the whole card so the dummy columns match what training produced. Only the first item is needed, the rest are train and test splits that are empty for upcoming fights
-    X = prep_data_for_model_training(card, upcoming_fights = True)[0]
+    X = prep_data_for_model_training(card[needed], upcoming_fights = True)[0]
 
     # Rename to match the model's own feature names before the reindex, the same way predict_xgboost_ensemble does internally
-    ensemble = request.app.state.ensemble
     if any('_sub.att' in feature for feature in ensemble[0]['features']):
         X.columns = X.columns.str.replace('_sub_attempt', '_sub.att')
 
     # Force the exact columns and order the model expects, filling absent dummy levels with zero
-    expected = ensemble[0]['model'].feature_names
     filled = len([col for col in expected if col not in X.columns])
     X = X.reindex(columns = expected, fill_value = 0)
 
@@ -256,9 +277,15 @@ def predict_fight(fight: FightRequest, request: Request):
     if filled > 0:
         logger.warning('%s of %s model features were missing from the prepped card and filled with zero', filled, len(expected))
 
+    # t3 = time.perf_counter()
+
     # Predict across the ensemble and pull out the requested bout
     probabilities, predicted_classes = predict_xgboost_ensemble(ensemble, X, model_hyper_params = model_hyper_params)
     position = X.index.get_loc(bout_label)
+
+    t4 = time.perf_counter()
+
+    logger.info('timing of prediction: %.3fs', t4 - t0)
 
     # Column 2 is fighter1 winning and column 0 is fighter2, matching Fighter1_win_prob and Fighter2_win_prob in evaluation.py.
     # The float() and int() calls matter because numpy's int64 is not a subclass of int and will not serialise to JSON
