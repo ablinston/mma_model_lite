@@ -55,6 +55,18 @@ class FightSummary(BaseModel):
     fighter1: str | None
     fighter2: str | None
 
+# Set up a response model for the Predict endpoint response
+class PredictionSummary(BaseModel):
+
+    bout: str
+    fighter1_odds: float
+    fighter2_odds: float
+    fighter1_true_closing_odds: float = Field(gt=1.0)
+    fighter1_win_prob: float = Field(le=1.0, ge=0.0)
+    fighter2_win_prob: float = Field(le=1.0, ge=0.0)
+    other_prob: float = Field(le=1.0, ge=0.0)
+    predicted_class: int
+
 # Set up the json formatter for the logs
 class JsonFormatter(logging.Formatter):
     def format(self, record):
@@ -201,7 +213,7 @@ def ready_check(request: Request):
     
 # Prediction end point, authorised using fn verify_token
 @app.post('/predict', dependencies = [Depends(verify_token)])
-def predict_fight(fight: FightRequest, request: Request):
+def predict_fight(fight: FightRequest, request: Request) -> PredictionSummary:
 
     # Log the prediction call
     logger.info('Predicting %s', fight.bout)
