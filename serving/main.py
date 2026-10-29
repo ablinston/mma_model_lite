@@ -132,8 +132,21 @@ async def lifespan(app: FastAPI):
     app.state.ensemble = joblib.load(settings.ensemble_path) # Can use settings object here without as an input because it is imported
     logger.info('Loaded model %s', settings.ensemble_path)
 
-    # Load the upcoming fights data
-    full_data = fp.ParquetFile(settings.dataset_path).to_pandas()
+    # Load the upcoming fights data. Reading all 15,000 columns peaks at 1.6GB to keep a dozen rows, which
+    # is more than the pod gets, so name what actually gets used. Parquet is columnar so this reads a
+    # fraction of the file. The _sub.att mapping is the same one the predict endpoint does further down
+    wanted = {col.replace('_sub.att', '_sub_attempt') for col in app.state.ensemble[0]['model'].feature_names}
+    wanted.update(['bout', 'date', 'event', 'fighter1', 'fighter2', 'outcome'])
+
+    # The raw odds calculate_all_true_odds_columns derives the true odds from on every request
+    for fighter in ['fighter1', 'fighter2']:
+        for odds in ['betfair_exch_odds', 'best_closing_odds', 'open_odds',
+                     'notformodel_date_fighter_odd_scrape', 'notformodel_betfair_odds_datetime']:
+            wanted.add(fighter + '_' + odds)
+
+    # Walk the file's own columns rather than handing over the set, because fastparquet raises on a name it does not have
+    parquet = fp.ParquetFile(settings.dataset_path)
+    full_data = parquet.to_pandas(columns = [col for col in parquet.columns if col in wanted])
     app.state.fights = full_data[full_data['outcome'].isna()].copy()
 
     # Record when the dataset was last written, so /ready can report how stale the card is

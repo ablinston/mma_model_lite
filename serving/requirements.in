@@ -1,0 +1,18 @@
+fastapi
+uvicorn
+pydantic-settings
+fastparquet
+pandas
+numpy
+polars
+scipy
+scikit-learn
+xgboost
+joblib
+pyyaml
+mlflow
+matplotlib
+seaborn
+rapidfuzz
+requests
+ablinston-ml @ git+https://github.com/ablinston/ablinston-ml@main
