@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OrdinalEncoder
 
-from mma_functions import odds, pipelines
+from mma_functions import odds
 from mma_functions.config import odds_scrape_config
 
 # This function checks five data frames containing events, fight results and stats. It checks that the same
@@ -12,6 +12,9 @@ from mma_functions.config import odds_scrape_config
 # It returns a data frame detailing the checks done and whether they passed (True) or not (False)
 
 def check_data_coverage(event_details_df, fight_details_df, fight_results_df, fight_stats_df, fight_odds_df, fighter_details_df, fighter_tott_df, event_odds_df, betfair_odds_df, upcoming_events_df, upcoming_fight_details_df, betfair_upcoming_odds_df, config):
+    
+    # pipelines imports the whole package, scrapers included, so only pull it in when this runs
+    from mma_functions import pipelines
     
     # # Debug
     # event_details = parsed_event_details_df.copy()

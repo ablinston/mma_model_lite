@@ -5,9 +5,12 @@
 .git
 .dvc
 *.dvc
+**/.env
 data
-models
 results
+secrets
+configs/betfair_login_config.yaml
+serving/locustfile.py
 
 __pycache__
 .pytest_cache
