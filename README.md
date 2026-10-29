@@ -7,6 +7,7 @@ Everything runs inside Docker.
 
 - `mma_functions/` is the package holding all the model code. It is grouped by topic: `scraping`, `parsing`, `odds_scraping`, `cleaning`, `dataset`, `features`, `elo`, `odds`, `betfair`, `modelling`, `evaluation`, `tracking` and `utils`. `pipelines.py` holds the functions that drive a whole stage and are allowed to reach into everything else. `config.py` loads the yaml files from `configs/`.
 - `pipeline/` is the numbered scripts, one per stage, run in order. They should stay thin and just call into `mma_functions`.
+- `serving/` is the FastAPI service that puts the ensemble behind an HTTP endpoint. It has its own Dockerfile and its own pins, separate from the repo's.
 - `configs/` is the yaml config. Import what you need from `mma_functions.config`, e.g. `from mma_functions.config import config, elo_config`.
 - `tests/unit_tests/` is the pytest suite. `tests/data/` holds the expected outputs the tests compare against.
 - `data/`, `models/` and `results/` are outputs, with the datasets tracked in DVC.
@@ -85,6 +86,30 @@ Scripts are run from `/workspace`, e.g. `python pipeline/16_predict_future_event
 ## Raspberry Pi
 
 The Pi needs the 64 bit Raspberry Pi OS. There are no 32 bit wheels for polars, pyarrow or xgboost so a 32 bit OS tries to compile them from source and fails. The image built on the Pi is arm64 and the one built on Windows is amd64, so they can't be copied between the two. Each machine builds its own from the same Dockerfile. This is slow on the Pi, 20 minutes or so, but only needed when `requirements.txt` changes.
+
+# Serving
+
+`serving/` is a FastAPI app that scores one upcoming fight against odds supplied by the caller. `GET /fights` lists the bouts it can serve, `POST /predict` returns the probabilities and needs a bearer token, and `/health` and `/ready` are there for the Kubernetes probes.
+
+Run it locally from `/workspace`:
+
+```
+uvicorn serving.main:app --reload
+```
+
+Config is environment only, read from `serving/.env` in dev, and it won't start without `ENSEMBLE_PATH`, `DATASET_PATH` and `AUTH_TOKEN`. Pydantic-settings reads that file into its own object and never into `os.environ`, so anything else that needs the token, locust for instance, needs it exported separately.
+
+The image pins are `serving/requirements.in` compiled into `serving/requirements.txt`, which is the serving subset of the root `requirements.txt` rather than all of it. Build from the repo root, because the context has to include `mma_functions/` and `configs/`:
+
+```
+docker build -f serving/Dockerfile -t mma-serving .
+```
+
+The package isn't pip installed in the image. The repo layout is mirrored at `/app` with `PYTHONPATH=/app`, because `config.py` finds the yaml relative to its own file. The model is baked in, the dataset is mounted at runtime.
+
+The k3s manifests live in the `mlflow-platform` repo under `k8s/`.
+
+One thing worth knowing before scaling it: a single uvicorn worker tops out at about 1.33 requests a second with a p50 of 750ms, and it is GIL bound rather than CPU bound, so more workers is the only lever that moves it. Four give 4.12 req/s, which is 77% of linear, the rest going to memory bandwidth on the 15,148 column frames.
 
 # Updating training data
 
