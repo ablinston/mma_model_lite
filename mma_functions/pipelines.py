@@ -1657,7 +1657,7 @@ def btest_model_and_log_mlflow(actuals_data, prediction_probabilities, breakdown
             # Use try except in case sample sizes too small
             try:
                 # Calculate the metrics
-                metrics = evaluation.calculate_metrics(prediction_probabilities[row_filter], actuals_data["target"][row_filter], actuals_data["fighter1_backtesting_odds"][row_filter], actuals_data["fighter1_backtesting_odds"][row_filter])
+                metrics = evaluation.calculate_metrics(prediction_probabilities[row_filter], actuals_data["target"][row_filter], actuals_data["fighter1_backtesting_odds"][row_filter], actuals_data["fighter2_backtesting_odds"][row_filter])
                 
                 # Add odds metrics
                 metrics.update(evaluation.calculate_metrics_odds(actuals_data[row_filter], actuals_data["target"][row_filter]))
