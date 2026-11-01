@@ -459,12 +459,13 @@ def clean_text_columns(df):
         
         # Clean any names that are equivalent.
         # This is to get alignment between the fighter names on UFCstats/fighters and bout stats
-        if col in ["fighter", "FIGHTER"]:
+        if col in ["fighter", "FIGHTER", "bout", "opponent"]:
             df.loc[:, col] = df[col].str.replace("montserendon", "montserratrendon")
             df.loc[:, col] = df[col].str.replace("michaelaswell", "michaelaswelljr").str.replace("jrjr", "jr")
             df.loc[:, col] = df[col].str.replace("zachreese", "zacharyreese")
             df.loc[:, col] = df[col].str.replace("shaquemerock", "shemrock")
             df.loc[:, col] = df[col].str.replace("patrickyfreire", "patriciofreire")
             df.loc[:, col] = df[col].str.replace("kaikamakaiii", "kaikamaka")
+            df.loc[:, col] = df[col].str.replace("bibulatovmagomed", "magomedbibulatov")
             
     return df

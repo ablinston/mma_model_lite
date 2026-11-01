@@ -297,11 +297,14 @@ def standard_data_filter(df, include_upcoming=False, keep_rows_with_flag=False):
     
     # Remove any unrealistic odds
     df.loc[(df["fighter1_true_closing_odds"] >= 15) | (df["fighter2_true_closing_odds"] >= 15), "notformodel_exclusion_reason"] = "Odds out of range"
-    
+
     df.loc[(df["fighter1_hist_fights"] <= 2) | (df["fighter2_hist_fights"] <= 2), "notformodel_exclusion_reason"] = "Fights < 3"
 
     # Find anyone with missing true odds
     df.loc[(df["fighter1_true_closing_odds"].isna()) | (df["fighter2_true_closing_odds"].isna()), "notformodel_exclusion_reason"] = "Missing odds"
+
+    # Find anyone with missing fighter data for some reason
+    df.loc[(df["fighter1_hist_fights"].isna()) | (df["fighter2_hist_fights"].isna()), "notformodel_exclusion_reason"] = "Missing fighter data"
 
     df.loc[(df["womens"] == 1), "notformodel_exclusion_reason"] = "Womens"
 
