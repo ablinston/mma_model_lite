@@ -1081,6 +1081,9 @@ def scrape_all_unparsed_data(skip_betfair_history, config, betfair_login_config,
     parsed_event_odds_df = fp.ParquetFile("./data/" + config["event_odds_file_name"]).to_pandas()
     parsed_betfair_odds_df = fp.ParquetFile("./data/" + config["betfair_odds_file_name"]).to_pandas()
 
+    # The saved bouts were cleaned back when they were scraped, so clean them again in case the name fixes have moved on since
+    parsed_fight_details_df[["BOUT"]] = utils.clean_text_columns(parsed_fight_details_df[["BOUT"]])
+
     if unparsed_events == True:
         
         ##### Add new events to events data #####
