@@ -39,7 +39,7 @@ skip_data_update = False
 skip_save_data = False
 
 # The length of the trailing window for the rolling logloss
-rolling_window_months = 8
+rolling_window_months = 1
 
 # The date to split the sample on when comparing logloss by method of victory
 period_split_date = "2025-08-01"
