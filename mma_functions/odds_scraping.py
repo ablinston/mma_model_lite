@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import copy
 from datetime import timedelta
 from functools import partial
+import html
 import json
 import pandas as pd
 import random
@@ -1013,27 +1014,51 @@ def find_fight_url(fight_urls, fighter_name):
     return ""
 
 
+def unpack_astro_props(value):
+
+    """
+    Turns the props on an astro-island tag back into plain dicts and lists. Astro writes every value as
+    a [type, value] pair, where type 0 is a plain value and type 1 is a list. A pair with nothing after
+    the type is an undefined.
+    """
+
+    if len(value) == 1:
+        return None
+
+    value_type, contents = value
+
+    if value_type == 1:
+        return [unpack_astro_props(item) for item in contents]
+
+    if isinstance(contents, dict):
+        return {key: unpack_astro_props(item) for key, item in contents.items()}
+
+    return contents
+
+
 def get_subevent_markets(page_source):
 
     """
-    Pulls the odds data out of an oddschecker fight page. The page is server rendered React, so the
-    whole thing sits in a json payload in a script tag rather than in the html itself.
+    Pulls the win market odds out of an oddschecker fight page. The odds grid is an Astro island, so
+    the data sits in the props attribute of its astro-island tag rather than in the html itself.
+    Returns the bets and the bookmakers for the win market.
     """
 
-    payload = re.search(
-        r'<script type="application/json" data-hypernova-key="subeventmarkets"[^>]*>(.*?)</script>',
-        page_source,
-        re.S)
+    island = re.search(r'<astro-island[^>]*component-export="GridGroupIsland"[^>]*props="([^"]*)"', page_source)
 
-    if payload is None:
+    if island is None:
         raise RuntimeError("No odds data in the page. The layout has changed, or the page is not a fight page")
 
-    payload = payload.group(1).strip()
+    grid_group = unpack_astro_props(json.loads(html.unescape(island.group(1)))["componentArgs"])
 
-    # Hypernova wraps its payloads in an html comment
-    payload = re.sub(r"-->$", "", re.sub(r"^<!--", "", payload)).strip()
+    # Find the win market rather than method of victory, round betting and the rest
+    win_market_ids = [market["ocMarketId"] for group in grid_group["marketGroups"].values() for market in group
+                      if market["betTypeName"] == market_to_use]
 
-    return json.loads(payload)["bestOdds"]
+    if len(win_market_ids) == 0:
+        raise RuntimeError("No " + market_to_use + " on the page")
+
+    return grid_group["oddsGrids"][str(win_market_ids[0])]["queries"][0]["state"]["data"]
 
 
 def get_fighter_odds(markets, fighter_name):
@@ -1044,48 +1069,45 @@ def get_fighter_odds(markets, fighter_name):
     exchanges comes from oddschecker rather than from a list I keep.
     """
 
-    # Find the win market rather than method of victory, round betting and the rest
-    win_market_ids = [market["ocMarketId"] for market in markets["markets"]["entities"].values()
-                      if market["marketTypeName"] == market_to_use]
+    bookies = {bookie["code"]: bookie for bookie in markets["bookmakers"]}
 
-    # Find the bet for this fighter in that market
+    # Find the bet for this fighter
     cleaned_name = clean_name_for_odds_search(fighter_name)
 
-    bet_ids = [bet["ocBetId"] for bet in markets["bets"]["entities"].values()
-               if bet["marketId"] in win_market_ids and clean_name_for_odds_search(bet["betName"]) == cleaned_name]
+    bets = [bet for bet in markets["bets"] if clean_name_for_odds_search(bet["name"]) == cleaned_name]
 
     wanted_bookies = [clean_bookie_name(bookie) for bookie in bet_config["bookies_to_use"]]
 
     odds_rows = []
 
-    for bet_id in bet_ids:
-        for bookie_code, price in markets["odds"].get(str(bet_id), {}).items():
+    for bet in bets:
+        for price in bet["odds"]:
 
             # oddschecker sometimes prices a bookmaker code that isn't in the bookmakers list on
             # the page, and there is then no name or type to look up. Say which one it was and
             # carry on, rather than losing the whole card over one missing bookie
-            if bookie_code not in markets["bookmakers"]["entities"]:
-                # print("No bookmaker found for code " + bookie_code + " when pricing " + fighter_name)
+            if price["bookmakerCode"] not in bookies:
+                # print("No bookmaker found for code " + price["bookmakerCode"] + " when pricing " + fighter_name)
                 continue
 
-            bookie = markets["bookmakers"]["entities"][bookie_code]
+            bookie = bookies[price["bookmakerCode"]]
 
-            if clean_bookie_name(bookie["bookmakerName"]) not in wanted_bookies:
+            if clean_bookie_name(bookie["name"]) not in wanted_bookies:
                 continue
 
-            if price["status"] != "ACTIVE" or price["oddsDecimal"] is None:
+            if price["status"] != "ACTIVE" or price["decimal"] is None:
                 continue
 
             # Take the commission off the winnings for an exchange, leaving the stake alone
-            if bookie["bookmakerType"] == "exchange":
-                effective_odds = 1 + (price["oddsDecimal"] - 1) * (1 - bet_config["exchange_commission"])
+            if bookie["type"] == "EXCHANGE":
+                effective_odds = 1 + (price["decimal"] - 1) * (1 - bet_config["exchange_commission"])
             else:
-                effective_odds = price["oddsDecimal"]
+                effective_odds = price["decimal"]
 
             odds_rows.append({
-                "bookie": bookie["bookmakerName"],
-                "is_exchange": bookie["bookmakerType"] == "exchange",
-                "odds": price["oddsDecimal"],
+                "bookie": bookie["name"],
+                "is_exchange": bookie["type"] == "EXCHANGE",
+                "odds": price["decimal"],
                 "effective_odds": round(effective_odds, 3)
                 })
 
@@ -1099,7 +1121,7 @@ def report_missing_bookies(markets):
     doesn't just quietly produce no odds.
     """
 
-    available = [clean_bookie_name(bookie["bookmakerName"]) for bookie in markets["bookmakers"]["entities"].values()]
+    available = [clean_bookie_name(bookie["name"]) for bookie in markets["bookmakers"]]
 
     missing = [bookie for bookie in bet_config["bookies_to_use"] if clean_bookie_name(bookie) not in available]
 
